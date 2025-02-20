@@ -25,70 +25,72 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Charging mode according to IEC 61851-1 terminology
+    /// Classification of emission according to the Euro emission classification 
+    /// (based on several amendments to the 1970 Directive 70/220/EEC). 
+    /// Note that vehicleType as well as fuelType are mandatory to provide to make this classification explicit.
     /// </summary>
-    public enum ChargingModes
+    public enum EmissionClassificationEuro
     {
 
         /// <summary>
-        /// Mode 1, AC 1 phase.
+        /// Euro 5.
         /// </summary>
-        [XmlEnum("mode1AC1p")]
-        Mode1AC1p,
+        [XmlEnum("euro5")]
+        Euro5,
 
         /// <summary>
-        /// Mode 1, AC 3 phases.
+        /// Euro 5a.
         /// </summary>
-        [XmlEnum("mode1AC3p")]
-        Mode1AC3p,
+        [XmlEnum("euro5a")]
+        Euro5a,
 
         /// <summary>
-        /// Mode 2, AC 1 phase.
+        /// Euro 5b.
         /// </summary>
-        [XmlEnum("mode2AC1p")]
-        Mode2AC1p,
+        [XmlEnum("euro5b")]
+        Euro5b,
 
         /// <summary>
-        /// Mode 2, AC 3 phases.
+        /// Euro 6.
         /// </summary>
-        [XmlEnum("mode2AC3p")]
-        Mode2AC3p,
+        [XmlEnum("euro6")]
+        Euro6,
 
         /// <summary>
-        /// Mode 3, AC 3 phases.
+        /// Euro 6a.
         /// </summary>
-        [XmlEnum("mode3AC3p")]
-        Mode3AC3p,
+        [XmlEnum("euro6a")]
+        Euro6a,
 
         /// <summary>
-        /// Mode 4, DC.
+        /// Euro 6b.
         /// </summary>
-        [XmlEnum("mode4DC")]
-        Mode4DC,
+        [XmlEnum("euro6b")]
+        Euro6b,
 
         /// <summary>
-        /// Legacy-Inductive.
+        /// Euro 6c.
         /// </summary>
-        [XmlEnum("legacyInductive")]
-        LegacyInductive,
+        [XmlEnum("euro6c")]
+        Euro6c,
 
         /// <summary>
-        /// Charging with a combined charging solution (CCS). AC and DC are used simultaneously.
+        /// Euro V.
         /// </summary>
-        [XmlEnum("ccs")]
-        Ccs,
+        [XmlEnum("euroV")]
+        EuroV,
 
         /// <summary>
-        /// Some other charging mode.
+        /// Euro VI.
+        /// </summary>
+        [XmlEnum("euroVI")]
+        EuroVI,
+
+        /// <summary>
+        /// Any other level.
         /// </summary>
         [XmlEnum("other")]
         Other,
-
-        /// <summary>
-        /// The type of the charging mode is unknown.
-        /// </summary>
-        [XmlEnum("unknown")]
-        Unknown,
 
         [XmlEnum("_extended")]
         Extended

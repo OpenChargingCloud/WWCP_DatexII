@@ -25,70 +25,46 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Charging mode according to IEC 61851-1 terminology
+    /// Different types of reservation.
     /// </summary>
-    public enum ChargingModes
+    public enum ReservationTypes
     {
 
         /// <summary>
-        /// Mode 1, AC 1 phase.
+        /// Reservation is optional.
         /// </summary>
-        [XmlEnum("mode1AC1p")]
-        Mode1AC1p,
+        [XmlEnum("optional")]
+        Optional,
 
         /// <summary>
-        /// Mode 1, AC 3 phases.
+        /// Reservation is mandatory.
         /// </summary>
-        [XmlEnum("mode1AC3p")]
-        Mode1AC3p,
+        [XmlEnum("mandatory")]
+        Mandatory,
 
         /// <summary>
-        /// Mode 2, AC 1 phase.
+        /// Reservation is not possible.
         /// </summary>
-        [XmlEnum("mode2AC1p")]
-        Mode2AC1p,
+        [XmlEnum("notAvailable")]
+        NotAvailable,
 
         /// <summary>
-        /// Mode 2, AC 3 phases.
+        /// There is a specific contingent that can be reserved.
         /// </summary>
-        [XmlEnum("mode2AC3p")]
-        Mode2AC3p,
+        [XmlEnum("partly")]
+        Partly,
 
         /// <summary>
-        /// Mode 3, AC 3 phases.
-        /// </summary>
-        [XmlEnum("mode3AC3p")]
-        Mode3AC3p,
-
-        /// <summary>
-        /// Mode 4, DC.
-        /// </summary>
-        [XmlEnum("mode4DC")]
-        Mode4DC,
-
-        /// <summary>
-        /// Legacy-Inductive.
-        /// </summary>
-        [XmlEnum("legacyInductive")]
-        LegacyInductive,
-
-        /// <summary>
-        /// Charging with a combined charging solution (CCS). AC and DC are used simultaneously.
-        /// </summary>
-        [XmlEnum("ccs")]
-        Ccs,
-
-        /// <summary>
-        /// Some other charging mode.
-        /// </summary>
-        [XmlEnum("other")]
-        Other,
-
-        /// <summary>
-        /// The type of the charging mode is unknown.
+        /// Possibility of reservation is unknown.
         /// </summary>
         [XmlEnum("unknown")]
         Unknown,
+
+        /// <summary>
+        /// Possibility of reservation is not specified.
+        /// </summary>
+        [XmlEnum("unspecified")]
+        Unspecified,
 
         [XmlEnum("_extended")]
         Extended

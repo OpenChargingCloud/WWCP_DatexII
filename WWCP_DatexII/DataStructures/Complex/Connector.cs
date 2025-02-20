@@ -19,24 +19,89 @@
 
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class Connector
+    /// <summary>
+    /// Parameters and description of an interface that is available
+    /// at the given electric charging point to connect vehicles.
+    /// </summary>
+    /// <param name="ConnectorType">Specification of the connector, i.e. the charging interface type.</param>
+    /// <param name="MaxPowerAtSocket">Maximum power at the socket.</param>
+    /// <param name="OtherConnector">Some other connector / charging interface.</param>
+    /// <param name="CountryOfDomesticSocket">Countries for which the domestic socket is applicable. Only needed if explicit type of a domestic socket is not specified.</param>
+    /// <param name="ChargingMode">Available charging modes.</param>
+    /// <param name="ConnectorFormat">Information on the cable type used.</param>
+    /// <param name="Voltage">Possible degrees of voltage.</param>
+    /// <param name="MaximumCurrent">Maximum current.</param>
+    public class Connector(ConnectorTypes         ConnectorType,
+                           Watt                   MaxPowerAtSocket,
+                           String?                OtherConnector           = null,
+                           IEnumerable<Country>?  CountryOfDomesticSocket  = null,
+                           ChargingModes?         ChargingMode             = null,
+                           ConnectorFormats?      ConnectorFormat          = null,
+                           Volt?                  Voltage                  = null,
+                           Ampere?                MaximumCurrent           = null)
     {
 
-        [XmlElement(ElementName = "connectorType",     Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public String?  ConnectorType       { get; set; }
+        /// <summary>
+        /// Specification of the connector, i.e. the charging interface type.
+        /// </summary>
+        [XmlElement(ElementName = "connectorType",   Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public ConnectorTypes         ConnectorType              { get; set; } = ConnectorType;
 
+        /// <summary>
+        /// Maximum power at the socket.
+        /// </summary>
+        [XmlElement("maxPowerAtSocket",              Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public Watt                   MaxPowerAtSocket           { get; set; } = MaxPowerAtSocket;
 
-        [XmlElement(ElementName = "otherConnector",    Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public String?  OtherConnector      { get; set; }
+        /// <summary>
+        /// Some other connector / charging interface.
+        /// </summary>
+        [XmlElement(ElementName = "otherConnector",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public String?                OtherConnector             { get; set; } = OtherConnector;
 
+        /// <summary>
+        /// Countries for which the domestic socket is applicable.
+        /// Only needed if explicit type of a domestic socket is not specified.
+        /// </summary>
+        [XmlElement("countryOfDomesticSocket",       Namespace = "http://datex2.eu/schema/3/common")]
+        public IEnumerable<Country>?  CountryOfDomesticSocket    { get; set; } = CountryOfDomesticSocket ?? [];  // 2-Letter-Code
 
-        [XmlElement(ElementName = "maxPowerAtSocket",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public Int32?   MaxPowerAtSocket    { get; set; }
+        /// <summary>
+        /// Available charging modes.
+        /// </summary>
+        [XmlElement("chargingMode",                  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public ChargingModes?         ChargingMode               { get; set; } = ChargingMode;
+
+        /// <summary>
+        /// Information on the cable type used.
+        /// </summary>
+        [XmlElement("connectorFormat",               Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public ConnectorFormats?      ConnectorFormat            { get; set; } = ConnectorFormat;
+
+        /// <summary>
+        /// Possible degrees of voltage.
+        /// </summary>
+        [XmlElement("voltage",                       Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public Volt?                  Voltage                    { get; set; } = Voltage;
+
+        /// <summary>
+        /// Maximum current.
+        /// </summary>
+        [XmlElement("maximumCurrent",                Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public Ampere?                MaximumCurrent             { get; set; } = MaximumCurrent;
+
+        ///// <summary>
+        ///// Optional extension element for additional content.
+        ///// </summary>
+        //[XmlElement("_connectorExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? ConnectorExtension { get; set; }
 
     }
 

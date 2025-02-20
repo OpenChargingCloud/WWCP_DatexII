@@ -18,22 +18,49 @@
 #region Usings
 
 using System.Xml.Serialization;
-using System.Collections.Generic;
 
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII
 {
+
+    /// <summary>
+    /// Amenities such as the facility (or a facility in the surrounding) being roofed or illuminated.
+    /// </summary>
+    [XmlType("Amenities", Namespace = "http://datex2.eu/schema/3/facilities")]
     public class Amenities
     {
-        [XmlElement(ElementName = "illuminated", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public bool? Illuminated { get; set; }
 
-        [XmlElement(ElementName = "roofed", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public bool? Roofed { get; set; }
+        /// <summary>
+        /// The facility is illuminated during darkness.
+        /// </summary>
+        [XmlElement("illuminated", Namespace = "http://datex2.eu/schema/3/common")]
+        public Boolean? Illuminated { get; set; }
 
-        [XmlElement(ElementName = "illuminatedRechargingParkingNearby", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public bool? IlluminatedRechargingParkingNearby { get; set; }
+        /// <summary>
+        /// The facility has got a roof.
+        /// </summary>
+        [XmlElement("roofed", Namespace = "http://datex2.eu/schema/3/common")]
+        public Boolean? Roofed { get; set; }
+
+        /// <summary>
+        /// There is an illuminated recharging or refuelling parking location in the immediate surrounding of the facility.
+        /// </summary>
+        [XmlElement("illuminatedRechargingParkingNearby", Namespace = "http://datex2.eu/schema/3/common")]
+        public Boolean? IlluminatedRechargingParkingNearby { get; set; }
+
+        /// <summary>
+        /// There is a roofed recharging or refuelling parking location in the immediate surrounding of the facility.
+        /// </summary>
+        [XmlElement("roofedRechargingParkingNearby", Namespace = "http://datex2.eu/schema/3/common")]
+        public Boolean? RoofedRechargingParkingNearby { get; set; }
+
+        ///// <summary>
+        ///// Optional extension element for additional amenities information.
+        ///// </summary>
+        //[XmlElement("_amenitiesExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? AmenitiesExtension { get; set; }
+
     }
 
 }

@@ -25,29 +25,30 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Height characteristic of a vehicle.
+    /// Specification of a continuous period of time within a 24 hour period.
     /// </summary>
-    [XmlType("HeightCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
-    public class HeightCharacteristic
+    [XmlType("TimePeriodOfDay", Namespace = "http://datex2.eu/schema/3/common")]
+    public class TimePeriodOfDay(String StartTimeOfPeriod,
+                                 String EndTimeOfPeriod)
     {
 
         /// <summary>
-        /// The operator to be used in the vehicle characteristic comparison operation.
+        /// Start of time period.
         /// </summary>
-        [XmlElement("comparisonOperator", Namespace = "http://datex2.eu/schema/3/common")]
-        public ComparisonOperators  ComparisonOperator               { get; set; }
+        [XmlElement("startTimeOfPeriod", Namespace = "http://datex2.eu/schema/3/common")]
+        public String  StartTimeOfPeriod    { get; set; } = StartTimeOfPeriod;
 
         /// <summary>
-        /// The height of the highest part, excluding antennae, of an individual vehicle above the road surface, in metres.
+        /// End of time period.
         /// </summary>
-        [XmlElement("vehicleHeight", Namespace = "http://datex2.eu/schema/3/common")]
-        public Single               VehicleHeight                    { get; set; }
+        [XmlElement("endTimeOfPeriod", Namespace = "http://datex2.eu/schema/3/common")]
+        public String  EndTimeOfPeriod      { get; set; } = EndTimeOfPeriod;
 
         ///// <summary>
-        ///// Optional extension element for additional height characteristic information.
+        ///// Optional extension element for additional time period information.
         ///// </summary>
-        //[XmlElement("_heightCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        //public ExtensionType?       HeightCharacteristicExtension    { get; set; }
+        //[XmlElement("_timePeriodOfDayExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? TimePeriodOfDayExtension { get; set; }
 
     }
 

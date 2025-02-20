@@ -25,29 +25,29 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Height characteristic of a vehicle.
+    /// Length characteristic of a vehicle.
     /// </summary>
-    [XmlType("HeightCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
-    public class HeightCharacteristic
+    [XmlType("LengthCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
+    public class LengthCharacteristic
     {
 
         /// <summary>
         /// The operator to be used in the vehicle characteristic comparison operation.
         /// </summary>
-        [XmlElement("comparisonOperator", Namespace = "http://datex2.eu/schema/3/common")]
-        public ComparisonOperators  ComparisonOperator               { get; set; }
+        [XmlElement("comparisonOperator",  Namespace = "http://datex2.eu/schema/3/common")]
+        public ComparisonOperators  ComparisonOperator    { get; set; }
 
         /// <summary>
-        /// The height of the highest part, excluding antennae, of an individual vehicle above the road surface, in metres.
+        /// The overall distance between the front and back of an individual vehicle, including the length of any trailers, couplings, embedded features etc.
         /// </summary>
-        [XmlElement("vehicleHeight", Namespace = "http://datex2.eu/schema/3/common")]
-        public Single               VehicleHeight                    { get; set; }
+        [XmlElement("vehicleLength",       Namespace = "http://datex2.eu/schema/3/common")]
+        public Single               VehicleLength         { get; set; }
 
         ///// <summary>
-        ///// Optional extension element for additional height characteristic information.
+        ///// Optional extension element for additional length characteristic information.
         ///// </summary>
-        //[XmlElement("_heightCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        //public ExtensionType?       HeightCharacteristicExtension    { get; set; }
+        //[XmlElement("_lengthCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? LengthCharacteristicExtension { get; set; }
 
     }
 

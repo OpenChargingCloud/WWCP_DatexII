@@ -19,39 +19,78 @@
 
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Hermod.HTTP;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class DedicatedParkingSpaces
+    /// <summary>
+    /// Dedicated parking spaces directly belonging to a facility (which is usually not a parking site itself).
+    /// </summary>
+    public class DedicatedParkingSpaces(UInt16                                NumberOfSpaces,
+
+                                        String                                Id,
+                                        String                                Version,
+
+                                        MultilingualString?                   Name                    = null,
+                                        IEnumerable<MultilingualString>?      Alias                   = null,
+                                        String?                               ExternalIdentifier      = null,
+                                        DateTime?                             LastUpdated             = null,
+                                        MultilingualString?                   Description             = null,
+                                        IEnumerable<Accessibilities>?         Accessibility           = null,
+                                        IEnumerable<MultilingualString>?      AdditionalInformation   = null,
+                                        IEnumerable<URL>?                     InformationWebsites     = null,
+                                        IEnumerable<URL>?                     PhotoURLs               = null,
+                                        IEnumerable<Image>?                   Photos                  = null,
+                                        AOperatingHours?                      OperatingHours          = null,
+                                        LocationReference?                    LocationReference       = null,
+                                        AOrganisation?                        Owner                   = null,
+                                        AOrganisation?                        Operator                = null,
+                                        AOrganisation?                        Helpdesk                = null,
+                                        IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles   = null,
+                                        Dimension?                            Dimension               = null,
+                                        Amenities?                            Amenities               = null,
+
+                                        IEnumerable<UserTypes>?               UserSpecific            = null)
+
+        : AFacilityObject(Id,
+                          Version,
+
+                          Name,
+                          Alias,
+                          ExternalIdentifier,
+                          LastUpdated,
+                          Description,
+                          Accessibility,
+                          AdditionalInformation,
+                          InformationWebsites,
+                          PhotoURLs,
+                          Photos,
+                          OperatingHours,
+                          LocationReference,
+                          Owner,
+                          Operator,
+                          Helpdesk,
+                          ApplicableForVehicles,
+                          Dimension,
+                          Amenities)
+
     {
-        [XmlAttribute("id")]
-        public String?  Id { get; set; }
 
-        [XmlAttribute("version")]
-        public String?  Version { get; set; }
+        /// <summary>
+        /// The number of parking spaces.
+        /// </summary>
+        [XmlElement(ElementName = "numberOfSpaces",  Namespace = "http://datex2.eu/schema/3/facilities")]
+        public UInt16                  NumberOfSpaces    { get; set; } = NumberOfSpaces;
 
-        [XmlElement(ElementName = "accessibility", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public String?  Accessibility { get; set; }
+        /// <summary>
+        /// The indicated parking spaces are specifically for the given set of users.
+        /// </summary>
+        [XmlElement(ElementName = "userSpecific",    Namespace = "http://datex2.eu/schema/3/facilities")]
+        public IEnumerable<UserTypes>  UserSpecific      { get; set; } = UserSpecific ?? [];
 
-        [XmlElement(ElementName = "applicableForVehicles", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public ApplicableForVehicles? ApplicableForVehicles { get; set; }
-
-        [XmlElement(ElementName = "amenities", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public Amenities? Amenities { get; set; }
-
-        [XmlElement(ElementName = "numberOfSpaces", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public int? NumberOfSpaces { get; set; }
-
-        [XmlElement(ElementName = "dimension", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public Dimension? Dimension { get; set; }
-
-        [XmlElement(ElementName = "userSpecific", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public String?  UserSpecific { get; set; }
-
-        [XmlElement(ElementName = "locationReference", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PointLocation? LocationReference { get; set; }
     }
 
 }

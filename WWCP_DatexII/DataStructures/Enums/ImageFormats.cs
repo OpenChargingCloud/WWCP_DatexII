@@ -24,9 +24,39 @@ using System.Xml.Serialization;
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class OpenAllHours
+    /// <summary>
+    /// Identifies an image format.
+    /// </summary>
+    public enum ImageFormats
     {
-        // Marker-Klasse für OpenAllHours; zusätzliche Details können ergänzt werden, falls erforderlich.
+
+        /// <summary>
+        /// The bmp image format.
+        /// </summary>
+        [XmlEnum("bmp")]
+        BMP,
+
+        /// <summary>
+        /// The gif image format.
+        /// </summary>
+        [XmlEnum("gif")]
+        GIF,
+
+        /// <summary>
+        /// The jpeg image format.
+        /// </summary>
+        [XmlEnum("jpeg")]
+        JPEG,
+
+        /// <summary>
+        /// The png image format.
+        /// </summary>
+        [XmlEnum("png")]
+        PNG,
+
+        [XmlEnum("_extended")]
+        Extended
+
     }
 
 }

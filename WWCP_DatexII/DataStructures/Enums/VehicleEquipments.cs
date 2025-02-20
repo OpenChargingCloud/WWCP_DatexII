@@ -25,70 +25,46 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Charging mode according to IEC 61851-1 terminology
+    /// Types of vehicle equipment in use or on board.
     /// </summary>
-    public enum ChargingModes
+    public enum VehicleEquipments
     {
 
         /// <summary>
-        /// Mode 1, AC 1 phase.
+        /// Vehicle not using snow chains.
         /// </summary>
-        [XmlEnum("mode1AC1p")]
-        Mode1AC1p,
+        [XmlEnum("notUsingSnowChains")]
+        NotUsingSnowChains,
 
         /// <summary>
-        /// Mode 1, AC 3 phases.
+        /// Vehicle not using either snow tyres or snow chains.
         /// </summary>
-        [XmlEnum("mode1AC3p")]
-        Mode1AC3p,
+        [XmlEnum("notUsingSnowChainsOrTyres")]
+        NotUsingSnowChainsOrTyres,
 
         /// <summary>
-        /// Mode 2, AC 1 phase.
+        /// Vehicle using snow chains.
         /// </summary>
-        [XmlEnum("mode2AC1p")]
-        Mode2AC1p,
+        [XmlEnum("snowChainsInUse")]
+        SnowChainsInUse,
 
         /// <summary>
-        /// Mode 2, AC 3 phases.
+        /// Vehicle using snow tyres.
         /// </summary>
-        [XmlEnum("mode2AC3p")]
-        Mode2AC3p,
+        [XmlEnum("snowTyresInUse")]
+        SnowTyresInUse,
 
         /// <summary>
-        /// Mode 3, AC 3 phases.
+        /// Vehicle using snow tyres or snow chains.
         /// </summary>
-        [XmlEnum("mode3AC3p")]
-        Mode3AC3p,
+        [XmlEnum("snowChainsOrTyresInUse")]
+        SnowChainsOrTyresInUse,
 
         /// <summary>
-        /// Mode 4, DC.
+        /// Vehicle which is not carrying on board snow tyres or chains.
         /// </summary>
-        [XmlEnum("mode4DC")]
-        Mode4DC,
-
-        /// <summary>
-        /// Legacy-Inductive.
-        /// </summary>
-        [XmlEnum("legacyInductive")]
-        LegacyInductive,
-
-        /// <summary>
-        /// Charging with a combined charging solution (CCS). AC and DC are used simultaneously.
-        /// </summary>
-        [XmlEnum("ccs")]
-        Ccs,
-
-        /// <summary>
-        /// Some other charging mode.
-        /// </summary>
-        [XmlEnum("other")]
-        Other,
-
-        /// <summary>
-        /// The type of the charging mode is unknown.
-        /// </summary>
-        [XmlEnum("unknown")]
-        Unknown,
+        [XmlEnum("withoutSnowTyresOrChainsOnBoard")]
+        WithoutSnowTyresOrChainsOnBoard,
 
         [XmlEnum("_extended")]
         Extended

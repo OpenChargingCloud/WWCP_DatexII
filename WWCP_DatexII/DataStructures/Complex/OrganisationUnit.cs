@@ -24,13 +24,53 @@ using System.Xml.Serialization;
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class OrganisationUnit
+    /// <summary>
+    /// A unit within the organisation, which has a separate location, operating hours, address and/or contacts.
+    /// </summary>
+    [XmlType("OrganisationUnit", Namespace = "http://datex2.eu/schema/3/facilities")]
+    public class OrganisationUnit(MultilingualString?               Name                 = null,
+                                  IEnumerable<MultilingualString>?  Function             = null,
+                                  LocationReference?                LocationReference    = null,
+                                  IEnumerable<ContactInformation>?  ContactInformation   = null,
+                                  AOperatingHours?                  OperatingHours       = null)
     {
-        [XmlElement(ElementName = "name", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public Values? Name { get; set; }
 
-        [XmlElement(ElementName = "contactInformation", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public ContactInformation? ContactInformation { get; set; }
+        /// <summary>
+        /// A name for this organisation unit.
+        /// </summary>
+        [XmlElement("name",                Namespace = "http://datex2.eu/schema/3/common")]
+        public MultilingualString?              Name                  { get; set; } = Name;
+
+        /// <summary>
+        /// Functions this unit is responsible for or a specific type, e.g. headquarter or sales.
+        /// </summary>
+        [XmlElement("function",            Namespace = "http://datex2.eu/schema/3/common")]
+        public IEnumerable<MultilingualString>  Function              { get; set; } = Function?.          Distinct() ?? [];
+
+        /// <summary>
+        /// Location reference for this organisation unit.
+        /// </summary>
+        [XmlElement("locationReference",   Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public LocationReference?               LocationReference     { get; set; } = LocationReference;
+
+        /// <summary>
+        /// Contact information for this organisation unit.
+        /// </summary>
+        [XmlElement("contactInformation",  Namespace = "http://datex2.eu/schema/3/facilities")]
+        public IEnumerable<ContactInformation>  ContactInformation    { get; set; } = ContactInformation?.Distinct() ?? [];
+
+        /// <summary>
+        /// Operating hours of this organisation unit.
+        /// </summary>
+        [XmlElement("operatingHours",      Namespace = "http://datex2.eu/schema/3/facilities")]
+        public AOperatingHours?                 OperatingHours        { get; set; } = OperatingHours;
+
+        ///// <summary>
+        ///// Optional extension element for additional organisation unit information.
+        ///// </summary>
+        //[XmlElement("_organisationUnitExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? OrganisationUnitExtension { get; set; }
+
     }
 
 }

@@ -25,70 +25,64 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Charging mode according to IEC 61851-1 terminology
+    /// Collection of special types of days.
     /// </summary>
-    public enum ChargingModes
+    public enum SpecialDayTypes
     {
 
         /// <summary>
-        /// Mode 1, AC 1 phase.
+        /// The day preceding a public holiday.
         /// </summary>
-        [XmlEnum("mode1AC1p")]
-        Mode1AC1p,
+        [XmlEnum("dayBeforePublicHoliday")]
+        DayBeforePublicHoliday,
 
         /// <summary>
-        /// Mode 1, AC 3 phases.
+        /// A public holiday in general.
         /// </summary>
-        [XmlEnum("mode1AC3p")]
-        Mode1AC3p,
+        [XmlEnum("publicHoliday")]
+        PublicHoliday,
 
         /// <summary>
-        /// Mode 2, AC 1 phase.
+        /// A day following a public holiday.
         /// </summary>
-        [XmlEnum("mode2AC1p")]
-        Mode2AC1p,
+        [XmlEnum("dayFollowingPublicHoliday")]
+        DayFollowingPublicHoliday,
 
         /// <summary>
-        /// Mode 2, AC 3 phases.
+        /// A day between a public holiday and the weekend.
         /// </summary>
-        [XmlEnum("mode2AC3p")]
-        Mode2AC3p,
+        [XmlEnum("longWeekendDay")]
+        LongWeekendDay,
 
         /// <summary>
-        /// Mode 3, AC 3 phases.
+        /// A holiday in lieu of a public holiday that falls on a weekend.
         /// </summary>
-        [XmlEnum("mode3AC3p")]
-        Mode3AC3p,
+        [XmlEnum("inLieuOfPublicHoliday")]
+        InLieuOfPublicHoliday,
 
         /// <summary>
-        /// Mode 4, DC.
+        /// A school day.
         /// </summary>
-        [XmlEnum("mode4DC")]
-        Mode4DC,
+        [XmlEnum("schoolDay")]
+        SchoolDay,
 
         /// <summary>
-        /// Legacy-Inductive.
+        /// A day within the school holidays.
         /// </summary>
-        [XmlEnum("legacyInductive")]
-        LegacyInductive,
+        [XmlEnum("schoolHolidays")]
+        SchoolHolidays,
 
         /// <summary>
-        /// Charging with a combined charging solution (CCS). AC and DC are used simultaneously.
+        /// A day of a public event.
         /// </summary>
-        [XmlEnum("ccs")]
-        Ccs,
+        [XmlEnum("publicEventDay")]
+        PublicEventDay,
 
         /// <summary>
-        /// Some other charging mode.
+        /// Some other special day.
         /// </summary>
         [XmlEnum("other")]
         Other,
-
-        /// <summary>
-        /// The type of the charging mode is unknown.
-        /// </summary>
-        [XmlEnum("unknown")]
-        Unknown,
 
         [XmlEnum("_extended")]
         Extended

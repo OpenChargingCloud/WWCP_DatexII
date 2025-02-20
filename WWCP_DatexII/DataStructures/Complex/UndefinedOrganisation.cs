@@ -23,15 +23,19 @@ using System.Xml.Serialization;
 
 namespace cloud.charging.open.protocols.DatexII
 {
-    public class OverallPeriod
+
+    /// <summary>
+    /// The organisation for the specified association end (within the specified validity if applicable) is not defined.
+    /// </summary>
+    [XmlType("UndefinedOrganisation", Namespace = "http://datex2.eu/schema/3/facilities")]
+    public class UndefinedOrganisation : AOrganisation
     {
 
-        [XmlElement(ElementName = "overallStartTime",  Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime?  OverallStartTime    { get; set; }
-
-
-        [XmlElement(ElementName = "overallEndTime",    Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime?  OverallEndTime      { get; set; }
+        ///// <summary>
+        ///// Optional extension element for additional undefined organisation information.
+        ///// </summary>
+        //[XmlElement("_undefinedOrganisationExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? UndefinedOrganisationExtension { get; set; }
 
     }
 

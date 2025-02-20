@@ -25,29 +25,30 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Height characteristic of a vehicle.
+    /// An image, with encoded data and identification of format.
     /// </summary>
-    [XmlType("HeightCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
-    public class HeightCharacteristic
+    [XmlType("Image", Namespace = "http://datex2.eu/schema/3/facilities")]
+    public class Image(Byte[]        Data,
+                       ImageFormats  Format)
     {
 
         /// <summary>
-        /// The operator to be used in the vehicle characteristic comparison operation.
+        /// Encoded image data.
         /// </summary>
-        [XmlElement("comparisonOperator", Namespace = "http://datex2.eu/schema/3/common")]
-        public ComparisonOperators  ComparisonOperator               { get; set; }
+        [XmlElement("imageData", Namespace = "http://datex2.eu/schema/3/common")]
+        public Byte[]        Data      { get; set; } = Data;
 
         /// <summary>
-        /// The height of the highest part, excluding antennae, of an individual vehicle above the road surface, in metres.
+        /// Identifies the image format of the associated image data.
         /// </summary>
-        [XmlElement("vehicleHeight", Namespace = "http://datex2.eu/schema/3/common")]
-        public Single               VehicleHeight                    { get; set; }
+        [XmlElement("imageFormat", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public ImageFormats  Format    { get; set; } = Format;
 
         ///// <summary>
-        ///// Optional extension element for additional height characteristic information.
+        ///// Optional extension element for additional content.
         ///// </summary>
-        //[XmlElement("_heightCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        //public ExtensionType?       HeightCharacteristicExtension    { get; set; }
+        //[XmlElement("_imageExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType?   ImageExtension    { get; set; }
 
     }
 

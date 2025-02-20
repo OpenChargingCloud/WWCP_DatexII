@@ -19,35 +19,37 @@
 
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Height characteristic of a vehicle.
+    /// Weight characteristic of the heaviest axle on the vehicle.
     /// </summary>
-    [XmlType("HeightCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
-    public class HeightCharacteristic
+    [XmlType("HeaviestAxleWeightCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
+    public class HeaviestAxleWeightCharacteristic
     {
 
         /// <summary>
         /// The operator to be used in the vehicle characteristic comparison operation.
         /// </summary>
         [XmlElement("comparisonOperator", Namespace = "http://datex2.eu/schema/3/common")]
-        public ComparisonOperators  ComparisonOperator               { get; set; }
+        public ComparisonOperators  ComparisonOperator    { get; set; }
 
         /// <summary>
-        /// The height of the highest part, excluding antennae, of an individual vehicle above the road surface, in metres.
+        /// The weight of the heaviest axle on the vehicle.
         /// </summary>
-        [XmlElement("vehicleHeight", Namespace = "http://datex2.eu/schema/3/common")]
-        public Single               VehicleHeight                    { get; set; }
+        [XmlElement("heaviestAxleWeight", Namespace = "http://datex2.eu/schema/3/common")]
+        public Tonne                HeaviestAxleWeight    { get; set; }
 
         ///// <summary>
-        ///// Optional extension element for additional height characteristic information.
+        ///// Optional extension element for additional heaviest axle weight characteristic information.
         ///// </summary>
-        //[XmlElement("_heightCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        //public ExtensionType?       HeightCharacteristicExtension    { get; set; }
+        //[XmlElement("_heaviestAxleWeightCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? HeaviestAxleWeightCharacteristicExtension { get; set; }
 
     }
 
