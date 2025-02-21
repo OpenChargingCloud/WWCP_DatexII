@@ -25,25 +25,42 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// An integer number representing an angle in whole degrees between 0 and 359.
     /// </summary>
-    public enum RatePolicies
+    [XmlType("AngleInDegrees", Namespace = "http://datex2.eu/schema/3/common")]
+    public readonly struct AngleInDegrees
     {
 
-        /// <summary>
-        /// A contract defines the pricing.
-        /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        #region Properties
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// Gets or sets the AngleInDegrees value.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlText]
+        public UInt16 Value { get; }
 
-        [XmlEnum("_extended")]
-        Extended
+        #endregion
+
+        #region Constructor(s)
+
+        public AngleInDegrees(UInt16 Value)
+        {
+
+            if (Value < 0 || Value > 359)
+                throw new ArgumentException("Angle must be between 0 and 359 degrees.", nameof(Value));
+
+            this.Value = Value;
+
+        }
+
+        #endregion
+
+
+        //public static implicit operator string(AngleInDegrees tz) => tz._value;
+        //public static implicit operator AngleInDegrees(string s) => new AngleInDegrees(s);
+
+        public override readonly String ToString()
+            => Value.ToString();
 
     }
 

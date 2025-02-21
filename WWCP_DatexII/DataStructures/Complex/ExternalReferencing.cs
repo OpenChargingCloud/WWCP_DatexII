@@ -25,31 +25,29 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// The NUTS-Code representation for the area (Nomenclature of territorial units for statistics)
-    /// or its LAU code representation (Local Administrative Unit).
+    /// A location defined by reference to an external/other referencing system.
     /// </summary>
-    [XmlType("NutsArea", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-    public class NutsArea(NutsCode       NutsCode,
-                          NutsCodeTypes  NutsCodeType)
+    [XmlType("ExternalReferencing", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+    public class ExternalReferencing
     {
 
         /// <summary>
-        /// The NUTS code for the named area.
+        /// A code in the external referencing system which defines the location.
         /// </summary>
-        [XmlElement("nutsCode", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public NutsCode       NutsCode        { get; set; } = NutsCode;
+        [XmlElement("externalLocationCode", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public String ExternalLocationCode { get; set; } = string.Empty;
 
         /// <summary>
-        /// The NUTS code type for the named area.
+        /// Identification of the external/other location referencing system.
         /// </summary>
-        [XmlElement("nutsCodeType", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public NutsCodeTypes  NutsCodeType    { get; set; } = NutsCodeType;
+        [XmlElement("externalReferencingSystem", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public String ExternalReferencingSystem { get; set; } = string.Empty;
 
         ///// <summary>
-        ///// Optional extension element for additional NutsArea information.
+        ///// Optional extension element for additional external referencing information.
         ///// </summary>
-        //[XmlElement("_nutsAreaExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        //public ExtensionType? NutsAreaExtension { get; set; }
+        //[XmlElement("_externalReferencingExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? ExternalReferencingExtension { get; set; }
 
     }
 

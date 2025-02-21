@@ -23,20 +23,39 @@ using System.Xml.Serialization;
 
 namespace cloud.charging.open.protocols.DatexII
 {
-    public class HeaderInformation
+
+    /// <summary>
+    /// Management information relating to the data contained within a publication.
+    /// </summary>
+    [XmlType("HeaderInformation", Namespace = "http://datex2.eu/schema/3/common")]
+    public class HeaderInformation(InformationStatus                          InformationStatus,
+                                   Confidentialities?                         Confidentiality          = null,
+                                   IEnumerable<InformationDeliveryServices>?  AllowedDeliveryChannel   = null)
     {
 
+        /// <summary>
+        /// The status of the related information (real, test, exercise, etc.).
+        /// </summary>
+        [XmlElement("informationStatus",       Namespace = "http://datex2.eu/schema/3/common")]
+        public InformationStatus                         InformationStatus         { get; set; } = InformationStatus;
 
-        [XmlElement(ElementName = "confidentiality",         Namespace = "http://datex2.eu/schema/3/common")]
-        public String?  Confidentiality           { get; set; }
+        /// <summary>
+        /// The extent to which the related information may be circulated, according to the recipient type.
+        /// </summary>
+        [XmlElement("confidentiality",         Namespace = "http://datex2.eu/schema/3/common")]
+        public Confidentialities?                        Confidentiality           { get; set; } = Confidentiality;
 
+        /// <summary>
+        /// The allowed delivery channels.
+        /// </summary>
+        [XmlElement("allowedDeliveryChannel",  Namespace = "http://datex2.eu/schema/3/common")]
+        public IEnumerable<InformationDeliveryServices>  AllowedDeliveryChannel    { get; set; } = AllowedDeliveryChannel?.Distinct() ?? [];
 
-        [XmlElement(ElementName = "allowedDeliveryChannel",  Namespace = "http://datex2.eu/schema/3/common")]
-        public String?  AllowedDeliveryChannel    { get; set; }
-
-
-        [XmlElement(ElementName = "informationStatus",       Namespace = "http://datex2.eu/schema/3/common")]
-        public String?  InformationStatus         { get; set; }
+        ///// <summary>
+        ///// Optional extension element for additional header information.
+        ///// </summary>
+        //[XmlElement("_headerInformationExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? HeaderInformationExtension { get; set; }
 
     }
 

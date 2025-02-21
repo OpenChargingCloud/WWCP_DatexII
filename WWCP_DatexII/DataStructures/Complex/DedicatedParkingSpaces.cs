@@ -29,10 +29,9 @@ namespace cloud.charging.open.protocols.DatexII
     /// <summary>
     /// Dedicated parking spaces directly belonging to a facility (which is usually not a parking site itself).
     /// </summary>
-    public class DedicatedParkingSpaces(UInt16                                NumberOfSpaces,
-
-                                        String                                Id,
+    public class DedicatedParkingSpaces(String                                Id,
                                         String                                Version,
+                                        UInt16                                NumberOfSpaces,
 
                                         MultilingualString?                   Name                    = null,
                                         IEnumerable<MultilingualString>?      Alias                   = null,

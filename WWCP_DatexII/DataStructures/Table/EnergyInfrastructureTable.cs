@@ -24,23 +24,45 @@ using System.Xml.Serialization;
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class EnergyInfrastructureTable
+    /// <summary>
+    /// A table of sites where vehicles can be supplied with energy.
+    /// </summary>
+    [XmlType("EnergyInfrastructureTable", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public class EnergyInfrastructureTable(String                                 Id,
+                                           String                                 Version,
+                                           IEnumerable<EnergyInfrastructureSite>  EnergyInfrastructureSites,
+                                           String?                                TableName   = null)
     {
 
+        /// <summary>
+        /// Unique identifier for the table.
+        /// </summary>
         [XmlAttribute("id")]
-        public String?                                 Id                           { get; set; }
+        public String                                 Id                           { get; set; } = Id;
 
-
+        /// <summary>
+        /// Version of the table.
+        /// </summary>
         [XmlAttribute("version")]
-        public String?                                 Version                      { get; set; }
+        public String                                 Version                      { get; set; } = Version;
 
+        /// <summary>
+        /// A collection of EnergyInfrastructureSite instances.
+        /// </summary>
+        [XmlElement("energyInfrastructureSite",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public IEnumerable<EnergyInfrastructureSite>  EnergyInfrastructureSites    { get; set; } = EnergyInfrastructureSites.Distinct();
 
-        [XmlElement(ElementName = "tableName")]
-        public String?                                 TableName                    { get; set; }
+        /// <summary>
+        /// The name of the Energy Infrastructure Table.
+        /// </summary>
+        [XmlElement("tableName",                 Namespace = "http://datex2.eu/schema/3/common")]
+        public String?                                TableName                    { get; set; } = TableName;
 
-
-        [XmlElement(ElementName = "energyInfrastructureSite",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<EnergyInfrastructureSite>?  EnergyInfrastructureSites    { get; set; }
+        ///// <summary>
+        ///// Optional extension element for additional EnergyInfrastructureTable information.
+        ///// </summary>
+        //[XmlElement("_energyInfrastructureTableExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? EnergyInfrastructureTableExtension { get; set; }
 
     }
 

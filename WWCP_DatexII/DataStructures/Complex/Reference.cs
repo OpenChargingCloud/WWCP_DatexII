@@ -24,19 +24,18 @@ using System.Xml.Serialization;
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class Reference
+    /// <summary>
+    /// Represents a reference with a required identifier.
+    /// </summary>
+    [XmlType("Reference", Namespace = "http://datex2.eu/schema/3/common")]
+    public class Reference(String Id)
     {
 
-        [XmlAttribute("targetClass")]
-        public String?  TargetClass     { get; set; }
-
-
+        /// <summary>
+        /// The unique identifier for the reference.
+        /// </summary>
         [XmlAttribute("id")]
-        public String?  Id              { get; set; }
-
-
-        [XmlAttribute("version")]
-        public String?  Version         { get; set; }
+        public String Id { get; set; } = Id;
 
     }
 

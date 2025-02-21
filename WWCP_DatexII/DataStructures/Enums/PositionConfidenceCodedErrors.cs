@@ -25,22 +25,22 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// Error code for horizontal or vertical position confidence.
     /// </summary>
-    public enum RatePolicies
+    public enum PositionConfidenceCodedErrors
     {
 
         /// <summary>
-        /// A contract defines the pricing.
+        /// Indicates the accuracy is out of range, i.e. greater than 4 093 cm for horizontal position.
         /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        [XmlEnum("outOfRange")]
+        OutOfRange,
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// Indicates the accuracy information is unavailable.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlEnum("unavailable")]
+        Unavailable,
 
         [XmlEnum("_extended")]
         Extended

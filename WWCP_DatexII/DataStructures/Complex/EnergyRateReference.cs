@@ -25,25 +25,17 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// A reference to an EnergyRate.
     /// </summary>
-    public enum RatePolicies
+    [XmlType("_EnergyRateReference", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public class EnergyRateReference(String Id) : Reference(Id)
     {
 
         /// <summary>
-        /// A contract defines the pricing.
+        /// Fixed attribute indicating the target class.
         /// </summary>
-        [XmlEnum("contract")]
-        Contract,
-
-        /// <summary>
-        /// Prices are for ad hoc refueling.
-        /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
-
-        [XmlEnum("_extended")]
-        Extended
+        [XmlAttribute("targetClass")]
+        public String  TargetClass    { get; } = "egi:EnergyRate";
 
     }
 

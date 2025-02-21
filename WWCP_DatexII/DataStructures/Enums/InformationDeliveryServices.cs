@@ -25,22 +25,28 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// List of service channels or devices on which information or data exchanged can be delivered.
     /// </summary>
-    public enum RatePolicies
+    public enum InformationDeliveryServices
     {
 
         /// <summary>
-        /// A contract defines the pricing.
+        /// Includes any general delivery channel such as broadcast channels (e.g. radio, tv, RDS-TMC, TPEG services, etc.) or web publishing available to public or to specific users, depending on Service Provider policies.
         /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        [XmlEnum("anyGeneralDeliveryService")]
+        AnyGeneralDeliveryService,
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// Specific services which deliver warning alerts to end users to enhance safety via any specific application available to drivers, including C-ITS services.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlEnum("safetyServices")]
+        SafetyServices,
+
+        /// <summary>
+        /// Variable Message Signs or any other visual roadside devices which information are accessible to drivers which aim to affect driving style improving safety and road network LoS.
+        /// </summary>
+        [XmlEnum("vms")]
+        Vms,
 
         [XmlEnum("_extended")]
         Extended

@@ -25,22 +25,34 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// Classification of the urgency to rectify a fault.
     /// </summary>
-    public enum RatePolicies
+    public enum FaultUrgencies
     {
 
         /// <summary>
-        /// A contract defines the pricing.
+        /// The urgency to rectify this fault is normal.
         /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        [XmlEnum("normal")]
+        Normal,
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// It is urgent to rectify this fault.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlEnum("urgent")]
+        Urgent,
+
+        /// <summary>
+        /// It is extremely urgent to rectify this fault.
+        /// </summary>
+        [XmlEnum("extremelyUrgent")]
+        ExtremelyUrgent,
+
+        /// <summary>
+        /// The urgency to rectify this fault is not known.
+        /// </summary>
+        [XmlEnum("unknown")]
+        Unknown,
 
         [XmlEnum("_extended")]
         Extended

@@ -25,25 +25,33 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// Amount in units, which are specified by unitTypeEnum.
     /// </summary>
-    public enum RatePolicies
+    [XmlType("Units", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public readonly struct Units
     {
 
-        /// <summary>
-        /// A contract defines the pricing.
-        /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        #region Properties
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// Gets or sets the Units value.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlText]
+        public Double Value { get; }
 
-        [XmlEnum("_extended")]
-        Extended
+        #endregion
+
+        #region Constructor(s)
+
+        public Units(UInt16 Value)
+        {
+            this.Value = Value;
+        }
+
+        #endregion
+
+        public override readonly String ToString()
+            => Value.ToString();
 
     }
 

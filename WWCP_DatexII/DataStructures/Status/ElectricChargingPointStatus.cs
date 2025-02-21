@@ -123,7 +123,7 @@ namespace cloud.charging.open.protocols.DatexII
         /// The status of the refill point.
         /// </summary>
         [XmlElement(ElementName = "status",                      Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public RefillPointStatus                      Status                        { get; set; }
+        public RefillPointStatusEnum                  Status                        { get; set; }
 
 
         [XmlElement(ElementName = "energyRateUpdate",            Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]

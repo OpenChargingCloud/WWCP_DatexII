@@ -24,10 +24,25 @@ using System.Xml.Serialization;
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class BrandsAcceptedCodeList
+    /// <summary>
+    /// Use this class to describe details of the brands that are accepted.
+    /// </summary>
+    [XmlType("BrandsAcceptedCodeList", Namespace = "http://datex2.eu/schema/3/facilities")]
+    public class BrandsAcceptedCodeList(PaymentBrands BrandsAcceptedList)
     {
-        [XmlElement(ElementName = "brandsAcceptedList", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public List<String>? BrandsAcceptedList { get; set; }
+
+        /// <summary>
+        /// List of accepted brands for payment cards.
+        /// </summary>
+        [XmlElement("brandsAcceptedList", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public PaymentBrands  BrandsAcceptedList    { get; set; } = BrandsAcceptedList;
+
+        ///// <summary>
+        ///// Optional extension element for additional information.
+        ///// </summary>
+        //[XmlElement("_brandsAcceptedCodeListExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? BrandsAcceptedCodeListExtension { get; set; }
+
     }
 
 }

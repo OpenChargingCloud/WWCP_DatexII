@@ -23,19 +23,46 @@ using System.Xml.Serialization;
 
 namespace cloud.charging.open.protocols.DatexII
 {
-    public class EnergyRateUpdate
+
+    /// <summary>
+    /// Updates a rate defined in the static part of the model.
+    /// </summary>
+    [XmlType("EnergyRateUpdate", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public class EnergyRateUpdate(DateTime                   LastUpdated,
+                                  EnergyRateReference        EnergyRateReference,
+                                  MultilingualString?        AdditionalInformation   = null,
+                                  IEnumerable<EnergyPrice>?  EnergyPrices            = null)
     {
 
-        [XmlElement(ElementName = "lastUpdated",          Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public DateTime?     LastUpdated            { get; set; }
+        /// <summary>
+        /// The date/time at which this information was last updated.
+        /// </summary>
+        [XmlElement("lastUpdated",            Namespace = "http://datex2.eu/schema/3/common")]
+        public DateTime                  LastUpdated              { get; set; } = LastUpdated;
 
+        /// <summary>
+        /// Specifies the EnergyRate that is updated here.
+        /// </summary>
+        [XmlElement("energyRateReference",    Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public EnergyRateReference       EnergyRateReference      { get; set; } = EnergyRateReference;
 
-        [XmlElement(ElementName = "energyRateReference",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public Reference?    EnergyRateReference    { get; set; }
+        /// <summary>
+        /// Free text field for additional information regarding the energy rates.
+        /// </summary>
+        [XmlElement("additionalInformation",  Namespace = "http://datex2.eu/schema/3/common")]
+        public MultilingualString?       AdditionalInformation    { get; set; } = AdditionalInformation;
 
+        /// <summary>
+        /// A collection of energy price definitions.
+        /// </summary>
+        [XmlElement("energyPrice",            Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public IEnumerable<EnergyPrice>  EnergyPrices             { get; set; } = EnergyPrices ?? [];
 
-        [XmlElement(ElementName = "energyPrice",          Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public EnergyPrice?  EnergyPrice            { get; set; }
+        ///// <summary>
+        ///// Optional extension element for additional energy rate update information.
+        ///// </summary>
+        //[XmlElement("_energyRateUpdateExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? EnergyRateUpdateExtension { get; set; }
 
     }
 

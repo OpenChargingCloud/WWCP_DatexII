@@ -19,30 +19,47 @@
 
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    [XmlRoot("payload", Namespace = "http://datex2.eu/schema/3/d2Payload")]
-    public class EnergyInfrastructureTablePublication
+    /// <summary>
+    /// A publication of static information on the infrastructure for vehicle energy supply.
+    /// </summary>
+    [XmlType("EnergyInfrastructureTablePublication", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public class EnergyInfrastructureTablePublication(DateTime                                 PublicationTime,
+                                                      InternationalIdentifier                  PublicationCreator,
+                                                      Languages                                Language,
+
+                                                      HeaderInformation?                       HeaderInformation            = null,
+                                                      IEnumerable<EnergyInfrastructureTable>?  EnergyInfrastructureTables   = null)
+
+        : PayloadPublication(PublicationTime,
+                             PublicationCreator,
+                             Language)
+
     {
 
-        [XmlElement(ElementName = "publicationTime",            Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime?                                PublicationTime               { get; set; }
+        /// <summary>
+        /// Management information relating to the publication.
+        /// </summary>
+        [XmlElement("headerInformation",          Namespace = "http://datex2.eu/schema/3/common")]
+        public HeaderInformation?                      HeaderInformation             { get; set; } = HeaderInformation;
 
+        /// <summary>
+        /// A collection of EnergyInfrastructureTable instances.
+        /// </summary>
+        [XmlElement("energyInfrastructureTable",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public IEnumerable<EnergyInfrastructureTable>  EnergyInfrastructureTables    { get; set; } = EnergyInfrastructureTables?.Distinct() ?? [];
 
-        [XmlElement(ElementName = "publicationCreator",         Namespace = "http://datex2.eu/schema/3/common")]
-        public PublicationCreator?                      PublicationCreator            { get; set; }
-
-
-        [XmlElement(ElementName = "headerInformation",          Namespace = "http://datex2.eu/schema/3/common")]
-        public HeaderInformation?                       HeaderInformation             { get; set; }
-
-
-        [XmlElement(ElementName = "energyInfrastructureTable",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<EnergyInfrastructureTable>?  EnergyInfrastructureTables    { get; set; }
-
+        ///// <summary>
+        ///// Optional extension element for additional publication information.
+        ///// </summary>
+        //[XmlElement("_energyInfrastructureTablePublicationExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? EnergyInfrastructureTablePublicationExtension { get; set; }
 
     }
 

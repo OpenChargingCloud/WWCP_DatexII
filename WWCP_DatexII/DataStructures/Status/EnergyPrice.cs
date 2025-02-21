@@ -19,24 +19,66 @@
 
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class EnergyPrice
+    /// <summary>
+    /// A price definition for energy refueling.
+    /// </summary>
+    [XmlType("EnergyPrice", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public class EnergyPrice(PriceTypes           PriceType,
+                             AmountOfMoney        Value,
+                             Boolean?             TaxIncluded             = null,
+                             Percentage?          TaxRate                 = null,
+                             MultilingualString?  AdditionalInformation   = null,
+                             OverallPeriod?       OverallPeriod           = null)
     {
 
-        [XmlElement(ElementName = "priceType",      Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public String?         PriceType        { get; set; }
+        /// <summary>
+        /// The type of price for the energy supply.
+        /// </summary>
+        [XmlElement("priceType", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public PriceTypes           PriceType                { get; set; } = PriceType;
 
+        /// <summary>
+        /// The price for the energy according to the price type.
+        /// </summary>
+        [XmlElement("value", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public AmountOfMoney        Value                    { get; set; } = Value;
 
-        [XmlElement(ElementName = "value",          Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public Decimal?        Value            { get; set; }
+        /// <summary>
+        /// [TRUE] indicates that tax is included; [FALSE] indicates that tax is added additionally.
+        /// </summary>
+        [XmlElement("taxIncluded", Namespace = "http://datex2.eu/schema/3/common")]
+        public Boolean?             TaxIncluded              { get; set; } = TaxIncluded;
 
+        /// <summary>
+        /// The percentage rate of tax to be applied.
+        /// </summary>
+        [XmlElement("taxRate", Namespace = "http://datex2.eu/schema/3/common")]
+        public Percentage?          TaxRate                  { get; set; } = TaxRate;
 
-        [XmlElement(ElementName = "overallPeriod",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public OverallPeriod?  OverallPeriod    { get; set; }
+        /// <summary>
+        /// Free text field for additional information regarding the price.
+        /// </summary>
+        [XmlElement("additionalInformation", Namespace = "http://datex2.eu/schema/3/common")]
+        public MultilingualString?  AdditionalInformation    { get; set; } = AdditionalInformation;
+
+        /// <summary>
+        /// The overall period during which the price is applicable.
+        /// </summary>
+        [XmlElement("overallPeriod", Namespace = "http://datex2.eu/schema/3/common")]
+        public OverallPeriod?       OverallPeriod            { get; set; } = OverallPeriod;
+
+        ///// <summary>
+        ///// Optional extension element for additional energy price information.
+        ///// </summary>
+        //[XmlElement("_energyPriceExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? EnergyPriceExtension { get; set; }
 
     }
 

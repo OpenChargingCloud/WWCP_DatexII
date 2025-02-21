@@ -24,16 +24,39 @@ using System.Xml.Serialization;
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class AddressLine
+    /// <summary>
+    /// A class defining information concerning one line of a postal address.
+    /// </summary>
+    [XmlType("AddressLine", Namespace = "http://datex2.eu/schema/3/locationExtension")]
+    public class AddressLine(UInt32              Order,
+                             MultilingualString  Text,
+                             AddressLineTypes    Type)
     {
+
+        /// <summary>
+        /// The sequence order that the address line element should be displayed in.
+        /// </summary>
         [XmlAttribute("order")]
-        public int? Order { get; set; }
+        public UInt32              Order    { get; set; } = Order;
 
-        [XmlElement(ElementName = "type", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public String?  Type { get; set; }
+        /// <summary>
+        /// Free-text description for the address line element.
+        /// </summary>
+        [XmlElement("text", Namespace = "http://datex2.eu/schema/3/common")]
+        public MultilingualString  Text     { get; set; } = Text;
 
-        [XmlElement(ElementName = "text", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public Values? Text { get; set; }
+        /// <summary>
+        /// The type for the address line element.
+        /// </summary>
+        [XmlElement("type", Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        public AddressLineTypes    Type     { get; set; } = Type;
+
+        ///// <summary>
+        ///// Optional extension element for additional address line information.
+        ///// </summary>
+        //[XmlElement("_addressLineExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? AddressLineExtension { get; set; }
+
     }
 
 }

@@ -25,25 +25,43 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// A NUTS code (Nomenclature of territorial units for statistics).
+    /// Must be at most 5 characters long.
     /// </summary>
-    public enum RatePolicies
+    [XmlType("NutsCode", Namespace = "http://datex2.eu/schema/3/locationExtension")]
+    public readonly struct NutsCode
     {
 
-        /// <summary>
-        /// A contract defines the pricing.
-        /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        #region Properties
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// Gets or sets the nuts code.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlText]
+        public String Value { get; }
 
-        [XmlEnum("_extended")]
-        Extended
+        #endregion
+
+        #region Constructor(s)
+
+        public NutsCode(String Value)
+        {
+
+            if (Value.Length > 5)
+                throw new ArgumentException("NutsCode must be 5 characters or less.", nameof(Value));
+
+            this.Value = Value;
+
+        }
+
+        #endregion
+
+
+        //public static implicit operator string(NutsCode tz) => tz._value;
+        //public static implicit operator NutsCode(string s) => new NutsCode(s);
+
+        public override readonly String ToString()
+            => Value;
 
     }
 

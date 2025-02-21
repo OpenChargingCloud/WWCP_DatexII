@@ -24,7 +24,10 @@ using System.Xml.Serialization;
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public enum RefillPointStatus
+    /// <summary>
+    /// The status of a refill point.
+    /// </summary>
+    public enum RefillPointStatusEnum
     {
 
         /// <summary>

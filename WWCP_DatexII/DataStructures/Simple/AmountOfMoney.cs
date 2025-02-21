@@ -17,6 +17,7 @@
 
 #region Usings
 
+using System.Globalization;
 using System.Xml.Serialization;
 
 #endregion
@@ -25,25 +26,37 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// A monetary value expressed to two decimal places with a maximum of 8 total digits (including 2 fractional digits).
     /// </summary>
-    public enum RatePolicies
+    [XmlType("AmountOfMoney", Namespace = "http://datex2.eu/schema/3/facilities")]
+    public readonly struct AmountOfMoney
     {
 
-        /// <summary>
-        /// A contract defines the pricing.
-        /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        #region Properties
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// Gets or sets the AmountOfMoney value.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlText]
+        public Decimal Value { get; }
 
-        [XmlEnum("_extended")]
-        Extended
+        #endregion
+
+        #region Constructor(s)
+
+        public AmountOfMoney(Decimal Value)
+        {
+            this.Value = Value;
+        }
+
+        #endregion
+
+
+        //public static implicit operator string(AmountOfMoney tz) => tz._value;
+        //public static implicit operator AmountOfMoney(string s) => new AmountOfMoney(s);
+
+        public override readonly String ToString()
+            => Value.ToString("F2", CultureInfo.InvariantCulture);
 
     }
 

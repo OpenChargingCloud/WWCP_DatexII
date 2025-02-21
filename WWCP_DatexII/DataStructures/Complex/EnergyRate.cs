@@ -19,32 +19,109 @@
 
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII
 {
-    public class EnergyRate
+
+    /// <summary>
+    /// A rate dedicated for Energy.
+    /// </summary>
+    [XmlType("EnergyRate", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public class EnergyRate(String                 Id,
+                            DateTime               LastUpdated,
+                            RatePolicies           RatePolicy,
+                            IEnumerable<Currency>  ApplicableCurrency,
+                            MultilingualString?    RateName                    = null,
+                            Boolean?               CombinationWithParkingFee   = null,
+                            AmountOfMoney?         MinimumDeliveryFee          = null,
+                            AmountOfMoney?         MaximumDeliveryFee          = null,
+                            Percentage?            Discount                    = null,
+                            MultilingualString?    AdditionalInformation       = null,
+                            PaymentMethod?         PaymentMethod               = null,
+                            OverallPeriod?         OverallPeriod               = null)
     {
+
+        /// <summary>
+        /// Unique identifier for this EnergyRate.
+        /// </summary>
         [XmlAttribute("id")]
-        public String?  Id { get; set; }
+        public String                 Id                           { get; set; } = Id;
 
-        [XmlElement(ElementName = "ratePolicy", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public String?  RatePolicy { get; set; }
+        /// <summary>
+        /// The date/time at which this information was last updated.
+        /// </summary>
+        [XmlElement("lastUpdated", Namespace = "http://datex2.eu/schema/3/common")]
+        public DateTime               LastUpdated                  { get; set; } = LastUpdated;
 
-        [XmlElement(ElementName = "lastUpdated", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public DateTime? LastUpdated { get; set; }
+        /// <summary>
+        /// Indication if the price is contract based or ad hoc.
+        /// </summary>
+        [XmlElement("ratePolicy", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public RatePolicies           RatePolicy                   { get; set; } = RatePolicy;
 
-        [XmlElement(ElementName = "applicableCurrency", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public String?  ApplicableCurrency { get; set; }
+        /// <summary>
+        /// A general information on the applicable monetary currency.
+        /// </summary>
+        [XmlElement("applicableCurrency", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public IEnumerable<Currency>  ApplicableCurrency           { get; set; } = ApplicableCurrency.Distinct() ?? [];
 
-        [XmlElement(ElementName = "paymentMethod", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public PaymentMethod? PaymentMethod { get; set; }
+        /// <summary>
+        /// A name for this rate, for example the name of the specific energy contract.
+        /// </summary>
+        [XmlElement("rateName", Namespace = "http://datex2.eu/schema/3/common")]
+        public MultilingualString?    RateName                     { get; set; } = RateName;
 
-        [XmlElement(ElementName = "energyPrice", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public List<EnergyPrice>? EnergyPrices { get; set; }
+        /// <summary>
+        /// [TRUE] indicates that tax is included; [FALSE] indicates that tax is added additionally.
+        /// </summary>
+        [XmlElement("combinationWithParkingFee", Namespace = "http://datex2.eu/schema/3/common")]
+        public Boolean?               CombinationWithParkingFee    { get; set; } = CombinationWithParkingFee;
 
-        [XmlElement(ElementName = "rateName", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public AdditionalInformation? RateName { get; set; }
+        /// <summary>
+        /// A minimum delivery fee.
+        /// </summary>
+        [XmlElement("minimumDeliveryFee", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public AmountOfMoney?         MinimumDeliveryFee           { get; set; } = MinimumDeliveryFee;
+
+        /// <summary>
+        /// A maximum delivery fee.
+        /// </summary>
+        [XmlElement("maximumDeliveryFee", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public AmountOfMoney?         MaximumDeliveryFee           { get; set; } = MaximumDeliveryFee;
+
+        /// <summary>
+        /// Discount indicated in %.
+        /// </summary>
+        [XmlElement("discount", Namespace = "http://datex2.eu/schema/3/common")]
+        public Percentage?            Discount                     { get; set; } = Discount;
+
+        /// <summary>
+        /// Free text field for additional information regarding the energy rates.
+        /// </summary>
+        [XmlElement("additionalInformation", Namespace = "http://datex2.eu/schema/3/common")]
+        public MultilingualString?    AdditionalInformation        { get; set; } = AdditionalInformation;
+
+        /// <summary>
+        /// Payment method information.
+        /// </summary>
+        [XmlElement("paymentMethod", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public PaymentMethod?         PaymentMethod                { get; set; } = PaymentMethod;
+
+        /// <summary>
+        /// The specification of the period during which the energy rate is valid.
+        /// </summary>
+        [XmlElement("overallPeriod", Namespace = "http://datex2.eu/schema/3/common")]
+        public OverallPeriod?         OverallPeriod                { get; set; } = OverallPeriod;
+
+        ///// <summary>
+        ///// Optional extension element for additional energy rate information.
+        ///// </summary>
+        //[XmlElement("_energyRateExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? EnergyRateExtension { get; set; }
+
     }
 
 }

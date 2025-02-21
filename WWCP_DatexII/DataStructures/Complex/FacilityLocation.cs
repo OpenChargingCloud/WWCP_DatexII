@@ -24,13 +24,39 @@ using System.Xml.Serialization;
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class FacilityLocation
+    /// <summary>
+    /// A location for which a time zone and an address can be specified.
+    /// </summary>
+    [XmlType("FacilityLocation", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+    public class FacilityLocation(TimeZone?               TimeZone    = null,
+                                  Address?                Address     = null,
+                                  IEnumerable<NutsArea>?  NutsAreas   = null)
     {
-        [XmlElement(ElementName = "address", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public Address? Address { get; set; }
 
-        [XmlElement(ElementName = "nutsArea", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public NutsArea? NutsArea { get; set; }
+        /// <summary>
+        /// The time zone the facility is located in.
+        /// </summary>
+        [XmlElement("timeZone", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public TimeZone?              TimeZone     { get; set; } = TimeZone;
+
+        /// <summary>
+        /// An address specification following ISO 19160-4.
+        /// </summary>
+        [XmlElement("address", Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        public Address?               Address      { get; set; } = Address;
+
+        /// <summary>
+        /// One or more NUTS areas.
+        /// </summary>
+        [XmlElement("nutsArea", Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        public IEnumerable<NutsArea>  NutsAreas    { get; set; } = NutsAreas?.Distinct() ?? [];
+
+        ///// <summary>
+        ///// Optional extension element for additional facility location information.
+        ///// </summary>
+        //[XmlElement("_facilityLocationExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? FacilityLocationExtension { get; set; }
+
     }
 
 }

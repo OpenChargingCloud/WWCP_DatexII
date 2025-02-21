@@ -25,22 +25,41 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// Types of NUTS codes (Nomenclature of territorial units for statistics)
+    /// including LAU codes (Local Administrative Units).
     /// </summary>
-    public enum RatePolicies
+    public enum NutsCodeTypes
     {
 
         /// <summary>
-        /// A contract defines the pricing.
+        /// NUTS 1 code.
         /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        [XmlEnum("nuts1Code")]
+        Nuts1Code,
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// NUTS 2 code.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlEnum("nuts2Code")]
+        Nuts2Code,
+
+        /// <summary>
+        /// NUTS 3 code.
+        /// </summary>
+        [XmlEnum("nuts3Code")]
+        Nuts3Code,
+
+        /// <summary>
+        /// LAU 1 code.
+        /// </summary>
+        [XmlEnum("lau1Code")]
+        Lau1Code,
+
+        /// <summary>
+        /// LAU 2 code.
+        /// </summary>
+        [XmlEnum("lau2Code")]
+        Lau2Code,
 
         [XmlEnum("_extended")]
         Extended

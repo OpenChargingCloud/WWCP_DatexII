@@ -25,22 +25,28 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// Coded value for type of height.
     /// </summary>
-    public enum RatePolicies
+    public enum HeightTypes
     {
 
         /// <summary>
-        /// A contract defines the pricing.
+        /// Value measured vertically above the reference ellipsoid.
         /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        [XmlEnum("ellipsoidalHeight")]
+        EllipsoidalHeight,
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// Height type corresponding to a value measured along the direction of gravity above the reference geoid.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlEnum("gravityRelatedHeight")]
+        GravityRelatedHeight,
+
+        /// <summary>
+        /// Height type corresponding to a value measured vertically above the ground level at this point.
+        /// </summary>
+        [XmlEnum("relativeHeight")]
+        RelativeHeight,
 
         [XmlEnum("_extended")]
         Extended

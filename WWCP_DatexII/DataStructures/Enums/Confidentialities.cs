@@ -25,22 +25,34 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// Values of confidentiality.
     /// </summary>
-    public enum RatePolicies
+    public enum Confidentialities
     {
 
         /// <summary>
-        /// A contract defines the pricing.
+        /// For internal use only of the recipient organisation.
         /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        [XmlEnum("internalUse")]
+        InternalUse,
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// No restriction on usage.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlEnum("noRestriction")]
+        NoRestriction,
+
+        /// <summary>
+        /// Restricted for use only by authorities.
+        /// </summary>
+        [XmlEnum("restrictedToAuthorities")]
+        RestrictedToAuthorities,
+
+        /// <summary>
+        /// Restricted for use only by authorities and traffic operators.
+        /// </summary>
+        [XmlEnum("restrictedToAuthoritiesAndTrafficOperators")]
+        RestrictedToAuthoritiesAndTrafficOperators,
 
         [XmlEnum("_extended")]
         Extended

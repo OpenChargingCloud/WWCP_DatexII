@@ -24,15 +24,31 @@ using System.Xml.Serialization;
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class PlannedRefillPointStatus
+    /// <summary>
+    /// Planned status information for a refill point, for example reservations.
+    /// </summary>
+    [XmlType("PlannedRefillPointStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public class PlannedRefillPointStatus(RefillPointStatusEnum  Status,
+                                          OverallPeriod          OverallPeriod)
     {
 
-        [XmlElement(ElementName = "status",         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public RefillPointStatus  Status           { get; set; }
+        /// <summary>
+        /// Status of the refill point.
+        /// </summary>
+        [XmlElement("status", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public RefillPointStatusEnum  Status           { get; set; } = Status;
 
+        /// <summary>
+        /// Overall period during which this planned status is effective.
+        /// </summary>
+        [XmlElement("overallPeriod", Namespace = "http://datex2.eu/schema/3/common")]
+        public OverallPeriod          OverallPeriod    { get; set; } = OverallPeriod;
 
-        [XmlElement(ElementName = "overallPeriod",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public OverallPeriod?     OverallPeriod    { get; set; }
+        ///// <summary>
+        ///// Optional extension element for additional planned refill point status information.
+        ///// </summary>
+        //[XmlElement("_plannedRefillPointStatusExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? PlannedRefillPointStatusExtension { get; set; }
 
     }
 

@@ -25,22 +25,34 @@ namespace cloud.charging.open.protocols.DatexII
 {
 
     /// <summary>
-    /// Contract based or ad hoc prices for energy.
+    /// Status of the related information (i.e. real, test or exercise).
     /// </summary>
-    public enum RatePolicies
+    public enum InformationStatus
     {
 
         /// <summary>
-        /// A contract defines the pricing.
+        /// The information is real. It is not a test or exercise.
         /// </summary>
-        [XmlEnum("contract")]
-        Contract,
+        [XmlEnum("real")]
+        Real,
 
         /// <summary>
-        /// Prices are for ad hoc refueling.
+        /// The information is part of an exercise which is for testing security.
         /// </summary>
-        [XmlEnum("adHoc")]
-        AdHoc,
+        [XmlEnum("securityExercise")]
+        SecurityExercise,
+
+        /// <summary>
+        /// The information is part of an exercise which includes tests of associated technical subsystems.
+        /// </summary>
+        [XmlEnum("technicalExercise")]
+        TechnicalExercise,
+
+        /// <summary>
+        /// The information is part of a test for checking the exchange of this type of information.
+        /// </summary>
+        [XmlEnum("test")]
+        Test,
 
         [XmlEnum("_extended")]
         Extended

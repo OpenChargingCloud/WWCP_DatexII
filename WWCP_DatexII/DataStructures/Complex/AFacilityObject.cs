@@ -50,6 +50,7 @@ namespace cloud.charging.open.protocols.DatexII
                                           IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles   = null,
                                           Dimension?                            Dimension               = null,
                                           Amenities?                            Amenities               = null)
+
     {
 
         /// <summary>

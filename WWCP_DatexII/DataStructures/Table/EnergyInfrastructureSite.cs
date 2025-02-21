@@ -19,73 +19,124 @@
 
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Hermod.HTTP;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class EnergyInfrastructureSite
+    /// <summary>
+    /// A site where vehicles can be supplied with energy, including all buildings, stations, parking spaces and other associated services.
+    /// </summary>
+    [XmlType("EnergyInfrastructureSite", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public class EnergyInfrastructureSite(String                                Id,
+                                          String                                Version,
+
+                                          MultilingualString?                   Name                     = null,
+                                          IEnumerable<MultilingualString>?      Alias                    = null,
+                                          String?                               ExternalIdentifier       = null,
+                                          DateTime?                             LastUpdated              = null,
+                                          MultilingualString?                   Description              = null,
+                                          IEnumerable<Accessibilities>?         Accessibility            = null,
+                                          IEnumerable<MultilingualString>?      AdditionalInformation    = null,
+                                          IEnumerable<URL>?                     InformationWebsites      = null,
+                                          IEnumerable<URL>?                     PhotoURLs                = null,
+                                          IEnumerable<Image>?                   Photos                   = null,
+                                          AOperatingHours?                      OperatingHours           = null,
+                                          LocationReference?                    LocationReference        = null,
+                                          AOrganisation?                        Owner                    = null,
+                                          AOrganisation?                        Operator                 = null,
+                                          AOrganisation?                        Helpdesk                 = null,
+                                          IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles    = null,
+                                          Dimension?                            Dimension                = null,
+                                          Amenities?                            Amenities                = null,
+
+                                          IEnumerable<ASupplementalFacility>?   SupplementalFacilities   = null,
+                                          IEnumerable<DedicatedParkingSpaces>?  DedicatedParkingSpaces   = null)
+
+        : Facility(Id,
+                   Version,
+
+                   Name,
+                   Alias,
+                   ExternalIdentifier,
+                   LastUpdated,
+                   Description,
+                   Accessibility,
+                   AdditionalInformation,
+                   InformationWebsites,
+                   PhotoURLs,
+                   Photos,
+                   OperatingHours,
+                   LocationReference,
+                   Owner,
+                   Operator,
+                   Helpdesk,
+                   ApplicableForVehicles,
+                   Dimension,
+                   Amenities,
+
+                   SupplementalFacilities,
+                   DedicatedParkingSpaces)
+
     {
 
-        [XmlAttribute("id")]
-        public String?                                    Id                              { get; set; }
+        /// <summary>
+        /// Specifies the type of the site.
+        /// </summary>
+        [XmlElement("typeOfSite", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public EnergyInfrastructureSiteTypes?            TypeOfSite { get; set; }
 
+        /// <summary>
+        /// The brand of the site.
+        /// </summary>
+        [XmlElement("brand", Namespace = "http://datex2.eu/schema/3/common")]
+        public MultilingualString?                       Brand { get; set; }
 
-        [XmlAttribute("version")]
-        public String?                                    Version                         { get; set; }
+        /// <summary>
+        /// Limitation to a set of users (exclusive).
+        /// </summary>
+        [XmlElement("exclusiveUsers", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public IEnumerable<UserTypes>                    ExclusiveUsers { get; set; }
 
+        /// <summary>
+        /// Users that are preferred at this site (but not exclusive).
+        /// </summary>
+        [XmlElement("preferredUsers", Namespace = "http://datex2.eu/schema/3/facilities")]
+        public IEnumerable<UserTypes>                    PreferredUsers { get; set; }
 
-        [XmlElement(ElementName = "accessibility",                Namespace = "http://datex2.eu/schema/3/facilities")]
-        public String?                                    Accessibility                   { get; set; }
+        /// <summary>
+        /// Specifies the type of service available at an EnergyInfrastructureSite.
+        /// </summary>
+        [XmlElement("serviceType", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public IEnumerable<ServiceType>                  ServiceTypes { get; set; }
 
+        /// <summary>
+        /// Possibility to specify the location of the site's entrance.
+        /// </summary>
+        [XmlElement("entrance", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public IEnumerable<ALocation>                    Entrances { get; set; }
 
-        [XmlElement(ElementName = "additionalInformation",        Namespace = "http://datex2.eu/schema/3/facilities")]
-        public AdditionalInformation?                     AdditionalInformation           { get; set; }
+        /// <summary>
+        /// Possibility to specify the location of the site's exit.
+        /// </summary>
+        [XmlElement("exit", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public IEnumerable<ALocation>                    Exits { get; set; }
 
+        /// <summary>
+        /// Specifications of charging stations on the site.
+        /// </summary>
+        [XmlElement("energyInfrastructureStation", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public IEnumerable<EnergyInfrastructureStation>  EnergyInfrastructureStations { get; set; }
 
-        [XmlElement(ElementName = "informationWebsite",           Namespace = "http://datex2.eu/schema/3/facilities")]
-        public InformationWebsite?                        InformationWebsite              { get; set; }
-
-
-        [XmlElement(ElementName = "operatingHours",               Namespace = "http://datex2.eu/schema/3/facilities")]
-        public OpenAllHours?                              OperatingHours                  { get; set; }
-
-
-        [XmlElement(ElementName = "locationReference",            Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public AreaLocation?                              LocationReference               { get; set; }
-
-
-        [XmlElement(ElementName = "operator",                     Namespace = "http://datex2.eu/schema/3/facilities")]
-        public OrganisationSpecification?                 Operator                        { get; set; }
-
-
-        [XmlElement(ElementName = "dedicatedParkingSpaces",       Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<DedicatedParkingSpaces>?       DedicatedParkingSpaces          { get; set; }
-
-
-        [XmlElement(ElementName = "typeOfSite")]
-        public String?                                    TypeOfSite                      { get; set; }
-
-
-        [XmlElement(ElementName = "brand")]
-        public Brand?                                     Brand                           { get; set; }
-
-
-        [XmlElement(ElementName = "exclusiveUsers")]
-        public String?                                    ExclusiveUsers                  { get; set; }
-
-
-        [XmlElement(ElementName = "serviceType")]
-        public ServiceType?                               ServiceType                     { get; set; }
-
-
-        [XmlElement(ElementName = "entrance",                     Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public Entrance?                                  Entrance                        { get; set; }
-
-
-        [XmlElement(ElementName = "energyInfrastructureStation",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<EnergyInfrastructureStation>?  EnergyInfrastructureStations    { get; set; }
+        ///// <summary>
+        ///// Optional extension element for additional EnergyInfrastructureSite information.
+        ///// </summary>
+        //[XmlElement("_energyInfrastructureSiteExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? EnergyInfrastructureSiteExtension { get; set; }
 
     }
+
 
 }

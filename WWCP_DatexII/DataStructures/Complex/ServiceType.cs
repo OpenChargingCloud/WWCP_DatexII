@@ -18,22 +18,37 @@
 #region Usings
 
 using System.Xml.Serialization;
-using System.Collections.Generic;
 
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII
 {
 
-    public class ServiceType
+    /// <summary>
+    /// A specification of service types for the fuelling/charging and payment process.
+    /// </summary>
+    [XmlType("ServiceType", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    public class ServiceType(ServiceTypes    ServiceTypeValue,
+                             OverallPeriod?  OverallPeriod   = null)
     {
 
-        [XmlElement(ElementName = "serviceType")]
-        public String?         Type             { get; set; }
+        /// <summary>
+        /// Information on different service types for the fuelling/charging and payment process.
+        /// </summary>
+        [XmlElement("serviceType", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public ServiceTypes    ServiceTypeValue    { get; set; } = ServiceTypeValue;
 
+        /// <summary>
+        /// The overall period during which the service is available.
+        /// </summary>
+        [XmlElement("overallPeriod", Namespace = "http://datex2.eu/schema/3/common")]
+        public OverallPeriod?  OverallPeriod       { get; set; } = OverallPeriod;
 
-        [XmlElement(ElementName = "overallPeriod", Namespace = "http://datex2.eu/schema/3/common")]
-        public OverallPeriod?  OverallPeriod    { get; set; }
+        ///// <summary>
+        ///// Optional extension element for additional service type information.
+        ///// </summary>
+        //[XmlElement("_serviceTypeExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        //public ExtensionType? ServiceTypeExtension { get; set; }
 
     }
 
