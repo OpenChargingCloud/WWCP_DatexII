@@ -1,0 +1,69 @@
+﻿/*
+ * Copyright (c) 2014-2025 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * This file is part of WWCP DatexII <https://github.com/OpenChargingCloud/WWCP_DatexII>
+ *
+ * Licensed under the Affero GPL license, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.gnu.org/licenses/agpl.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#region Usings
+
+using System.Xml.Serialization;
+
+#endregion
+
+namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
+{
+
+    /// <summary>
+    /// Types of NUTS codes (Nomenclature of territorial units for statistics)
+    /// including LAU codes (Local Administrative Units).
+    /// </summary>
+    public enum NutsCodeTypes
+    {
+
+        /// <summary>
+        /// NUTS 1 code.
+        /// </summary>
+        [XmlEnum("nuts1Code")]
+        Nuts1Code,
+
+        /// <summary>
+        /// NUTS 2 code.
+        /// </summary>
+        [XmlEnum("nuts2Code")]
+        Nuts2Code,
+
+        /// <summary>
+        /// NUTS 3 code.
+        /// </summary>
+        [XmlEnum("nuts3Code")]
+        Nuts3Code,
+
+        /// <summary>
+        /// LAU 1 code.
+        /// </summary>
+        [XmlEnum("lau1Code")]
+        Lau1Code,
+
+        /// <summary>
+        /// LAU 2 code.
+        /// </summary>
+        [XmlEnum("lau2Code")]
+        Lau2Code,
+
+        [XmlEnum("_extended")]
+        Extended
+
+    }
+
+}
