@@ -1,6 +1,6 @@
 # WWCP Datex II
 
-This software libraries allow you to build _Datex II_ services and use case specific gateways between Datex II and the World Wide Charging Protocol (WWCP).
+This software libraries allow you to build EU [DatexII](https://github.com/DATEX-II-EU) services and use case specific gateways between Datex II and the World Wide Charging Protocol (WWCP).
 
 
 #### Your contributions
