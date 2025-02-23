@@ -42,7 +42,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
     public class DatexII_BaseTests
     {
 
-        #region Reset_ChargingStation_Test()
+        #region Base_Test1()
 
         /// <summary>
         /// A test...
@@ -64,9 +64,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
                                   HeaderInformation:            new HeaderInformation(
                                                                     InformationStatus:        InformationStatus.Test,
-                                                                    Confidentiality:          Confidentialities.InternalUse,
+                                                                    Confidentiality:          Confidentiality.InternalUse,
                                                                     AllowedDeliveryChannel:   [
-                                                                                                  InformationDeliveryServices.AnyGeneralDeliveryService
+                                                                                                  InformationDeliveryService.AnyGeneralDeliveryService
                                                                                               ]
                                                                 ),
 

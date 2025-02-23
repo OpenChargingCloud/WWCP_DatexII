@@ -7,8 +7,13 @@
  xmlns:fac="http://datex2.eu/schema/3/facilities"
  xmlns:prk="http://datex2.eu/schema/3/parking"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd" xmlns:egi="http://datex2.eu/schema/3/energyInfrastructure" xsi:type="egi:EnergyInfrastructureTablePublication" lang="de" modelBaseVersion="3"
-     profileName="Level C profile Energy Infrastructure" profileVersion="00-01-00">
+ xsi:schemaLocation="http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"
+ xmlns:egi="http://datex2.eu/schema/3/energyInfrastructure"
+ xsi:type="egi:EnergyInfrastructureTablePublication"
+ lang="de"
+ modelBaseVersion="3"
+ profileName="Level C profile Energy Infrastructure"
+ profileVersion="00-01-00">
     <com:publicationTime>2025-01-10T11:13:51+01:00</com:publicationTime>
     <com:publicationCreator>
         <com:country>de</com:country>

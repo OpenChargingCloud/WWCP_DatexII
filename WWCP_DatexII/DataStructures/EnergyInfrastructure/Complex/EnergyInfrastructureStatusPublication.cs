@@ -50,25 +50,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Reference to static tables containing the sites referenced in this publication.
         /// </summary>
-        [XmlElement("tableReference", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("tableReference",                                   Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
         public IEnumerable<EnergyInfrastructureTableVersionedReference>  TableReference                                    { get; set; } = TableReference?.                Distinct() ?? [];
 
         /// <summary>
         /// Management information relating to the publication.
         /// </summary>
-        [XmlElement("headerInformation", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("headerInformation",                                Namespace = "http://datex2.eu/schema/3/common")]
         public HeaderInformation?                                        HeaderInformation                                 { get; set; } = HeaderInformation;
 
         /// <summary>
         /// Dynamic status information of one or more energy supplying sites.
         /// </summary>
-        [XmlElement("energyInfrastructureSiteStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyInfrastructureSiteStatus",                   Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
         public IEnumerable<EnergyInfrastructureSiteStatus>               EnergyInfrastructureSiteStatus                    { get; set; } = EnergyInfrastructureSiteStatus?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional publication information.
         /// </summary>
-        [XmlElement("_energyInfrastructureStatusPublicationExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyInfrastructureStatusPublicationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                                                 EnergyInfrastructureStatusPublicationExtension    { get; set; }
 
     }

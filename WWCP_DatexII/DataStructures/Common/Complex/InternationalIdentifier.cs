@@ -45,13 +45,27 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// Identifier or name unique within the specified country.
         /// </summary>
         [XmlElement("nationalIdentifier",  Namespace = "http://datex2.eu/schema/3/common")]
-        public String     NationalIdentifier                  { get; set; } = NationalIdentifier;
+        public String     NationalIdentifier                  { get; set; } = NationalIdentifier.Trim();
 
         /// <summary>
         /// Optional extension element for additional international identifier information.
         /// </summary>
         [XmlElement("_internationalIdentifierExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?  InternationalIdentifierExtension    { get; set; }
+
+
+        public XElement ToXML()
+        {
+
+            var xml = new XElement(XML_IO.nsCom + "publicationCreator",
+                          new XElement(XML_IO.nsCom + "country",             Country.Alpha2Code.ToLower()),
+                          new XElement(XML_IO.nsCom + "nationalIdentifier",  NationalIdentifier)
+                      );
+
+            return xml;
+
+        }
+
 
     }
 

@@ -22,6 +22,7 @@ using System.Xml.Serialization;
 using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
+using System.Xml.Linq;
 
 #endregion
 
