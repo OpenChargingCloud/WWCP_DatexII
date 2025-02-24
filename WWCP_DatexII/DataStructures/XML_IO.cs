@@ -29,12 +29,12 @@ namespace cloud.charging.open.protocols.DatexII.v3
 
         public static XNamespace nsXsi  = "http://www.w3.org/2001/XMLSchema-instance";
         public static XNamespace nsD2   = "http://datex2.eu/schema/3/d2Payload";
-        public static XNamespace nsCom  = "http://datex2.eu/schema/3/common";
+        public static XNamespace nsCommon  = "http://datex2.eu/schema/3/common";
         public static XNamespace nsLocx = "http://datex2.eu/schema/3/locationExtension";
         public static XNamespace nsLoc  = "http://datex2.eu/schema/3/locationReferencing";
         public static XNamespace nsFac  = "http://datex2.eu/schema/3/facilities";
         public static XNamespace nsPrk  = "http://datex2.eu/schema/3/parking";
-        public static XNamespace nsEgi  = "http://datex2.eu/schema/3/energyInfrastructure";
+        public static XNamespace nsEnergyInfrastructure  = "http://datex2.eu/schema/3/energyInfrastructure";
 
     }
 

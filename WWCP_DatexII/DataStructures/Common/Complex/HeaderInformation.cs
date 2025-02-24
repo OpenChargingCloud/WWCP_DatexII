@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -43,25 +44,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// The status of the related information (real, test, exercise, etc.).
         /// </summary>
         [XmlElement("informationStatus",            Namespace = "http://datex2.eu/schema/3/common")]
-        public InformationStatus                        InformationStatus             { get; set; } = InformationStatus;
+        public InformationStatus                        InformationStatus             { get; } = InformationStatus;
 
         /// <summary>
         /// The extent to which the related information may be circulated, according to the recipient type.
         /// </summary>
         [XmlElement("confidentiality",              Namespace = "http://datex2.eu/schema/3/common")]
-        public Confidentiality?                         Confidentiality               { get; set; } = Confidentiality;
+        public Confidentiality?                         Confidentiality               { get; } = Confidentiality;
 
         /// <summary>
         /// The allowed delivery channels.
         /// </summary>
         [XmlElement("allowedDeliveryChannel",       Namespace = "http://datex2.eu/schema/3/common")]
-        public IEnumerable<InformationDeliveryService>  AllowedDeliveryChannel        { get; set; } = AllowedDeliveryChannel?.Distinct() ?? [];
+        public IEnumerable<InformationDeliveryService>  AllowedDeliveryChannel        { get; } = AllowedDeliveryChannel?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional header information.
         /// </summary>
         [XmlElement("_headerInformationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                                HeaderInformationExtension    { get; set; } = HeaderInformationExtension;
+        public XElement?                                HeaderInformationExtension    { get; } = HeaderInformationExtension;
 
         #endregion
 
@@ -74,69 +75,61 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <param name="XML">The XML to be parsed.</param>
         /// <param name="HeaderInformation">The parsed HeaderInformation.</param>
         /// <param name="ErrorResponse">An optional error response.</param>
-        public static Boolean TryParseXML(XElement                XML,
-                                          out HeaderInformation?  HeaderInformation,
-                                          out String?             ErrorResponse)
+        public static Boolean TryParseXML(XElement                                     XML,
+                                          [NotNullWhen(true)]  out HeaderInformation?  HeaderInformation,
+                                          [NotNullWhen(false)] out String?             ErrorResponse)
         {
 
-            ErrorResponse = null;
+            HeaderInformation  = null;
+            ErrorResponse      = null;
 
+            #region TryParse InformationStatus          [mandatory]
 
-            var aa = XML.MapValueOrFail(XML_IO.nsCom + "confidentiality", Common.Confidentiality.Parse);
-
-
-
-            Confidentiality? confidentiality = null;
-            var confidentialityEl = XML.Element(XML_IO.nsCom + "confidentiality");
-            if (confidentialityEl is not null)
+            if (!XML.TryParseMandatory(XML_IO.nsCommon + "informationStatus",
+                                       "information status",
+                                       InformationStatus.TryParse,
+                                       out InformationStatus informationStatus,
+                                       out ErrorResponse))
             {
-                if (Common.Confidentiality.TryParse(confidentialityEl.Value, out var cVal))
-                    confidentiality = cVal;
-                else
-                {
-                    HeaderInformation  = null;
-                    ErrorResponse      = $"Invalid 'confidentiality' value '{confidentialityEl.Value}'!";
-                    return false;
-                }
-            }
-
-
-            var channels         = new List<InformationDeliveryService>();
-            var allowedChannels  = XML.Elements(XML_IO.nsCom + "allowedDeliveryChannel");
-            foreach (var chEl in allowedChannels)
-            {
-                if (InformationDeliveryService.TryParse(chEl.Value, out var channelVal))
-                    channels.Add(channelVal);
-                else
-                {
-                    HeaderInformation  = null;
-                    ErrorResponse      = $"Invalid 'allowedDeliveryChannel' value '{chEl.Value}'!";
-                    return false;
-                }
-            }
-
-
-            var statusEl = XML.Element(XML_IO.nsCom + "informationStatus");
-            if (statusEl is null)
-            {
-                HeaderInformation  = null;
-                ErrorResponse      = "Missing required 'informationStatus' XML element!";
                 return false;
             }
 
-            if (!InformationStatus.TryParse(statusEl.Value, out var infoStatus))
+            #endregion
+
+            #region TryParse Confidentiality            [optional]
+
+            if (XML.TryParseOptional(XML_IO.nsCommon + "confidentiality",
+                                     "confidentiality",
+                                     Common.Confidentiality.TryParse,
+                                     out Confidentiality? confidentiality,
+                                     out ErrorResponse))
             {
-                HeaderInformation  = null;
-                ErrorResponse      = $"Invalid 'informationStatus' value: '{statusEl.Value}'!";
-                return false;
+                if (ErrorResponse is not null)
+                    return false;
             }
+
+            #endregion
+
+            #region TryParse AllowedDeliveryChannels    [optional]
+
+            if (XML.TryParseMandatoryElements(XML_IO.nsCommon + "allowedDeliveryChannel",
+                                              "allowed delivery channels",
+                                              InformationDeliveryService.TryParse,
+                                              out IEnumerable<InformationDeliveryService> allowedDeliveryChannels,
+                                              out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
 
 
             HeaderInformation = new HeaderInformation(
-                                    infoStatus,
+                                    informationStatus,
                                     confidentiality,
-                                    channels,
-                                    XML.Element(XML_IO.nsCom + "_headerInformationExtension")
+                                    allowedDeliveryChannels,
+                                    XML.Element(XML_IO.nsCommon + "_headerInformationExtension")
                                 );
 
             return true;
@@ -150,16 +143,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         public XElement ToXML()
         {
 
-            var xml = new XElement(XML_IO.nsCom + "headerInformation",
+            var xml = new XElement(XML_IO.nsCommon + "headerInformation",
 
                           Confidentiality.HasValue
-                              ? new XElement(XML_IO.nsCom + "confidentiality",          Confidentiality.       ToString())
+                              ? new XElement(XML_IO.nsCommon + "confidentiality",               Confidentiality.       ToString())
                               : null,
 
                           AllowedDeliveryChannel?.Select(allowedDeliveryChannel =>
-                                new XElement(XML_IO.nsCom + "allowedDeliveryChannel",   allowedDeliveryChannel.ToString())),
+                                new XElement(XML_IO.nsCommon + "allowedDeliveryChannel",        allowedDeliveryChannel.ToString())),
 
-                                new XElement(XML_IO.nsCom + "informationStatus",        InformationStatus.     ToString())
+                                new XElement(XML_IO.nsCommon + "informationStatus",             InformationStatus.     ToString()),
+
+                          HeaderInformationExtension is not null
+                              ? new XElement(XML_IO.nsCommon + "_headerInformationExtension",   HeaderInformationExtension)
+                              : null
 
                       );
 

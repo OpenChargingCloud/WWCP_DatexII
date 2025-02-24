@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -35,35 +36,62 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                            String?                                TableName   = null)
     {
 
+        #region Properties
+
         /// <summary>
         /// Unique identifier for the table.
         /// </summary>
         [XmlAttribute("id")]
-        public String                                 Id                           { get; set; } = Id;
+        public String                                 Id                                    { get; } = Id;
 
         /// <summary>
         /// Version of the table.
         /// </summary>
         [XmlAttribute("version")]
-        public String                                 Version                               { get; set; } = Version;
+        public String                                 Version                               { get; } = Version;
 
         /// <summary>
         /// A collection of EnergyInfrastructureSite instances.
         /// </summary>
         [XmlElement("energyInfrastructureSite",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<EnergyInfrastructureSite>  EnergyInfrastructureSites             { get; set; } = EnergyInfrastructureSites.Distinct();
+        public IEnumerable<EnergyInfrastructureSite>  EnergyInfrastructureSites             { get; } = EnergyInfrastructureSites.Distinct();
 
         /// <summary>
         /// The name of the Energy Infrastructure Table.
         /// </summary>
         [XmlElement("tableName",                 Namespace = "http://datex2.eu/schema/3/common")]
-        public String?                                TableName                             { get; set; } = TableName;
+        public String?                                TableName                             { get; } = TableName;
 
         /// <summary>
         /// Optional extension element for additional EnergyInfrastructureTable information.
         /// </summary>
         [XmlElement("_energyInfrastructureTableExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                              EnergyInfrastructureTableExtension    { get; set; }
+        public XElement?                              EnergyInfrastructureTableExtension    { get; }
+
+        #endregion
+
+
+        #region TryParseXML(XML, out EnergyInfrastructureTable, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an EnergyInfrastructureTable.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="EnergyInfrastructureTable">The parsed EnergyInfrastructureTable.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                             XML,
+                                          [NotNullWhen(true)]  out EnergyInfrastructureTable?  EnergyInfrastructureTable,
+                                          [NotNullWhen(false)] out String?                     ErrorResponse)
+        {
+
+            EnergyInfrastructureTable  = null;
+            ErrorResponse              = null;
+
+            return true;
+
+        }
+
+        #endregion
 
     }
 

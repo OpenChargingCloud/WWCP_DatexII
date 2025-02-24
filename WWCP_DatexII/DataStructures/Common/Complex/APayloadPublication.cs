@@ -34,62 +34,69 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     [XmlType("PayloadPublication", Namespace = "http://datex2.eu/schema/3/common")]
     public abstract class APayloadPublication(DateTime                 PublicationTime,
                                               InternationalIdentifier  PublicationCreator,
-                                              Languages                Language)
+                                              Languages                Language,
+
+                                              String?                  ModelBaseVersion              = null,
+                                              String?                  ExtensionName                 = null,
+                                              String?                  ExtensionVersion              = null,
+                                              String?                  ProfileName                   = null,
+                                              String?                  ProfileVersion                = null,
+                                              XElement?                PayloadPublicationExtension   = null)
     {
 
         /// <summary>
         /// Date/time at which the payload publication was created.
         /// </summary>
         [XmlElement("publicationTime",     Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime                 PublicationTime                { get; set; } = PublicationTime;
+        public DateTime                 PublicationTime                { get; } = PublicationTime;
 
         /// <summary>
         /// Identifier of the publication creator.
         /// </summary>
         [XmlElement("publicationCreator",  Namespace = "http://datex2.eu/schema/3/common")]
-        public InternationalIdentifier  PublicationCreator             { get; set; } = PublicationCreator;
+        public InternationalIdentifier  PublicationCreator             { get; } = PublicationCreator;
 
         /// <summary>
         /// The default language used throughout the payload publication.
         /// </summary>
         [XmlAttribute("lang")]
-        public Languages                Language                       { get; set; } = Language;
+        public Languages                Language                       { get; } = Language;
 
         /// <summary>
         /// Model base version, fixed to "3".
         /// </summary>
         [XmlAttribute("modelBaseVersion")]
-        public String                   ModelBaseVersion               { get; }      = "3";
+        public String                   ModelBaseVersion               { get; } = ModelBaseVersion ?? "3";
 
         /// <summary>
         /// Optional extension name.
         /// </summary>
         [XmlAttribute("extensionName")]
-        public String?                  ExtensionName                  { get; set; }
+        public String?                  ExtensionName                  { get; } = ExtensionName;
 
         /// <summary>
         /// Optional extension version.
         /// </summary>
         [XmlAttribute("extensionVersion")]
-        public String?                  ExtensionVersion               { get; set; }
+        public String?                  ExtensionVersion               { get; } = ExtensionVersion;
 
         /// <summary>
         /// The profile name, default "Level C profile Energy Infrastructure".
         /// </summary>
         [XmlAttribute("profileName")]
-        public String                   ProfileName                    { get; } = "Level C profile Energy Infrastructure";
+        public String                   ProfileName                    { get; } = ProfileName      ?? "Level C profile Energy Infrastructure";
 
         /// <summary>
         /// The profile version, default "00-02-00".
         /// </summary>
         [XmlAttribute("profileVersion")]
-        public String                   ProfileVersion                 { get; } = "00-02-00";
+        public String                   ProfileVersion                 { get; } = ProfileVersion   ?? "00-02-00";
 
         /// <summary>
         /// Optional extension element for additional payload publication information.
         /// </summary>
         [XmlElement("_payloadPublicationExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                PayloadPublicationExtension    { get; set; }
+        public XElement?                PayloadPublicationExtension    { get; } = PayloadPublicationExtension;
 
     }
 

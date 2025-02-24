@@ -17,12 +17,13 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
-using System.Xml.Linq;
 
 #endregion
 
@@ -37,52 +38,69 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                                       InternationalIdentifier                  PublicationCreator,
                                                       Languages                                Language,
 
-                                                      HeaderInformation?                       HeaderInformation            = null,
-                                                      IEnumerable<EnergyInfrastructureTable>?  EnergyInfrastructureTables   = null)
+                                                      HeaderInformation?                       HeaderInformation                               = null,
+                                                      IEnumerable<EnergyInfrastructureTable>?  EnergyInfrastructureTables                      = null,
+                                                      XElement?                                EnergyInfrastructureTablePublicationExtension   = null,
+
+                                                      String?                                  ModelBaseVersion                                = null,
+                                                      String?                                  ExtensionName                                   = null,
+                                                      String?                                  ExtensionVersion                                = null,
+                                                      String?                                  ProfileName                                     = null,
+                                                      String?                                  ProfileVersion                                  = null,
+                                                      XElement?                                PayloadPublicationExtension                     = null)
 
         : APayloadPublication(PublicationTime,
                               PublicationCreator,
-                              Language)
+                              Language,
+
+                              ModelBaseVersion,
+                              ExtensionName,
+                              ExtensionVersion,
+                              ProfileName,
+                              ProfileVersion,
+                              PayloadPublicationExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// Management information relating to the publication.
         /// </summary>
         [XmlElement("headerInformation",                               Namespace = "http://datex2.eu/schema/3/common")]
-        public HeaderInformation?                      HeaderInformation                                { get; set; } = HeaderInformation;
+        public HeaderInformation?                      HeaderInformation                                { get; } = HeaderInformation;
 
         /// <summary>
         /// A collection of EnergyInfrastructureTable instances.
         /// </summary>
         [XmlElement("energyInfrastructureTable",                       Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<EnergyInfrastructureTable>  EnergyInfrastructureTables                       { get; set; } = EnergyInfrastructureTables?.Distinct() ?? [];
+        public IEnumerable<EnergyInfrastructureTable>  EnergyInfrastructureTables                       { get; } = EnergyInfrastructureTables?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional publication information.
         /// </summary>
         [XmlElement("_energyInfrastructureTablePublicationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                               EnergyInfrastructureTablePublicationExtension    { get; set; }
+        public XElement?                               EnergyInfrastructureTablePublicationExtension    { get; } = EnergyInfrastructureTablePublicationExtension;
 
-
+        #endregion
 
 
         // <?xml version="1.0" encoding="UTF-8"?>
-        // <d2:payload xmlns:d2 = "http://datex2.eu/schema/3/d2Payload"
-        //  xmlns:com           = "http://datex2.eu/schema/3/common"
-        //  xmlns:locx          = "http://datex2.eu/schema/3/locationExtension"
-        //  xmlns:loc           = "http://datex2.eu/schema/3/locationReferencing"
-        //  xmlns               = "http://datex2.eu/schema/3/energyInfrastructure"
-        //  xmlns:fac           = "http://datex2.eu/schema/3/facilities"
-        //  xmlns:prk           = "http://datex2.eu/schema/3/parking"
-        //  xmlns:xsi           = "http://www.w3.org/2001/XMLSchema-instance"
-        //  xsi:schemaLocation  = "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"
-        //  xmlns:egi           = "http://datex2.eu/schema/3/energyInfrastructure"
-        //  xsi:type            = "egi:EnergyInfrastructureTablePublication"
-        //  lang                = "de"
-        //  modelBaseVersion    = "3"
-        //  profileName         = "Level C profile Energy Infrastructure"
-        //  profileVersion      = "00-01-00">
+        // <d2:payload xmlns:d2            = "http://datex2.eu/schema/3/d2Payload"
+        //             xmlns:com           = "http://datex2.eu/schema/3/common"
+        //             xmlns:locx          = "http://datex2.eu/schema/3/locationExtension"
+        //             xmlns:loc           = "http://datex2.eu/schema/3/locationReferencing"
+        //             xmlns               = "http://datex2.eu/schema/3/energyInfrastructure"
+        //             xmlns:fac           = "http://datex2.eu/schema/3/facilities"
+        //             xmlns:prk           = "http://datex2.eu/schema/3/parking"
+        //             xmlns:xsi           = "http://www.w3.org/2001/XMLSchema-instance"
+        //             xsi:schemaLocation  = "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"
+        //             xmlns:egi           = "http://datex2.eu/schema/3/energyInfrastructure"
+        //             xsi:type            = "egi:EnergyInfrastructureTablePublication"
+        //             lang                = "de"
+        //             modelBaseVersion    = "3"
+        //             profileName         = "Level C profile Energy Infrastructure"
+        //             profileVersion      = "00-01-00">
         //
         //     <com:publicationTime>2025-01-10T11:13:51+01:00</com:publicationTime>
         //
@@ -104,6 +122,184 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         // </d2:payload>
 
 
+        #region TryParseXML(XML, out EnergyInfrastructureTablePublication, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an EnergyInfrastructureTablePublication.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="EnergyInfrastructureTablePublication">The parsed EnergyInfrastructureTablePublication.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                                        XML,
+                                          [NotNullWhen(true)]  out EnergyInfrastructureTablePublication?  EnergyInfrastructureTablePublication,
+                                          [NotNullWhen(false)] out String?                                ErrorResponse)
+        {
+
+            EnergyInfrastructureTablePublication  = null;
+            ErrorResponse                         = null;
+
+
+            #region TryParse PublicationTime               [mandatory]
+
+            if (!XML.TryParseMandatoryTimestamp(XML_IO.nsCommon + "publicationTime",
+                                                "publication time",
+                                                out var publicationTime,
+                                                out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse PublicationCreator            [mandatory]
+
+            if (!XML.TryParseMandatory(XML_IO.nsCommon + "publicationCreator",
+                                       "publication creator",
+                                       InternationalIdentifier.TryParseXML,
+                                       out InternationalIdentifier? publicationCreator,
+                                       out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse Language                      [mandatory]
+
+            if (!XML.TryParseMandatoryAttribute("lang",
+                                                "publication language",
+                                                LanguagesExtensions.TryParse,
+                                                out Languages language,
+                                                out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+
+            #region TryParse HeaderInformation             [optional]
+
+            if (XML.TryParseOptional(XML_IO.nsEnergyInfrastructure + "headerInformation",
+                                     "header information",
+                                     HeaderInformation.TryParseXML,
+                                     out HeaderInformation? headerInformation,
+                                     out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse EnergyInfrastructureTables    [optional]
+
+            if (XML.TryParseOptionalElements(XML_IO.nsEnergyInfrastructure + "energyInfrastructureTable",
+                                             "header information",
+                                             EnergyInfrastructureTable.TryParseXML,
+                                             out IEnumerable<EnergyInfrastructureTable> energyInfrastructureTables,
+                                             out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+
+            #region TryParse ModelBaseVersion              [optional]
+
+            if (XML.TryParseOptionalTextAttribute("modelBaseVersion",
+                                                  "publication model base version",
+                                                  out String? modelBaseVersion,
+                                                  out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse ExtensionName                 [optional]
+
+            if (XML.TryParseOptionalTextAttribute("extensionName",
+                                                  "publication extension name",
+                                                  out String? extensionName,
+                                                  out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse ExtensionVersion              [optional]
+
+            if (XML.TryParseOptionalTextAttribute("extensionVersion",
+                                                  "publication extension version",
+                                                  out String? extensionVersion,
+                                                  out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse ProfileName                   [optional]
+
+            if (XML.TryParseOptionalTextAttribute("profileName",
+                                                  "publication profile name",
+                                                  out String? profileName,
+                                                  out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse ProfileVersion                [optional]
+
+            if (XML.TryParseOptionalTextAttribute("profileVersion",
+                                                  "publication profile version",
+                                                  out String? profileVersion,
+                                                  out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+
+            EnergyInfrastructureTablePublication  = new EnergyInfrastructureTablePublication(
+
+                                                        publicationTime.Value,
+                                                        publicationCreator,
+                                                        language,
+
+                                                        headerInformation,
+                                                        energyInfrastructureTables,
+                                                        XML.Element(XML_IO.nsCommon + "_energyInfrastructureTablePublicationExtension"),
+
+                                                        modelBaseVersion,
+                                                        extensionName,
+                                                        extensionVersion,
+                                                        profileName,
+                                                        profileVersion,
+                                                        XML.Element(XML_IO.nsCommon + "_payloadPublicationExtension")
+
+                                                    );
+
+            return true;
+
+        }
+
+        #endregion
+
+        #region ToXML()
+
         public XElement ToXML()
         {
 
@@ -122,27 +318,27 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             var xml = new XElement(XML_IO.nsD2 + "payload",
 
-                          new XAttribute(XNamespace.Xmlns + "d2",   XML_IO.nsD2),
-                          new XAttribute(XNamespace.Xmlns + "com",  XML_IO.nsCom),
-                          new XAttribute(XNamespace.Xmlns + "locx", XML_IO.nsLocx),
-                          new XAttribute(XNamespace.Xmlns + "loc",  XML_IO.nsLoc),
-                          new XAttribute(XNamespace.Xmlns + "fac",  XML_IO.nsFac),
-                          new XAttribute(XNamespace.Xmlns + "prk",  XML_IO.nsPrk),
-                          new XAttribute(XNamespace.Xmlns + "xsi",  XML_IO.nsXsi),
+                          new XAttribute(XNamespace.Xmlns + "d2",          XML_IO.nsD2),
+                          new XAttribute(XNamespace.Xmlns + "com",         XML_IO.nsCommon),
+                          new XAttribute(XNamespace.Xmlns + "locx",        XML_IO.nsLocx),
+                          new XAttribute(XNamespace.Xmlns + "loc",         XML_IO.nsLoc),
+                          new XAttribute(XNamespace.Xmlns + "fac",         XML_IO.nsFac),
+                          new XAttribute(XNamespace.Xmlns + "prk",         XML_IO.nsPrk),
+                          new XAttribute(XNamespace.Xmlns + "xsi",         XML_IO.nsXsi),
 
                           new XAttribute(XML_IO.nsXsi + "schemaLocation",  "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"),
                           new XAttribute(XML_IO.nsXsi + "type",            "egi:EnergyInfrastructureTablePublication"),
-                          new XAttribute("lang",                    Language.AsText()),
-                          new XAttribute("modelBaseVersion",        "3"),
-                          new XAttribute("profileName",             "Level C profile Energy Infrastructure"),
-                          new XAttribute("profileVersion",          "00-01-00"),
+                          new XAttribute("lang",                           Language.AsText()),
+                          new XAttribute("modelBaseVersion",               "3"),
+                          new XAttribute("profileName",                    "Level C profile Energy Infrastructure"),
+                          new XAttribute("profileVersion",                 "00-01-00"),
 
-                          new XElement(XML_IO.nsCom + "publicationTime",   PublicationTime.ToIso8601()),
+                          new XElement(XML_IO.nsCommon + "publicationTime",   PublicationTime.ToIso8601()),
 
                           PublicationCreator.ToXML(),
                           HeaderInformation?.ToXML(),
 
-                          new XElement(XML_IO.nsEgi + "energyInfrastructureTable", "xxx"
+                          new XElement(XML_IO.nsEnergyInfrastructure + "energyInfrastructureTable", "xxx"
                           )
 
                       );
@@ -151,8 +347,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         }
 
+        #endregion
 
-        public XDocument ToXDoc()
+        #region ToXDocument()
+
+        public XDocument ToXDocument()
         {
 
             return new XDocument(
@@ -162,6 +361,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         }
 
+        #endregion
 
     }
 

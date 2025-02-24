@@ -18,4 +18,13 @@
     <ProjectReference Include="..\WWCP_DatexII_WebAPI\WWCP_DatexII_WebAPI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Examples\EnergyInfrastructureStatusPublication.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Examples\EnergyInfrastructureTablePublication.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

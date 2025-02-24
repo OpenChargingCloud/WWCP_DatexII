@@ -17,7 +17,11 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
+
+using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -39,8 +43,90 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
     {
 
+        #region Properties
+
         [XmlAttribute("targetClass")]
         public String  TargetClass    { get; } = "egi:EnergyInfrastructureTable";
+
+        #endregion
+
+
+        #region TryParseXML(XML, out EnergyInfrastructureTableVersionedReference, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an EnergyInfrastructureTableVersionedReference.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="EnergyInfrastructureTableVersionedReference">The parsed EnergyInfrastructureTableVersionedReference.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                                               XML,
+                                          [NotNullWhen(true)]  out EnergyInfrastructureTableVersionedReference?  EnergyInfrastructureTableVersionedReference,
+                                          [NotNullWhen(false)] out String?                                       ErrorResponse)
+        {
+
+            EnergyInfrastructureTableVersionedReference = null;
+
+            // <tableReference xmlns       = "http://datex2.eu/schema/3/energyInfrastructure"
+            //                 version     = "2"
+            //                 id          = "2474A514-0E5D-48F9-A908-F185DD4177A2"
+            //                 targetClass = "egi:EnergyInfrastructureTable" />
+
+            #region TryParse Id             [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("id",
+                                                    "id",
+                                                    out var id,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse Version        [optional]
+
+            if (XML.TryParseOptionalTextAttribute("version",
+                                                  "version",
+                                                  out var version,
+                                                  out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse TargetClass    [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("targetClass",
+                                                    "target class",
+                                                    out var targetClass,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            var nsPrefix = XML.GetPrefixOfNamespace(XML_IO.nsEnergyInfrastructure);
+
+            if (targetClass != $"{nsPrefix}:EnergyInfrastructureTable")
+            {
+                ErrorResponse = $"Invalid target class '{targetClass}'!";
+                return false;
+            }
+
+            #endregion
+
+
+            EnergyInfrastructureTableVersionedReference = new EnergyInfrastructureTableVersionedReference(
+                                                              id,
+                                                              version
+                                                          );
+
+            return true;
+
+        }
+
+        #endregion
 
     }
 

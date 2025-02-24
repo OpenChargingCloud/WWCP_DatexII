@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.Facilities;
@@ -33,20 +34,21 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// </summary>
     [XmlType("EnergyInfrastructureSiteStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
     public class EnergyInfrastructureSiteStatus(FacilityObjectVersionedReference                 Reference,
-                                                DateTime?                                        LastUpdated                           = null,
-                                                OpeningStatus?                                   OpeningStatus                         = null,
-                                                OperationStatus?                                 OperationStatus                       = null,
-                                                Boolean?                                         RegularOperatingHoursInForce          = null,
-                                                MultilingualString?                              StatusDescription                     = null,
-                                                AOperatingHours?                                 NewOperatingHours                     = null,
-                                                Fault?                                           Fault                                 = null,
+                                                DateTime?                                        LastUpdated                               = null,
+                                                OpeningStatus?                                   OpeningStatus                             = null,
+                                                OperationStatus?                                 OperationStatus                           = null,
+                                                Boolean?                                         RegularOperatingHoursInForce              = null,
+                                                MultilingualString?                              StatusDescription                         = null,
+                                                AOperatingHours?                                 NewOperatingHours                         = null,
+                                                Fault?                                           Fault                                     = null,
 
-                                                IEnumerable<SupplementalFacilityStatus>?         SupplementalFacilityStatuses          = null,
+                                                IEnumerable<SupplementalFacilityStatus>?         SupplementalFacilityStatuses              = null,
 
-                                                UInt16?                                          AvailableCarParkingPlaces             = null,
-                                                UInt16?                                          AvailableTruckParkingPlaces           = null,
-                                                IEnumerable<EnergyInfrastructureStationStatus>?  EnergyInfrastructureStationStatuses   = null,
-                                                IEnumerable<ServiceType>?                        ServiceTypes                          = null)
+                                                UInt16?                                          AvailableCarParkingPlaces                 = null,
+                                                UInt16?                                          AvailableTruckParkingPlaces               = null,
+                                                IEnumerable<EnergyInfrastructureStationStatus>?  EnergyInfrastructureStationStatuses       = null,
+                                                IEnumerable<ServiceType>?                        ServiceTypes                              = null,
+                                                XElement?                                        EnergyInfrastructureSiteStatusExtension   = null)
 
         : FacilityStatus(Reference,
                          LastUpdated,
@@ -61,35 +63,63 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
     {
 
+        #region Properties
+
         /// <summary>
         /// Parking places available for cars.
         /// </summary>
         [XmlElement("availableCarParkingPlaces",          Namespace = "http://datex2.eu/schema/3/common")]
-        public UInt16?                                         AvailableCarParkingPlaces                  { get; set; } = AvailableCarParkingPlaces;
+        public UInt16?                                         AvailableCarParkingPlaces                  { get; } = AvailableCarParkingPlaces;
 
         /// <summary>
         /// Parking places available for trucks.
         /// </summary>
         [XmlElement("availableTruckParkingPlaces",        Namespace = "http://datex2.eu/schema/3/common")]
-        public UInt16?                                         AvailableTruckParkingPlaces                { get; set; } = AvailableTruckParkingPlaces;
+        public UInt16?                                         AvailableTruckParkingPlaces                { get; } = AvailableTruckParkingPlaces;
 
         /// <summary>
         /// Specify the status of a charging station with dynamic information.
         /// </summary>
         [XmlElement("energyInfrastructureStationStatus",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<EnergyInfrastructureStationStatus>  EnergyInfrastructureStationStatuses        { get; set; } = EnergyInfrastructureStationStatuses?.Distinct() ?? [];
+        public IEnumerable<EnergyInfrastructureStationStatus>  EnergyInfrastructureStationStatuses        { get; } = EnergyInfrastructureStationStatuses?.Distinct() ?? [];
 
         /// <summary>
         /// The service type for the site. If no period is given, the currently available service is meant.
         /// </summary>
         [XmlElement("serviceType",                        Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<ServiceType>                        ServiceTypes                               { get; set; } = ServiceTypes?.                       Distinct() ?? [];
+        public IEnumerable<ServiceType>                        ServiceTypes                               { get; } = ServiceTypes?.                       Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional site status information.
         /// </summary>
         [XmlElement("_energyInfrastructureSiteStatusExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                                       EnergyInfrastructureSiteStatusExtension    { get; set; }
+        public XElement?                                       EnergyInfrastructureSiteStatusExtension    { get; } = EnergyInfrastructureSiteStatusExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out EnergyInfrastructureSiteStatus, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an EnergyInfrastructureSiteStatus.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="EnergyInfrastructureSiteStatus">The parsed EnergyInfrastructureSiteStatus.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                                  XML,
+                                          [NotNullWhen(true)]  out EnergyInfrastructureSiteStatus?  EnergyInfrastructureSiteStatus,
+                                          [NotNullWhen(false)] out String?                          ErrorResponse)
+        {
+
+            EnergyInfrastructureSiteStatus  = null;
+            ErrorResponse                   = null;
+
+            return true;
+
+        }
+
+        #endregion
+
 
     }
 
