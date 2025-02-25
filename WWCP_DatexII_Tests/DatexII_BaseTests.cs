@@ -83,14 +83,14 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
                                                                                                              Name:                           new MultilingualString(
                                                                                                                                                  new MultilingualStringValue(
-                                                                                                                                                     "de",
+                                                                                                                                                     Languages.de,
                                                                                                                                                      "Ladestation 1"
                                                                                                                                                  )
                                                                                                                                              ),
                                                                                                              Alias:                          [
                                                                                                                                                  new MultilingualString(
                                                                                                                                                      new MultilingualStringValue(
-                                                                                                                                                         "de",
+                                                                                                                                                         Languages.de,
                                                                                                                                                          "Ladestation 1"
                                                                                                                                                      )
                                                                                                                                                  )
@@ -99,7 +99,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                              LastUpdated:                    Timestamp.Now,
                                                                                                              Description:                    new MultilingualString(
                                                                                                                                                  new MultilingualStringValue(
-                                                                                                                                                     "de",
+                                                                                                                                                     Languages.de,
                                                                                                                                                      "Dies ist Ladestation 1"
                                                                                                                                                  )
                                                                                                                                              ),
@@ -109,7 +109,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                              AdditionalInformation:          [
                                                                                                                                                  new MultilingualString(
                                                                                                                                                      new MultilingualStringValue(
-                                                                                                                                                         "de",
+                                                                                                                                                         Languages.de,
                                                                                                                                                          "Ladestation mit RGB-Licht!"
                                                                                                                                                      )
                                                                                                                                                  )
@@ -164,7 +164,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                              TypeOfSite:                     EnergyInfrastructureSiteTypes.Onstreet,
                                                                                                              Brand:                          new MultilingualString(
                                                                                                                                                  new MultilingualStringValue(
-                                                                                                                                                     "de",
+                                                                                                                                                     Languages.de,
                                                                                                                                                      "SchönerLaden"
                                                                                                                                                  )
                                                                                                                                              ),

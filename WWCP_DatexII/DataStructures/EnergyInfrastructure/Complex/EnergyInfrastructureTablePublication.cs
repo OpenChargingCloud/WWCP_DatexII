@@ -34,7 +34,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// A publication of static information on the infrastructure for vehicle energy supply.
     /// </summary>
     [XmlType("EnergyInfrastructureTablePublication", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-    public class EnergyInfrastructureTablePublication(DateTime                                 PublicationTime,
+    public class EnergyInfrastructureTablePublication(DateTimeOffset                           PublicationTime,
                                                       InternationalIdentifier                  PublicationCreator,
                                                       Languages                                Language,
 
@@ -141,9 +141,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse PublicationTime               [mandatory]
 
-            if (!XML.TryParseMandatoryTimestamp(XML_IO.nsCommon + "publicationTime",
+            if (!XML.TryParseMandatoryTimestamp(DatexIINS.Common + "publicationTime",
                                                 "publication time",
-                                                out var publicationTime,
+                                                out DateTimeOffset publicationTime,
                                                 out ErrorResponse))
             {
                 return false;
@@ -153,7 +153,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse PublicationCreator            [mandatory]
 
-            if (!XML.TryParseMandatory(XML_IO.nsCommon + "publicationCreator",
+            if (!XML.TryParseMandatory(DatexIINS.Common + "publicationCreator",
                                        "publication creator",
                                        InternationalIdentifier.TryParseXML,
                                        out InternationalIdentifier? publicationCreator,
@@ -180,7 +180,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse HeaderInformation             [optional]
 
-            if (XML.TryParseOptional(XML_IO.nsEnergyInfrastructure + "headerInformation",
+            if (XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "headerInformation",
                                      "header information",
                                      HeaderInformation.TryParseXML,
                                      out HeaderInformation? headerInformation,
@@ -194,7 +194,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse EnergyInfrastructureTables    [optional]
 
-            if (XML.TryParseOptionalElements(XML_IO.nsEnergyInfrastructure + "energyInfrastructureTable",
+            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureTable",
                                              "header information",
                                              EnergyInfrastructureTable.TryParseXML,
                                              out IEnumerable<EnergyInfrastructureTable> energyInfrastructureTables,
@@ -275,20 +275,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             EnergyInfrastructureTablePublication  = new EnergyInfrastructureTablePublication(
 
-                                                        publicationTime.Value,
+                                                        publicationTime,
                                                         publicationCreator,
                                                         language,
 
                                                         headerInformation,
                                                         energyInfrastructureTables,
-                                                        XML.Element(XML_IO.nsCommon + "_energyInfrastructureTablePublicationExtension"),
+                                                        XML.Element(DatexIINS.Common + "_energyInfrastructureTablePublicationExtension"),
 
                                                         modelBaseVersion,
                                                         extensionName,
                                                         extensionVersion,
                                                         profileName,
                                                         profileVersion,
-                                                        XML.Element(XML_IO.nsCommon + "_payloadPublicationExtension")
+                                                        XML.Element(DatexIINS.Common + "_payloadPublicationExtension")
 
                                                     );
 
@@ -303,42 +303,29 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         public XElement ToXML()
         {
 
-            //XNamespace nsD2   = "http://datex2.eu/schema/3/d2Payload";
-            //XNamespace nsCom  = "http://datex2.eu/schema/3/common";
-            //XNamespace nsLocx = "http://datex2.eu/schema/3/locationExtension";
-            //XNamespace nsLoc  = "http://datex2.eu/schema/3/locationReferencing";
-            //XNamespace nsFac  = "http://datex2.eu/schema/3/facilities";
-            //XNamespace nsPrk  = "http://datex2.eu/schema/3/parking";
-            //// Default-Namespace (xmlns="http://datex2.eu/schema/3/energyInfrastructure")
-            ////XNamespace ns     = "http://datex2.eu/schema/3/energyInfrastructure";
-            //// Der "egi"-Namespace verweist ebenfalls auf "http://datex2.eu/schema/3/energyInfrastructure"
-            //XNamespace nsEgi  = "http://datex2.eu/schema/3/energyInfrastructure";
-            //// Schema-Instance Namespace
-            //XNamespace nsXsi  = "http://www.w3.org/2001/XMLSchema-instance";
+            var xml = new XElement(DatexIINS.D2Payload + "payload",
 
-            var xml = new XElement(XML_IO.nsD2 + "payload",
+                          new XAttribute(XNamespace.Xmlns + "d2",          DatexIINS.D2Payload),
+                          new XAttribute(XNamespace.Xmlns + "com",         DatexIINS.Common),
+                          new XAttribute(XNamespace.Xmlns + "locx",        DatexIINS.LocationExtension),
+                          new XAttribute(XNamespace.Xmlns + "loc",         DatexIINS.LocationReferencing),
+                          new XAttribute(XNamespace.Xmlns + "fac",         DatexIINS.Facilities),
+                          new XAttribute(XNamespace.Xmlns + "prk",         DatexIINS.Parking),
+                          new XAttribute(XNamespace.Xmlns + "xsi",         DatexIINS.XSI),
 
-                          new XAttribute(XNamespace.Xmlns + "d2",          XML_IO.nsD2),
-                          new XAttribute(XNamespace.Xmlns + "com",         XML_IO.nsCommon),
-                          new XAttribute(XNamespace.Xmlns + "locx",        XML_IO.nsLocx),
-                          new XAttribute(XNamespace.Xmlns + "loc",         XML_IO.nsLoc),
-                          new XAttribute(XNamespace.Xmlns + "fac",         XML_IO.nsFac),
-                          new XAttribute(XNamespace.Xmlns + "prk",         XML_IO.nsPrk),
-                          new XAttribute(XNamespace.Xmlns + "xsi",         XML_IO.nsXsi),
-
-                          new XAttribute(XML_IO.nsXsi + "schemaLocation",  "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"),
-                          new XAttribute(XML_IO.nsXsi + "type",            "egi:EnergyInfrastructureTablePublication"),
+                          new XAttribute(DatexIINS.XSI + "schemaLocation",  "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"),
+                          new XAttribute(DatexIINS.XSI + "type",            "egi:EnergyInfrastructureTablePublication"),
                           new XAttribute("lang",                           Language.AsText()),
                           new XAttribute("modelBaseVersion",               "3"),
                           new XAttribute("profileName",                    "Level C profile Energy Infrastructure"),
                           new XAttribute("profileVersion",                 "00-01-00"),
 
-                          new XElement(XML_IO.nsCommon + "publicationTime",   PublicationTime.ToIso8601()),
-
+                          new XElement(DatexIINS.Common + "publicationTime",   PublicationTime.ToIso8601()),
+                          new DateTime().ToIso8601(),
                           PublicationCreator.ToXML(),
                           HeaderInformation?.ToXML(),
 
-                          new XElement(XML_IO.nsEnergyInfrastructure + "energyInfrastructureTable", "xxx"
+                          new XElement(DatexIINS.EnergyInfrastructure + "energyInfrastructureTable", "xxx"
                           )
 
                       );

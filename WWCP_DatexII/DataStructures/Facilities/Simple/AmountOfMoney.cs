@@ -20,16 +20,19 @@
 using System.Globalization;
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 {
 
     /// <summary>
-    /// A monetary value expressed to two decimal places with a maximum of 8 total digits (including 2 fractional digits).
+    /// A monetary value expressed to two decimal places with a maximum
+    /// of 8 total digits (including 2 fractional digits).
     /// </summary>
     [XmlType("AmountOfMoney", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public readonly struct AmountOfMoney
+    public readonly struct AmountOfMoney(Decimal Value)
     {
 
         #region Properties
@@ -38,22 +41,89 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Gets or sets the AmountOfMoney value.
         /// </summary>
         [XmlText]
-        public Decimal Value { get; }
+        public Decimal  Value    { get; } = Value;
 
         #endregion
 
-        #region Constructor(s)
 
-        public AmountOfMoney(Decimal Value)
+        #region (static) Parse   (Text)
+
+        /// <summary>
+        /// Parse the given string as an AmountOfMoney.
+        /// </summary>
+        /// <param name="Text">A text representation of an AmountOfMoney.</param>
+        public static AmountOfMoney Parse(String Text)
         {
-            this.Value = Value;
+
+            if (TryParse(Text, out var amountOfMoney))
+                return amountOfMoney;
+
+            throw new ArgumentException($"Invalid text representation of an AmountOfMoney: '{Text}'!",
+                                        nameof(Text));
+
         }
 
         #endregion
 
+        #region (static) TryParse(Text)
 
-        //public static implicit operator string(AmountOfMoney tz) => tz._value;
-        //public static implicit operator AmountOfMoney(string s) => new AmountOfMoney(s);
+        /// <summary>
+        /// Try to parse the given text as an AmountOfMoney.
+        /// </summary>
+        /// <param name="Text">A text representation of an AmountOfMoney.</param>
+        public static AmountOfMoney? TryParse(String Text)
+        {
+
+            if (TryParse(Text, out var amountOfMoney))
+                return amountOfMoney;
+
+            return null;
+
+        }
+
+        #endregion
+
+        #region (static) TryParse(Text, out AmountOfMoney)
+
+        /// <summary>
+        /// Try to parse the given text as an AmountOfMoney.
+        /// </summary>
+        /// <param name="Text">A text representation of an AmountOfMoney.</param>
+        /// <param name="AmountOfMoney">The parsed AmountOfMoney.</param>
+        public static Boolean TryParse(String Text, out AmountOfMoney AmountOfMoney)
+        {
+
+            Text = Text.Trim();
+
+            if (Text.IsNotNullOrEmpty())
+            {
+                if (Decimal.TryParse(Text, out var value))
+                {
+                    AmountOfMoney = new AmountOfMoney(value);
+                    return true;
+                }
+            }
+
+            AmountOfMoney = default;
+            return false;
+
+        }
+
+        #endregion
+
+        #region Clone()
+
+        /// <summary>
+        /// Clone this AmountOfMoney.
+        /// </summary>
+        public AmountOfMoney Clone()
+
+            => new (
+                   Value
+               );
+
+        #endregion
+
 
         public override readonly String ToString()
             => Value.ToString("F2", CultureInfo.InvariantCulture);

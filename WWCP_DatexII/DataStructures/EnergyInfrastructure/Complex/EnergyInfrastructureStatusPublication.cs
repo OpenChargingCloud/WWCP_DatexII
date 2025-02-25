@@ -34,7 +34,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// Dynamic information on the status of energy supplying sites.
     /// </summary>
     [XmlType("EnergyInfrastructureStatusPublication", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-    public class EnergyInfrastructureStatusPublication(DateTime                                                   PublicationTime,
+    public class EnergyInfrastructureStatusPublication(DateTimeOffset                                             PublicationTime,
                                                        InternationalIdentifier                                    PublicationCreator,
                                                        Languages                                                  Language,
 
@@ -111,9 +111,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse PublicationTime                   [mandatory]
 
-            if (!XML.TryParseMandatoryTimestamp(XML_IO.nsCommon + "publicationTime",
+            if (!XML.TryParseMandatoryTimestamp(DatexIINS.Common + "publicationTime",
                                                 "publication time",
-                                                out var publicationTime,
+                                                out DateTimeOffset publicationTime,
                                                 out ErrorResponse))
             {
                 return false;
@@ -123,7 +123,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse PublicationCreator                [mandatory]
 
-            if (!XML.TryParseMandatory(XML_IO.nsCommon + "publicationCreator",
+            if (!XML.TryParseMandatory(DatexIINS.Common + "publicationCreator",
                                        "publication creator",
                                        InternationalIdentifier.TryParseXML,
                                        out InternationalIdentifier? publicationCreator,
@@ -150,7 +150,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse TableReferences                   [optional]
 
-            if (XML.TryParseOptionalElements(XML_IO.nsEnergyInfrastructure + "tableReference",
+            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "tableReference",
                                              "publication table references",
                                              EnergyInfrastructureTableVersionedReference.TryParseXML,
                                              out IEnumerable<EnergyInfrastructureTableVersionedReference> tableReferences,
@@ -164,7 +164,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse HeaderInformation                 [optional]
 
-            if (XML.TryParseOptional(XML_IO.nsEnergyInfrastructure + "headerInformation",
+            if (XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "headerInformation",
                                      "header information",
                                      HeaderInformation.TryParseXML,
                                      out HeaderInformation? headerInformation,
@@ -178,7 +178,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse EnergyInfrastructureSiteStatus    [optional]
 
-            if (XML.TryParseOptionalElements(XML_IO.nsEnergyInfrastructure + "energyInfrastructureSiteStatus",
+            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureSiteStatus",
                                              "header information",
                                              EnergyInfrastructure.EnergyInfrastructureSiteStatus.TryParseXML,
                                              out IEnumerable<EnergyInfrastructureSiteStatus> energyInfrastructureSiteStatus,
@@ -259,21 +259,21 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             EnergyInfrastructureStatusPublication  = new EnergyInfrastructureStatusPublication(
 
-                                                         publicationTime.Value,
+                                                         publicationTime,
                                                          publicationCreator,
                                                          language,
 
                                                          tableReferences,
                                                          headerInformation,
                                                          energyInfrastructureSiteStatus,
-                                                         XML.Element(XML_IO.nsCommon + "_energyInfrastructureStatusPublicationExtension"),
+                                                         XML.Element(DatexIINS.Common + "_energyInfrastructureStatusPublicationExtension"),
 
                                                          modelBaseVersion,
                                                          extensionName,
                                                          extensionVersion,
                                                          profileName,
                                                          profileVersion,
-                                                         XML.Element(XML_IO.nsCommon + "_payloadPublicationExtension")
+                                                         XML.Element(DatexIINS.Common + "_payloadPublicationExtension")
 
                                                      );
 

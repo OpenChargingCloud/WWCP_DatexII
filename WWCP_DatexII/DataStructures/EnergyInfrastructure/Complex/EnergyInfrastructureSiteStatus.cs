@@ -21,6 +21,8 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Diagnostics.CodeAnalysis;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.Facilities;
 
@@ -41,12 +43,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                                 MultilingualString?                              StatusDescription                         = null,
                                                 AOperatingHours?                                 NewOperatingHours                         = null,
                                                 Fault?                                           Fault                                     = null,
+                                                XElement?                                        FacilityObjectStatusExtension             = null,
 
                                                 IEnumerable<SupplementalFacilityStatus>?         SupplementalFacilityStatuses              = null,
+                                                XElement?                                        FacilityStatusExtension                   = null,
 
                                                 UInt16?                                          AvailableCarParkingPlaces                 = null,
                                                 UInt16?                                          AvailableTruckParkingPlaces               = null,
-                                                IEnumerable<EnergyInfrastructureStationStatus>?  EnergyInfrastructureStationStatuses       = null,
+                                                IEnumerable<EnergyInfrastructureStationStatus>?  EnergyInfrastructureStationStatus         = null,
                                                 IEnumerable<ServiceType>?                        ServiceTypes                              = null,
                                                 XElement?                                        EnergyInfrastructureSiteStatusExtension   = null)
 
@@ -58,8 +62,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                          StatusDescription,
                          NewOperatingHours,
                          Fault,
+                         FacilityObjectStatusExtension,
 
-                         SupplementalFacilityStatuses)
+                         SupplementalFacilityStatuses,
+                         FacilityStatusExtension)
 
     {
 
@@ -81,13 +87,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// Specify the status of a charging station with dynamic information.
         /// </summary>
         [XmlElement("energyInfrastructureStationStatus",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<EnergyInfrastructureStationStatus>  EnergyInfrastructureStationStatuses        { get; } = EnergyInfrastructureStationStatuses?.Distinct() ?? [];
+        public IEnumerable<EnergyInfrastructureStationStatus>  EnergyInfrastructureStationStatus          { get; } = EnergyInfrastructureStationStatus?.Distinct() ?? [];
 
         /// <summary>
         /// The service type for the site. If no period is given, the currently available service is meant.
         /// </summary>
         [XmlElement("serviceType",                        Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<ServiceType>                        ServiceTypes                               { get; } = ServiceTypes?.                       Distinct() ?? [];
+        public IEnumerable<ServiceType>                        ServiceTypes                               { get; } = ServiceTypes?.                     Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional site status information.
@@ -113,6 +119,60 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             EnergyInfrastructureSiteStatus  = null;
             ErrorResponse                   = null;
+
+            #region TryParse Reference                    [mandatory]
+
+            if (!XML.TryParseMandatory(DatexIINS.Facilities + "reference",
+                                       "facility object versioned reference",
+                                       FacilityObjectVersionedReference.TryParseXML,
+                                       out FacilityObjectVersionedReference? reference,
+                                       out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+
+
+
+            #region TryParse EnergyInfrastructureStationStatus    [optional]
+
+            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureStationStatus",
+                                             "energy infrastructure station status",
+                                             EnergyInfrastructure.EnergyInfrastructureStationStatus.TryParseXML,
+                                             out IEnumerable<EnergyInfrastructureStationStatus> energyInfrastructureStationStatuses,
+                                             out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+
+            EnergyInfrastructureSiteStatus = new EnergyInfrastructureSiteStatus(
+
+                                                 reference,
+                                                 null, //lastUpdated,
+                                                 null, //openingStatus,
+                                                 null, //operationStatus,
+                                                 null, //regularOperatingHoursInForce,
+                                                 null, //statusDescription,
+                                                 null, //newOperatingHours,
+                                                 null, //fault,
+                                                 null,
+
+                                                 null, //supplementalFacilityStatuses,
+                                                 null,
+
+                                                 null, //availableCarParkingPlaces,
+                                                 null, //availableTruckParkingPlaces,
+                                                 energyInfrastructureStationStatuses,
+                                                 null, //serviceTypes,
+                                                 null  //energyInfrastructureSiteStatusExtension
+
+                                             );
 
             return true;
 

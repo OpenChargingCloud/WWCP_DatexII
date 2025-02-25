@@ -17,12 +17,14 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
-using System.Xml.Linq;
+using cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure;
 
 #endregion
 
@@ -100,6 +102,68 @@ namespace cloud.charging.open.protocols.DatexII.v3.D2Payload
         //   </xs:element>
         //
         // </xs:schema>
+
+
+        #region TryParseXML(XML, out PayloadPublication, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an PayloadPublication.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="PayloadPublication">The parsed PayloadPublication.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                       XML,
+                                          [NotNullWhen(true)]  out APayloadPublication?  PayloadPublication,
+                                          [NotNullWhen(false)] out String?               ErrorResponse)
+        {
+
+            PayloadPublication  = null;
+            ErrorResponse       = null;
+
+            var concreteTypeAttribute        = XML.Attribute(DatexIINS.XSI + "type");
+            var concreteTypeNamespace        = concreteTypeAttribute?.Name.NamespaceName;
+            var concerteTypeName             = concreteTypeAttribute?.Value.Split(':');
+
+            var concreteTypeNamespacePrefix  = XML.GetNamespaceOfPrefix(concerteTypeName?[0] ?? "");
+            var concreteTypeNamespaceSuffix  =                          concerteTypeName?[1] ?? "";
+
+
+            if (concreteTypeNamespacePrefix?.NamespaceName == DatexIINS.EnergyInfrastructure.NamespaceName)
+            {
+
+                switch (concreteTypeNamespaceSuffix)
+                {
+
+                    case "EnergyInfrastructureStatusPublication":
+                        if (EnergyInfrastructureStatusPublication.TryParseXML(XML,
+                                                                              out var energyInfrastructureStatusPublication,
+                                                                              out ErrorResponse))
+                        {
+                            PayloadPublication = energyInfrastructureStatusPublication;
+                            return true;
+                        }
+                        break;
+
+                    case "EnergyInfrastructureTablePublication":
+                        if (EnergyInfrastructureTablePublication.TryParseXML(XML,
+                                                                             out var energyInfrastructureTablePublication,
+                                                                             out ErrorResponse))
+                        {
+                            PayloadPublication = energyInfrastructureTablePublication;
+                            return true;
+                        }
+                        break;
+
+                }
+
+            }
+
+            return PayloadPublication is not null;
+
+        }
+
+        #endregion
+
 
     }
 

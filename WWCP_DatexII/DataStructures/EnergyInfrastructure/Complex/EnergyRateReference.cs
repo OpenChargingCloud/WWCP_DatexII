@@ -17,7 +17,11 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
+
+using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -33,11 +37,99 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     public class EnergyRateReference(String Id) : Reference(Id)
     {
 
+        #region Properties
+
         /// <summary>
         /// Fixed attribute indicating the target class.
         /// </summary>
         [XmlAttribute("targetClass")]
         public String  TargetClass    { get; } = "egi:EnergyRate";
+
+        #endregion
+
+
+        #region TryParseXML(XML, out EnergyRateReference, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an EnergyRateReference.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="EnergyRateReference">The parsed EnergyRateReference.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                                               XML,
+                                          [NotNullWhen(true)]  out EnergyRateReference?  EnergyRateReference,
+                                          [NotNullWhen(false)] out String?                                       ErrorResponse)
+        {
+
+            EnergyRateReference = null;
+
+            // <energyRateReference xmlns       = "http://datex2.eu/schema/3/energyInfrastructure"
+            //                      id          = "74034E3E-9D2F-4410-BE6F-CAA3176D69B4"
+            //                      targetClass = "egi:EnergyRate" />
+
+            #region TryParse Id             [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("id",
+                                                    "id",
+                                                    out var id,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse TargetClass    [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("targetClass",
+                                                    "target class",
+                                                    out var targetClass,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.EnergyInfrastructure);
+
+            if (targetClass != $"{nsPrefix}:EnergyRate")
+            {
+                ErrorResponse = $"Invalid target class '{targetClass}'!";
+                return false;
+            }
+
+            #endregion
+
+
+            EnergyRateReference = new EnergyRateReference(
+                                      id
+                                  );
+
+            return true;
+
+        }
+
+        #endregion
+
+        #region ToXML()
+
+        public XElement ToXML()
+        {
+
+            // <energyRateReference xmlns       = "http://datex2.eu/schema/3/energyInfrastructure"
+            //                      id          = "74034E3E-9D2F-4410-BE6F-CAA3176D69B4"
+            //                      targetClass = "egi:EnergyRate" />
+
+            var xml = new XElement(DatexIINS.EnergyInfrastructure + "tableReference",
+                          new XAttribute("targetClass",   TargetClass),
+                          new XAttribute("id",            Id)
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
+
 
     }
 

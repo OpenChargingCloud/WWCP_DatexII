@@ -32,13 +32,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// </summary>
     [XmlType("FacilityObjectStatus", Namespace = "http://datex2.eu/schema/3/facilities")]
     public class FacilityObjectStatus(FacilityObjectVersionedReference  Reference,
-                                      DateTime?                         LastUpdated                    = null,
-                                      OpeningStatus?                    OpeningStatus                  = null,
-                                      OperationStatus?                  OperationStatus                = null,
-                                      Boolean?                          RegularOperatingHoursInForce   = null,
-                                      MultilingualString?               StatusDescription              = null,
-                                      AOperatingHours?                  NewOperatingHours              = null,
-                                      Fault?                            Fault                          = null)
+                                      DateTimeOffset?                   LastUpdated                     = null,
+                                      OpeningStatus?                    OpeningStatus                   = null,
+                                      OperationStatus?                  OperationStatus                 = null,
+                                      Boolean?                          RegularOperatingHoursInForce    = null,
+                                      MultilingualString?               StatusDescription               = null,
+                                      AOperatingHours?                  NewOperatingHours               = null,
+                                      Fault?                            Fault                           = null,
+                                      XElement?                         FacilityObjectStatusExtension   = null)
 
     {
 
@@ -46,55 +47,55 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Reference to the corresponding static facility object.
         /// </summary>
         [XmlElement("reference",                       Namespace = "http://datex2.eu/schema/3/facilities")]
-        public FacilityObjectVersionedReference  Reference                        { get; set; } = Reference;
+        public FacilityObjectVersionedReference  Reference                        { get; } = Reference;
 
         /// <summary>
         /// Information on the time when the information was last updated.
         /// </summary>
         [XmlElement("lastUpdated",                     Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime?                         LastUpdated                      { get; set; } = LastUpdated;
+        public DateTimeOffset?                   LastUpdated                      { get; } = LastUpdated;
 
         /// <summary>
         /// The opening status of this facility (open or closed).
         /// </summary>
         [XmlElement("openingStatus",                   Namespace = "http://datex2.eu/schema/3/facilities")]
-        public OpeningStatus?                    OpeningStatus                    { get; set; } = OpeningStatus;
+        public OpeningStatus?                    OpeningStatus                    { get; } = OpeningStatus;
 
         /// <summary>
         /// The operation status of this facility.
         /// </summary>
         [XmlElement("operationStatus",                 Namespace = "http://datex2.eu/schema/3/facilities")]
-        public OperationStatus?                  OperationStatus                  { get; set; } = OperationStatus;
+        public OperationStatus?                  OperationStatus                  { get; } = OperationStatus;
 
         /// <summary>
         /// If true, regular operating hours are in force (can be open or closed).
         /// </summary>
         [XmlElement("regularOperatingHoursInForce",    Namespace = "http://datex2.eu/schema/3/common")]
-        public Boolean?                          RegularOperatingHoursInForce     { get; set; } = RegularOperatingHoursInForce;
+        public Boolean?                          RegularOperatingHoursInForce     { get; } = RegularOperatingHoursInForce;
 
         /// <summary>
         /// A description for the status of this facility.
         /// </summary>
         [XmlElement("statusDescription",               Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?               StatusDescription                { get; set; } = StatusDescription;
+        public MultilingualString?               StatusDescription                { get; } = StatusDescription;
 
         /// <summary>
         /// Overrides the operating hours information specified in the static part either with a new reference or with a new defined version.
         /// </summary>
         [XmlElement("newOperatingHours",               Namespace = "http://datex2.eu/schema/3/facilities")]
-        public AOperatingHours?                  NewOperatingHours                { get; set; } = NewOperatingHours;
+        public AOperatingHours?                  NewOperatingHours                { get; } = NewOperatingHours;
 
         /// <summary>
         /// Fault information, if applicable.
         /// </summary>
         [XmlElement("fault",                           Namespace = "http://datex2.eu/schema/3/common")]
-        public Fault?                            Fault                            { get; set; } = Fault;
+        public Fault?                            Fault                            { get; } = Fault;
 
         /// <summary>
         /// Optional extension element for additional dynamic status information.
         /// </summary>
         [XmlElement("_facilityObjectStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                         FacilityObjectStatusExtension    { get; set; }
+        public XElement?                         FacilityObjectStatusExtension    { get; } = FacilityObjectStatusExtension;
 
     }
 

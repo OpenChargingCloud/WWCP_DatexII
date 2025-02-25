@@ -37,7 +37,7 @@ namespace cloud.charging.open.protocols.DatexII
         /// Gets or sets the Units value.
         /// </summary>
         [XmlText]
-        public Double Value { get; }
+        public Double  Value    { get; }
 
         #endregion
 

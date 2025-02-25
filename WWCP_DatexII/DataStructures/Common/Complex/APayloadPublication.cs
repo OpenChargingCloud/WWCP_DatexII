@@ -32,7 +32,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// that can be exchanged via a DATEX II interface.
     /// </summary>
     [XmlType("PayloadPublication", Namespace = "http://datex2.eu/schema/3/common")]
-    public abstract class APayloadPublication(DateTime                 PublicationTime,
+    public abstract class APayloadPublication(DateTimeOffset           PublicationTime,
                                               InternationalIdentifier  PublicationCreator,
                                               Languages                Language,
 
@@ -48,7 +48,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// Date/time at which the payload publication was created.
         /// </summary>
         [XmlElement("publicationTime",     Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime                 PublicationTime                { get; } = PublicationTime;
+        public DateTimeOffset           PublicationTime                { get; } = PublicationTime;
 
         /// <summary>
         /// Identifier of the publication creator.

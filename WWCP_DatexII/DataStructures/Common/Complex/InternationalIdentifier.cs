@@ -78,7 +78,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse Country               [mandatory]
 
-            if (!XML.TryParseMandatory<Country>(XML_IO.nsCommon + "country",
+            if (!XML.TryParseMandatory<Country>(DatexIINS.Common + "country",
                                                 "country",
                                                 Country.TryParse,
                                                 out var country,
@@ -91,7 +91,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse NationalIdentifier    [mandatory]  // Maybe some RegEx?
 
-            if (!XML.TryParseMandatoryText(XML_IO.nsCommon + "nationalIdentifier",
+            if (!XML.TryParseMandatoryText(DatexIINS.Common + "nationalIdentifier",
                                            "national identifier",
                                            out var nationalIdentifier,
                                            out ErrorResponse))
@@ -105,7 +105,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
             InternationalIdentifier = new InternationalIdentifier(
                                           country,
                                           nationalIdentifier,
-                                          XML.Element(XML_IO.nsCommon + "_internationalIdentifierExtension")
+                                          XML.Element(DatexIINS.Common + "_internationalIdentifierExtension")
                                       );
 
             return true;
@@ -119,13 +119,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         public XElement ToXML()
         {
 
-            var xml = new XElement(XML_IO.nsCommon + "publicationCreator",
+            var xml = new XElement(DatexIINS.Common + "publicationCreator",
 
-                                new XElement(XML_IO.nsCommon + "country",                             Country.Alpha2Code.ToLower()),
-                                new XElement(XML_IO.nsCommon + "nationalIdentifier",                  NationalIdentifier),
+                                new XElement(DatexIINS.Common + "country",                             Country.Alpha2Code.ToLower()),
+                                new XElement(DatexIINS.Common + "nationalIdentifier",                  NationalIdentifier),
 
                           InternationalIdentifierExtension is not null
-                              ? new XElement(XML_IO.nsCommon + "_internationalIdentifierExtension",   InternationalIdentifierExtension)
+                              ? new XElement(DatexIINS.Common + "_internationalIdentifierExtension",   InternationalIdentifierExtension)
                               : null
 
                       );

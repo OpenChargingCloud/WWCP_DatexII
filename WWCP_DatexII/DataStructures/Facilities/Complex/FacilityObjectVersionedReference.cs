@@ -17,7 +17,11 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
+
+using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -38,11 +42,119 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
     {
 
+        #region Properties
+
         /// <summary>
         /// Fixed attribute indicating the target class.
         /// </summary>
         [XmlAttribute("targetClass")]
         public String  TargetClass    { get; } = "fac:FacilityObject";
+
+        #endregion
+
+
+        #region TryParseXML(XML, out FacilityObjectVersionedReference, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an FacilityObjectVersionedReference.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="FacilityObjectVersionedReference">The parsed FacilityObjectVersionedReference.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement XML,
+                                          [NotNullWhen(true)]   out FacilityObjectVersionedReference?  FacilityObjectVersionedReference,
+                                          [NotNullWhen(false)]  out String?                            ErrorResponse)
+        {
+
+            FacilityObjectVersionedReference = null;
+
+            // <fac:reference targetClass = "fac:FacilityObject"
+            //                id          = "21F02723-CF84-4380-84D4-050917836C7C"
+            //                version     = "1" />
+
+            #region TryParse Id             [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("id",
+                                                    "id",
+                                                    out var id,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse Version        [optional]
+
+            if (XML.TryParseOptionalTextAttribute("version",
+                                                  "version",
+                                                  out var version,
+                                                  out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse TargetClass    [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("targetClass",
+                                                    "target class",
+                                                    out var targetClass,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.Facilities);
+
+            if (targetClass != $"{nsPrefix}:FacilityObject")
+            {
+                ErrorResponse = $"Invalid target class '{targetClass}'!";
+                return false;
+            }
+
+            #endregion
+
+
+            FacilityObjectVersionedReference = new FacilityObjectVersionedReference(
+                                                   id,
+                                                   version
+                                               );
+
+            return true;
+
+        }
+
+        #endregion
+
+        #region ToXML()
+
+        public XElement ToXML()
+        {
+
+            // <fac:reference targetClass = "fac:FacilityObject"
+            //                id          = "21F02723-CF84-4380-84D4-050917836C7C"
+            //                version     = "1" />
+
+            var xml = new XElement(DatexIINS.Facilities + "reference",
+
+                                new XAttribute("targetClass",   TargetClass),
+                                new XAttribute("id",            Id),
+
+                          Version.IsNotNullOrEmpty()
+                              ? new XAttribute("version",       Version)
+                              : null
+
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
+
 
     }
 

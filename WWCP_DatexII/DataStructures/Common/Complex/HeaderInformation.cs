@@ -85,7 +85,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse InformationStatus          [mandatory]
 
-            if (!XML.TryParseMandatory(XML_IO.nsCommon + "informationStatus",
+            if (!XML.TryParseMandatory(DatexIINS.Common + "informationStatus",
                                        "information status",
                                        InformationStatus.TryParse,
                                        out InformationStatus informationStatus,
@@ -98,7 +98,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse Confidentiality            [optional]
 
-            if (XML.TryParseOptional(XML_IO.nsCommon + "confidentiality",
+            if (XML.TryParseOptional(DatexIINS.Common + "confidentiality",
                                      "confidentiality",
                                      Common.Confidentiality.TryParse,
                                      out Confidentiality? confidentiality,
@@ -112,11 +112,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse AllowedDeliveryChannels    [optional]
 
-            if (XML.TryParseMandatoryElements(XML_IO.nsCommon + "allowedDeliveryChannel",
-                                              "allowed delivery channels",
-                                              InformationDeliveryService.TryParse,
-                                              out IEnumerable<InformationDeliveryService> allowedDeliveryChannels,
-                                              out ErrorResponse))
+            if (XML.TryParseOptionalElements(DatexIINS.Common + "allowedDeliveryChannel",
+                                             "allowed delivery channels",
+                                             InformationDeliveryService.TryParse,
+                                             out IEnumerable<InformationDeliveryService> allowedDeliveryChannels,
+                                             out ErrorResponse))
             {
                 if (ErrorResponse is not null)
                     return false;
@@ -129,7 +129,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                     informationStatus,
                                     confidentiality,
                                     allowedDeliveryChannels,
-                                    XML.Element(XML_IO.nsCommon + "_headerInformationExtension")
+                                    XML.Element(DatexIINS.Common + "_headerInformationExtension")
                                 );
 
             return true;
@@ -143,19 +143,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         public XElement ToXML()
         {
 
-            var xml = new XElement(XML_IO.nsCommon + "headerInformation",
+            var xml = new XElement(DatexIINS.Common + "headerInformation",
 
                           Confidentiality.HasValue
-                              ? new XElement(XML_IO.nsCommon + "confidentiality",               Confidentiality.       ToString())
+                              ? new XElement(DatexIINS.Common + "confidentiality",               Confidentiality.       ToString())
                               : null,
 
                           AllowedDeliveryChannel?.Select(allowedDeliveryChannel =>
-                                new XElement(XML_IO.nsCommon + "allowedDeliveryChannel",        allowedDeliveryChannel.ToString())),
+                                new XElement(DatexIINS.Common + "allowedDeliveryChannel",        allowedDeliveryChannel.ToString())),
 
-                                new XElement(XML_IO.nsCommon + "informationStatus",             InformationStatus.     ToString()),
+                                new XElement(DatexIINS.Common + "informationStatus",             InformationStatus.     ToString()),
 
                           HeaderInformationExtension is not null
-                              ? new XElement(XML_IO.nsCommon + "_headerInformationExtension",   HeaderInformationExtension)
+                              ? new XElement(DatexIINS.Common + "_headerInformationExtension",   HeaderInformationExtension)
                               : null
 
                       );

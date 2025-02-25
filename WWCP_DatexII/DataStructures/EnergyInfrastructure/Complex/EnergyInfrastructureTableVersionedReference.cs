@@ -45,6 +45,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #region Properties
 
+        /// <summary>
+        /// Fixed attribute indicating the target class.
+        /// </summary>
         [XmlAttribute("targetClass")]
         public String  TargetClass    { get; } = "egi:EnergyInfrastructureTable";
 
@@ -106,7 +109,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                 return false;
             }
 
-            var nsPrefix = XML.GetPrefixOfNamespace(XML_IO.nsEnergyInfrastructure);
+            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.EnergyInfrastructure);
 
             if (targetClass != $"{nsPrefix}:EnergyInfrastructureTable")
             {
@@ -127,6 +130,34 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         }
 
         #endregion
+
+        #region ToXML()
+
+        public XElement ToXML()
+        {
+
+            // <tableReference xmlns       = "http://datex2.eu/schema/3/energyInfrastructure"
+            //                 version     = "2"
+            //                 id          = "2474A514-0E5D-48F9-A908-F185DD4177A2"
+            //                 targetClass = "egi:EnergyInfrastructureTable" />
+
+            var xml = new XElement(DatexIINS.EnergyInfrastructure + "tableReference",
+
+                                new XAttribute("targetClass",   TargetClass),
+                                new XAttribute("id",            Id),
+
+                          Version.IsNotNullOrEmpty()
+                              ? new XAttribute("version",       Version)
+                              : null
+
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
+
 
     }
 

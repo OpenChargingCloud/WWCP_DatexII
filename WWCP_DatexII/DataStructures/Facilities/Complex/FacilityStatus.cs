@@ -32,15 +32,17 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// </summary>
     [XmlType("FacilityStatus", Namespace = "http://datex2.eu/schema/3/facilities")]
     public class FacilityStatus(FacilityObjectVersionedReference          Reference,
-                                DateTime?                                 LastUpdated                    = null,
-                                OpeningStatus?                            OpeningStatus                  = null,
-                                OperationStatus?                          OperationStatus                = null,
-                                Boolean?                                  RegularOperatingHoursInForce   = null,
-                                MultilingualString?                       StatusDescription              = null,
-                                AOperatingHours?                          NewOperatingHours              = null,
-                                Fault?                                    Fault                          = null,
+                                DateTimeOffset?                           LastUpdated                     = null,
+                                OpeningStatus?                            OpeningStatus                   = null,
+                                OperationStatus?                          OperationStatus                 = null,
+                                Boolean?                                  RegularOperatingHoursInForce    = null,
+                                MultilingualString?                       StatusDescription               = null,
+                                AOperatingHours?                          NewOperatingHours               = null,
+                                Fault?                                    Fault                           = null,
+                                XElement?                                 FacilityObjectStatusExtension   = null,
 
-                                IEnumerable<SupplementalFacilityStatus>?  SupplementalFacilityStatuses   = null)
+                                IEnumerable<SupplementalFacilityStatus>?  SupplementalFacilityStatus      = null,
+                                XElement?                                 FacilityStatusExtension         = null)
 
         : FacilityObjectStatus(Reference,
                                LastUpdated,
@@ -49,7 +51,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                RegularOperatingHoursInForce,
                                StatusDescription,
                                NewOperatingHours,
-                               Fault)
+                               Fault,
+                               FacilityObjectStatusExtension)
 
     {
 
@@ -57,13 +60,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Dynamic status information for supplemental facilities associated with this facility.
         /// </summary>
         [XmlElement("supplementalFacilityStatus",  Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<SupplementalFacilityStatus>  SupplementalFacilityStatuses    { get; set; } = SupplementalFacilityStatuses?.Distinct() ?? [];
+        public IEnumerable<SupplementalFacilityStatus>  SupplementalFacilityStatus    { get; } = SupplementalFacilityStatus?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional facility status information.
         /// </summary>
         [XmlElement("_facilityStatusExtension",    Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                                FacilityStatusExtension         { get; set; }
+        public XElement?                                FacilityStatusExtension       { get; } = FacilityStatusExtension;
 
     }
 
