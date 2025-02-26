@@ -31,7 +31,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// Provides information about an organisation including its units and contact information.
     /// </summary>
     [XmlType("Organisation", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public abstract class AOrganisation(OverallPeriod?  GeneralTimeValidity   = null)
+    public abstract class AOrganisation(OverallPeriod?  GeneralTimeValidity     = null,
+                                        XElement?       OrganisationExtension   = null)
     {
 
         /// <summary>
@@ -39,13 +40,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// This is not a specification of the operating hours as such.
         /// </summary>
         [XmlElement("generalTimeValidity", Namespace = "http://datex2.eu/schema/3/common")]
-        public OverallPeriod?  GeneralTimeValidity      { get; set; } = GeneralTimeValidity;
+        public OverallPeriod?  GeneralTimeValidity      { get; } = GeneralTimeValidity;
 
         /// <summary>
         /// Optional extension element for additional organisation information.
         /// </summary>
         [XmlElement("_organisationExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?       OrganisationExtension    { get; set; }
+        public XElement?       OrganisationExtension    { get; } = OrganisationExtension;
 
     }
 

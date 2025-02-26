@@ -29,20 +29,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// Operating hours, either by reference or by specification.
     /// </summary>
     [XmlType("OperatingHours", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public abstract class AOperatingHours(ClosureInformation? ClosureInformation = null)
+    public abstract class AOperatingHours(ClosureInformation?  ClosureInformation        = null,
+                                          XElement?            OperatingHoursExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Optional closure information.
         /// </summary>
         [XmlElement("closureInformation", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public ClosureInformation?  ClosureInformation         { get; set; } = ClosureInformation;
+        public ClosureInformation?  ClosureInformation         { get; } = ClosureInformation;
 
         /// <summary>
         /// Optional extension element for additional operating hours information.
         /// </summary>
         [XmlElement("_operatingHoursExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            OperatingHoursExtension    { get; set; }
+        public XElement?            OperatingHoursExtension    { get; } = OperatingHoursExtension;
+
+        #endregion
 
     }
 

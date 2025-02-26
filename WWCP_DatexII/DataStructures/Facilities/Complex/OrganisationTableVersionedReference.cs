@@ -17,7 +17,11 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
+
+using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -37,8 +41,111 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
     {
 
+        #region Properties
+
+        /// <summary>
+        /// Fixed attribute indicating the target class.
+        /// </summary>
         [XmlAttribute("targetClass")]
         public String  TargetClass    { get; } = "fac:OrganisationTable";
+
+        #endregion
+
+
+        #region TryParseXML(XML, out OrganisationTableVersionedReference, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an OrganisationTableVersionedReference.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="OrganisationTableVersionedReference">The parsed OrganisationTableVersionedReference.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                                       XML,
+                                          [NotNullWhen(true)]  out OrganisationTableVersionedReference?  OrganisationTableVersionedReference,
+                                          [NotNullWhen(false)] out String?                               ErrorResponse)
+        {
+
+            OrganisationTableVersionedReference = null;
+
+            #region TryParse Id             [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("id",
+                                                    "id",
+                                                    out var id,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse Version        [optional]
+
+            if (XML.TryParseOptionalTextAttribute("version",
+                                                  "version",
+                                                  out var version,
+                                                  out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse TargetClass    [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("targetClass",
+                                                    "target class",
+                                                    out var targetClass,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.Facilities);
+
+            if (targetClass != $"{nsPrefix}:OrganisationTable")
+            {
+                ErrorResponse = $"Invalid target class '{targetClass}'!";
+                return false;
+            }
+
+            #endregion
+
+
+            OrganisationTableVersionedReference = new OrganisationTableVersionedReference(
+                                                      id,
+                                                      version
+                                                  );
+
+            return true;
+
+        }
+
+        #endregion
+
+        #region ToXML()
+
+        public XElement ToXML()
+        {
+
+            var xml = new XElement(DatexIINS.EnergyInfrastructure + "organisationTableReference",
+
+                                new XAttribute("targetClass",   TargetClass),
+                                new XAttribute("id",            Id),
+
+                          Version.IsNotNullOrEmpty()
+                              ? new XAttribute("version",       Version)
+                              : null
+
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
+
 
     }
 

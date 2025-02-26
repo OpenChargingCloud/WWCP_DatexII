@@ -122,10 +122,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             var concreteTypeAttribute        = XML.Attribute(DatexIINS.XSI + "type");
             var concreteTypeNamespace        = concreteTypeAttribute?.Name.NamespaceName;
-            var concerteTypeName             = concreteTypeAttribute?.Value.Split(':');
+            var concreteTypeName             = concreteTypeAttribute?.Value.Split(':');
 
-            var concreteTypeNamespacePrefix  = concerteTypeName?.Length == 2 ? XML.GetNamespaceOfPrefix(concerteTypeName?[0] ?? "") : DatexIINS.EnergyInfrastructure.NamespaceName;
-            var concreteTypeNamespaceSuffix  = concerteTypeName?.Length == 2 ? concerteTypeName?[1] ?? "" : concerteTypeName?[0] ?? "";
+            var concreteTypeNamespacePrefix  = concreteTypeName?.Length == 2 ? XML.GetNamespaceOfPrefix(concreteTypeName?[0] ?? "") : DatexIINS.EnergyInfrastructure.NamespaceName;
+            var concreteTypeNamespaceSuffix  = concreteTypeName?.Length == 2 ? concreteTypeName?[1] ?? "" : concreteTypeName?[0] ?? "";
 
 
             if (concreteTypeNamespacePrefix?.NamespaceName == DatexIINS.EnergyInfrastructure.NamespaceName)

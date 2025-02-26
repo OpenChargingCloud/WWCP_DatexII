@@ -61,7 +61,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <param name="XML">The XML to be parsed.</param>
         /// <param name="FacilityObjectVersionedReference">The parsed FacilityObjectVersionedReference.</param>
         /// <param name="ErrorResponse">An optional error response.</param>
-        public static Boolean TryParseXML(XElement XML,
+        public static Boolean TryParseXML(XElement                                                     XML,
                                           [NotNullWhen(true)]   out FacilityObjectVersionedReference?  FacilityObjectVersionedReference,
                                           [NotNullWhen(false)]  out String?                            ErrorResponse)
         {

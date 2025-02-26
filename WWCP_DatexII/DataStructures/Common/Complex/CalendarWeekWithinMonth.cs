@@ -31,12 +31,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// </summary>
     [XmlType("CalendarWeekWithinMonth", Namespace = "http://datex2.eu/schema/3/common")]
     public class CalendarWeekWithinMonth(IEnumerable<CalendarWeekWithinMonthEnum>?  ApplicableCalenderWeekWithinMonth   = null,
+                                         XElement?                                  CalendarWeekWithinMonthExtension    = null,
 
-                                         IEnumerable<Days>?                         ApplicableDay                       = null,
-                                         IEnumerable<MonthOfYear>?                  ApplicableMonth                     = null)
+                                         IEnumerable<Day>?                          ApplicableDays                      = null,
+                                         IEnumerable<MonthOfYear>?                  ApplicableMonths                    = null,
+                                         XElement?                                  DayWeekMonthExtension               = null)
 
-        : DayWeekMonth(ApplicableDay,
-                       ApplicableMonth)
+        : DayWeekMonth(ApplicableDays,
+                       ApplicableMonths,
+                       DayWeekMonthExtension)
 
     {
 
@@ -53,7 +56,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// Optional extension element for additional information.
         /// </summary>
         [XmlElement("_calendarWeekWithinMonthExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                                 CalendarWeekWithinMonthExtension     { get; set; }
+        public XElement?                                 CalendarWeekWithinMonthExtension     { get; set; } = CalendarWeekWithinMonthExtension;
 
     }
 

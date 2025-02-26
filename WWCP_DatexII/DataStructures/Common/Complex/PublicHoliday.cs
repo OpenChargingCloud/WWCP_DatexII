@@ -32,14 +32,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     public class PublicHoliday(MultilingualString        PublicHolidayName,
 
                                Boolean                   IntersectWithApplicableDays,
-                               SpecialDayTypes           SpecialDayType,
-                               PublicEventTypes?         PublicEvent   = null,
-                               IEnumerable<ANamedArea>?  NamedAreas    = null)
+                               SpecialDayType            SpecialDayType,
+                               PublicEventType?          PublicEvent              = null,
+                               IEnumerable<ANamedArea>?  NamedAreas               = null,
+                               XElement?                 SpecialDayExtension      = null,
+                               XElement?                 PublicHolidayExtension   = null)
+
 
         : SpecialDay(IntersectWithApplicableDays,
                      SpecialDayType,
                      PublicEvent,
-                     NamedAreas)
+                     NamedAreas,
+                     SpecialDayExtension)
 
     {
 
@@ -47,13 +51,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// Specification of a specific public holiday by its name.
         /// </summary>
         [XmlElement("publicHolidayName", Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString  PublicHolidayName         { get; set; } = PublicHolidayName;
+        public MultilingualString  PublicHolidayName         { get; } = PublicHolidayName;
 
         /// <summary>
         /// Optional extension element for additional public holiday information.
         /// </summary>
         [XmlElement("_publicHolidayExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?           PublicHolidayExtension    { get; set; }
+        public XElement?           PublicHolidayExtension    { get; } = PublicHolidayExtension;
 
     }
 

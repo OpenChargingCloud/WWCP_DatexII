@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -29,14 +30,45 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// An abstract hook class to hook in a model for a named area.
     /// </summary>
     [XmlType("NamedArea", Namespace = "http://datex2.eu/schema/3/common")]
-    public abstract class ANamedArea
+    public abstract class ANamedArea(XElement? ANamedAreaExtension = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Optional extension element for additional named area information.
         /// </summary>
         [XmlElement("_namedAreaExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  NamedAreaExtension    { get; set; }
+        public XElement?  ANamedAreaExtension    { get; } = ANamedAreaExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out ANamedArea, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an ANamedArea.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="ANamedArea">The parsed ANamedArea.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                              XML,
+                                          [NotNullWhen(true)]  out ANamedArea?  ANamedArea,
+                                          [NotNullWhen(false)] out String?      ErrorResponse)
+        {
+
+            ANamedArea     = null;
+            ErrorResponse  = null;
+
+
+            return true;
+
+        }
+
+        #endregion
+
+
+        public abstract XElement ToXML(XName? XName = null);
 
     }
 

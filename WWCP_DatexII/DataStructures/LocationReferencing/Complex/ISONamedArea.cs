@@ -33,36 +33,66 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// The ISO 3166-2 representation for the named area.
     /// </summary>
     [XmlType("IsoNamedArea", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-    public class IsoNamedArea(MultilingualString  AreaName,
+    public class ISONamedArea(MultilingualString  AreaName,
                               SubdivisionTypes    SubdivisionType,
                               SubdivisionCode     SubdivisionCode,
-                              NamedAreaTypes?     NamedAreaType   = null,
-                              Country?            Country         = null)
+                              NamedAreaTypes?     NamedAreaType           = null,
+                              Country?            Country                 = null,
+                              XElement?           NamedAreaExtension      = null,
+                              XElement?           ISONamedAreaExtension   = null,
+
+                              XElement?           ANamedAreaExtension     = null)
 
         : NamedArea(AreaName,
                     NamedAreaType,
-                    Country)
+                    Country,
+                    NamedAreaExtension,
+                    ANamedAreaExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// The ISO 3166-2 subdivision type for the named area.
         /// </summary>
         [XmlElement("subdivisionType",         Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public SubdivisionTypes  SubdivisionType          { get; set; } = SubdivisionType;
+        public SubdivisionTypes  SubdivisionType          { get; } = SubdivisionType;
 
         /// <summary>
         /// The second part of an ISO 3166-2 subdivision code for the named area.
         /// This may be used along with the country attribute from the parent class to form a full ISO 3166-2 subdivision code.
         /// </summary>
         [XmlElement("subdivisionCode",         Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public SubdivisionCode   SubdivisionCode          { get; set; } = SubdivisionCode;
+        public SubdivisionCode   SubdivisionCode          { get; } = SubdivisionCode;
 
         /// <summary>
         /// Optional extension element for additional ISO named area information.
         /// </summary>
         [XmlElement("_isoNamedAreaExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?         ISONamedAreaExtension    { get; set; }
+        public XElement?         ISONamedAreaExtension    { get; } = ISONamedAreaExtension;
+
+        #endregion
+
+
+        #region ToXML(XMLName = null)
+
+        public override XElement ToXML(XName? XMLName = null)
+        {
+
+            var xml = new XElement(XMLName ?? DatexIINS.LocationReferencing + "IsoNamedArea",
+
+                           new XElement(DatexIINS.LocationReferencing + "areaName",
+                               AreaName.ToXML()
+                           )
+
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
 
     }
 

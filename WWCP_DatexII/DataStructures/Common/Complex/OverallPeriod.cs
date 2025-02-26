@@ -166,6 +166,36 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
+        #region ToXML(XMLName = null)
+
+        public XElement ToXML(XName? XMLName = null)
+        {
+
+            var xml = new XElement(XMLName ?? DatexIINS.Common + "overallPeriod",
+
+                                new XElement(DatexIINS.Common + "overallStartTime",   OverallStartTime.    ToIso8601WithOffset()),
+
+                          OverallEndTime.HasValue
+                              ? new XElement(DatexIINS.Common + "overallEndTime",     OverallEndTime.Value.ToIso8601WithOffset())
+                              : null
+
+                          //ValidPeriod     is not null
+                          //    ? new XElement(DatexIINS.Common + "validPeriod",        ValidPeriod.         ToXML(DatexIINS.Common + "validPeriod"))
+                          //    : null,
+
+                          //ExceptionPeriod is not null
+                          //    ? new XElement(DatexIINS.Common + "exceptionPeriod",    ExceptionPeriod.     ToXML(DatexIINS.Common + "exceptionPeriod"))
+                          //    : null
+
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
+
+
     }
 
 }

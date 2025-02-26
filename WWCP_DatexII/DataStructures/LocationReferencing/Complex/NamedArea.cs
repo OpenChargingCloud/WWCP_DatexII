@@ -35,36 +35,65 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// </summary>
     [XmlType("NamedArea", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
     public class NamedArea(MultilingualString  AreaName,
-                           NamedAreaTypes?     NamedAreaType   = null,
-                           Country?            Country         = null)
+                           NamedAreaTypes?     NamedAreaType         = null,
+                           Country?            Country               = null,
+                           XElement?           NamedAreaExtension    = null,
 
-        : ANamedArea
+                           XElement?           ANamedAreaExtension   = null)
+
+        : ANamedArea(ANamedAreaExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// The name of the area.
         /// </summary>
         [XmlElement("areaName",       Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString  AreaName         { get; set; } = AreaName;
+        public MultilingualString  AreaName              { get; } = AreaName;
 
         /// <summary>
         /// The type of the area.
         /// </summary>
         [XmlElement("namedAreaType",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public NamedAreaTypes?     NamedAreaType    { get; set; } = NamedAreaType;
+        public NamedAreaTypes?     NamedAreaType         { get; } = NamedAreaType;
 
         /// <summary>
         /// EN ISO 3166-1 two-character country code.
         /// </summary>
         [XmlElement("country",        Namespace = "http://datex2.eu/schema/3/common")]
-        public Country?            Country          { get; set; } = Country;
+        public Country?            Country               { get; } = Country;
 
-        ///// <summary>
-        ///// Optional extension element for additional named area information.
-        ///// </summary>
-        //[XmlElement("_namedAreaExtension", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        //public XElement?           NamedAreaExtension    { get; set; }
+        /// <summary>
+        /// Optional extension element for additional named area information.
+        /// </summary>
+        [XmlElement("_namedAreaExtension", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public XElement?           NamedAreaExtension    { get; } = NamedAreaExtension;
+
+        #endregion
+
+
+
+
+        #region ToXML(XMLName = null)
+
+        public override XElement ToXML(XName? XMLName = null)
+        {
+
+            var xml = new XElement(XMLName ?? DatexIINS.LocationReferencing + "NamedArea",
+
+                           new XElement(DatexIINS.LocationReferencing + "areaName",
+                               AreaName.ToXML()
+                           )
+
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
 
     }
 

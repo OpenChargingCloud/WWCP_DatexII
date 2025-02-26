@@ -138,7 +138,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region (static) TryParse(Text)
 
         /// <summary>
-        /// Try to parse the given text as confidentiality.
+        /// Try to parse the given text as a confidentiality.
         /// </summary>
         /// <param name="Text">A text representation of a confidentiality.</param>
         public static Confidentiality? TryParse(String Text)

@@ -40,7 +40,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// The values of the multilingual string.
         /// </summary>
-        [XmlElement("values")]
+        [XmlArray("values")]
         public IEnumerable<MultilingualStringValue>  Values    { get; set; } = Values;
 
         #endregion
@@ -81,6 +81,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                  );
 
             return true;
+
+        }
+
+        #endregion
+
+        #region ToXML(XMLName = null)
+
+        public XElement ToXML(XName? XMLName = null)
+        {
+
+            // C# is very strict with XML namespaces!
+            var xmlElement    = XMLName ?? DatexIINS.Common + "MultilingualString";
+            var xmlNamespace  = xmlElement.Namespace;
+
+            var xml = new XElement(XMLName ?? DatexIINS.Common + "MultilingualString",
+
+                          new XElement(xmlNamespace + "values",
+
+                              Values.Any()
+                                  ? Values.Select(value => value.ToXML(xmlNamespace + "value"))
+                                  : null
+
+                          )
+
+                      );
+
+            return xml;
 
         }
 
@@ -151,6 +178,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                       );
 
             return true;
+
+        }
+
+        #endregion
+
+        #region ToXML(XMLName = null)
+
+        public XElement ToXML(XName? XMLName = null)
+        {
+
+            var xml = new XElement(XMLName ?? "value",
+
+                          new XAttribute("lang", Language.ToString()),
+
+                          Text
+
+                      );
+
+            return xml;
 
         }
 

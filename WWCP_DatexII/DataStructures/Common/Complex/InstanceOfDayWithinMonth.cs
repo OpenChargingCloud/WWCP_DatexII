@@ -30,12 +30,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// </summary>
     [XmlType("InstanceOfDayWithinMonth", Namespace = "http://datex2.eu/schema/3/common")]
     public class InstanceOfDayWithinMonth(IEnumerable<InstanceOfDay>  ApplicableInstanceOfDayWithinMonth,
+                                          XElement?                   InstanceOfDayWithinMonthExtension   = null,
 
-                                          IEnumerable<Days>?          ApplicableDay     = null,
-                                          IEnumerable<MonthOfYear>?   ApplicableMonth   = null)
+                                          IEnumerable<Day>?           ApplicableDays                      = null,
+                                          IEnumerable<MonthOfYear>?   ApplicableMonths                    = null,
+                                          XElement?                   DayWeekMonthExtension               = null)
 
-        : DayWeekMonth(ApplicableDay,
-                       ApplicableMonth)
+        : DayWeekMonth(ApplicableDays,
+                       ApplicableMonths,
+                       DayWeekMonthExtension)
 
     {
 
@@ -50,7 +53,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// Optional extension element for additional instance-of-day-within-month information.
         /// </summary>
         [XmlElement("_instanceOfDayWithinMonthExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                   InstanceOfDayWithinMonthExtension     { get; set; }
+        public XElement?                   InstanceOfDayWithinMonthExtension     { get; set; } = InstanceOfDayWithinMonthExtension;
 
     }
 

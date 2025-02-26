@@ -105,7 +105,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
             Period         = null;
             ErrorResponse  = null;
 
-            #region TryParse StartOfPeriod      [optional]
+            #region TryParse StartOfPeriod                  [optional]
 
             if (XML.TryParseOptionalTimestamp(DatexIINS.Common + "startOfPeriod",
                                               "start of period",
@@ -118,7 +118,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #endregion
 
-            #region TryParse EndOfPeriod      [optional]
+            #region TryParse EndOfPeriod                    [optional]
 
             if (XML.TryParseOptionalTimestamp(DatexIINS.Common + "endOfPeriod",
                                               "end of period",
@@ -131,17 +131,72 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #endregion
 
+            #region TryParse PeriodName                     [optional]
 
+            if (XML.TryParseOptional(DatexIINS.Common + "periodName",
+                                     "period name",
+                                     MultilingualString.TryParseXML,
+                                     out MultilingualString? periodName,
+                                     out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse RecurringTimePeriodOfDay       [optional]
+
+            if (XML.TryParseOptionalElements(DatexIINS.Common + "recurringTimePeriodOfDay",
+                                             "recurring time period of day",
+                                             TimePeriodOfDay.TryParseXML,
+                                             out IEnumerable<TimePeriodOfDay>? recurringTimePeriodOfDay,
+                                             out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse RecurringDayWeekMonthPeriod    [optional]
+
+            if (XML.TryParseOptionalElements(DatexIINS.Common + "recurringDayWeekMonthPeriod",
+                                             "recurring day week month period",
+                                             DayWeekMonth.TryParseXML,
+                                             out IEnumerable<DayWeekMonth>? recurringDayWeekMonthPeriod,
+                                             out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse RecurringSpecialDay            [optional]
+
+            if (XML.TryParseOptionalElements(DatexIINS.Common + "recurringSpecialDay",
+                                             "recurring day week month period",
+                                             SpecialDay.TryParseXML,
+                                             out IEnumerable<SpecialDay>? recurringSpecialDay,
+                                             out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
 
 
             Period = new Period(
 
                          startOfPeriod,
                          endOfPeriod,
-                         null, //periodName,
-                         null, //recurringTimePeriodOfDay,
-                         null, //recurringDayWeekMonthPeriod,
-                         null, //recurringSpecialDay,
+                         periodName,
+                         recurringTimePeriodOfDay,
+                         recurringDayWeekMonthPeriod,
+                         recurringSpecialDay,
+
                          XML.Element(DatexIINS.Common + "_periodExtension")
 
                      );
@@ -152,6 +207,38 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
+        #region ToXML(XMLName = null)
+
+        public XElement ToXML(XName? XMLName = null)
+        {
+
+            var xml = new XElement(XMLName ?? DatexIINS.Common + "period",
+
+                          StartOfPeriod.HasValue
+                              ? new XElement(DatexIINS.Common + "startOfPeriod",   StartOfPeriod.Value.ToIso8601WithOffset())
+                              : null,
+
+                          EndOfPeriod.  HasValue
+                              ? new XElement(DatexIINS.Common + "endOfPeriod",     EndOfPeriod.  Value.ToIso8601WithOffset())
+                              : null,
+
+                          PeriodName?.ToXML(DatexIINS.Common + "periodName"),
+
+                          RecurringTimePeriodOfDay?.   Select(timePeriodOfDay => timePeriodOfDay.ToXML(DatexIINS.Common + "recurringTimePeriodOfDay")),
+
+                          RecurringDayWeekMonthPeriod?.Select(dayWeekMonth    => dayWeekMonth.   ToXML(DatexIINS.Common + "recurringDayWeekMonthPeriod")),
+
+                          RecurringSpecialDay?.        Select(specialDay      => specialDay.     ToXML(DatexIINS.Common + "recurringSpecialDay")),
+
+                          PeriodExtension
+
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
 
     }
 
