@@ -8,7 +8,7 @@ This software libraries allow you to build EU [DatexII](https://github.com/DATEX
 
 ### applicableCalenderWeekWithinMonth vs. applicableCalendarWeekWithinMonth
 
-DATEXII_3_Common.xsd (line 99 for status version, line 200 for table version) has the following spelling mistake within a XML element name of the `CalendarWeekWithinMonth` complex type:
+DATEXII_3_Common.xsd (line 99 for status version, line 200 for table version) has the following spelling mistake within a XML element name `applicableCalenderWeekWithinMonth` of the `CalendarWeekWithinMonth` complex type:
 ```
 <xs:complexType name="CalendarWeekWithinMonth">
   <xs:annotation>
