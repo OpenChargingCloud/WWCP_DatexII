@@ -7,13 +7,22 @@ This software libraries allow you to build EU [DatexII](https://github.com/DATEX
 
 ### perman(an)entlyClosed vs. permanentlyClosed
 
-DATEXII_3_Facilities.xsd (line 101 for status version, line 255 for table version) has the following spelling mistake within a XML element name on the `ClosureInformation` complex type:
+DATEXII_3_Facilities.xsd (line 101 for status version, line 255 for table version) has the following spelling mistake within a XML element name of the `ClosureInformation` complex type:
 ```
 <xs:element name="permananentlyClosed" type="com:Boolean" minOccurs="0" maxOccurs="1">
   <xs:annotation>
     <xs:documentation>Permanently closed, i.e. it is not intended to open again.</xs:documentation>
   </xs:annotation>
 </xs:element>
+```
+
+DATEXII_3_EnergyInfrastructure.xsd (line 463 for status version, line 1411 for table version) has the following spelling mistake within an ENUM name of the `ServiceTypeEnum` enumeration:
+```
+<xs:enumeration value="pyhsicalAttendance">
+  <xs:annotation>
+    <xs:documentation>Presence of physical persons attending the recharging or refuelling station.</xs:documentation>
+  </xs:annotation>
+</xs:enumeration>
 ```
 
 #### Your contributions
