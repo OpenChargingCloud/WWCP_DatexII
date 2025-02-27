@@ -27,6 +27,16 @@ DATEXII_3_EnergyInfrastructure.xsd (line 463 for status version, line 1411 for t
 </xs:enumeration>
 ```
 
+### onstreet vs. onStreet
+
+DATEXII_3_EnergyInfrastructure.xsd (line 164 for table version) has the following spelling mistake within an ENUM name of the `EnergyInfrastructureSiteTypeEnum` enumeration:
+
+<xs:enumeration value="onstreet">
+  <xs:annotation>
+    <xs:documentation>The energy infrastructure site is located alongside a street, for example some singular charging stations.</xs:documentation>
+  </xs:annotation>
+</xs:enumeration>
+
 #### Your contributions
 
 This software is developed by [GraphDefined GmbH](http://www.graphdefined.com).
