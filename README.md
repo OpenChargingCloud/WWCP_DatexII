@@ -5,6 +5,30 @@ This software libraries allow you to build EU [DatexII](https://github.com/DATEX
 
 ## Known DatexII Specification Issues
 
+
+### applicableCalenderWeekWithinMonth vs. applicableCalendarWeekWithinMonth
+
+DATEXII_3_Common.xsd (line 99 for status version, line 200 for table version) has the following spelling mistake within a XML element name of the `CalendarWeekWithinMonth` complex type:
+```
+<xs:complexType name="CalendarWeekWithinMonth">
+  <xs:annotation>
+    <xs:documentation>Specification of periods defined by relevant calendar weeks in a month, see ISO8601. Note: Calendar weeks start with Monday. First week is the week containing the first of the month.</xs:documentation>
+  </xs:annotation>
+  <xs:complexContent>
+    <xs:extension base="com:DayWeekMonth">
+      <xs:sequence>
+        <xs:element name="applicableCalenderWeekWithinMonth" type="com:_CalendarWeekWithinMonthEnum" minOccurs="1" maxOccurs="6">
+          <xs:annotation>
+            <xs:documentation>Calender week in month. See ISO8601.  "All weeks of the month" is expressed by not using the CalendarWeekOfMonth class. Note: Calendar weeks start with Monday. First week is the week containing the first of the month.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="_calendarWeekWithinMonthExtension" type="com:_ExtensionType" minOccurs="0" />
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+```
+
 ### perman(an)entlyClosed vs. permanentlyClosed
 
 DATEXII_3_Facilities.xsd (line 101 for status version, line 255 for table version) has the following spelling mistake within a XML element name of the `ClosureInformation` complex type:
@@ -37,6 +61,8 @@ DATEXII_3_EnergyInfrastructure.xsd (line 164 for table version) has the followin
   </xs:annotation>
 </xs:enumeration>
 ```
+
+
 
 #### Your contributions
 
