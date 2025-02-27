@@ -17,13 +17,13 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.LocationReferencing;
-using System.Xml.Linq;
 
 #endregion
 
@@ -36,32 +36,36 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     [XmlType("SupplementalEquipment", Namespace = "http://datex2.eu/schema/3/facilities")]
     public class SupplementalEquipment(String                                Id,
                                        String                                Version,
-                                       EquipmentTypes                        EquipmentType,
+                                       EquipmentType                         EquipmentType,
 
-                                       MultilingualString?                   Name                    = null,
-                                       IEnumerable<MultilingualString>?      Alias                   = null,
-                                       String?                               ExternalIdentifier      = null,
-                                       DateTime?                             LastUpdated             = null,
-                                       MultilingualString?                   Description             = null,
-                                       IEnumerable<Accessibilities>?         Accessibility           = null,
-                                       IEnumerable<MultilingualString>?      AdditionalInformation   = null,
-                                       IEnumerable<URL>?                     InformationWebsites     = null,
-                                       IEnumerable<URL>?                     PhotoURLs               = null,
-                                       IEnumerable<Image>?                   Photos                  = null,
-                                       AOperatingHours?                      OperatingHours          = null,
-                                       ALocationReference?                   LocationReference       = null,
-                                       AOrganisation?                        Owner                   = null,
-                                       AOrganisation?                        Operator                = null,
-                                       AOrganisation?                        Helpdesk                = null,
-                                       IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles   = null,
-                                       Dimension?                            Dimension               = null,
-                                       Amenities?                            Amenities               = null,
+                                       MultilingualString?                   Name                             = null,
+                                       IEnumerable<MultilingualString>?      Alias                            = null,
+                                       String?                               ExternalIdentifier               = null,
+                                       DateTime?                             LastUpdated                      = null,
+                                       MultilingualString?                   Description                      = null,
+                                       IEnumerable<Accessibility>?           Accessibility                    = null,
+                                       IEnumerable<MultilingualString>?      AdditionalInformation            = null,
+                                       IEnumerable<URL>?                     InformationWebsites              = null,
+                                       IEnumerable<URL>?                     PhotoURLs                        = null,
+                                       IEnumerable<Image>?                   Photos                           = null,
+                                       AOperatingHours?                      OperatingHours                   = null,
+                                       ALocationReference?                   LocationReference                = null,
+                                       AOrganisation?                        Owner                            = null,
+                                       AOrganisation?                        Operator                         = null,
+                                       AOrganisation?                        Helpdesk                         = null,
+                                       IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles            = null,
+                                       Dimension?                            Dimension                        = null,
+                                       Amenities?                            Amenities                        = null,
 
-                                       Availabilities?                       Availability            = null,
-                                       UInt64?                               Quantity                = null,
-                                       Boolean?                              RegularlyCleaned        = null,
-                                       IEnumerable<UserTypes>?               ApplicableForUser       = null,
-                                       Boolean?                              Nearby                  = null)
+                                       Availability?                         Availability                     = null,
+                                       UInt64?                               Quantity                         = null,
+                                       Boolean?                              RegularlyCleaned                 = null,
+                                       IEnumerable<UserType>?                ApplicableForUser                = null,
+                                       Boolean?                              Nearby                           = null,
+
+                                       XElement?                             FacilityObjectExtension          = null,
+                                       XElement?                             SupplementalFacilityExtension    = null,
+                                       XElement?                             SupplementalEquipmentExtension   = null)
 
         : ASupplementalFacility(Id,
                                 Version,
@@ -89,20 +93,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                 Quantity,
                                 RegularlyCleaned,
                                 ApplicableForUser,
-                                Nearby)
+                                Nearby,
+
+                                FacilityObjectExtension,
+                                SupplementalFacilityExtension)
 
     {
+
+        #region Properties
+
         /// <summary>
         /// One type of equipment.
         /// </summary>
         [XmlElement("equipmentType",                    Namespace = "http://datex2.eu/schema/3/facilities")]
-        public EquipmentTypes  EquipmentType                     { get; set; } = EquipmentType;
+        public EquipmentType  EquipmentType                     { get; } = EquipmentType;
 
         /// <summary>
         /// Optional extension element for additional supplemental equipment information.
         /// </summary>
         [XmlElement("_supplementalEquipmentExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?       SupplementalEquipmentExtension    { get; set; }
+        public XElement?      SupplementalEquipmentExtension    { get; } = SupplementalEquipmentExtension;
+
+        #endregion
 
     }
 

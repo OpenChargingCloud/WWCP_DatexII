@@ -25,22 +25,22 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 {
 
     /// <summary>
-    /// Extension methods for confidentialitys.
+    /// Extension methods for Confidentialities.
     /// </summary>
     public static class ConfidentialityExtensions
     {
 
         /// <summary>
-        /// Indicates whether this confidentiality is null or empty.
+        /// Indicates whether this Confidentiality is null or empty.
         /// </summary>
-        /// <param name="Confidentiality">A confidentiality.</param>
+        /// <param name="Confidentiality">A Confidentiality.</param>
         public static Boolean IsNullOrEmpty(this Confidentiality? Confidentiality)
             => !Confidentiality.HasValue || Confidentiality.Value.IsNullOrEmpty;
 
         /// <summary>
-        /// Indicates whether this confidentiality is null or empty.
+        /// Indicates whether this Confidentiality is null or empty.
         /// </summary>
-        /// <param name="Confidentiality">A confidentiality.</param>
+        /// <param name="Confidentiality">A Confidentiality.</param>
         public static Boolean IsNotNullOrEmpty(this Confidentiality? Confidentiality)
             => Confidentiality.HasValue && Confidentiality.Value.IsNotNullOrEmpty;
 
@@ -48,7 +48,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
 
     /// <summary>
-    /// A confidentiality.
+    /// A Confidentiality.
     /// </summary>
     public readonly struct Confidentiality : IId,
                                              IEquatable<Confidentiality>,
@@ -65,19 +65,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Properties
 
         /// <summary>
-        /// Indicates whether this confidentiality is null or empty.
+        /// Indicates whether this Confidentiality is null or empty.
         /// </summary>
         public readonly  Boolean                          IsNullOrEmpty
             => InternalId.IsNullOrEmpty();
 
         /// <summary>
-        /// Indicates whether this confidentiality is NOT null or empty.
+        /// Indicates whether this Confidentiality is NOT null or empty.
         /// </summary>
         public readonly  Boolean                          IsNotNullOrEmpty
             => InternalId.IsNotNullOrEmpty();
 
         /// <summary>
-        /// The length of the confidentiality.
+        /// The length of the Confidentiality.
         /// </summary>
         public readonly  UInt64                           Length
             => (UInt64) (InternalId?.Length ?? 0);
@@ -93,9 +93,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Constructor(s)
 
         /// <summary>
-        /// Create a new confidentiality based on the given text.
+        /// Create a new Confidentiality based on the given text.
         /// </summary>
-        /// <param name="Text">The text representation of a confidentiality.</param>
+        /// <param name="Text">The text representation of a Confidentiality.</param>
         private Confidentiality(String Text)
         {
             this.InternalId = Text;
@@ -119,16 +119,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region (static) Parse   (Text)
 
         /// <summary>
-        /// Parse the given string as a confidentiality.
+        /// Parse the given string as a Confidentiality.
         /// </summary>
-        /// <param name="Text">A text representation of a confidentiality.</param>
+        /// <param name="Text">A text representation of a Confidentiality.</param>
         public static Confidentiality Parse(String Text)
         {
 
             if (TryParse(Text, out var confidentiality))
                 return confidentiality;
 
-            throw new ArgumentException($"Invalid text representation of a confidentiality: '{Text}'!",
+            throw new ArgumentException($"Invalid text representation of a Confidentiality: '{Text}'!",
                                         nameof(Text));
 
         }
@@ -138,9 +138,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region (static) TryParse(Text)
 
         /// <summary>
-        /// Try to parse the given text as a confidentiality.
+        /// Try to parse the given text as a Confidentiality.
         /// </summary>
-        /// <param name="Text">A text representation of a confidentiality.</param>
+        /// <param name="Text">A text representation of a Confidentiality.</param>
         public static Confidentiality? TryParse(String Text)
         {
 
@@ -156,10 +156,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region (static) TryParse(Text, out Confidentiality)
 
         /// <summary>
-        /// Try to parse the given text as confidentiality.
+        /// Try to parse the given text as Confidentiality.
         /// </summary>
-        /// <param name="Text">A text representation of a confidentiality.</param>
-        /// <param name="Confidentiality">The parsed confidentiality.</param>
+        /// <param name="Text">A text representation of a Confidentiality.</param>
+        /// <param name="Confidentiality">The parsed Confidentiality.</param>
         public static Boolean TryParse(String Text, out Confidentiality Confidentiality)
         {
 
@@ -185,7 +185,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Clone()
 
         /// <summary>
-        /// Clone this confidentiality.
+        /// Clone this Confidentiality.
         /// </summary>
         public Confidentiality Clone()
 
@@ -232,8 +232,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="Confidentiality1">A confidentiality.</param>
-        /// <param name="Confidentiality2">Another confidentiality.</param>
+        /// <param name="Confidentiality1">A Confidentiality.</param>
+        /// <param name="Confidentiality2">Another Confidentiality.</param>
         /// <returns>true|false</returns>
         public static Boolean operator == (Confidentiality Confidentiality1,
                                            Confidentiality Confidentiality2)
@@ -247,8 +247,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="Confidentiality1">A confidentiality.</param>
-        /// <param name="Confidentiality2">Another confidentiality.</param>
+        /// <param name="Confidentiality1">A Confidentiality.</param>
+        /// <param name="Confidentiality2">Another Confidentiality.</param>
         /// <returns>true|false</returns>
         public static Boolean operator != (Confidentiality Confidentiality1,
                                            Confidentiality Confidentiality2)
@@ -262,8 +262,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="Confidentiality1">A confidentiality.</param>
-        /// <param name="Confidentiality2">Another confidentiality.</param>
+        /// <param name="Confidentiality1">A Confidentiality.</param>
+        /// <param name="Confidentiality2">Another Confidentiality.</param>
         /// <returns>true|false</returns>
         public static Boolean operator < (Confidentiality Confidentiality1,
                                           Confidentiality Confidentiality2)
@@ -277,8 +277,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="Confidentiality1">A confidentiality.</param>
-        /// <param name="Confidentiality2">Another confidentiality.</param>
+        /// <param name="Confidentiality1">A Confidentiality.</param>
+        /// <param name="Confidentiality2">Another Confidentiality.</param>
         /// <returns>true|false</returns>
         public static Boolean operator <= (Confidentiality Confidentiality1,
                                            Confidentiality Confidentiality2)
@@ -292,8 +292,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="Confidentiality1">A confidentiality.</param>
-        /// <param name="Confidentiality2">Another confidentiality.</param>
+        /// <param name="Confidentiality1">A Confidentiality.</param>
+        /// <param name="Confidentiality2">Another Confidentiality.</param>
         /// <returns>true|false</returns>
         public static Boolean operator > (Confidentiality Confidentiality1,
                                           Confidentiality Confidentiality2)
@@ -307,8 +307,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="Confidentiality1">A confidentiality.</param>
-        /// <param name="Confidentiality2">Another confidentiality.</param>
+        /// <param name="Confidentiality1">A Confidentiality.</param>
+        /// <param name="Confidentiality2">Another Confidentiality.</param>
         /// <returns>true|false</returns>
         public static Boolean operator >= (Confidentiality Confidentiality1,
                                            Confidentiality Confidentiality2)
@@ -324,14 +324,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region CompareTo(Object)
 
         /// <summary>
-        /// Compares two confidentialitys.
+        /// Compares two Confidentialitys.
         /// </summary>
-        /// <param name="Object">confidentiality to compare with.</param>
+        /// <param name="Object">Confidentiality to compare with.</param>
         public Int32 CompareTo(Object? Object)
 
             => Object is Confidentiality confidentiality
                    ? CompareTo(confidentiality)
-                   : throw new ArgumentException("The given object is not confidentiality!",
+                   : throw new ArgumentException("The given object is not Confidentiality!",
                                                  nameof(Object));
 
         #endregion
@@ -339,9 +339,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region CompareTo(Confidentiality)
 
         /// <summary>
-        /// Compares two confidentialitys.
+        /// Compares two Confidentialitys.
         /// </summary>
-        /// <param name="Confidentiality">confidentiality to compare with.</param>
+        /// <param name="Confidentiality">Confidentiality to compare with.</param>
         public Int32 CompareTo(Confidentiality Confidentiality)
 
             => String.Compare(InternalId,
@@ -357,9 +357,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Equals(Object)
 
         /// <summary>
-        /// Compares two confidentialitys for equality.
+        /// Compares two Confidentialitys for equality.
         /// </summary>
-        /// <param name="Object">confidentiality to compare with.</param>
+        /// <param name="Object">Confidentiality to compare with.</param>
         public override Boolean Equals(Object? Object)
 
             => Object is Confidentiality confidentiality &&
@@ -370,9 +370,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Equals(Confidentiality)
 
         /// <summary>
-        /// Compares two confidentialitys for equality.
+        /// Compares two Confidentialitys for equality.
         /// </summary>
-        /// <param name="Confidentiality">confidentiality to compare with.</param>
+        /// <param name="Confidentiality">Confidentiality to compare with.</param>
         public Boolean Equals(Confidentiality Confidentiality)
 
             => String.Equals(InternalId,

@@ -17,13 +17,13 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.LocationReferencing;
-using System.Xml.Linq;
 
 #endregion
 
@@ -37,35 +37,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     [XmlType("SupplementalServiceFacility", Namespace = "http://datex2.eu/schema/3/facilities")]
     public class SupplementalServiceFacility(String                                Id,
                                              String                                Version,
-                                             ServiceFacilityTypes                  ServiceFacilityType,
+                                             ServiceFacilityType                   ServiceFacilityType,
 
-                                             MultilingualString?                   Name                         = null,
-                                             IEnumerable<MultilingualString>?      Alias                        = null,
-                                             String?                               ExternalIdentifier           = null,
-                                             DateTime?                             LastUpdated                  = null,
-                                             MultilingualString?                   Description                  = null,
-                                             IEnumerable<Accessibilities>?         Accessibility                = null,
-                                             IEnumerable<MultilingualString>?      AdditionalInformation        = null,
-                                             IEnumerable<URL>?                     InformationWebsites          = null,
-                                             IEnumerable<URL>?                     PhotoURLs                    = null,
-                                             IEnumerable<Image>?                   Photos                       = null,
-                                             AOperatingHours?                      OperatingHours               = null,
-                                             ALocationReference?                   LocationReference            = null,
-                                             AOrganisation?                        Owner                        = null,
-                                             AOrganisation?                        Operator                     = null,
-                                             AOrganisation?                        Helpdesk                     = null,
-                                             IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles        = null,
-                                             Dimension?                            Dimension                    = null,
-                                             Amenities?                            Amenities                    = null,
+                                             MultilingualString?                   Name                                   = null,
+                                             IEnumerable<MultilingualString>?      Alias                                  = null,
+                                             String?                               ExternalIdentifier                     = null,
+                                             DateTime?                             LastUpdated                            = null,
+                                             MultilingualString?                   Description                            = null,
+                                             IEnumerable<Accessibility>?           Accessibility                          = null,
+                                             IEnumerable<MultilingualString>?      AdditionalInformation                  = null,
+                                             IEnumerable<URL>?                     InformationWebsites                    = null,
+                                             IEnumerable<URL>?                     PhotoURLs                              = null,
+                                             IEnumerable<Image>?                   Photos                                 = null,
+                                             AOperatingHours?                      OperatingHours                         = null,
+                                             ALocationReference?                   LocationReference                      = null,
+                                             AOrganisation?                        Owner                                  = null,
+                                             AOrganisation?                        Operator                               = null,
+                                             AOrganisation?                        Helpdesk                               = null,
+                                             IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles                  = null,
+                                             Dimension?                            Dimension                              = null,
+                                             Amenities?                            Amenities                              = null,
 
-                                             Availabilities?                       Availability                 = null,
-                                             UInt64?                               Quantity                     = null,
-                                             Boolean?                              RegularlyCleaned             = null,
-                                             IEnumerable<UserTypes>?               ApplicableForUser            = null,
-                                             Boolean?                              Nearby                       = null,
+                                             Availability?                         Availability                           = null,
+                                             UInt64?                               Quantity                               = null,
+                                             Boolean?                              RegularlyCleaned                       = null,
+                                             IEnumerable<UserType>?                ApplicableForUser                      = null,
+                                             Boolean?                              Nearby                                 = null,
 
-                                             UInt64?                               NumberOfSubitems             = null,
-                                             UInt64?                               DistanceFromOriginFacility   = null)
+                                             UInt64?                               NumberOfSubitems                       = null,
+                                             UInt64?                               DistanceFromOriginFacility             = null,
+
+                                             XElement?                             FacilityObjectExtension                = null,
+                                             XElement?                             SupplementalFacilityExtension          = null,
+                                             XElement?                             SupplementalServiceFacilityExtension   = null)
 
         : ASupplementalFacility(Id,
                                 Version,
@@ -93,34 +97,41 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                 Quantity,
                                 RegularlyCleaned,
                                 ApplicableForUser,
-                                Nearby)
+                                Nearby,
+
+                                FacilityObjectExtension,
+                                SupplementalFacilityExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// One type of service.
         /// </summary>
         [XmlElement("serviceFacilityType",                    Namespace = "http://datex2.eu/schema/3/facilities")]
-        public ServiceFacilityTypes  ServiceFacilityType                     { get; set; } = ServiceFacilityType;
+        public ServiceFacilityType  ServiceFacilityType                     { get; } = ServiceFacilityType;
 
         /// <summary>
         /// The quantity of subitems to this service facility type, e.g. the total number of restaurant places or fuel dispensers etc.
         /// </summary>
         [XmlElement("numberOfSubitems",                       Namespace = "http://datex2.eu/schema/3/common")]
-        public UInt64?               NumberOfSubitems                        { get; set; } = NumberOfSubitems;
+        public UInt64?              NumberOfSubitems                        { get; } = NumberOfSubitems;
 
         /// <summary>
         /// Approximate distance (in metres) between this supplemental facility and some origin facility to which it is clearly related 
         /// (typically a larger facility, e.g. a parking site).
         /// </summary>
         [XmlElement("distanceFromOriginFacility",             Namespace = "http://datex2.eu/schema/3/common")]
-        public UInt64?               DistanceFromOriginFacility              { get; set; } = DistanceFromOriginFacility;
+        public UInt64?              DistanceFromOriginFacility              { get; } = DistanceFromOriginFacility;
 
         /// <summary>
         /// Optional extension element for additional supplemental service facility information.
         /// </summary>
         [XmlElement("_supplementalServiceFacilityExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?             SupplementalServiceFacilityExtension    { get; set; }
+        public XElement?            SupplementalServiceFacilityExtension    { get; } = SupplementalServiceFacilityExtension;
+
+        #endregion
 
     }
 

@@ -42,19 +42,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Start of time period.
         /// </summary>
-        [XmlElement("startTimeOfPeriod",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("startTimeOfPeriod",          Namespace = "http://datex2.eu/schema/3/common")]
         public Time       StartTimeOfPeriod           { get; } = StartTimeOfPeriod;
 
         /// <summary>
         /// End of time period.
         /// </summary>
-        [XmlElement("endTimeOfPeriod",    Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("endTimeOfPeriod",            Namespace = "http://datex2.eu/schema/3/common")]
         public Time       EndTimeOfPeriod             { get; } = EndTimeOfPeriod;
 
         /// <summary>
         /// Optional extension element for additional time period information.
         /// </summary>
-        [XmlElement("_timePeriodOfDayExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_timePeriodOfDayExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?  TimePeriodOfDayExtension    { get; } = TimePeriodOfDayExtension;
 
         #endregion

@@ -43,6 +43,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
     {
 
+        #region Properties
+
         /// <summary>
         /// Reference to the corresponding static facility object.
         /// </summary>
@@ -96,6 +98,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_facilityObjectStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                         FacilityObjectStatusExtension    { get; } = FacilityObjectStatusExtension;
+
+        #endregion
 
     }
 

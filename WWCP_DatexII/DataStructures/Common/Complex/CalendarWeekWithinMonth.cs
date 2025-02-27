@@ -30,7 +30,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// Note: Calendar weeks start with Monday. The first week is the week containing the first day of the month.
     /// </summary>
     [XmlType("CalendarWeekWithinMonth", Namespace = "http://datex2.eu/schema/3/common")]
-    public class CalendarWeekWithinMonth(IEnumerable<CalendarWeekWithinMonthEnum>?  ApplicableCalenderWeekWithinMonth   = null,
+    public class CalendarWeekWithinMonth(IEnumerable<CalendarWeekWithinMonthEnum>?  ApplicableCalendarWeekWithinMonth   = null,
                                          XElement?                                  CalendarWeekWithinMonthExtension    = null,
 
                                          IEnumerable<Day>?                          ApplicableDays                      = null,
@@ -43,20 +43,24 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
     {
 
+        #region Properties
+
         /// <summary>
         /// Calendar week in month.
         /// "All weeks of the month" is expressed by not using the CalendarWeekWithinMonth class.
         /// Note: Calendar weeks start with Monday. The first week is the week containing the first day of the month.
         /// Must have at least one and no more than six values.
         /// </summary>
-        [XmlElement("applicableCalenderWeekWithinMonth", Namespace = "http://datex2.eu/schema/3/common")]
-        public IEnumerable<CalendarWeekWithinMonthEnum>  ApplicableCalenderWeekWithinMonth    { get; set; } = ApplicableCalenderWeekWithinMonth?.Distinct() ?? [];
+        [XmlElement("applicableCalendarWeekWithinMonth",  Namespace = "http://datex2.eu/schema/3/common")]
+        public IEnumerable<CalendarWeekWithinMonthEnum>  ApplicableCalendarWeekWithinMonth    { get; } = ApplicableCalendarWeekWithinMonth?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional information.
         /// </summary>
-        [XmlElement("_calendarWeekWithinMonthExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                                 CalendarWeekWithinMonthExtension     { get; set; } = CalendarWeekWithinMonthExtension;
+        [XmlElement("_calendarWeekWithinMonthExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?                                 CalendarWeekWithinMonthExtension     { get; } = CalendarWeekWithinMonthExtension;
+
+        #endregion
 
     }
 

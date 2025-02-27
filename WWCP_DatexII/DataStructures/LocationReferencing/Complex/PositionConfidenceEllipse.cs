@@ -34,55 +34,60 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// The centre of the ellipse corresponds to the reference position point for which the position accuracy is evaluated.
     /// </summary>
     [XmlType("PositionConfidenceEllipse", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class PositionConfidenceEllipse(Meter?                          SemiMajorAxisLength             = null,
-                                           PositionConfidenceCodedErrors?  SemiMajorAxisLengthCodedError   = null,
-                                           Meter?                          SemiMinorAxisLength             = null,
-                                           PositionConfidenceCodedErrors?  SemiMinorAxisLengthCodedError   = null,
-                                           AngleInDegrees?                 SemiMajorAxisOrientation        = null,
-                                           Boolean?                        SemiMajorAxisOrientationError   = null)
+    public class PositionConfidenceEllipse(Meter?                         SemiMajorAxisLength                  = null,
+                                           PositionConfidenceCodedError?  SemiMajorAxisLengthCodedError        = null,
+                                           Meter?                         SemiMinorAxisLength                  = null,
+                                           PositionConfidenceCodedError?  SemiMinorAxisLengthCodedError        = null,
+                                           AngleInDegrees?                SemiMajorAxisOrientation             = null,
+                                           Boolean?                       SemiMajorAxisOrientationError        = null,
+                                           XElement?                      PositionConfidenceEllipseExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Half of length of the major axis, i.e. the distance between the centre point and the major axis point of the position accuracy ellipse.
         /// </summary>
         [XmlElement("semiMajorAxisLength",                  Namespace = "http://datex2.eu/schema/3/common")]
-        public Meter?                          SemiMajorAxisLength                   { get; set; } = SemiMajorAxisLength;
+        public Meter?                         SemiMajorAxisLength                   { get; } = SemiMajorAxisLength;
 
         /// <summary>
         /// Provides a coded error in case the semi-major axis length is not defined.
         /// </summary>
         [XmlElement("semiMajorAxisLengthCodedError",        Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PositionConfidenceCodedErrors?  SemiMajorAxisLengthCodedError         { get; set; } = SemiMajorAxisLengthCodedError;
+        public PositionConfidenceCodedError?  SemiMajorAxisLengthCodedError         { get; } = SemiMajorAxisLengthCodedError;
 
         /// <summary>
         /// Half of length of the minor axis, i.e. the distance between the centre point and the minor axis point of the position accuracy ellipse.
         /// </summary>
         [XmlElement("semiMinorAxisLength",                  Namespace = "http://datex2.eu/schema/3/common")]
-        public Meter?                          SemiMinorAxisLength                   { get; set; } = SemiMinorAxisLength;
+        public Meter?                         SemiMinorAxisLength                   { get; } = SemiMinorAxisLength;
 
         /// <summary>
         /// Provides a coded error in case the semi-minor axis length is not defined.
         /// </summary>
         [XmlElement("semiMinorAxisLengthCodedError",        Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PositionConfidenceCodedErrors?  SemiMinorAxisLengthCodedError         { get; set; } = SemiMinorAxisLengthCodedError;
+        public PositionConfidenceCodedError?  SemiMinorAxisLengthCodedError         { get; } = SemiMinorAxisLengthCodedError;
 
         /// <summary>
         /// Orientation direction of the ellipse's major axis with respect to geographic north, in degrees.
         /// </summary>
         [XmlElement("semiMajorAxisOrientation",             Namespace = "http://datex2.eu/schema/3/common")]
-        public AngleInDegrees?                 SemiMajorAxisOrientation              { get; set; } = SemiMajorAxisOrientation;
+        public AngleInDegrees?                SemiMajorAxisOrientation              { get; } = SemiMajorAxisOrientation;
 
         /// <summary>
         /// Indicates whether the ellipse orientation is unavailable (True) or not (False).
         /// </summary>
         [XmlElement("semiMajorAxisOrientationError",        Namespace = "http://datex2.eu/schema/3/common")]
-        public Boolean?                        SemiMajorAxisOrientationError         { get; set; } = SemiMajorAxisOrientationError;
+        public Boolean?                       SemiMajorAxisOrientationError         { get; } = SemiMajorAxisOrientationError;
 
         /// <summary>
         /// Optional extension element for additional position confidence ellipse information.
         /// </summary>
         [XmlElement("_positionConfidenceEllipseExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                       PositionConfidenceEllipseExtension    { get; set; }
+        public XElement?                      PositionConfidenceEllipseExtension    { get; } = PositionConfidenceEllipseExtension;
+
+        #endregion
 
     }
 

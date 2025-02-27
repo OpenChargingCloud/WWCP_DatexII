@@ -29,41 +29,46 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// Amenities such as the facility (or a facility in the surrounding) being roofed or illuminated.
     /// </summary>
     [XmlType("Amenities", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public class Amenities(Boolean?  Illuminated                          = null,
-                           Boolean?  Roofed                               = null,
-                           Boolean?  IlluminatedRechargingParkingNearby   = null,
-                           Boolean?  RoofedRechargingParkingNearby        = null)
+    public class Amenities(Boolean?   Illuminated                          = null,
+                           Boolean?   Roofed                               = null,
+                           Boolean?   IlluminatedRechargingParkingNearby   = null,
+                           Boolean?   RoofedRechargingParkingNearby        = null,
+                           XElement?  AmenitiesExtension                   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The facility is illuminated during darkness.
         /// </summary>
         [XmlElement("illuminated",                         Namespace = "http://datex2.eu/schema/3/common")]
-        public Boolean?   Illuminated                           { get; set; } = Illuminated;
+        public Boolean?   Illuminated                           { get; } = Illuminated;
 
         /// <summary>
         /// The facility has got a roof.
         /// </summary>
         [XmlElement("roofed",                              Namespace = "http://datex2.eu/schema/3/common")]
-        public Boolean?   Roofed                                { get; set; } = Roofed;
+        public Boolean?   Roofed                                { get; } = Roofed;
 
         /// <summary>
         /// There is an illuminated recharging or refuelling parking location in the immediate surrounding of the facility.
         /// </summary>
         [XmlElement("illuminatedRechargingParkingNearby",  Namespace = "http://datex2.eu/schema/3/common")]
-        public Boolean?   IlluminatedRechargingParkingNearby    { get; set; } = IlluminatedRechargingParkingNearby;
+        public Boolean?   IlluminatedRechargingParkingNearby    { get; } = IlluminatedRechargingParkingNearby;
 
         /// <summary>
         /// There is a roofed recharging or refuelling parking location in the immediate surrounding of the facility.
         /// </summary>
         [XmlElement("roofedRechargingParkingNearby",       Namespace = "http://datex2.eu/schema/3/common")]
-        public Boolean?   RoofedRechargingParkingNearby         { get; set; } = RoofedRechargingParkingNearby;
+        public Boolean?   RoofedRechargingParkingNearby         { get; } = RoofedRechargingParkingNearby;
 
         /// <summary>
         /// Optional extension element for additional amenities information.
         /// </summary>
         [XmlElement("_amenitiesExtension",                 Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  AmenitiesExtension                    { get; set; }
+        public XElement?  AmenitiesExtension                    { get; } = AmenitiesExtension;
+
+        #endregion
 
     }
 

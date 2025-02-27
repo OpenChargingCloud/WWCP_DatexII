@@ -29,34 +29,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// Horizontal position accuracy parameters defined according to EN 16803-1.
     /// </summary>
     [XmlType("PositionAccuracy", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class PositionAccuracy(Double? AccuracyPercentile50   = null,
-                                  Double? AccuracyPercentile75   = null,
-                                  Double? AccuracyPercentile95   = null)
+    public class PositionAccuracy(Double?    AccuracyPercentile50        = null,
+                                  Double?    AccuracyPercentile75        = null,
+                                  Double?    AccuracyPercentile95        = null,
+                                  XElement?  PositionAccuracyExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Accuracy defined by the 50th percentile of the cumulative distribution of position errors.
         /// </summary>
         [XmlElement("accuracyPercentile50",        Namespace = "http://datex2.eu/schema/3/common")]
-        public Double?    AccuracyPercentile50         { get; set; } = AccuracyPercentile50;
+        public Double?    AccuracyPercentile50         { get; } = AccuracyPercentile50;
 
         /// <summary>
         /// Accuracy defined by the 75th percentile of the cumulative distribution of position errors.
         /// </summary>
         [XmlElement("accuracyPercentile75",        Namespace = "http://datex2.eu/schema/3/common")]
-        public Double?    AccuracyPercentile75         { get; set; } = AccuracyPercentile75;
+        public Double?    AccuracyPercentile75         { get; } = AccuracyPercentile75;
 
         /// <summary>
         /// Accuracy defined by the 95th percentile of the cumulative distribution of position errors.
         /// </summary>
         [XmlElement("accuracyPercentile95",        Namespace = "http://datex2.eu/schema/3/common")]
-        public Double?    AccuracyPercentile95         { get; set; } = AccuracyPercentile95;
+        public Double?    AccuracyPercentile95         { get; } = AccuracyPercentile95;
 
         /// <summary>
         /// Optional extension element for additional position accuracy information.
         /// </summary>
         [XmlElement("_positionAccuracyExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  PositionAccuracyExtension    { get; set; }
+        public XElement?  PositionAccuracyExtension    { get; } = PositionAccuracyExtension;
+
+        #endregion
 
     }
 

@@ -30,7 +30,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// Modeled on DirectPositionListType in GML (EN ISO 19136), but constrained to represent a 2D or 3D polyline.
     /// </summary>
     [XmlType("GmlPosList", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public readonly struct GmlPosList
+    public readonly struct GMLPosList
     {
 
         #region Data
@@ -54,7 +54,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #region Constructor(s)
 
-        public GmlPosList(String Value)
+        public GMLPosList(String Value)
         {
 
             if (!string.IsNullOrWhiteSpace(Value) && !PatternRegex.IsMatch(Value))

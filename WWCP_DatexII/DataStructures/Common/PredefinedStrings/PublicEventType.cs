@@ -51,8 +51,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// A PublicEventType.
     /// </summary>
     public readonly struct PublicEventType : IId,
-                                            IEquatable<PublicEventType>,
-                                            IComparable<PublicEventType>
+                                             IEquatable<PublicEventType>,
+                                             IComparable<PublicEventType>
     {
 
         #region Data

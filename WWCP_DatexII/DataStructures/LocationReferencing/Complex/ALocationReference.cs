@@ -31,14 +31,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// One LocationReference should not use multiple Location objects to represent the same physical location.
     /// </summary>
     [XmlType("LocationReference", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public abstract class ALocationReference
+    public abstract class ALocationReference(XElement? LocationReferenceExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Optional extension element for additional location reference information.
         /// </summary>
         [XmlElement("_locationReferenceExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  LocationReferenceExtension    { get; set; }
+        public XElement?  LocationReferenceExtension    { get; } = LocationReferenceExtension;
+
+        #endregion
 
     }
 

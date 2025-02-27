@@ -33,41 +33,46 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
     /// A street oriented addressing structure supporting delivery.
     /// </summary>
     [XmlType("Address", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-    public class Address(String?                    Postcode       = null,
-                         MultilingualString?        City           = null,
-                         Country?                   CountryCode    = null,
-                         IEnumerable<AddressLine>?  AddressLines   = null)
+    public class Address(String?                    Postcode           = null,
+                         MultilingualString?        City               = null,
+                         Country?                   CountryCode        = null,
+                         IEnumerable<AddressLine>?  AddressLines       = null,
+                         XElement?                  AddressExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Postcode or postal code for the address.
         /// </summary>
         [XmlElement("postcode",           Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public String?                   Postcode            { get; set; } = Postcode;
+        public String?                   Postcode            { get; } = Postcode;
 
         /// <summary>
         /// Postal city name of the address.
         /// </summary>
         [XmlElement("city",               Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public MultilingualString?       City                { get; set; } = City;
+        public MultilingualString?       City                { get; } = City;
 
         /// <summary>
         /// EN ISO 3166-1 two-character country code.
         /// </summary>
         [XmlElement("countryCode",        Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public Country?                  CountryCode         { get; set; } = CountryCode;
+        public Country?                  CountryCode         { get; } = CountryCode;
 
         /// <summary>
         /// One or more address lines.
         /// </summary>
         [XmlElement("addressLine",        Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public IEnumerable<AddressLine>  AddressLines        { get; set; } = AddressLines?.Distinct() ?? [];
+        public IEnumerable<AddressLine>  AddressLines        { get; } = AddressLines?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional address information.
         /// </summary>
         [XmlElement("_addressExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                 AddressExtension    { get; set; }
+        public XElement?                 AddressExtension    { get; } = AddressExtension;
+
+        #endregion
 
     }
 

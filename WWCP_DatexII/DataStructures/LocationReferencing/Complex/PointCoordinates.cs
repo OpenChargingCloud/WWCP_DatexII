@@ -34,44 +34,49 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                                   Double                          Longitude,
                                   IEnumerable<HeightCoordinate>?  HeightCoordinates            = null,
                                   PositionConfidenceEllipse?      PositionConfidenceEllipse    = null,
-                                  PositionAccuracy?               HorizontalPositionAccuracy   = null)
+                                  PositionAccuracy?               HorizontalPositionAccuracy   = null,
+                                  XElement?                       PointCoordinatesExtension    = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Latitude in decimal degrees using ETRS89.
         /// </summary>
         [XmlElement("latitude",                    Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public Double                         Latitude                      { get; set; } = Latitude;
+        public Double                         Latitude                      { get; } = Latitude;
 
         /// <summary>
         /// Longitude in decimal degrees using ETRS89.
         /// </summary>
         [XmlElement("longitude",                   Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public Double                         Longitude                     { get; set; } = Longitude;
+        public Double                         Longitude                     { get; } = Longitude;
 
         /// <summary>
         /// Optional height coordinate(s); up to 3 occurrences.
         /// </summary>
         [XmlElement("heightCoordinate",            Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public IEnumerable<HeightCoordinate>  HeightCoordinates             { get; set; } = HeightCoordinates?.Distinct() ?? [];
+        public IEnumerable<HeightCoordinate>  HeightCoordinates             { get; } = HeightCoordinates?.Distinct() ?? [];
 
         /// <summary>
         /// Position confidence ellipse that describes the uncertainty in the position.
         /// </summary>
         [XmlElement("positionConfidenceEllipse",   Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PositionConfidenceEllipse?     PositionConfidenceEllipse     { get; set; } = PositionConfidenceEllipse;
+        public PositionConfidenceEllipse?     PositionConfidenceEllipse     { get; } = PositionConfidenceEllipse;
 
         /// <summary>
         /// Defines the horizontal position accuracy according to EN 16803-1.
         /// </summary>
         [XmlElement("horizontalPositionAccuracy",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PositionAccuracy?              HorizontalPositionAccuracy    { get; set; } = HorizontalPositionAccuracy;
+        public PositionAccuracy?              HorizontalPositionAccuracy    { get; } = HorizontalPositionAccuracy;
 
         /// <summary>
         /// Optional extension element for additional point coordinates information.
         /// </summary>
         [XmlElement("_pointCoordinatesExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                      PointCoordinatesExtension     { get; set; }
+        public XElement?                      PointCoordinatesExtension     { get; } = PointCoordinatesExtension;
+
+        #endregion
 
     }
 

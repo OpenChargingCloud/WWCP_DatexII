@@ -29,14 +29,22 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// Multiple (i.e. more than one) physically separate locations which have no specific order.
     /// </summary>
     [XmlType("LocationGroup", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public abstract class ALocationGroup : ALocationReference
+    public abstract class ALocationGroup(XElement? LocationGroupExtension       = null,
+                                         XElement? LocationReferenceExtension   = null)
+
+        : ALocationReference(LocationReferenceExtension)
+
     {
+
+        #region Properties
 
         /// <summary>
         /// Optional extension element for additional location group information.
         /// </summary>
         [XmlElement("_locationGroupExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  LocationGroupExtension    { get; set; }
+        public XElement?  LocationGroupExtension    { get; } = LocationGroupExtension;
+
+        #endregion
 
     }
 

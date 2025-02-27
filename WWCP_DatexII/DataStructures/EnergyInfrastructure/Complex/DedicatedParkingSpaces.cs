@@ -17,6 +17,7 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
@@ -24,7 +25,6 @@ using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.Facilities;
 using cloud.charging.open.protocols.DatexII.v3.LocationReferencing;
-using System.Xml.Linq;
 
 #endregion
 
@@ -39,26 +39,27 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                         String                                Version,
                                         UInt16                                NumberOfSpaces,
 
-                                        MultilingualString?                   Name                    = null,
-                                        IEnumerable<MultilingualString>?      Alias                   = null,
-                                        String?                               ExternalIdentifier      = null,
-                                        DateTime?                             LastUpdated             = null,
-                                        MultilingualString?                   Description             = null,
-                                        IEnumerable<Accessibilities>?         Accessibility           = null,
-                                        IEnumerable<MultilingualString>?      AdditionalInformation   = null,
-                                        IEnumerable<URL>?                     InformationWebsites     = null,
-                                        IEnumerable<URL>?                     PhotoURLs               = null,
-                                        IEnumerable<Image>?                   Photos                  = null,
-                                        AOperatingHours?                      OperatingHours          = null,
-                                        ALocationReference?                   LocationReference       = null,
-                                        AOrganisation?                        Owner                   = null,
-                                        AOrganisation?                        Operator                = null,
-                                        AOrganisation?                        Helpdesk                = null,
-                                        IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles   = null,
-                                        Dimension?                            Dimension               = null,
-                                        Amenities?                            Amenities               = null,
+                                        MultilingualString?                   Name                              = null,
+                                        IEnumerable<MultilingualString>?      Alias                             = null,
+                                        String?                               ExternalIdentifier                = null,
+                                        DateTime?                             LastUpdated                       = null,
+                                        MultilingualString?                   Description                       = null,
+                                        IEnumerable<Accessibility>?           Accessibility                     = null,
+                                        IEnumerable<MultilingualString>?      AdditionalInformation             = null,
+                                        IEnumerable<URL>?                     InformationWebsites               = null,
+                                        IEnumerable<URL>?                     PhotoURLs                         = null,
+                                        IEnumerable<Image>?                   Photos                            = null,
+                                        AOperatingHours?                      OperatingHours                    = null,
+                                        ALocationReference?                   LocationReference                 = null,
+                                        AOrganisation?                        Owner                             = null,
+                                        AOrganisation?                        Operator                          = null,
+                                        AOrganisation?                        Helpdesk                          = null,
+                                        IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles             = null,
+                                        Dimension?                            Dimension                         = null,
+                                        Amenities?                            Amenities                         = null,
 
-                                        IEnumerable<UserTypes>?               UserSpecific            = null)
+                                        IEnumerable<UserType>?                UserSpecific                      = null,
+                                        XElement?                             DedicatedParkingSpacesExtension   = null)
 
         : AFacilityObject(Id,
                           Version,
@@ -80,27 +81,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                           Helpdesk,
                           ApplicableForVehicles,
                           Dimension,
-                          Amenities)
+                          Amenities,
+
+                          DedicatedParkingSpacesExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// The number of parking spaces.
         /// </summary>
-        [XmlElement(ElementName = "numberOfSpaces",  Namespace = "http://datex2.eu/schema/3/facilities")]
-        public UInt16                  NumberOfSpaces                     { get; set; } = NumberOfSpaces;
+        [XmlElement(ElementName = "numberOfSpaces",      Namespace = "http://datex2.eu/schema/3/facilities")]
+        public UInt16                 NumberOfSpaces                     { get; } = NumberOfSpaces;
 
         /// <summary>
         /// The indicated parking spaces are specifically for the given set of users.
         /// </summary>
-        [XmlElement(ElementName = "userSpecific",    Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<UserTypes>  UserSpecific                       { get; set; } = UserSpecific ?? [];
+        [XmlElement(ElementName = "userSpecific",        Namespace = "http://datex2.eu/schema/3/facilities")]
+        public IEnumerable<UserType>  UserSpecific                       { get; } = UserSpecific ?? [];
 
         /// <summary>
         /// Optional extension element for additional dedicated parking spaces information.
         /// </summary>
-        [XmlElement("_dedicatedParkingSpacesExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?               DedicatedParkingSpacesExtension    { get; set; }
+        [XmlElement("_dedicatedParkingSpacesExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?              DedicatedParkingSpacesExtension    { get; }
+
+        #endregion
 
     }
 

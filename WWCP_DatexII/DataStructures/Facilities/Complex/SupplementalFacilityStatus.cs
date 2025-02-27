@@ -34,18 +34,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     [XmlType("SupplementalFacilityStatus", Namespace = "http://datex2.eu/schema/3/facilities")]
     public class SupplementalFacilityStatus(FacilityObjectVersionedReference  Reference,
 
-                                            DateTime?                         LastUpdated                    = null,
-                                            OpeningStatus?                    OpeningStatus                  = null,
-                                            OperationStatus?                  OperationStatus                = null,
-                                            Boolean?                          RegularOperatingHoursInForce   = null,
-                                            MultilingualString?               StatusDescription              = null,
-                                            AOperatingHours?                  NewOperatingHours              = null,
-                                            Fault?                            Fault                          = null,
+                                            UInt16?                           QuantityOverride                      = null,
+                                            UInt16?                           NumberOfSubitemsOverride              = null,
+                                            UInt16?                           VacantSubitems                        = null,
+                                            OperationStatus?                  EquipmentOperationStatus              = null,
+                                            XElement?                         SupplementalFacilityStatusExtension   = null,
 
-                                            UInt16?                           QuantityOverride               = null,
-                                            UInt16?                           NumberOfSubitemsOverride       = null,
-                                            UInt16?                           VacantSubitems                 = null,
-                                            OperationStatus?                  EquipmentOperationStatus       = null)
+                                            DateTime?                         LastUpdated                           = null,
+                                            OpeningStatus?                    OpeningStatus                         = null,
+                                            OperationStatus?                  OperationStatus                       = null,
+                                            Boolean?                          RegularOperatingHoursInForce          = null,
+                                            MultilingualString?               StatusDescription                     = null,
+                                            AOperatingHours?                  NewOperatingHours                     = null,
+                                            Fault?                            Fault                                 = null,
+                                            XElement?                         FacilityObjectStatusExtension         = null)
 
         : FacilityObjectStatus(Reference,
                                LastUpdated,
@@ -54,40 +56,45 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                RegularOperatingHoursInForce,
                                StatusDescription,
                                NewOperatingHours,
-                               Fault)
+                               Fault,
+                               FacilityObjectStatusExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// Overrides the static quantity information (for example because of long- or midterm closures, such as renovation).
         /// </summary>
         [XmlElement("quantityOverride",                      Namespace = "http://datex2.eu/schema/3/common")]
-        public UInt16?           QuantityOverride                       { get; set; } = QuantityOverride;
+        public UInt16?           QuantityOverride                       { get; } = QuantityOverride;
 
         /// <summary>
         /// Overrides the static value 'numberOfSubitems' (for example because of long- or midterm closures, such as renovation).
         /// </summary>
         [XmlElement("numberOfSubitemsOverride",              Namespace = "http://datex2.eu/schema/3/common")]
-        public UInt16?           NumberOfSubitemsOverride               { get; set; } = NumberOfSubitemsOverride;
+        public UInt16?           NumberOfSubitemsOverride               { get; } = NumberOfSubitemsOverride;
 
         /// <summary>
         /// Sets the number of currently vacant elements of either equipment (e.g. free toilets) 
         /// or service facility subitems (e.g. free restaurant places).
         /// </summary>
         [XmlElement("vacantSubitems",                        Namespace = "http://datex2.eu/schema/3/common")]
-        public UInt16?           VacantSubitems                         { get; set; } = VacantSubitems;
+        public UInt16?           VacantSubitems                         { get; } = VacantSubitems;
 
         /// <summary>
         /// Specifies whether this supplemental equipment is available / in operation or not.
         /// </summary>
         [XmlElement("equipmentOperationStatus",              Namespace = "http://datex2.eu/schema/3/facilities")]
-        public OperationStatus?  EquipmentOperationStatus               { get; set; } = EquipmentOperationStatus;
+        public OperationStatus?  EquipmentOperationStatus               { get; } = EquipmentOperationStatus;
 
         /// <summary>
         /// Optional extension element for additional supplemental facility status information.
         /// </summary>
         [XmlElement("_supplementalFacilityStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?         SupplementalFacilityStatusExtension    { get; set; }
+        public XElement?         SupplementalFacilityStatusExtension    { get; } = SupplementalFacilityStatusExtension;
+
+        #endregion
 
     }
 

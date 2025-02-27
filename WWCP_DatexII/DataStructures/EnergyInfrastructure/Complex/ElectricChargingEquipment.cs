@@ -17,6 +17,7 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
@@ -24,7 +25,6 @@ using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.Facilities;
 using cloud.charging.open.protocols.DatexII.v3.LocationReferencing;
-using System.Xml.Linq;
 
 #endregion
 
@@ -39,30 +39,34 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                            String                                Version,
                                            ElectricChargingPoint                 ElectricChargingPoint,
 
-                                           MultilingualString?                   Name                    = null,
-                                           IEnumerable<MultilingualString>?      Alias                   = null,
-                                           String?                               ExternalIdentifier      = null,
-                                           DateTime?                             LastUpdated             = null,
-                                           MultilingualString?                   Description             = null,
-                                           IEnumerable<Accessibilities>?         Accessibility           = null,
-                                           IEnumerable<MultilingualString>?      AdditionalInformation   = null,
-                                           IEnumerable<URL>?                     InformationWebsites     = null,
-                                           IEnumerable<URL>?                     PhotoURLs               = null,
-                                           IEnumerable<Image>?                   Photos                  = null,
-                                           AOperatingHours?                      OperatingHours          = null,
-                                           ALocationReference?                   LocationReference       = null,
-                                           AOrganisation?                        Owner                   = null,
-                                           AOrganisation?                        Operator                = null,
-                                           AOrganisation?                        Helpdesk                = null,
-                                           IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles   = null,
-                                           Dimension?                            Dimension               = null,
-                                           Amenities?                            Amenities               = null,
+                                           MultilingualString?                   Name                                 = null,
+                                           IEnumerable<MultilingualString>?      Alias                                = null,
+                                           String?                               ExternalIdentifier                   = null,
+                                           DateTime?                             LastUpdated                          = null,
+                                           MultilingualString?                   Description                          = null,
+                                           IEnumerable<Accessibility>?           Accessibility                        = null,
+                                           IEnumerable<MultilingualString>?      AdditionalInformation                = null,
+                                           IEnumerable<URL>?                     InformationWebsites                  = null,
+                                           IEnumerable<URL>?                     PhotoURLs                            = null,
+                                           IEnumerable<Image>?                   Photos                               = null,
+                                           AOperatingHours?                      OperatingHours                       = null,
+                                           ALocationReference?                   LocationReference                    = null,
+                                           AOrganisation?                        Owner                                = null,
+                                           AOrganisation?                        Operator                             = null,
+                                           AOrganisation?                        Helpdesk                             = null,
+                                           IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles                = null,
+                                           Dimension?                            Dimension                            = null,
+                                           Amenities?                            Amenities                            = null,
 
-                                           Availabilities?                       Availability            = null,
-                                           UInt64?                               Quantity                = null,
-                                           Boolean?                              RegularlyCleaned        = null,
-                                           IEnumerable<UserTypes>?               ApplicableForUser       = null,
-                                           Boolean?                              Nearby                  = null)
+                                           Availability?                         Availability                         = null,
+                                           UInt64?                               Quantity                             = null,
+                                           Boolean?                              RegularlyCleaned                     = null,
+                                           IEnumerable<UserType>?                ApplicableForUser                    = null,
+                                           Boolean?                              Nearby                               = null,
+
+                                           XElement?                             FacilityObjectExtension              = null,
+                                           XElement?                             SupplementalFacilityExtension        = null,
+                                           XElement?                             ElectricChargingEquipmentExtension   = null)
 
         : ASupplementalFacility(Id,
                                 Version,
@@ -90,21 +94,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                 Quantity,
                                 RegularlyCleaned,
                                 ApplicableForUser,
-                                Nearby)
+                                Nearby,
+
+                                FacilityObjectExtension,
+                                SupplementalFacilityExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// The electric charging point.
         /// </summary>
-        [XmlElement("electricChargingPoint", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public ElectricChargingPoint  ElectricChargingPoint                 { get; set; } = ElectricChargingPoint;
+        [XmlElement("electricChargingPoint",                Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public ElectricChargingPoint  ElectricChargingPoint                 { get; } = ElectricChargingPoint;
 
         /// <summary>
         /// Optional extension element for additional electric charging equipment information.
         /// </summary>
-        [XmlElement("_electricChargingEquipmentExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?              ElectricChargingEquipmentExtension    { get; set; }
+        [XmlElement("_electricChargingEquipmentExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?              ElectricChargingEquipmentExtension    { get; } = ElectricChargingEquipmentExtension;
+
+        #endregion
 
     }
 

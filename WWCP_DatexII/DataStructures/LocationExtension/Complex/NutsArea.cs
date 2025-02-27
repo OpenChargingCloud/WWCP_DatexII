@@ -32,27 +32,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
     /// or its LAU code representation (Local Administrative Unit).
     /// </summary>
     [XmlType("NutsArea", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-    public class NutsArea(NutsCode       NutsCode,
-                          NutsCodeTypes  NutsCodeType)
+    public class NutsArea(NutsCode      NutsCode,
+                          NutsCodeType  NutsCodeType,
+                          XElement?     NutsAreaExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The NUTS code for the named area.
         /// </summary>
         [XmlElement("nutsCode",            Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public NutsCode       NutsCode             { get; set; } = NutsCode;
+        public NutsCode      NutsCode             { get; } = NutsCode;
 
         /// <summary>
         /// The NUTS code type for the named area.
         /// </summary>
         [XmlElement("nutsCodeType",        Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public NutsCodeTypes  NutsCodeType         { get; set; } = NutsCodeType;
+        public NutsCodeType  NutsCodeType         { get; } = NutsCodeType;
 
         /// <summary>
         /// Optional extension element for additional NutsArea information.
         /// </summary>
         [XmlElement("_nutsAreaExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?      NutsAreaExtension    { get; set; }
+        public XElement?     NutsAreaExtension    { get; } = NutsAreaExtension;
+
+        #endregion
 
     }
 

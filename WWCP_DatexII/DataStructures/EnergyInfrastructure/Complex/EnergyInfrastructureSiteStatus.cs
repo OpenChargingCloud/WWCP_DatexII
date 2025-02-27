@@ -51,7 +51,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                                 UInt16?                                          AvailableCarParkingPlaces                 = null,
                                                 UInt16?                                          AvailableTruckParkingPlaces               = null,
                                                 IEnumerable<EnergyInfrastructureStationStatus>?  EnergyInfrastructureStationStatus         = null,
-                                                IEnumerable<ServiceType>?                        ServiceTypes                              = null,
+                                                IEnumerable<Service>?                            Services                                  = null,
                                                 XElement?                                        EnergyInfrastructureSiteStatusExtension   = null)
 
         : FacilityStatus(Reference,
@@ -74,31 +74,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Parking places available for cars.
         /// </summary>
-        [XmlElement("availableCarParkingPlaces",          Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("availableCarParkingPlaces",                 Namespace = "http://datex2.eu/schema/3/common")]
         public UInt16?                                         AvailableCarParkingPlaces                  { get; } = AvailableCarParkingPlaces;
 
         /// <summary>
         /// Parking places available for trucks.
         /// </summary>
-        [XmlElement("availableTruckParkingPlaces",        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("availableTruckParkingPlaces",               Namespace = "http://datex2.eu/schema/3/common")]
         public UInt16?                                         AvailableTruckParkingPlaces                { get; } = AvailableTruckParkingPlaces;
 
         /// <summary>
         /// Specify the status of a charging station with dynamic information.
         /// </summary>
-        [XmlElement("energyInfrastructureStationStatus",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyInfrastructureStationStatus",         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
         public IEnumerable<EnergyInfrastructureStationStatus>  EnergyInfrastructureStationStatus          { get; } = EnergyInfrastructureStationStatus?.Distinct() ?? [];
 
         /// <summary>
         /// The service type for the site. If no period is given, the currently available service is meant.
         /// </summary>
-        [XmlElement("serviceType",                        Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<ServiceType>                        ServiceTypes                               { get; } = ServiceTypes?.                     Distinct() ?? [];
+        [XmlElement("serviceType",                               Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public IEnumerable<Service>                            Services                                   { get; } = Services?.                         Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional site status information.
         /// </summary>
-        [XmlElement("_energyInfrastructureSiteStatusExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyInfrastructureSiteStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                                       EnergyInfrastructureSiteStatusExtension    { get; } = EnergyInfrastructureSiteStatusExtension;
 
         #endregion

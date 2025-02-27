@@ -25,22 +25,22 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 {
 
     /// <summary>
-    /// Extension methods for informationDeliveryServices.
+    /// Extension methods for InformationDeliveryServices.
     /// </summary>
     public static class InformationDeliveryServiceExtensions
     {
 
         /// <summary>
-        /// Indicates whether this information delivery service is null or empty.
+        /// Indicates whether this InformationDeliveryService is null or empty.
         /// </summary>
-        /// <param name="InformationDeliveryService">An information delivery service.</param>
+        /// <param name="InformationDeliveryService">An InformationDeliveryService.</param>
         public static Boolean IsNullOrEmpty(this InformationDeliveryService? InformationDeliveryService)
             => !InformationDeliveryService.HasValue || InformationDeliveryService.Value.IsNullOrEmpty;
 
         /// <summary>
-        /// Indicates whether this information delivery service is null or empty.
+        /// Indicates whether this InformationDeliveryService is null or empty.
         /// </summary>
-        /// <param name="InformationDeliveryService">An information delivery service.</param>
+        /// <param name="InformationDeliveryService">An InformationDeliveryService.</param>
         public static Boolean IsNotNullOrEmpty(this InformationDeliveryService? InformationDeliveryService)
             => InformationDeliveryService.HasValue && InformationDeliveryService.Value.IsNotNullOrEmpty;
 
@@ -48,7 +48,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
 
     /// <summary>
-    /// An information delivery service.
+    /// An InformationDeliveryService.
     /// </summary>
     public readonly struct InformationDeliveryService : IId,
                                                         IEquatable<InformationDeliveryService>,
@@ -65,25 +65,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Properties
 
         /// <summary>
-        /// Indicates whether this information delivery service is null or empty.
+        /// Indicates whether this InformationDeliveryService is null or empty.
         /// </summary>
         public readonly  Boolean                          IsNullOrEmpty
             => InternalId.IsNullOrEmpty();
 
         /// <summary>
-        /// Indicates whether this information delivery service is NOT null or empty.
+        /// Indicates whether this InformationDeliveryService is NOT null or empty.
         /// </summary>
         public readonly  Boolean                          IsNotNullOrEmpty
             => InternalId.IsNotNullOrEmpty();
 
         /// <summary>
-        /// The length of the information delivery service.
+        /// The length of the InformationDeliveryService.
         /// </summary>
         public readonly  UInt64                           Length
             => (UInt64) (InternalId?.Length ?? 0);
 
         /// <summary>
-        /// All registered information delivery services.
+        /// All registered InformationDeliveryServices.
         /// </summary>
         public static    IEnumerable<InformationDeliveryService>  All
             => lookup.Values;
@@ -93,9 +93,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Constructor(s)
 
         /// <summary>
-        /// Create a new information delivery service based on the given text.
+        /// Create a new InformationDeliveryService based on the given text.
         /// </summary>
-        /// <param name="Text">The text representation of an information delivery service.</param>
+        /// <param name="Text">The text representation of an InformationDeliveryService.</param>
         private InformationDeliveryService(String Text)
         {
             this.InternalId = Text;
@@ -119,16 +119,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region (static) Parse   (Text)
 
         /// <summary>
-        /// Parse the given string as an information delivery service.
+        /// Parse the given string as an InformationDeliveryService.
         /// </summary>
-        /// <param name="Text">A text representation of an information delivery service.</param>
+        /// <param name="Text">A text representation of an InformationDeliveryService.</param>
         public static InformationDeliveryService Parse(String Text)
         {
 
             if (TryParse(Text, out var informationDeliveryService))
                 return informationDeliveryService;
 
-            throw new ArgumentException($"Invalid text representation of an information delivery service: '{Text}'!",
+            throw new ArgumentException($"Invalid text representation of an InformationDeliveryService: '{Text}'!",
                                         nameof(Text));
 
         }
@@ -138,9 +138,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region (static) TryParse(Text)
 
         /// <summary>
-        /// Try to parse the given text as an information delivery service.
+        /// Try to parse the given text as an InformationDeliveryService.
         /// </summary>
-        /// <param name="Text">A text representation of an information delivery service.</param>
+        /// <param name="Text">A text representation of an InformationDeliveryService.</param>
         public static InformationDeliveryService? TryParse(String Text)
         {
 
@@ -156,10 +156,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region (static) TryParse(Text, out InformationDeliveryService)
 
         /// <summary>
-        /// Try to parse the given text as an information delivery service.
+        /// Try to parse the given text as an InformationDeliveryService.
         /// </summary>
-        /// <param name="Text">A text representation of an information delivery service.</param>
-        /// <param name="InformationDeliveryService">The parsed information delivery service.</param>
+        /// <param name="Text">A text representation of an InformationDeliveryService.</param>
+        /// <param name="InformationDeliveryService">The parsed InformationDeliveryService.</param>
         public static Boolean TryParse(String Text, out InformationDeliveryService InformationDeliveryService)
         {
 
@@ -185,7 +185,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Clone()
 
         /// <summary>
-        /// Clone this information delivery service.
+        /// Clone this InformationDeliveryService.
         /// </summary>
         public InformationDeliveryService Clone()
 
@@ -231,8 +231,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="InformationDeliveryService1">An information delivery service.</param>
-        /// <param name="InformationDeliveryService2">Another information delivery service.</param>
+        /// <param name="InformationDeliveryService1">An InformationDeliveryService.</param>
+        /// <param name="InformationDeliveryService2">Another InformationDeliveryService.</param>
         /// <returns>true|false</returns>
         public static Boolean operator == (InformationDeliveryService InformationDeliveryService1,
                                            InformationDeliveryService InformationDeliveryService2)
@@ -246,8 +246,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="InformationDeliveryService1">An information delivery service.</param>
-        /// <param name="InformationDeliveryService2">Another information delivery service.</param>
+        /// <param name="InformationDeliveryService1">An InformationDeliveryService.</param>
+        /// <param name="InformationDeliveryService2">Another InformationDeliveryService.</param>
         /// <returns>true|false</returns>
         public static Boolean operator != (InformationDeliveryService InformationDeliveryService1,
                                            InformationDeliveryService InformationDeliveryService2)
@@ -261,8 +261,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="InformationDeliveryService1">An information delivery service.</param>
-        /// <param name="InformationDeliveryService2">Another information delivery service.</param>
+        /// <param name="InformationDeliveryService1">An InformationDeliveryService.</param>
+        /// <param name="InformationDeliveryService2">Another InformationDeliveryService.</param>
         /// <returns>true|false</returns>
         public static Boolean operator < (InformationDeliveryService InformationDeliveryService1,
                                           InformationDeliveryService InformationDeliveryService2)
@@ -276,8 +276,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="InformationDeliveryService1">An information delivery service.</param>
-        /// <param name="InformationDeliveryService2">Another information delivery service.</param>
+        /// <param name="InformationDeliveryService1">An InformationDeliveryService.</param>
+        /// <param name="InformationDeliveryService2">Another InformationDeliveryService.</param>
         /// <returns>true|false</returns>
         public static Boolean operator <= (InformationDeliveryService InformationDeliveryService1,
                                            InformationDeliveryService InformationDeliveryService2)
@@ -291,8 +291,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="InformationDeliveryService1">An information delivery service.</param>
-        /// <param name="InformationDeliveryService2">Another information delivery service.</param>
+        /// <param name="InformationDeliveryService1">An InformationDeliveryService.</param>
+        /// <param name="InformationDeliveryService2">Another InformationDeliveryService.</param>
         /// <returns>true|false</returns>
         public static Boolean operator > (InformationDeliveryService InformationDeliveryService1,
                                           InformationDeliveryService InformationDeliveryService2)
@@ -306,8 +306,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Compares two instances of this object.
         /// </summary>
-        /// <param name="InformationDeliveryService1">An information delivery service.</param>
-        /// <param name="InformationDeliveryService2">Another information delivery service.</param>
+        /// <param name="InformationDeliveryService1">An InformationDeliveryService.</param>
+        /// <param name="InformationDeliveryService2">Another InformationDeliveryService.</param>
         /// <returns>true|false</returns>
         public static Boolean operator >= (InformationDeliveryService InformationDeliveryService1,
                                            InformationDeliveryService InformationDeliveryService2)
@@ -323,14 +323,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region CompareTo(Object)
 
         /// <summary>
-        /// Compares two information delivery services.
+        /// Compares two InformationDeliveryServices.
         /// </summary>
-        /// <param name="Object">An information delivery service to compare with.</param>
+        /// <param name="Object">An InformationDeliveryService to compare with.</param>
         public Int32 CompareTo(Object? Object)
 
             => Object is InformationDeliveryService informationDeliveryService
                    ? CompareTo(informationDeliveryService)
-                   : throw new ArgumentException("The given object is not an information delivery service!",
+                   : throw new ArgumentException("The given object is not an InformationDeliveryService!",
                                                  nameof(Object));
 
         #endregion
@@ -338,9 +338,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region CompareTo(InformationDeliveryService)
 
         /// <summary>
-        /// Compares two information delivery services.
+        /// Compares two InformationDeliveryServices.
         /// </summary>
-        /// <param name="InformationDeliveryService">An information delivery service to compare with.</param>
+        /// <param name="InformationDeliveryService">An InformationDeliveryService to compare with.</param>
         public Int32 CompareTo(InformationDeliveryService InformationDeliveryService)
 
             => String.Compare(InternalId,
@@ -356,9 +356,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Equals(Object)
 
         /// <summary>
-        /// Compares two information delivery services for equality.
+        /// Compares two InformationDeliveryServices for equality.
         /// </summary>
-        /// <param name="Object">An information delivery service to compare with.</param>
+        /// <param name="Object">An InformationDeliveryService to compare with.</param>
         public override Boolean Equals(Object? Object)
 
             => Object is InformationDeliveryService informationDeliveryService &&
@@ -369,9 +369,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #region Equals(InformationDeliveryService)
 
         /// <summary>
-        /// Compares two information delivery services for equality.
+        /// Compares two InformationDeliveryServices for equality.
         /// </summary>
-        /// <param name="InformationDeliveryService">An information delivery service to compare with.</param>
+        /// <param name="InformationDeliveryService">An InformationDeliveryService to compare with.</param>
         public Boolean Equals(InformationDeliveryService InformationDeliveryService)
 
             => String.Equals(InternalId,

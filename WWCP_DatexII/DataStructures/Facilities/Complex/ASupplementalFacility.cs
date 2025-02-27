@@ -37,30 +37,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     public abstract class ASupplementalFacility(String                                Id,
                                                 String                                Version,
 
-                                                MultilingualString?                   Name                    = null,
-                                                IEnumerable<MultilingualString>?      Alias                   = null,
-                                                String?                               ExternalIdentifier      = null,
-                                                DateTime?                             LastUpdated             = null,
-                                                MultilingualString?                   Description             = null,
-                                                IEnumerable<Accessibilities>?         Accessibility           = null,
-                                                IEnumerable<MultilingualString>?      AdditionalInformation   = null,
-                                                IEnumerable<URL>?                     InformationWebsites     = null,
-                                                IEnumerable<URL>?                     PhotoURLs               = null,
-                                                IEnumerable<Image>?                   Photos                  = null,
-                                                AOperatingHours?                      OperatingHours          = null,
-                                                ALocationReference?                   LocationReference       = null,
-                                                AOrganisation?                        Owner                   = null,
-                                                AOrganisation?                        Operator                = null,
-                                                AOrganisation?                        Helpdesk                = null,
-                                                IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles   = null,
-                                                Dimension?                            Dimension               = null,
-                                                Amenities?                            Amenities               = null,
+                                                MultilingualString?                   Name                            = null,
+                                                IEnumerable<MultilingualString>?      Alias                           = null,
+                                                String?                               ExternalIdentifier              = null,
+                                                DateTime?                             LastUpdated                     = null,
+                                                MultilingualString?                   Description                     = null,
+                                                IEnumerable<Accessibility>?           Accessibility                   = null,
+                                                IEnumerable<MultilingualString>?      AdditionalInformation           = null,
+                                                IEnumerable<URL>?                     InformationWebsites             = null,
+                                                IEnumerable<URL>?                     PhotoURLs                       = null,
+                                                IEnumerable<Image>?                   Photos                          = null,
+                                                AOperatingHours?                      OperatingHours                  = null,
+                                                ALocationReference?                   LocationReference               = null,
+                                                AOrganisation?                        Owner                           = null,
+                                                AOrganisation?                        Operator                        = null,
+                                                AOrganisation?                        Helpdesk                        = null,
+                                                IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles           = null,
+                                                Dimension?                            Dimension                       = null,
+                                                Amenities?                            Amenities                       = null,
 
-                                                Availabilities?                       Availability            = null,
-                                                UInt64?                               Quantity                = null,
-                                                Boolean?                              RegularlyCleaned        = null,
-                                                IEnumerable<UserTypes>?               ApplicableForUser       = null,
-                                                Boolean?                              Nearby                  = null)
+                                                Availability?                         Availability                    = null,
+                                                UInt64?                               Quantity                        = null,
+                                                Boolean?                              RegularlyCleaned                = null,
+                                                IEnumerable<UserType>?                ApplicableForUser               = null,
+                                                Boolean?                              Nearby                          = null,
+
+                                                XElement?                             FacilityObjectExtension         = null,
+                                                XElement?                             SupplementalFacilityExtension   = null)
 
         : AFacilityObject(Id,
                           Version,
@@ -82,48 +85,54 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                           Helpdesk,
                           ApplicableForVehicles,
                           Dimension,
-                          Amenities)
+                          Amenities,
+
+                          FacilityObjectExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// Specifies whether the supplemental facility is available or not.
         /// Note that this is no dynamic information!
         /// </summary>
         [XmlElement("availability",                    Namespace = "http://datex2.eu/schema/3/facilities")]
-        public Availabilities?         Availability                     { get; set; } = Availability;
+        public Availability?          Availability                     { get; } = Availability;
 
         /// <summary>
         /// Number of the supplemental facility (e.g. number of toilets, restaurants, park &amp; ride places, etc.)
         /// with respect to given restrictions. Dynamic overridable.
         /// </summary>
         [XmlElement("quantity",                        Namespace = "http://datex2.eu/schema/3/common")]
-        public UInt64?                 Quantity                         { get; set; } = Quantity;
+        public UInt64?                Quantity                         { get; } = Quantity;
 
         /// <summary>
         /// Indicates whether the supplemental facility is cleaned on a regular basis.
         /// </summary>
         [XmlElement("regularlyCleaned",                Namespace = "http://datex2.eu/schema/3/common")]
-        public Boolean?                RegularlyCleaned                 { get; set; } = RegularlyCleaned;
+        public Boolean?               RegularlyCleaned                 { get; } = RegularlyCleaned;
 
         /// <summary>
         /// Limitation to a set of special users.
         /// </summary>
         [XmlElement("applicableForUser",               Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<UserTypes>  ApplicableForUser                { get; set; } = ApplicableForUser?.Distinct() ?? [];
+        public IEnumerable<UserType>  ApplicableForUser                { get; } = ApplicableForUser?.Distinct() ?? [];
 
         /// <summary>
         /// If true, the Supplemental Facility is not located on the site of the original facility but nearby.
         /// They do not necessarily belong together.
         /// </summary>
         [XmlElement("nearby",                          Namespace = "http://datex2.eu/schema/3/common")]
-        public Boolean?                Nearby                           { get; set; } = Nearby;
+        public Boolean?               Nearby                           { get; } = Nearby;
 
         /// <summary>
         /// Optional extension element for additional information.
         /// </summary>
         [XmlElement("_supplementalFacilityExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?               SupplementalFacilityExtension    { get; set; }
+        public XElement?              SupplementalFacilityExtension    { get; } = SupplementalFacilityExtension;
+
+        #endregion
 
     }
 

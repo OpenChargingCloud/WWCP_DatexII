@@ -32,28 +32,38 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// </summary>
     [XmlType("LocationByReference", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
     public class LocationByReference(PredefinedLocationVersionedReference  PredefinedLocationReference,
+                                     XElement?                             LocationByReferenceExtension   = null,
 
-                                     IEnumerable<ExternalReferencing>?     ExternalReferencing     = null,
-                                     PointCoordinates?                     CoordinatesForDisplay   = null,
-                                     FacilityLocation?                     FacilityLocation        = null)
+                                     IEnumerable<ExternalReferencing>?     ExternalReferencing            = null,
+                                     PointCoordinates?                     CoordinatesForDisplay          = null,
+                                     FacilityLocation?                     FacilityLocation               = null,
+                                     XElement?                             LocationExtension              = null,
+
+                                     XElement?                             LocationReferenceExtension     = null)
 
         : ALocation(ExternalReferencing,
                     CoordinatesForDisplay,
-                    FacilityLocation)
+                    FacilityLocation,
+                    LocationExtension,
+                    LocationReferenceExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// A reference to a versioned predefined location.
         /// </summary>
         [XmlElement("predefinedLocationReference",    Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PredefinedLocationVersionedReference  PredefinedLocationReference     { get; set; } = PredefinedLocationReference;
+        public PredefinedLocationVersionedReference  PredefinedLocationReference     { get; } = PredefinedLocationReference;
 
         /// <summary>
         /// Optional extension element for additional location by reference information.
         /// </summary>
         [XmlElement("_locationByReferenceExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                             LocationByReferenceExtension    { get; set; }
+        public XElement?                             LocationByReferenceExtension    { get; } = LocationByReferenceExtension;
+
+        #endregion
 
     }
 

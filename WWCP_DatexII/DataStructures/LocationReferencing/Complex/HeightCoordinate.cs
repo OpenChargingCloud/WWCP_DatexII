@@ -31,38 +31,46 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// Third coordinate for points defined geodetically.
     /// </summary>
     [XmlType("HeightCoordinate", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class HeightCoordinate
+    public class HeightCoordinate(Meter                HeightValue,
+                                  HeightType?          HeightType                  = null,
+                                  AltitudeConfidence?  AltitudeConfidence          = null,
+                                  PositionAccuracy?    VerticalPositionAccuracy    = null,
+                                  XElement?            HeightCoordinateExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Value in metres for the height measured vertically at the planar coordinates the point corresponds to.
         /// </summary>
         [XmlElement("heightValue",                 Namespace = "http://datex2.eu/schema/3/common")]
-        public Meter                HeightValue                  { get; set; }
+        public Meter                HeightValue                  { get; } = HeightValue;
 
         /// <summary>
         /// Type of measured height. When omitted, it is supposed to be the ellipsoidal height.
         /// </summary>
         [XmlElement("heightType",                  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public HeightTypes?         HeightType                   { get; set; }
+        public HeightType?          HeightType                   { get; } = HeightType;
 
         /// <summary>
         /// Altitude confidence.
         /// </summary>
         [XmlElement("altitudeConfidence",          Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public AltitudeConfidence?  AltitudeConfidence           { get; set; }
+        public AltitudeConfidence?  AltitudeConfidence           { get; } = AltitudeConfidence;
 
         /// <summary>
         /// Defines the vertical position accuracy according to EN16803-1.
         /// </summary>
         [XmlElement("verticalPositionAccuracy",    Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PositionAccuracy?    VerticalPositionAccuracy     { get; set; }
+        public PositionAccuracy?    VerticalPositionAccuracy     { get; } = VerticalPositionAccuracy;
 
         /// <summary>
         /// Optional extension element for additional height coordinate information.
         /// </summary>
         [XmlElement("_heightCoordinateExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            HeightCoordinateExtension    { get; set; }
+        public XElement?            HeightCoordinateExtension    { get; } = HeightCoordinateExtension;
+
+        #endregion
 
     }
 

@@ -32,48 +32,53 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// A unit within the organisation, which has a separate location, operating hours, address and/or contacts.
     /// </summary>
     [XmlType("OrganisationUnit", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public class OrganisationUnit(MultilingualString?               Name                 = null,
-                                  IEnumerable<MultilingualString>?  Function             = null,
-                                  ALocationReference?               LocationReference    = null,
-                                  IEnumerable<ContactInformation>?  ContactInformation   = null,
-                                  AOperatingHours?                  OperatingHours       = null)
+    public class OrganisationUnit(MultilingualString?               Name                        = null,
+                                  IEnumerable<MultilingualString>?  Function                    = null,
+                                  ALocationReference?               LocationReference           = null,
+                                  IEnumerable<ContactInformation>?  ContactInformation          = null,
+                                  AOperatingHours?                  OperatingHours              = null,
+                                  XElement?                         OrganisationUnitExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// A name for this organisation unit.
         /// </summary>
         [XmlElement("name",                        Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?              Name                         { get; set; } = Name;
+        public MultilingualString?              Name                         { get; } = Name;
 
         /// <summary>
         /// Functions this unit is responsible for or a specific type, e.g. headquarter or sales.
         /// </summary>
         [XmlElement("function",                    Namespace = "http://datex2.eu/schema/3/common")]
-        public IEnumerable<MultilingualString>  Function                     { get; set; } = Function?.          Distinct() ?? [];
+        public IEnumerable<MultilingualString>  Function                     { get; } = Function?.          Distinct() ?? [];
 
         /// <summary>
         /// Location reference for this organisation unit.
         /// </summary>
         [XmlElement("locationReference",           Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public ALocationReference?              LocationReference            { get; set; } = LocationReference;
+        public ALocationReference?              LocationReference            { get; } = LocationReference;
 
         /// <summary>
         /// Contact information for this organisation unit.
         /// </summary>
         [XmlElement("contactInformation",          Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<ContactInformation>  ContactInformation           { get; set; } = ContactInformation?.Distinct() ?? [];
+        public IEnumerable<ContactInformation>  ContactInformation           { get; } = ContactInformation?.Distinct() ?? [];
 
         /// <summary>
         /// Operating hours of this organisation unit.
         /// </summary>
         [XmlElement("operatingHours",              Namespace = "http://datex2.eu/schema/3/facilities")]
-        public AOperatingHours?                 OperatingHours               { get; set; } = OperatingHours;
+        public AOperatingHours?                 OperatingHours               { get; } = OperatingHours;
 
         /// <summary>
         /// Optional extension element for additional organisation unit information.
         /// </summary>
         [XmlElement("_organisationUnitExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                        OrganisationUnitExtension    { get; set; }
+        public XElement?                        OrganisationUnitExtension    { get; } = OrganisationUnitExtension;
+
+        #endregion
 
     }
 

@@ -17,6 +17,7 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 using org.GraphDefined.Vanaheimr.Illias;
@@ -25,7 +26,6 @@ using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.Facilities;
 using cloud.charging.open.protocols.DatexII.v3.LocationReferencing;
-using System.Xml.Linq;
 
 #endregion
 
@@ -38,14 +38,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     [XmlType("ElectricChargingPoint", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
     public class ElectricChargingPoint(String                                    Id,
                                        String                                    Version,
-                                       DeliveryUnitEnum                          DeliveryUnit,
+                                       DeliveryUnit                              DeliveryUnit,
 
                                        MultilingualString?                       Name                             = null,
                                        IEnumerable<MultilingualString>?          Alias                            = null,
                                        String?                                   ExternalIdentifier               = null,
                                        DateTime?                                 LastUpdated                      = null,
                                        MultilingualString?                       Description                      = null,
-                                       IEnumerable<Accessibilities>?             Accessibility                    = null,
+                                       IEnumerable<Accessibility>?               Accessibility                    = null,
                                        IEnumerable<MultilingualString>?          AdditionalInformation            = null,
                                        IEnumerable<URL>?                         InformationWebsites              = null,
                                        IEnumerable<URL>?                         PhotoURLs                        = null,
@@ -65,18 +65,23 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                        Units?                                    MinimumDeliveryAmount            = null,
                                        Units?                                    MaximumDeliveryAmount            = null,
                                        MultilingualString?                       ModelType                        = null,
-                                       ReservationTypes?                         Reservation                      = null,
+                                       ReservationType?                          Reservation                      = null,
 
                                        String?                                   EVSEId                           = null,
-                                       IEnumerable<ChargingPointUsages>?         UsageType                        = null,
+                                       IEnumerable<ChargingPointUsage>?          UsageType                        = null,
                                        IEnumerable<VehicleToGridCommunication>?  VehicleToGridCommunicationType   = null,
                                        Byte?                                     NumberOfConnectors               = null,
                                        IEnumerable<Volt>?                        AvailableVoltage                 = null,
                                        IEnumerable<Watt>?                        AvailableChargingPower           = null,
-                                       IEnumerable<SmartRechargingServices>?     SmartRechargingServices          = null,
+                                       IEnumerable<SmartRechargingService>?      SmartRechargingServices          = null,
                                        IEnumerable<MultilingualString>?          OtherSmartRechargingServices     = null,
                                        IEnumerable<Connector>?                   Connector                        = null,
-                                       IEnumerable<ElectricEnergy>?              ElectricEnergy                   = null)
+                                       IEnumerable<ElectricEnergy>?              ElectricEnergy                   = null,
+
+                                       XElement?                                 FacilityObjectExtension          = null,
+                                       XElement?                                 FacilityExtension                = null,
+                                       XElement?                                 RefillPointExtension             = null,
+                                       XElement?                                 ElectricChargingPointExtension   = null)
 
         : RefillPoint(Id,
                       Version,
@@ -107,75 +112,83 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                       MinimumDeliveryAmount,
                       MaximumDeliveryAmount,
                       ModelType,
-                      Reservation)
+                      Reservation,
+
+                      FacilityObjectExtension,
+                      FacilityExtension,
+                      RefillPointExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// Electric Vehicle Supply Equipment Identifier according to ISO 15118.
         /// </summary>
         [XmlElement("evseId",                          Namespace = "http://datex2.eu/schema/3/common")]
-        public String?                                  EVSEId                            { get; set; } = EVSEId;
+        public String?                                  EVSEId                            { get; } = EVSEId;
 
         /// <summary>
         /// Usage type of the electric charging point.
         /// </summary>
         [XmlElement("usageType",                       Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<ChargingPointUsages>         UsageType                         { get; set; } = UsageType?.                     Distinct() ?? [];
+        public IEnumerable<ChargingPointUsage>          UsageType                         { get; } = UsageType?.                     Distinct() ?? [];
 
         /// <summary>
         /// Type of vehicle to grid communication used.
         /// </summary>
         [XmlElement("vehicleToGridCommunicationType",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<VehicleToGridCommunication>  VehicleToGridCommunicationType    { get; set; } = VehicleToGridCommunicationType?.Distinct() ?? [];
+        public IEnumerable<VehicleToGridCommunication>  VehicleToGridCommunicationType    { get; } = VehicleToGridCommunicationType?.Distinct() ?? [];
 
         /// <summary>
         /// Information on the number of connectors at this charging point.
         /// </summary>
         [XmlElement("numberOfConnectors",              Namespace = "http://datex2.eu/schema/3/common")]
-        public Byte?                                    NumberOfConnectors                { get; set; } = NumberOfConnectors;
+        public Byte?                                    NumberOfConnectors                { get; } = NumberOfConnectors;
 
         /// <summary>
         /// Possible degrees of voltage.
         /// </summary>
         [XmlElement("availableVoltage",                Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<Volt>                        AvailableVoltage                  { get; set; } = AvailableVoltage?.              Distinct() ?? [];
+        public IEnumerable<Volt>                        AvailableVoltage                  { get; } = AvailableVoltage?.              Distinct() ?? [];
 
         /// <summary>
         /// Possible degrees of charging power in Watts.
         /// </summary>
         [XmlElement("availableChargingPower",          Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<Watt>                        AvailableChargingPower            { get; set; } = AvailableChargingPower?.        Distinct() ?? [];
+        public IEnumerable<Watt>                        AvailableChargingPower            { get; } = AvailableChargingPower?.        Distinct() ?? [];
 
         /// <summary>
         /// Smart recharging services that are available.
         /// </summary>
         [XmlElement("smartRechargingServices",         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<SmartRechargingServices>     SmartRechargingServices           { get; set; } = SmartRechargingServices?.       Distinct() ?? [];
+        public IEnumerable<SmartRechargingService>      SmartRechargingServices           { get; } = SmartRechargingServices?.       Distinct() ?? [];
 
         /// <summary>
         /// Other smart recharging services that are available.
         /// </summary>
         [XmlElement("otherSmartRechargingServices",    Namespace = "http://datex2.eu/schema/3/common")]
-        public IEnumerable<MultilingualString>          OtherSmartRechargingServices      { get; set; } = OtherSmartRechargingServices?.  Distinct() ?? [];
+        public IEnumerable<MultilingualString>          OtherSmartRechargingServices      { get; } = OtherSmartRechargingServices?.  Distinct() ?? [];
 
         /// <summary>
         /// Specify the connector(s).
         /// </summary>
         [XmlElement("connector",                       Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<Connector>                   Connector                         { get; set; } = Connector?.                     Distinct() ?? [];
+        public IEnumerable<Connector>                   Connector                         { get; } = Connector?.                     Distinct() ?? [];
 
         /// <summary>
         /// Electric energy definitions applicable at this charging point.
         /// </summary>
         [XmlElement("electricEnergy",                  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<ElectricEnergy>              ElectricEnergy                    { get; set; } = ElectricEnergy?.                Distinct() ?? [];
+        public IEnumerable<ElectricEnergy>              ElectricEnergy                    { get; } = ElectricEnergy?.                Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional electric charging point information.
         /// </summary>
         [XmlElement("_electricChargingPointExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                                ElectricChargingPointExtension    { get; set; }
+        public XElement?                                ElectricChargingPointExtension    { get; } = ElectricChargingPointExtension;
+
+        #endregion
 
     }
 

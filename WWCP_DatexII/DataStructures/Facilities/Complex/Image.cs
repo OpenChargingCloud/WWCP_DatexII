@@ -29,27 +29,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// An image, with encoded data and identification of format.
     /// </summary>
     [XmlType("Image", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public class Image(Byte[]        Data,
-                       ImageFormats  Format)
+    public class Image(Byte[]       Data,
+                       ImageFormat  Format,
+                       XElement?    ImageExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Encoded image data.
         /// </summary>
         [XmlElement("imageData",        Namespace = "http://datex2.eu/schema/3/common")]
-        public Byte[]        Data              { get; set; } = Data;
+        public Byte[]       Data              { get; } = Data;
 
         /// <summary>
         /// Identifies the image format of the associated image data.
         /// </summary>
         [XmlElement("imageFormat",      Namespace = "http://datex2.eu/schema/3/facilities")]
-        public ImageFormats  Format            { get; set; } = Format;
+        public ImageFormat  Format            { get; } = Format;
 
         /// <summary>
         /// Optional extension element for additional content.
         /// </summary>
         [XmlElement("_imageExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?     ImageExtension    { get; set; }
+        public XElement?    ImageExtension    { get; } = ImageExtension;
+
+        #endregion
 
     }
 

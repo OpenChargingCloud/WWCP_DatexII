@@ -44,19 +44,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Status of the refill point.
         /// </summary>
-        [XmlElement("status",         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("status",                              Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
         public RefillPointStatusEnum  Status                               { get; } = Status;
 
         /// <summary>
         /// Overall period during which this planned status is effective.
         /// </summary>
-        [XmlElement("overallPeriod",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("overallPeriod",                       Namespace = "http://datex2.eu/schema/3/common")]
         public OverallPeriod          OverallPeriod                        { get; } = OverallPeriod;
 
         /// <summary>
         /// Optional extension element for additional planned refill point status information.
         /// </summary>
-        [XmlElement("_plannedRefillPointStatusExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_plannedRefillPointStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?              PlannedRefillPointStatusExtension    { get; } = PlannedRefillPointStatusExtension;
 
         #endregion

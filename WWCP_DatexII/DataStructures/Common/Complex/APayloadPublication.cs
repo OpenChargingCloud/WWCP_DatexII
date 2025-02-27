@@ -44,6 +44,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                               XElement?                PayloadPublicationExtension   = null)
     {
 
+        #region Properties
+
         /// <summary>
         /// Date/time at which the payload publication was created.
         /// </summary>
@@ -97,6 +99,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlElement("_payloadPublicationExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                PayloadPublicationExtension    { get; } = PayloadPublicationExtension;
+
+        #endregion
 
     }
 

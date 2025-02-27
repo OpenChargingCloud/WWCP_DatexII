@@ -29,20 +29,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// Use this class to describe details of the brands that are accepted.
     /// </summary>
     [XmlType("BrandsAcceptedCodeList", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public class BrandsAcceptedCodeList(PaymentBrands BrandsAcceptedList)
+    public class BrandsAcceptedCodeList(PaymentBrand  BrandsAcceptedList,
+                                        XElement?     BrandsAcceptedCodeListExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// List of accepted brands for payment cards.
         /// </summary>
-        [XmlElement("brandsAcceptedList", Namespace = "http://datex2.eu/schema/3/facilities")]
-        public PaymentBrands  BrandsAcceptedList                 { get; set; } = BrandsAcceptedList;
+        [XmlElement("brandsAcceptedList",                Namespace = "http://datex2.eu/schema/3/facilities")]
+        public PaymentBrand  BrandsAcceptedList                 { get; } = BrandsAcceptedList;
 
         /// <summary>
         /// Optional extension element for additional information.
         /// </summary>
-        [XmlElement("_brandsAcceptedCodeListExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?      BrandsAcceptedCodeListExtension    { get; set; }
+        [XmlElement("_brandsAcceptedCodeListExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?     BrandsAcceptedCodeListExtension    { get; } = BrandsAcceptedCodeListExtension;
+
+        #endregion
 
     }
 

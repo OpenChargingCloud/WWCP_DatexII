@@ -42,18 +42,22 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
     {
 
+        #region Properties
+
         /// <summary>
         /// The specified instance(s) of the day of week within the month.
         /// At least one and at most five instances must be provided.
         /// </summary>
-        [XmlElement("applicableInstanceOfDayWithinMonth", Namespace = "http://datex2.eu/schema/3/common")]
-        public IEnumerable<InstanceOfDay>  ApplicableInstanceOfDayWithinMonth    { get; set; } = ApplicableInstanceOfDayWithinMonth.Distinct();
+        [XmlElement("applicableInstanceOfDayWithinMonth",  Namespace = "http://datex2.eu/schema/3/common")]
+        public IEnumerable<InstanceOfDay>  ApplicableInstanceOfDayWithinMonth    { get; } = ApplicableInstanceOfDayWithinMonth.Distinct();
 
         /// <summary>
         /// Optional extension element for additional instance-of-day-within-month information.
         /// </summary>
-        [XmlElement("_instanceOfDayWithinMonthExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                   InstanceOfDayWithinMonthExtension     { get; set; } = InstanceOfDayWithinMonthExtension;
+        [XmlElement("_instanceOfDayWithinMonthExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?                   InstanceOfDayWithinMonthExtension     { get; } = InstanceOfDayWithinMonthExtension;
+
+        #endregion
 
     }
 

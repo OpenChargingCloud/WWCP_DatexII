@@ -32,41 +32,46 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// the usable area might be larger than the product from its length and width.
     /// </summary>
     [XmlType("Dimension", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public class Dimension(Meter?        Length       = null,
-                           Meter?        Width        = null,
-                           Meter?        Height       = null,
-                           SquareMeter?  UsableArea   = null)
+    public class Dimension(Meter?        Length               = null,
+                           Meter?        Width                = null,
+                           Meter?        Height               = null,
+                           SquareMeter?  UsableArea           = null,
+                           XElement?     DimensionExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Length.
         /// </summary>
         [XmlElement("length",               Namespace = "http://datex2.eu/schema/3/common")]
-        public Meter?        Length                { get; set; } = Length;
+        public Meter?        Length                { get; } = Length;
 
         /// <summary>
         /// Width.
         /// </summary>
         [XmlElement("width",                Namespace = "http://datex2.eu/schema/3/common")]
-        public Meter?        Width                 { get; set; } = Width;
+        public Meter?        Width                 { get; } = Width;
 
         /// <summary>
         /// Height.
         /// </summary>
         [XmlElement("height",               Namespace = "http://datex2.eu/schema/3/common")]
-        public Meter?        Height                { get; set; } = Height;
+        public Meter?        Height                { get; } = Height;
 
         /// <summary>
         /// The area measured in square metres that is available for some specific purpose.
         /// </summary>
         [XmlElement("usableArea",           Namespace = "http://datex2.eu/schema/3/facilities")]
-        public SquareMeter?  UsableArea            { get; set; } = UsableArea;
+        public SquareMeter?  UsableArea            { get; } = UsableArea;
 
         /// <summary>
         /// Optional extension element for additional dimension information.
         /// </summary>
         [XmlElement("_dimensionExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?     DimensionExtension    { get; set; }
+        public XElement?     DimensionExtension    { get; } = DimensionExtension;
+
+        #endregion
 
     }
 

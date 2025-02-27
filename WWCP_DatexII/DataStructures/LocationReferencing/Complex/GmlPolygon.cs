@@ -29,28 +29,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// Planar surface defined by one exterior boundary and zero or more interior boundaries.
     /// </summary>
     [XmlType("GmlPolygon", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class GmlPolygon(GmlLinearRing                Exterior,
-                            IEnumerable<GmlLinearRing>?  Interior   = null)
+    public class GMLPolygon(GMLLinearRing                Exterior,
+                            IEnumerable<GMLLinearRing>?  Interior              = null,
+                            XElement?                    GMLPolygonExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// A boundary of a polygonal surface consisting of a ring, i.e. in the normal 2D case, a closed polygonal line distinguished as exterior.
         /// Such a polygonal line must have at least 4 pairs of coordinates.
         /// </summary>
         [XmlElement("exterior",              Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public GmlLinearRing                Exterior              { get; set; } = Exterior;
+        public GMLLinearRing                Exterior              { get; } = Exterior;
 
         /// <summary>
         /// A boundary of internal patches of a polygonal surface consisting of a ring feature.
         /// </summary>
         [XmlElement("interior",              Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public IEnumerable<GmlLinearRing>  Interior               { get; set; } = Interior?.Distinct() ?? [];
+        public IEnumerable<GMLLinearRing>  Interior               { get; } = Interior?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional polygon information.
         /// </summary>
         [XmlElement("_gmlPolygonExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                   GmlPolygonExtension    { get; set; }
+        public XElement?                   GMLPolygonExtension    { get; } = GMLPolygonExtension;
+
+        #endregion
 
     }
 

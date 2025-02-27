@@ -31,29 +31,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// The specification of a location on a network (as a point or a linear location).
     /// </summary>
     [XmlType("NetworkLocation", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public abstract class ANetworkLocation(IEnumerable<ExternalReferencing>?    ExternalReferencing                  = null,
+    public abstract class ANetworkLocation(SupplementaryPositionalDescription?  SupplementaryPositionalDescription   = null,
+                                           XElement?                            NetworkLocationExtension             = null,
+
+                                           IEnumerable<ExternalReferencing>?    ExternalReferencing                  = null,
                                            PointCoordinates?                    CoordinatesForDisplay                = null,
                                            FacilityLocation?                    FacilityLocation                     = null,
+                                           XElement?                            LocationExtension                    = null,
 
-                                           SupplementaryPositionalDescription?  SupplementaryPositionalDescription   = null)
+                                           XElement?                            LocationReferenceExtension           = null)
 
         : ALocation(ExternalReferencing,
                     CoordinatesForDisplay,
-                    FacilityLocation)
+                    FacilityLocation,
+                    LocationExtension,
+                    LocationReferenceExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// Supplementary positional description.
         /// </summary>
         [XmlElement("supplementaryPositionalDescription",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public SupplementaryPositionalDescription?  SupplementaryPositionalDescription    { get; set; } = SupplementaryPositionalDescription;
+        public SupplementaryPositionalDescription?  SupplementaryPositionalDescription    { get; } = SupplementaryPositionalDescription;
 
         /// <summary>
         /// Optional extension element for additional network location information.
         /// </summary>
         [XmlElement("_networkLocationExtension",           Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                            NetworkLocationExtension              { get; set; }
+        public XElement?                            NetworkLocationExtension              { get; } = NetworkLocationExtension;
+
+        #endregion
 
     }
 

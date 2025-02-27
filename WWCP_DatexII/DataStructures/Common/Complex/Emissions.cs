@@ -29,33 +29,40 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// Emission characteristics of vehicles.
     /// </summary>
     [XmlType("Emissions", Namespace = "http://datex2.eu/schema/3/common")]
-    public class Emissions
+    public class Emissions(EmissionClassificationEuro?  EmissionClassificationEuro    = null,
+                          IEnumerable<String>?          EmissionClassificationOther   = null,
+                          LowEmissionLevel?             EmissionLevel                 = null,
+                          XElement?                     EmissionsExtension            = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The minimum Euro emission classification the vehicle(s) must comply with.
         /// Note: vehicleType and fuelType should be provided to make this explicit.
         /// </summary>
         [XmlElement("emissionClassificationEuro", Namespace = "http://datex2.eu/schema/3/common")]
-        public EmissionClassificationEuro?  EmissionClassificationEuro     { get; set; }
+        public EmissionClassificationEuro?  EmissionClassificationEuro     { get; } = EmissionClassificationEuro;
 
         /// <summary>
         /// Some other (probably locally defined) values for emission classification.
         /// </summary>
         [XmlElement("emissionClassificationOther", Namespace = "http://datex2.eu/schema/3/common")]
-        public IEnumerable<String>?         EmissionClassificationOther    { get; set; }
+        public IEnumerable<String>?         EmissionClassificationOther    { get; } = EmissionClassificationOther;
 
         /// <summary>
         /// The low emission level of a vehicle.
         /// </summary>
         [XmlElement("emissionLevel", Namespace = "http://datex2.eu/schema/3/common")]
-        public LowEmissionLevels?           EmissionLevel                  { get; set; }
+        public LowEmissionLevel?            EmissionLevel                  { get; } = EmissionLevel;
 
         /// <summary>
         /// Optional extension element for additional emissions information.
         /// </summary>
         [XmlElement("_emissionsExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                    EmissionsExtension             { get; set; }
+        public XElement?                    EmissionsExtension             { get; } = EmissionsExtension;
+
+        #endregion
 
     }
 

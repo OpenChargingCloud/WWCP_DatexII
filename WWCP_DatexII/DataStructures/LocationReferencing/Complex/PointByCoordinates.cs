@@ -32,27 +32,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// </summary>
     [XmlType("PointByCoordinates", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
     public class PointByCoordinates(PointCoordinates  PointCoordinates,
-                                    AngleInDegrees?   Bearing   = null)
+                                    AngleInDegrees?   Bearing                       = null,
+                                    XElement?         PointByCoordinatesExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The coordinates that define the point.
         /// </summary>
         [XmlElement("pointCoordinates",              Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PointCoordinates  PointCoordinates               { get; set; } = PointCoordinates;
+        public PointCoordinates  PointCoordinates               { get; } = PointCoordinates;
 
         /// <summary>
         /// A bearing at the point measured in degrees (0 - 359). Unless otherwise specified the reference 
         /// direction corresponding to 0 degrees is North. Values increase in the clockwise direction.
         /// </summary>
         [XmlElement("bearing",                       Namespace = "http://datex2.eu/schema/3/common")]
-        public AngleInDegrees?   Bearing                        { get; set; } = Bearing;
+        public AngleInDegrees?   Bearing                        { get; } = Bearing;
 
         /// <summary>
         /// Optional extension element for additional point by coordinates information.
         /// </summary>
         [XmlElement("_pointByCoordinatesExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?         PointByCoordinatesExtension    { get; set; }
+        public XElement?         PointByCoordinatesExtension    { get; } = PointByCoordinatesExtension;
+
+        #endregion
 
     }
 

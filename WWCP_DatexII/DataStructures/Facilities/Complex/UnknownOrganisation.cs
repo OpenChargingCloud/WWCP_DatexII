@@ -20,6 +20,8 @@
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
+using cloud.charging.open.protocols.DatexII.v3.Common;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII.v3.Facilities
@@ -29,14 +31,24 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// The organisation for the specified association end (within the specified validity if applicable) is unknown.
     /// </summary>
     [XmlType("UnknownOrganisation", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public class UnknownOrganisation : AOrganisation
+    public class UnknownOrganisation(XElement?       UnknownOrganisationExtension   = null,
+                                     OverallPeriod?  GeneralTimeValidity            = null,
+                                     XElement?       OrganisationExtension          = null)
+
+        : AOrganisation(GeneralTimeValidity,
+                        OrganisationExtension)
+
     {
+
+        #region Properties
 
         /// <summary>
         /// Optional extension element for additional unknown organisation information.
         /// </summary>
         [XmlElement("_unknownOrganisationExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  UnknownOrganisationExtension    { get; set; }
+        public XElement?  UnknownOrganisationExtension    { get; } = UnknownOrganisationExtension;
+
+        #endregion
 
     }
 

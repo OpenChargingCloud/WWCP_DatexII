@@ -39,27 +39,30 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     public abstract class Facility(String                                Id,
                                    String                                Version,
 
-                                   MultilingualString?                   Name                     = null,
-                                   IEnumerable<MultilingualString>?      Alias                    = null,
-                                   String?                               ExternalIdentifier       = null,
-                                   DateTime?                             LastUpdated              = null,
-                                   MultilingualString?                   Description              = null,
-                                   IEnumerable<Accessibilities>?         Accessibility            = null,
-                                   IEnumerable<MultilingualString>?      AdditionalInformation    = null,
-                                   IEnumerable<URL>?                     InformationWebsites      = null,
-                                   IEnumerable<URL>?                     PhotoURLs                = null,
-                                   IEnumerable<Image>?                   Photos                   = null,
-                                   AOperatingHours?                      OperatingHours           = null,
-                                   ALocationReference?                   LocationReference        = null,
-                                   AOrganisation?                        Owner                    = null,
-                                   AOrganisation?                        Operator                 = null,
-                                   AOrganisation?                        Helpdesk                 = null,
-                                   IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles    = null,
-                                   Dimension?                            Dimension                = null,
-                                   Amenities?                            Amenities                = null,
+                                   MultilingualString?                   Name                      = null,
+                                   IEnumerable<MultilingualString>?      Alias                     = null,
+                                   String?                               ExternalIdentifier        = null,
+                                   DateTime?                             LastUpdated               = null,
+                                   MultilingualString?                   Description               = null,
+                                   IEnumerable<Accessibility>?           Accessibility             = null,
+                                   IEnumerable<MultilingualString>?      AdditionalInformation     = null,
+                                   IEnumerable<URL>?                     InformationWebsites       = null,
+                                   IEnumerable<URL>?                     PhotoURLs                 = null,
+                                   IEnumerable<Image>?                   Photos                    = null,
+                                   AOperatingHours?                      OperatingHours            = null,
+                                   ALocationReference?                   LocationReference         = null,
+                                   AOrganisation?                        Owner                     = null,
+                                   AOrganisation?                        Operator                  = null,
+                                   AOrganisation?                        Helpdesk                  = null,
+                                   IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles     = null,
+                                   Dimension?                            Dimension                 = null,
+                                   Amenities?                            Amenities                 = null,
 
-                                   IEnumerable<ASupplementalFacility>?   SupplementalFacilities   = null,
-                                   IEnumerable<DedicatedParkingSpaces>?  DedicatedParkingSpaces   = null)
+                                   IEnumerable<ASupplementalFacility>?   SupplementalFacilities    = null,
+                                   IEnumerable<DedicatedParkingSpaces>?  DedicatedParkingSpaces    = null,
+
+                                   XElement?                             FacilityObjectExtension   = null,
+                                   XElement?                             FacilityExtension         = null)
 
         : AFacilityObject(Id,
                           Version,
@@ -81,27 +84,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                           Helpdesk,
                           ApplicableForVehicles,
                           Dimension,
-                          Amenities)
+                          Amenities,
+
+                          FacilityObjectExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// Supplemental facilities, e.g. additional service or equipment available on the site.
         /// </summary>
         [XmlElement("supplementalFacility",    Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<ASupplementalFacility>   SupplementalFacilities    { get; set; } = SupplementalFacilities?.Distinct() ?? [];
+        public IEnumerable<ASupplementalFacility>   SupplementalFacilities    { get; } = SupplementalFacilities?.Distinct() ?? [];
 
         /// <summary>
         /// Dedicated parking spaces associated with the facility.
         /// </summary>
         [XmlElement("dedicatedParkingSpaces",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<DedicatedParkingSpaces>  DedicatedParkingSpaces    { get; set; } = DedicatedParkingSpaces?.Distinct() ?? [];
+        public IEnumerable<DedicatedParkingSpaces>  DedicatedParkingSpaces    { get; } = DedicatedParkingSpaces?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional facility information.
         /// </summary>
         [XmlElement("_facilityExtension",      Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                            FacilityExtension         { get; set; }
+        public XElement?                            FacilityExtension         { get; } = FacilityExtension;
+
+        #endregion
 
     }
 

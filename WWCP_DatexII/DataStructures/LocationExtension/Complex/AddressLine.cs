@@ -33,32 +33,37 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
     [XmlType("AddressLine", Namespace = "http://datex2.eu/schema/3/locationExtension")]
     public class AddressLine(UInt32              Order,
                              MultilingualString  Text,
-                             AddressLineTypes    Type)
+                             AddressLineType     Type,
+                             XElement?           AddressLineExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The sequence order that the address line element should be displayed in.
         /// </summary>
         [XmlAttribute("order")]
-        public UInt32              Order                   { get; set; } = Order;
+        public UInt32              Order                   { get; } = Order;
 
         /// <summary>
         /// Free-text description for the address line element.
         /// </summary>
         [XmlElement("text",                   Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString  Text                    { get; set; } = Text;
+        public MultilingualString  Text                    { get; } = Text;
 
         /// <summary>
         /// The type for the address line element.
         /// </summary>
         [XmlElement("type",                   Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public AddressLineTypes    Type                    { get; set; } = Type;
+        public AddressLineType     Type                    { get; } = Type;
 
         /// <summary>
         /// Optional extension element for additional address line information.
         /// </summary>
         [XmlElement("_addressLineExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?           AddressLineExtension    { get; set; }
+        public XElement?           AddressLineExtension    { get; } = AddressLineExtension;
+
+        #endregion
 
     }
 

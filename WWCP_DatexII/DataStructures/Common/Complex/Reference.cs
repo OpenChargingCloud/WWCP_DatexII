@@ -31,11 +31,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     public class Reference(String Id)
     {
 
+        #region Properties
+
         /// <summary>
         /// The unique identifier for the reference.
         /// </summary>
         [XmlAttribute("id")]
-        public String  Id    { get; set; } = Id;
+        public String  Id    { get; } = Id;
+
+        #endregion
 
     }
 

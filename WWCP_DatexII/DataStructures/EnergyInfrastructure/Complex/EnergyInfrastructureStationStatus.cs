@@ -50,7 +50,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                                                    Boolean?                                  IsAvailable                                  = null,
                                                    IEnumerable<RefillPointStatus>?           RefillPointStatus                            = null,
-                                                   IEnumerable<ServiceType>?                 ServiceTypes                                 = null,
+                                                   IEnumerable<Service>?                     Services                                     = null,
                                                    IEnumerable<EnergyRateUpdate>?            EnergyRateUpdates                            = null,
                                                    XElement?                                 EnergyInfrastructureStationStatusExtension   = null)
 
@@ -90,7 +90,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// If no period is given, the currently available service is meant.
         /// </summary>
         [XmlElement("serviceType",                                  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<ServiceType>        ServiceTypes                                  { get; } = ServiceTypes?.     Distinct() ?? [];
+        public IEnumerable<Service>            Services                                      { get; } = Services?.         Distinct() ?? [];
 
         /// <summary>
         /// Updates to the energy rate applicable at the station.

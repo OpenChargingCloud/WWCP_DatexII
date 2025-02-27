@@ -81,7 +81,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// Updates to the energy rate applicable at this refill point.
         /// </summary>
         [XmlElement("energyRateUpdate",             Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<EnergyRateUpdate>          EnergyRateUpdates             { get; } = EnergyRateUpdates?.         Distinct() ?? [];
+        public IEnumerable<EnergyRateUpdate>          EnergyRateUpdates             { get; } = EnergyRateUpdates?.       Distinct() ?? [];
 
         /// <summary>
         /// Estimated waiting time for customers without reservation.

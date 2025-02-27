@@ -17,7 +17,11 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
+
+using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -39,8 +43,111 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
     {
 
+        #region Properties
+
+        /// <summary>
+        /// Fixed attribute indicating the target class.
+        /// </summary>
         [XmlAttribute("targetClass")]
         public String  TargetClass    { get; } = "loc:PredefinedLocationGroup";
+
+        #endregion
+
+
+        #region TryParseXML(XML, out PredefinedLocationGroupVersionedReference, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an PredefinedLocationGroupVersionedReference.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="PredefinedLocationGroupVersionedReference">The parsed PredefinedLocationGroupVersionedReference.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                                               XML,
+                                          [NotNullWhen(true)]  out PredefinedLocationGroupVersionedReference?  PredefinedLocationGroupVersionedReference,
+                                          [NotNullWhen(false)] out String?                                       ErrorResponse)
+        {
+
+            PredefinedLocationGroupVersionedReference = null;
+
+            #region TryParse Id             [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("id",
+                                                    "id",
+                                                    out var id,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse Version        [optional]
+
+            if (XML.TryParseOptionalTextAttribute("version",
+                                                  "version",
+                                                  out var version,
+                                                  out ErrorResponse))
+            {
+                if (ErrorResponse is not null)
+                    return false;
+            }
+
+            #endregion
+
+            #region TryParse TargetClass    [mandatory]
+
+            if (!XML.TryParseMandatoryTextAttribute("targetClass",
+                                                    "target class",
+                                                    out var targetClass,
+                                                    out ErrorResponse))
+            {
+                return false;
+            }
+
+            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.LocationReferencing);
+
+            if (targetClass != $"{nsPrefix}:PredefinedLocationGroup")
+            {
+                ErrorResponse = $"Invalid target class '{targetClass}'!";
+                return false;
+            }
+
+            #endregion
+
+
+            PredefinedLocationGroupVersionedReference = new PredefinedLocationGroupVersionedReference(
+                                                            id,
+                                                            version
+                                                        );
+
+            return true;
+
+        }
+
+        #endregion
+
+        #region ToXML()
+
+        public XElement ToXML()
+        {
+
+            var xml = new XElement(DatexIINS.LocationReferencing + "predefinedLocationGroupReference",
+
+                                new XAttribute("targetClass",   TargetClass),
+                                new XAttribute("id",            Id),
+
+                          Version.IsNotNullOrEmpty()
+                              ? new XAttribute("version",       Version)
+                              : null
+
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
+
 
     }
 

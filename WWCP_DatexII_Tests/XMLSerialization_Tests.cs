@@ -119,7 +119,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                    new MultilingualStringValue(Languages.de, "Weinberg"),
                                                                                                                                    new MultilingualStringValue(Languages.en, "Vineyard")
                                                                                                                                ),
-                                                                                                            NamedAreaType:     NamedAreaTypes.RuralCounty,
+                                                                                                            NamedAreaType:     NamedAreaType.RuralCounty,
                                                                                                             Country:           Country.Germany
                                                                                                         ),
                                                                                                         new ISONamedArea(
@@ -127,9 +127,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                    new MultilingualStringValue(Languages.de, "ISO-Weinberg"),
                                                                                                                                    new MultilingualStringValue(Languages.en, "ISO-Vineyard")
                                                                                                                                ),
-                                                                                                            SubdivisionType:   SubdivisionTypes.County,
+                                                                                                            SubdivisionType:   SubdivisionType.County,
                                                                                                             SubdivisionCode:   new SubdivisionCode("DE"),
-                                                                                                            NamedAreaType:     NamedAreaTypes.TouristArea,
+                                                                                                            NamedAreaType:     NamedAreaType.TouristArea,
                                                                                                             Country:           Country.Germany
                                                                                                         )
                                                                                                     ]
@@ -163,6 +163,39 @@ namespace cloud.charging.open.protocols.DatexII.Tests
       <applicableMonth>september</applicableMonth>
     </DayWeekMonth>
   </recurringDayWeekMonthPeriod>
+  <recurringSpecialDay>
+    <intersectWithApplicableDays>true</intersectWithApplicableDays>
+    <specialDayType>publicHoliday</specialDayType>
+    <publicEvent>wineFestival</publicEvent>
+    <namedArea>
+      <NamedArea xmlns=""http://datex2.eu/schema/3/locationReferencing"">
+        <areaName>
+          <MultilingualString xmlns=""http://datex2.eu/schema/3/common"">
+            <values>
+              <value lang=""de"">Weinberg</value>
+              <value lang=""en"">Vineyard</value>
+            </values>
+          </MultilingualString>
+        </areaName>
+        <namedAreaType>ruralCounty</namedAreaType>
+        <country>DE</country>
+      </NamedArea>
+      <IsoNamedArea xmlns=""http://datex2.eu/schema/3/locationReferencing"">
+        <areaName>
+          <MultilingualString xmlns=""http://datex2.eu/schema/3/common"">
+            <values>
+              <value lang=""de"">ISO-Weinberg</value>
+              <value lang=""en"">ISO-Vineyard</value>
+            </values>
+          </MultilingualString>
+        </areaName>
+        <namedAreaType>touristArea</namedAreaType>
+        <country>DE</country>
+        <subdivisionType>county</subdivisionType>
+        <subdivisionCode>DE</subdivisionCode>
+      </IsoNamedArea>
+    </namedArea>
+  </recurringSpecialDay>
 </period>"));
 
         }

@@ -32,50 +32,60 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// to provide additional geospatial discrimination (e.g. for snow in an area but only above a certain altitude).
     /// </summary>
     [XmlType("AreaLocation", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class AreaLocation(IEnumerable<ExternalReferencing>?  ExternalReferencing           = null,
+    public class AreaLocation(AreaPlace?                         AreasAtWhichApplicable        = null,
+                              NamedArea?                         NamedArea                     = null,
+                              GMLMultiPolygon?                   GMLMultiPolygon               = null,
+                              AOpenLRAreaLocationReference?      OpenLRAreaLocationReference   = null,
+                              XElement?                          AreaLocationExtension         = null,
+
+                              IEnumerable<ExternalReferencing>?  ExternalReferencing           = null,
                               PointCoordinates?                  CoordinatesForDisplay         = null,
                               FacilityLocation?                  FacilityLocation              = null,
+                              XElement?                          LocationExtension             = null,
 
-                              AreaPlaces?                        AreasAtWhichApplicable        = null,
-                              NamedArea?                         NamedArea                     = null,
-                              GmlMultiPolygon?                   GmlMultiPolygon               = null,
-                              AOpenlrAreaLocationReference?      OpenlrAreaLocationReference   = null)
+                              XElement?                          LocationReferenceExtension    = null)
 
         : ALocation(ExternalReferencing,
                     CoordinatesForDisplay,
-                    FacilityLocation)
+                    FacilityLocation,
+                    LocationExtension,
+                    LocationReferenceExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// Places, in generic terms, at which the corresponding information applies.
         /// </summary>
         [XmlElement("areasAtWhichApplicable",       Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public AreaPlaces?                    AreasAtWhichApplicable         { get; set; } = AreasAtWhichApplicable;
+        public AreaPlace?                     AreasAtWhichApplicable         { get; } = AreasAtWhichApplicable;
 
         /// <summary>
         /// A named area defining boundaries or region.
         /// </summary>
         [XmlElement("namedArea",                    Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public NamedArea?                     NamedArea                      { get; set; } = NamedArea;
+        public NamedArea?                     NamedArea                      { get; } = NamedArea;
 
         /// <summary>
         /// A GML MultiPolygon representing the area.
         /// </summary>
         [XmlElement("gmlMultiPolygon",              Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public GmlMultiPolygon?               GmlMultiPolygon                { get; set; } = GmlMultiPolygon;
+        public GMLMultiPolygon?               GMLMultiPolygon                { get; } = GMLMultiPolygon;
 
         /// <summary>
         /// A reference to an area location defined using OpenLR.
         /// </summary>
         [XmlElement("openlrAreaLocationReference",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public AOpenlrAreaLocationReference?  OpenlrAreaLocationReference    { get; set; } = OpenlrAreaLocationReference;
+        public AOpenLRAreaLocationReference?  OpenLRAreaLocationReference    { get; } = OpenLRAreaLocationReference;
 
         /// <summary>
         /// Optional extension element for additional area location information.
         /// </summary>
         [XmlElement("_areaLocationExtension",       Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                      AreaLocationExtension          { get; set; }
+        public XElement?                      AreaLocationExtension          { get; } = AreaLocationExtension;
+
+        #endregion
 
     }
 

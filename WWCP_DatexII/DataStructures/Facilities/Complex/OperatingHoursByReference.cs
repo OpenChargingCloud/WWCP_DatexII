@@ -96,7 +96,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
             //
             // </operatingHoursByReference>
 
-            #region TryParse OperatingHoursReference         [optional]
+            #region TryParse OperatingHoursReference         [mandatory]
 
             if (!XML.TryParseMandatory(DatexIINS.Facilities + "operatingHoursReference",
                                        "operating hours reference",

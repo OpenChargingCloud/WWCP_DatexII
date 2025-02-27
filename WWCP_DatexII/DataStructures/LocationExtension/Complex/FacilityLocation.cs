@@ -29,34 +29,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
     /// A location for which a time zone and an address can be specified.
     /// </summary>
     [XmlType("FacilityLocation", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-    public class FacilityLocation(Facilities.TimeZone?    TimeZone    = null,
-                                  Address?                Address     = null,
-                                  IEnumerable<NutsArea>?  NutsAreas   = null)
+    public class FacilityLocation(Facilities.TimeZone?    TimeZone                    = null,
+                                  Address?                Address                     = null,
+                                  IEnumerable<NutsArea>?  NutsAreas                   = null,
+                                  XElement?               FacilityLocationExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The time zone the facility is located in.
         /// </summary>
         [XmlElement("timeZone",                    Namespace = "http://datex2.eu/schema/3/facilities")]
-        public Facilities.TimeZone?   TimeZone                     { get; set; } = TimeZone;
+        public Facilities.TimeZone?   TimeZone                     { get; } = TimeZone;
 
         /// <summary>
         /// An address specification following ISO 19160-4.
         /// </summary>
         [XmlElement("address",                     Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public Address?               Address                      { get; set; } = Address;
+        public Address?               Address                      { get; } = Address;
 
         /// <summary>
         /// One or more NUTS areas.
         /// </summary>
         [XmlElement("nutsArea",                    Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public IEnumerable<NutsArea>  NutsAreas                    { get; set; } = NutsAreas?.Distinct() ?? [];
+        public IEnumerable<NutsArea>  NutsAreas                    { get; } = NutsAreas?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional facility location information.
         /// </summary>
         [XmlElement("_facilityLocationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?              FacilityLocationExtension    { get; set; }
+        public XElement?              FacilityLocationExtension    { get; } = FacilityLocationExtension;
+
+        #endregion
 
     }
 

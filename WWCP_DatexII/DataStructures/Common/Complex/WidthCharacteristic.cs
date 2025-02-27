@@ -20,6 +20,8 @@
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII.v3.Common
@@ -29,26 +31,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// Width characteristic of a vehicle.
     /// </summary>
     [XmlType("WidthCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
-    public class WidthCharacteristic
+    public class WidthCharacteristic(ComparisonOperator  ComparisonOperator,
+                                     Meter               VehicleWidth,
+                                     XElement?           WidthCharacteristicExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The operator to be used in the vehicle characteristic comparison operation.
         /// </summary>
-        [XmlElement("comparisonOperator",  Namespace = "http://datex2.eu/schema/3/common")]
-        public ComparisonOperators  ComparisonOperator              { get; set; }
+        [XmlElement("comparisonOperator",             Namespace = "http://datex2.eu/schema/3/common")]
+        public ComparisonOperator  ComparisonOperator              { get; } = ComparisonOperator;
 
         /// <summary>
         /// The maximum width of an individual vehicle, including any features embedded or fixed on it, in metres.
         /// </summary>
-        [XmlElement("vehicleWidth",        Namespace = "http://datex2.eu/schema/3/common")]
-        public Double               VehicleWidth                    { get; set; }
+        [XmlElement("vehicleWidth",                   Namespace = "http://datex2.eu/schema/3/common")]
+        public Meter               VehicleWidth                    { get; } = VehicleWidth;
 
         /// <summary>
         /// Optional extension element for additional width characteristic information.
         /// </summary>
-        [XmlElement("_widthCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            WidthCharacteristicExtension    { get; set; }
+        [XmlElement("_widthCharacteristicExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?           WidthCharacteristicExtension    { get; } = WidthCharacteristicExtension;
+
+        #endregion
 
     }
 

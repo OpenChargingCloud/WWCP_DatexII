@@ -20,6 +20,8 @@
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 #endregion
 
 namespace cloud.charging.open.protocols.DatexII.v3.Common
@@ -29,26 +31,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// Length characteristic of a vehicle.
     /// </summary>
     [XmlType("LengthCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
-    public class LengthCharacteristic
+    public class LengthCharacteristic(ComparisonOperator  ComparisonOperator,
+                                      Meter               VehicleLength,
+                                      XElement?           LengthCharacteristicExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The operator to be used in the vehicle characteristic comparison operation.
         /// </summary>
         [XmlElement("comparisonOperator",  Namespace = "http://datex2.eu/schema/3/common")]
-        public ComparisonOperators  ComparisonOperator               { get; set; }
+        public ComparisonOperator  ComparisonOperator               { get; } = ComparisonOperator;
 
         /// <summary>
         /// The overall distance between the front and back of an individual vehicle, including the length of any trailers, couplings, embedded features etc.
         /// </summary>
         [XmlElement("vehicleLength",       Namespace = "http://datex2.eu/schema/3/common")]
-        public Single               VehicleLength                    { get; set; }
+        public Meter               VehicleLength                    { get; } = VehicleLength;
 
         /// <summary>
         /// Optional extension element for additional length characteristic information.
         /// </summary>
         [XmlElement("_lengthCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            LengthCharacteristicExtension    { get; set; }
+        public XElement?           LengthCharacteristicExtension    { get; } = LengthCharacteristicExtension;
+
+        #endregion
 
     }
 

@@ -29,26 +29,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// Evaluation of the altitude confidence assessed according to ETSI ISO 102894-2.
     /// </summary>
     [XmlType("AltitudeConfidence", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class AltitudeConfidence
+    public class AltitudeConfidence(AltitudeAccuracy?              AltitudeAccuracyCodedValue    = null,
+                                    PositionConfidenceCodedError?  AltitudeAccuracyCodedError    = null,
+                                    XElement?                      AltitudeConfidenceExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Absolute accuracy of reported value of a geographical point for a confidence level expressed by a coded scale.
         /// </summary>
         [XmlElement("altitudeAccuracyCodedValue",    Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public AltitudeAccuracies?             AltitudeAccuracyCodedValue     { get; set; }
+        public AltitudeAccuracy?              AltitudeAccuracyCodedValue     { get; } = AltitudeAccuracyCodedValue;
 
         /// <summary>
         /// Error code in case the altitude confidence is out of range or cannot be determined.
         /// </summary>
         [XmlElement("altitudeAccuracyCodedError",    Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PositionConfidenceCodedErrors?  AltitudeAccuracyCodedError     { get; set; }
+        public PositionConfidenceCodedError?  AltitudeAccuracyCodedError     { get; } = AltitudeAccuracyCodedError;
 
         /// <summary>
         /// Optional extension element for additional altitude confidence information.
         /// </summary>
         [XmlElement("_altitudeConfidenceExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                       AltitudeConfidenceExtension    { get; set; }
+        public XElement?                      AltitudeConfidenceExtension    { get; } = AltitudeConfidenceExtension;
+
+        #endregion
 
     }
 

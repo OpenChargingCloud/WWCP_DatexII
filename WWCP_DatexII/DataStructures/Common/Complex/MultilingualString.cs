@@ -41,7 +41,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// The values of the multilingual string.
         /// </summary>
         [XmlArray("values")]
-        public IEnumerable<MultilingualStringValue>  Values    { get; set; } = Values;
+        public IEnumerable<MultilingualStringValue>  Values    { get; } = Values;
 
         #endregion
 
@@ -113,94 +113,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
-
-    }
-
-    /// <summary>
-    /// Represents a multilingual string value with a language attribute.
-    /// </summary>
-    [XmlType("MultilingualStringValue", Namespace = "http://datex2.eu/schema/3/common")]
-    public class MultilingualStringValue(Languages  Language,
-                                         String     Text)
-    {
-
-        #region Properties
-
-        /// <summary>
-        /// The language of the text.
-        /// </summary>
-        [XmlAttribute("lang")]
-        public Languages  Language    { get; } = Language;
-
-        /// <summary>
-        /// The text.
-        /// </summary>
-        [XmlText]
-        public String     Text        { get; } = Text;
-
-        #endregion
-
-
-        #region TryParseXML(XML, out MultilingualStringValue, out ErrorResponse)
-
-        /// <summary>
-        /// Try to parse the given XML representation of a MultilingualStringValue.
-        /// </summary>
-        /// <param name="XML">The XML to be parsed.</param>
-        /// <param name="MultilingualStringValue">The parsed MultilingualStringValue.</param>
-        /// <param name="ErrorResponse">An optional error response.</param>
-        public static Boolean TryParseXML(XElement                                           XML,
-                                          [NotNullWhen(true)]  out MultilingualStringValue?  MultilingualStringValue,
-                                          [NotNullWhen(false)] out String?                   ErrorResponse)
-        {
-
-            MultilingualStringValue  = null;
-            ErrorResponse            = null;
-
-
-            #region TryParse Language    [mandatory]
-
-            if (!XML.TryParseMandatoryAttribute("lang",
-                                                "language",
-                                                LanguagesExtensions.TryParse,
-                                                out Languages language,
-                                                out ErrorResponse))
-            {
-                return false;
-            }
-
-            #endregion
-
-
-            MultilingualStringValue = new MultilingualStringValue(
-                                          language,
-                                          XML.Value
-                                      );
-
-            return true;
-
-        }
-
-        #endregion
-
-        #region ToXML(XMLName = null)
-
-        public XElement ToXML(XName? XMLName = null)
-        {
-
-            var xml = new XElement(XMLName ?? "value",
-
-                          new XAttribute("lang", Language.ToString()),
-
-                          Text
-
-                      );
-
-            return xml;
-
-        }
-
-        #endregion
 
     }
 

@@ -29,14 +29,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// A point location is a zero-dimensional element in a map that specifies a geometric location.
     /// </summary>
     [XmlType("OpenlrPointLocationReference", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public abstract class AOpenlrPointLocationReference
+    public abstract class AOpenLRPointLocationReference(XElement?  OpenLRPointLocationReferenceExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Optional extension element for additional OpenLR point location reference information.
         /// </summary>
         [XmlElement("_openlrPointLocationReferenceExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  OpenlrPointLocationReferenceExtension    { get; set; }
+        public XElement?  OpenLRPointLocationReferenceExtension    { get; } = OpenLRPointLocationReferenceExtension;
+
+        #endregion
 
     }
 

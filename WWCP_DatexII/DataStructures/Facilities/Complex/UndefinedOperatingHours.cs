@@ -47,7 +47,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Optional extension element for additional undefined operating hours information.
         /// </summary>
         [XmlElement("_undefinedOperatingHoursExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  UndefinedOperatingHoursExtension    { get; set; } = UndefinedOperatingHoursExtension;
+        public XElement?  UndefinedOperatingHoursExtension    { get; } = UndefinedOperatingHoursExtension;
 
         #endregion
 

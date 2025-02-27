@@ -31,41 +31,46 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// Contact information.
     /// </summary>
     [XmlType("ContactInformation", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public class ContactInformation(IEnumerable<Languages>?  Languages         = null,
-                                    String?                  TelephoneNumber   = null,
-                                    String?                  FaxNumber         = null,
-                                    String?                  EMail             = null)
+    public class ContactInformation(IEnumerable<Languages>?  Languages                     = null,
+                                    String?                  TelephoneNumber               = null,
+                                    String?                  FaxNumber                     = null,
+                                    String?                  EMail                         = null,
+                                    XElement?                ContactInformationExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Language(s) that are supported via telephone or mail.
         /// </summary>
         [XmlElement("language",                      Namespace = "http://datex2.eu/schema/3/common")]
-        public IEnumerable<Languages>  Languages                      { get; set; } = Languages?.Distinct() ?? [];
+        public IEnumerable<Languages>  Languages                      { get; } = Languages?.Distinct() ?? [];
 
         /// <summary>
         /// Telephone number, which can be a general number or the number of a specific contact person.
         /// </summary>
         [XmlElement("telephoneNumber",               Namespace = "http://datex2.eu/schema/3/common")]
-        public String?                 TelephoneNumber                { get; set; } = TelephoneNumber;
+        public String?                 TelephoneNumber                { get; } = TelephoneNumber;
 
         /// <summary>
         /// Fax number, which can be a general number or the number of a specific contact person.
         /// </summary>
         [XmlElement("faxNumber",                     Namespace = "http://datex2.eu/schema/3/common")]
-        public String?                 FaxNumber                      { get; set; } = FaxNumber;
+        public String?                 FaxNumber                      { get; } = FaxNumber;
 
         /// <summary>
         /// E-Mail address, which can be a general mail address or the mail address of a specific contact person.
         /// </summary>
         [XmlElement("eMail",                         Namespace = "http://datex2.eu/schema/3/common")]
-        public String?                 EMail                          { get; set; } = EMail;
+        public String?                 EMail                          { get; } = EMail;
 
         /// <summary>
         /// Optional extension element for additional contact information.
         /// </summary>
         [XmlElement("_contactInformationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?               ContactInformationExtension    { get; set; }
+        public XElement?               ContactInformationExtension    { get; } = ContactInformationExtension;
+
+        #endregion
 
     }
 

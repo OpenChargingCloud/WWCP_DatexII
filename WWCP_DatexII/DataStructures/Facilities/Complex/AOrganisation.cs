@@ -35,6 +35,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                         XElement?       OrganisationExtension   = null)
     {
 
+        #region Properties
+
         /// <summary>
         /// Specification of a time validity, for which this organisation information is valid in general.
         /// This is not a specification of the operating hours as such.
@@ -47,6 +49,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_organisationExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?       OrganisationExtension    { get; } = OrganisationExtension;
+
+        #endregion
 
     }
 

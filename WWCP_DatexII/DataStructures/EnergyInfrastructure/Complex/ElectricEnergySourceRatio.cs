@@ -17,9 +17,10 @@
 
 #region Usings
 
-using org.GraphDefined.Vanaheimr.Illias;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+
+using org.GraphDefined.Vanaheimr.Illias;
 
 #endregion
 
@@ -30,32 +31,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// Ratio for the specified energy source.
     /// </summary>
     [XmlType("ElectricEnergySourceRatio", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-    public class ElectricEnergySourceRatio
+    public class ElectricEnergySourceRatio(ElectricEnergySourceType  EnergySource,
+                                           PercentageDouble          SourceRatioValue,
+                                           String?                   OtherEnergySource                    = null,
+                                           XElement?                 ElectricEnergySourceRatioExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// An electric energy source.
         /// </summary>
         [XmlElement(ElementName = "energySource",       Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public ElectricEnergySourceTypes  EnergySource                          { get; set; }
+        public ElectricEnergySourceType  EnergySource                          { get; } = EnergySource;
 
         /// <summary>
         /// Some other energy source.
         /// </summary>
         [XmlElement(ElementName = "otherEnergySource",  Namespace = "http://datex2.eu/schema/3/common")]
-        public String?                    OtherEnergySource                     { get; set; }
+        public String?                   OtherEnergySource                     { get; } = OtherEnergySource;
 
         /// <summary>
         /// The percentage ratio value of this energy source.
         /// </summary>
         [XmlElement(ElementName = "sourceRatioValue",   Namespace = "http://datex2.eu/schema/3/common")]
-        public PercentageDouble           SourceRatioValue                      { get; set; }
+        public PercentageDouble          SourceRatioValue                      { get; } = SourceRatioValue;
 
         /// <summary>
         /// Optional extension element for additional content.
         /// </summary>
         [XmlElement(ElementName = "_electricEnergySourceRatioExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                  ElectricEnergySourceRatioExtension    { get; set; }
+        public XElement?                 ElectricEnergySourceRatioExtension    { get; } = ElectricEnergySourceRatioExtension;
+
+        #endregion
 
     }
 

@@ -56,6 +56,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
     {
 
+        #region Properties
+
         /// <summary>
         /// Dynamic status information for supplemental facilities associated with this facility.
         /// </summary>
@@ -67,6 +69,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_facilityStatusExtension",    Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                                FacilityStatusExtension       { get; } = FacilityStatusExtension;
+
+        #endregion
 
     }
 

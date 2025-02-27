@@ -31,14 +31,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// It is represented according to the OpenLR standard for Area Locations.
     /// </summary>
     [XmlType("OpenlrAreaLocationReference", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public abstract class AOpenlrAreaLocationReference
+    public abstract class AOpenLRAreaLocationReference(XElement?  OpenLRAreaLocationReferenceExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Optional extension element for additional OpenLR Area location reference information.
         /// </summary>
         [XmlElement("_openlrAreaLocationReferenceExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  OpenlrAreaLocationReferenceExtension    { get; set; }
+        public XElement?  OpenLRAreaLocationReferenceExtension    { get; } = OpenLRAreaLocationReferenceExtension;
+
+        #endregion
 
     }
 

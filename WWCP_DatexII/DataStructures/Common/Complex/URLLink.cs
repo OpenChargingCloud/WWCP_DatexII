@@ -34,32 +34,37 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     [XmlType("UrlLink", Namespace = "http://datex2.eu/schema/3/common")]
     public class URLLink(URL                  URLLinkAddress,
                          MultilingualString?  URLLinkDescription   = null,
-                         URLLinkTypes?        URLLinkType          = null)
+                         URLLinkType?         URLLinkType          = null,
+                         XElement?            URLLinkExtension     = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// A Uniform Resource Locator (URL) address pointing to a resource available on the Internet.
         /// </summary>
         [XmlElement("urlLinkAddress",      Namespace = "http://datex2.eu/schema/3/common")]
-        public URL                  URLLinkAddress        { get; set; } = URLLinkAddress;
+        public URL                  URLLinkAddress        { get; } = URLLinkAddress;
 
         /// <summary>
         /// Description of the relevant information available on the Internet from the URL link.
         /// </summary>
         [XmlElement("urlLinkDescription",  Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?  URLLinkDescription    { get; set; } = URLLinkDescription;
+        public MultilingualString?  URLLinkDescription    { get; } = URLLinkDescription;
 
         /// <summary>
         /// Details of the type of relevant information available on the Internet from the URL link.
         /// </summary>
         [XmlElement("urlLinkType",         Namespace = "http://datex2.eu/schema/3/common")]
-        public URLLinkTypes?        URLLinkType           { get; set; } = URLLinkType;
+        public URLLinkType?         URLLinkType           { get; } = URLLinkType;
 
         /// <summary>
         /// Optional extension element for additional URL link information.
         /// </summary>
-        [XmlElement("_urlLinkExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            URLLinkExtension      { get; set; }
+        [XmlElement("_urlLinkExtension",   Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?            URLLinkExtension      { get; } = URLLinkExtension;
+
+        #endregion
 
     }
 

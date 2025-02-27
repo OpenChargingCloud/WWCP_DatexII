@@ -35,14 +35,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     [XmlType("ContactPerson", Namespace = "http://datex2.eu/schema/3/facilities")]
     public class ContactPerson(String                   Name,
 
-                               String?                  FirstName         = null,
-                               MultilingualString?      Title             = null,
-                               MultilingualString?      Position          = null,
+                               String?                  FirstName                = null,
+                               MultilingualString?      Title                    = null,
+                               MultilingualString?      Position                 = null,
 
-                               IEnumerable<Languages>?  Languages         = null,
-                               String?                  TelephoneNumber   = null,
-                               String?                  FaxNumber         = null,
-                               String?                  EMail             = null)
+                               IEnumerable<Languages>?  Languages                = null,
+                               String?                  TelephoneNumber          = null,
+                               String?                  FaxNumber                = null,
+                               String?                  EMail                    = null,
+                               XElement?                ContactPersonExtension   = null)
 
         : ContactInformation(Languages,
                              TelephoneNumber,
@@ -51,35 +52,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
     {
 
+        #region Properties
+
         /// <summary>
         /// The (last) name of the contact person.
         /// </summary>
         [XmlElement("name",                     Namespace = "http://datex2.eu/schema/3/common")]
-        public String               Name                      { get; set; } = Name;
+        public String               Name                      { get; } = Name;
 
         /// <summary>
         /// The first name of the contact person.
         /// </summary>
         [XmlElement("firstName",                Namespace = "http://datex2.eu/schema/3/common")]
-        public String?              FirstName                 { get; set; } = FirstName;
+        public String?              FirstName                 { get; } = FirstName;
 
         /// <summary>
         /// Title information of the contact person.
         /// </summary>
         [XmlElement("title",                    Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?  Title                     { get; set; } = Title;
+        public MultilingualString?  Title                     { get; } = Title;
 
         /// <summary>
         /// The position of the contact person.
         /// </summary>
         [XmlElement("position",                 Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?  Position                  { get; set; } = Position;
+        public MultilingualString?  Position                  { get; } = Position;
 
         /// <summary>
         /// Optional extension element for additional contact person information.
         /// </summary>
         [XmlElement("_contactPersonExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            ContactPersonExtension    { get; set; }
+        public XElement?            ContactPersonExtension    { get; } = ContactPersonExtension;
+
+        #endregion
 
     }
 

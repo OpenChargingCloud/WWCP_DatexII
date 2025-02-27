@@ -17,6 +17,7 @@
 
 #region Usings
 
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
@@ -24,7 +25,6 @@ using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.Facilities;
 using cloud.charging.open.protocols.DatexII.v3.LocationReferencing;
-using System.Xml.Linq;
 
 #endregion
 
@@ -38,34 +38,38 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     [XmlType("RefillPoint", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
     public abstract class RefillPoint(String                                Id,
                                       String                                Version,
-                                      DeliveryUnitEnum                      DeliveryUnit,
+                                      DeliveryUnit                          DeliveryUnit,
 
-                                      MultilingualString?                   Name                     = null,
-                                      IEnumerable<MultilingualString>?      Alias                    = null,
-                                      String?                               ExternalIdentifier       = null,
-                                      DateTime?                             LastUpdated              = null,
-                                      MultilingualString?                   Description              = null,
-                                      IEnumerable<Accessibilities>?         Accessibility            = null,
-                                      IEnumerable<MultilingualString>?      AdditionalInformation    = null,
-                                      IEnumerable<URL>?                     InformationWebsites      = null,
-                                      IEnumerable<URL>?                     PhotoURLs                = null,
-                                      IEnumerable<Image>?                   Photos                   = null,
-                                      AOperatingHours?                      OperatingHours           = null,
-                                      ALocationReference?                   LocationReference        = null,
-                                      AOrganisation?                        Owner                    = null,
-                                      AOrganisation?                        Operator                 = null,
-                                      AOrganisation?                        Helpdesk                 = null,
-                                      IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles    = null,
-                                      Dimension?                            Dimension                = null,
-                                      Amenities?                            Amenities                = null,
+                                      MultilingualString?                   Name                      = null,
+                                      IEnumerable<MultilingualString>?      Alias                     = null,
+                                      String?                               ExternalIdentifier        = null,
+                                      DateTime?                             LastUpdated               = null,
+                                      MultilingualString?                   Description               = null,
+                                      IEnumerable<Accessibility>?           Accessibility             = null,
+                                      IEnumerable<MultilingualString>?      AdditionalInformation     = null,
+                                      IEnumerable<URL>?                     InformationWebsites       = null,
+                                      IEnumerable<URL>?                     PhotoURLs                 = null,
+                                      IEnumerable<Image>?                   Photos                    = null,
+                                      AOperatingHours?                      OperatingHours            = null,
+                                      ALocationReference?                   LocationReference         = null,
+                                      AOrganisation?                        Owner                     = null,
+                                      AOrganisation?                        Operator                  = null,
+                                      AOrganisation?                        Helpdesk                  = null,
+                                      IEnumerable<VehicleCharacteristics>?  ApplicableForVehicles     = null,
+                                      Dimension?                            Dimension                 = null,
+                                      Amenities?                            Amenities                 = null,
 
-                                      IEnumerable<ASupplementalFacility>?   SupplementalFacilities   = null,
-                                      IEnumerable<DedicatedParkingSpaces>?  DedicatedParkingSpaces   = null,
+                                      IEnumerable<ASupplementalFacility>?   SupplementalFacilities    = null,
+                                      IEnumerable<DedicatedParkingSpaces>?  DedicatedParkingSpaces    = null,
 
-                                      Units?                                MinimumDeliveryAmount    = null,
-                                      Units?                                MaximumDeliveryAmount    = null,
-                                      MultilingualString?                   ModelType                = null,
-                                      ReservationTypes?                     Reservation              = null)
+                                      Units?                                MinimumDeliveryAmount     = null,
+                                      Units?                                MaximumDeliveryAmount     = null,
+                                      MultilingualString?                   ModelType                 = null,
+                                      ReservationType?                      Reservation               = null,
+
+                                      XElement?                             FacilityObjectExtension   = null,
+                                      XElement?                             FacilityExtension         = null,
+                                      XElement?                             RefillPointExtension      = null)
 
         : Facility(Id,
                    Version,
@@ -90,45 +94,52 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    Amenities,
 
                    SupplementalFacilities,
-                   DedicatedParkingSpaces)
+                   DedicatedParkingSpaces,
+
+                   FacilityObjectExtension,
+                   FacilityExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// Measurement unit used for delivery and accounting of the energy provided at this refill point.
         /// </summary>
         [XmlElement("deliveryUnit",           Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public DeliveryUnitEnum     DeliveryUnit             { get; set; } = DeliveryUnit;
+        public DeliveryUnit         DeliveryUnit             { get; } = DeliveryUnit;
 
         /// <summary>
         /// Minimum delivery amount.
         /// </summary>
         [XmlElement("minimumDeliveryAmount",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public Units?               MinimumDeliveryAmount    { get; set; } = MinimumDeliveryAmount;
+        public Units?               MinimumDeliveryAmount    { get; } = MinimumDeliveryAmount;
 
         /// <summary>
         /// Maximum delivery amount.
         /// </summary>
         [XmlElement("maximumDeliveryAmount",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public Units?               MaximumDeliveryAmount    { get; set; } = MaximumDeliveryAmount;
+        public Units?               MaximumDeliveryAmount    { get; } = MaximumDeliveryAmount;
 
         /// <summary>
         /// A description of the refill point model type.
         /// </summary>
         [XmlElement("modelType",              Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?  ModelType                { get; set; } = ModelType;
+        public MultilingualString?  ModelType                { get; } = ModelType;
 
         /// <summary>
         /// Information regarding options for reservation of a time frame.
         /// </summary>
         [XmlElement("reservation",            Namespace = "http://datex2.eu/schema/3/facilities")]
-        public ReservationTypes?    Reservation              { get; set; } = Reservation;
+        public ReservationType?     Reservation              { get; } = Reservation;
 
         /// <summary>
         /// Optional extension element for additional refill point information.
         /// </summary>
         [XmlElement("_refillPointExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            RefillPointExtension     { get; set; }
+        public XElement?            RefillPointExtension     { get; } = RefillPointExtension;
+
+        #endregion
 
     }
 

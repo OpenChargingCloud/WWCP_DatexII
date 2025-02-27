@@ -32,6 +32,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                     String?  Version   = null)
     {
 
+        #region Properties
+
         /// <summary>
         /// The unique identifier for the reference.
         /// </summary>
@@ -43,6 +45,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlAttribute("version")]
         public String?  Version    { get; } = Version;
+
+        #endregion
 
     }
 

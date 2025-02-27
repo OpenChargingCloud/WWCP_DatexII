@@ -39,36 +39,40 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     public class EnergyInfrastructureSite(String                                     Id,
                                           String                                     Version,
 
-                                          MultilingualString?                        Name                           = null,
-                                          IEnumerable<MultilingualString>?           Alias                          = null,
-                                          String?                                    ExternalIdentifier             = null,
-                                          DateTime?                                  LastUpdated                    = null,
-                                          MultilingualString?                        Description                    = null,
-                                          IEnumerable<Accessibilities>?              Accessibility                  = null,
-                                          IEnumerable<MultilingualString>?           AdditionalInformation          = null,
-                                          IEnumerable<URL>?                          InformationWebsites            = null,
-                                          IEnumerable<URL>?                          PhotoURLs                      = null,
-                                          IEnumerable<Image>?                        Photos                         = null,
-                                          AOperatingHours?                           OperatingHours                 = null,
-                                          ALocationReference?                        LocationReference              = null,
-                                          AOrganisation?                             Owner                          = null,
-                                          AOrganisation?                             Operator                       = null,
-                                          AOrganisation?                             Helpdesk                       = null,
-                                          IEnumerable<VehicleCharacteristics>?       ApplicableForVehicles          = null,
-                                          Dimension?                                 Dimension                      = null,
-                                          Amenities?                                 Amenities                      = null,
+                                          MultilingualString?                        Name                                = null,
+                                          IEnumerable<MultilingualString>?           Alias                               = null,
+                                          String?                                    ExternalIdentifier                  = null,
+                                          DateTime?                                  LastUpdated                         = null,
+                                          MultilingualString?                        Description                         = null,
+                                          IEnumerable<Accessibility>?                Accessibility                       = null,
+                                          IEnumerable<MultilingualString>?           AdditionalInformation               = null,
+                                          IEnumerable<URL>?                          InformationWebsites                 = null,
+                                          IEnumerable<URL>?                          PhotoURLs                           = null,
+                                          IEnumerable<Image>?                        Photos                              = null,
+                                          AOperatingHours?                           OperatingHours                      = null,
+                                          ALocationReference?                        LocationReference                   = null,
+                                          AOrganisation?                             Owner                               = null,
+                                          AOrganisation?                             Operator                            = null,
+                                          AOrganisation?                             Helpdesk                            = null,
+                                          IEnumerable<VehicleCharacteristics>?       ApplicableForVehicles               = null,
+                                          Dimension?                                 Dimension                           = null,
+                                          Amenities?                                 Amenities                           = null,
 
-                                          IEnumerable<ASupplementalFacility>?        SupplementalFacilities         = null,
-                                          IEnumerable<DedicatedParkingSpaces>?       DedicatedParkingSpaces         = null,
+                                          IEnumerable<ASupplementalFacility>?        SupplementalFacilities              = null,
+                                          IEnumerable<DedicatedParkingSpaces>?       DedicatedParkingSpaces              = null,
 
-                                          EnergyInfrastructureSiteTypes?             TypeOfSite                     = null,
-                                          MultilingualString?                        Brand                          = null,
-                                          IEnumerable<UserTypes>?                    ExclusiveUsers                 = null,
-                                          IEnumerable<UserTypes>?                    PreferredUsers                 = null,
-                                          IEnumerable<ServiceType>?                  ServiceTypes                   = null,
-                                          IEnumerable<ALocation>?                    Entrances                      = null,
-                                          IEnumerable<ALocation>?                    Exits                          = null,
-                                          IEnumerable<EnergyInfrastructureStation>?  EnergyInfrastructureStations   = null)
+                                          EnergyInfrastructureSiteType?              TypeOfSite                          = null,
+                                          MultilingualString?                        Brand                               = null,
+                                          IEnumerable<UserType>?                     ExclusiveUsers                      = null,
+                                          IEnumerable<UserType>?                     PreferredUsers                      = null,
+                                          IEnumerable<Service>?                      ServiceTypes                        = null,
+                                          IEnumerable<ALocation>?                    Entrances                           = null,
+                                          IEnumerable<ALocation>?                    Exits                               = null,
+                                          IEnumerable<EnergyInfrastructureStation>?  EnergyInfrastructureStations        = null,
+
+                                          XElement?                                  FacilityObjectExtension             = null,
+                                          XElement?                                  FacilityExtension                   = null,
+                                          XElement?                                  EnergyInfrastructureSiteExtension   = null)
 
         : Facility(Id,
                    Version,
@@ -93,63 +97,70 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    Amenities,
 
                    SupplementalFacilities,
-                   DedicatedParkingSpaces)
+                   DedicatedParkingSpaces,
+
+                   FacilityObjectExtension,
+                   FacilityExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// Specifies the type of the site.
         /// </summary>
-        [XmlElement("typeOfSite",                   Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public EnergyInfrastructureSiteTypes?            TypeOfSite                           { get; set; } = TypeOfSite;
+        [XmlElement("typeOfSite",                          Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public EnergyInfrastructureSiteType?             TypeOfSite                           { get; } = TypeOfSite;
 
         /// <summary>
         /// The brand of the site.
         /// </summary>
-        [XmlElement("brand",                        Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?                       Brand                                { get; set; } = Brand;
+        [XmlElement("brand",                               Namespace = "http://datex2.eu/schema/3/common")]
+        public MultilingualString?                       Brand                                { get; } = Brand;
 
         /// <summary>
         /// Limitation to a set of users (exclusive).
         /// </summary>
-        [XmlElement("exclusiveUsers",               Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<UserTypes>                    ExclusiveUsers                       { get; set; } = ExclusiveUsers?.              Distinct() ?? [];
+        [XmlElement("exclusiveUsers",                      Namespace = "http://datex2.eu/schema/3/facilities")]
+        public IEnumerable<UserType>                     ExclusiveUsers                       { get; } = ExclusiveUsers?.              Distinct() ?? [];
 
         /// <summary>
         /// Users that are preferred at this site (but not exclusive).
         /// </summary>
-        [XmlElement("preferredUsers",               Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<UserTypes>                    PreferredUsers                       { get; set; } = PreferredUsers?.              Distinct() ?? [];
+        [XmlElement("preferredUsers",                      Namespace = "http://datex2.eu/schema/3/facilities")]
+        public IEnumerable<UserType>                     PreferredUsers                       { get; } = PreferredUsers?.              Distinct() ?? [];
 
         /// <summary>
         /// Specifies the type of service available at an EnergyInfrastructureSite.
         /// </summary>
-        [XmlElement("serviceType",                  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<ServiceType>                  ServiceTypes                         { get; set; } = ServiceTypes?.                Distinct() ?? [];
+        [XmlElement("serviceType",                         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public IEnumerable<Service>                      ServiceTypes                         { get; } = ServiceTypes?.                Distinct() ?? [];
 
         /// <summary>
         /// Possibility to specify the location of the site's entrance.
         /// </summary>
-        [XmlElement("entrance",                     Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public IEnumerable<ALocation>                    Entrances                            { get; set; } = Entrances?.                   Distinct() ?? [];
+        [XmlElement("entrance",                            Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public IEnumerable<ALocation>                    Entrances                            { get; } = Entrances?.                   Distinct() ?? [];
 
         /// <summary>
         /// Possibility to specify the location of the site's exit.
         /// </summary>
-        [XmlElement("exit",                         Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public IEnumerable<ALocation>                    Exits                                { get; set; } = Exits?.                       Distinct() ?? [];
+        [XmlElement("exit",                                Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public IEnumerable<ALocation>                    Exits                                { get; } = Exits?.                       Distinct() ?? [];
 
         /// <summary>
         /// Specifications of charging stations on the site.
         /// </summary>
-        [XmlElement("energyInfrastructureStation",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<EnergyInfrastructureStation>  EnergyInfrastructureStations         { get; set; } = EnergyInfrastructureStations?.Distinct() ?? [];
+        [XmlElement("energyInfrastructureStation",         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public IEnumerable<EnergyInfrastructureStation>  EnergyInfrastructureStations         { get; } = EnergyInfrastructureStations?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional EnergyInfrastructureSite information.
         /// </summary>
-        [XmlElement("_energyInfrastructureSiteExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                                 EnergyInfrastructureSiteExtension    { get; set; }
+        [XmlElement("_energyInfrastructureSiteExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?                                 EnergyInfrastructureSiteExtension    { get; } = EnergyInfrastructureSiteExtension;
+
+        #endregion
 
     }
 

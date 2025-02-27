@@ -31,27 +31,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// An area defined by a set of polygons according to GML (EN ISO 19136).
     /// </summary>
     [XmlType("GmlMultiPolygon", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class GmlMultiPolygon(MultilingualString?       GmlAreaName   = null,
-                                 IEnumerable<GmlPolygon>?  GmlPolygons   = null)
+    public class GMLMultiPolygon(MultilingualString?       GMLAreaName                = null,
+                                 IEnumerable<GMLPolygon>?  GMLPolygons                = null,
+                                 XElement?                 GMLMultiPolygonExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Name of the multi-polygon area.
         /// </summary>
         [XmlElement("gmlAreaName",                Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?      GmlAreaName                 { get; set; } = GmlAreaName;
+        public MultilingualString?      GMLAreaName                 { get; } = GMLAreaName;
 
         /// <summary>
         /// A collection of GML polygons that define the area.
         /// </summary>
         [XmlElement("gmlPolygon",                 Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public IEnumerable<GmlPolygon>  GmlPolygons                 { get; set; } = GmlPolygons?.Distinct() ?? [];
+        public IEnumerable<GMLPolygon>  GMLPolygons                 { get; } = GMLPolygons?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional multi-polygon information.
         /// </summary>
         [XmlElement("_gmlMultiPolygonExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                GmlMultiPolygonExtension    { get; set; }
+        public XElement?                GMLMultiPolygonExtension    { get; } = GMLMultiPolygonExtension;
+
+        #endregion
 
     }
 

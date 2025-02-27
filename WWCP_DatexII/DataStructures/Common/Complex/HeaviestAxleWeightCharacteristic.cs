@@ -31,26 +31,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// Weight characteristic of the heaviest axle on the vehicle.
     /// </summary>
     [XmlType("HeaviestAxleWeightCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
-    public class HeaviestAxleWeightCharacteristic
+    public class HeaviestAxleWeightCharacteristic(ComparisonOperator  ComparisonOperator,
+                                                  Tonne               HeaviestAxleWeight,
+                                                  XElement?           HeaviestAxleWeightCharacteristicExtension = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The operator to be used in the vehicle characteristic comparison operation.
         /// </summary>
         [XmlElement("comparisonOperator", Namespace = "http://datex2.eu/schema/3/common")]
-        public ComparisonOperators  ComparisonOperator                           { get; set; }
+        public ComparisonOperator  ComparisonOperator                           { get; } = ComparisonOperator;
 
         /// <summary>
         /// The weight of the heaviest axle on the vehicle.
         /// </summary>
         [XmlElement("heaviestAxleWeight", Namespace = "http://datex2.eu/schema/3/common")]
-        public Tonne                HeaviestAxleWeight                           { get; set; }
+        public Tonne               HeaviestAxleWeight                           { get; } = HeaviestAxleWeight;
 
         /// <summary>
         /// Optional extension element for additional heaviest axle weight characteristic information.
         /// </summary>
         [XmlElement("_heaviestAxleWeightCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            HeaviestAxleWeightCharacteristicExtension    { get; set; }
+        public XElement?           HeaviestAxleWeightCharacteristicExtension    { get; } = HeaviestAxleWeightCharacteristicExtension;
+
+        #endregion
 
     }
 

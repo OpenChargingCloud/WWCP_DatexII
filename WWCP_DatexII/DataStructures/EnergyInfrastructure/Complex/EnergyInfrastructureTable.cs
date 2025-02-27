@@ -33,7 +33,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     public class EnergyInfrastructureTable(String                                 Id,
                                            String                                 Version,
                                            IEnumerable<EnergyInfrastructureSite>  EnergyInfrastructureSites,
-                                           String?                                TableName   = null)
+                                           String?                                TableName                            = null,
+                                           XElement?                              EnergyInfrastructureTableExtension   = null)
     {
 
         #region Properties
@@ -53,20 +54,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// A collection of EnergyInfrastructureSite instances.
         /// </summary>
-        [XmlElement("energyInfrastructureSite",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyInfrastructureSite",             Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
         public IEnumerable<EnergyInfrastructureSite>  EnergyInfrastructureSites             { get; } = EnergyInfrastructureSites.Distinct();
 
         /// <summary>
         /// The name of the Energy Infrastructure Table.
         /// </summary>
-        [XmlElement("tableName",                 Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("tableName",                            Namespace = "http://datex2.eu/schema/3/common")]
         public String?                                TableName                             { get; } = TableName;
 
         /// <summary>
         /// Optional extension element for additional EnergyInfrastructureTable information.
         /// </summary>
-        [XmlElement("_energyInfrastructureTableExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                              EnergyInfrastructureTableExtension    { get; }
+        [XmlElement("_energyInfrastructureTableExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?                              EnergyInfrastructureTableExtension    { get; } = EnergyInfrastructureTableExtension;
 
         #endregion
 

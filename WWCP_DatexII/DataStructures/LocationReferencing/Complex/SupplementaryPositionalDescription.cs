@@ -31,27 +31,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// A collection of supplementary positional information which improves the precision of the location.
     /// </summary>
     [XmlType("SupplementaryPositionalDescription", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class SupplementaryPositionalDescription(MultilingualString?  LocationDescription   = null,
-                                                    UInt32?              LocationPrecision     = null)
+    public class SupplementaryPositionalDescription(MultilingualString?  LocationDescription                           = null,
+                                                    UInt32?              LocationPrecision                             = null,
+                                                    XElement?            SupplementaryPositionalDescriptionExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// Supplementary human-readable description of the location.
         /// </summary>
         [XmlElement("locationDescription",                           Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?  LocationDescription                            { get; set; } = LocationDescription;
+        public MultilingualString?  LocationDescription                            { get; } = LocationDescription;
 
         /// <summary>
         /// Indicates that the location is given with a precision which is better than the stated value in metres.
         /// </summary>
         [XmlAttribute("locationPrecision")]
-        public UInt32?              LocationPrecision                              { get; set; } = LocationPrecision;
+        public UInt32?              LocationPrecision                              { get; } = LocationPrecision;
 
         /// <summary>
         /// Optional extension element for additional supplementary positional information.
         /// </summary>
         [XmlElement("_supplementaryPositionalDescriptionExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            SupplementaryPositionalDescriptionExtension    { get; set; }
+        public XElement?            SupplementaryPositionalDescriptionExtension    { get; } = SupplementaryPositionalDescriptionExtension;
+
+        #endregion
 
     }
 

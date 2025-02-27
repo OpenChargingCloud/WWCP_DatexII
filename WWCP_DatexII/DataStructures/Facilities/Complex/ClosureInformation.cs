@@ -32,7 +32,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// Information about temporary or permanent closure.
     /// </summary>
     [XmlType("ClosureInformation", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public class ClosureInformation(Boolean?         PermananentlyClosed           = null,
+    public class ClosureInformation(Boolean?         PermanentlyClosed             = null,
                                     Boolean?         TemporarilyClosed             = null,
                                     DateTimeOffset?  ClosedFrom                    = null,
                                     DateTimeOffset?  TemporarilyClosedUntil        = null,
@@ -44,8 +44,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Permanently closed, i.e. it is not intended to open again.
         /// </summary>
-        [XmlElement("permananentlyClosed",           Namespace = "http://datex2.eu/schema/3/common")]
-        public Boolean?         PermananentlyClosed            { get; } = PermananentlyClosed;
+        [XmlElement("permanentlyClosed",             Namespace = "http://datex2.eu/schema/3/common")]
+        public Boolean?         PermanentlyClosed              { get; } = PermanentlyClosed;
 
         /// <summary>
         /// Temporarily closed for an unspecified period.
@@ -88,7 +88,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         {
 
             ClosureInformation  = null;
-            ErrorResponse       = null;
 
             #region TryParse PermananentlyClosed       [optional]
 

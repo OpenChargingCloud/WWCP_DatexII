@@ -33,59 +33,64 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                        String?              FaultIdentifier         = null,
                        MultilingualString?  FaultDescription        = null,
                        DateTime?            FaultCreationTime       = null,
-                       FaultSeverities?     FaultImpactSeverity     = null,
-                       FaultUrgencies?      FaultUrgencyToRectify   = null,
-                       String?              ManufacturerFaultCode   = null)
+                       FaultSeverity?       FaultImpactSeverity     = null,
+                       FaultUrgency?        FaultUrgencyToRectify   = null,
+                       String?              ManufacturerFaultCode   = null,
+                       XElement?            FaultExtension          = null)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// The date and time at which the fault information as specified in this instance was last updated.
         /// </summary>
         [XmlElement("faultLastUpdateTime", Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime             FaultLastUpdateTime      { get; set; } = FaultLastUpdateTime;
+        public DateTime             FaultLastUpdateTime      { get; } = FaultLastUpdateTime;
 
         /// <summary>
         /// Unique identifier of the fault.
         /// </summary>
         [XmlElement("faultIdentifier", Namespace = "http://datex2.eu/schema/3/common")]
-        public String?              FaultIdentifier          { get; set; } = FaultIdentifier;
+        public String?              FaultIdentifier          { get; } = FaultIdentifier;
 
         /// <summary>
         /// Textual description of the fault.
         /// </summary>
         [XmlElement("faultDescription", Namespace = "http://datex2.eu/schema/3/common")]
-        public MultilingualString?  FaultDescription         { get; set; } = FaultDescription;
+        public MultilingualString?  FaultDescription         { get; } = FaultDescription;
 
         /// <summary>
         /// The date and time at which the fault was originally recorded/reported.
         /// </summary>
         [XmlElement("faultCreationTime", Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime?            FaultCreationTime        { get; set; } = FaultCreationTime;
+        public DateTime?            FaultCreationTime        { get; } = FaultCreationTime;
 
         /// <summary>
         /// The severity of the fault in terms of how it affects the usability of the equipment or the reliability of the data generated.
         /// </summary>
         [XmlElement("faultImpactSeverity", Namespace = "http://datex2.eu/schema/3/common")]
-        public FaultSeverities?     FaultImpactSeverity      { get; set; } = FaultImpactSeverity;
+        public FaultSeverity?       FaultImpactSeverity      { get; } = FaultImpactSeverity;
 
         /// <summary>
         /// The urgency to rectify the fault.
         /// </summary>
         [XmlElement("faultUrgencyToRectify", Namespace = "http://datex2.eu/schema/3/common")]
-        public FaultUrgencies?      FaultUrgencyToRectify    { get; set; } = FaultUrgencyToRectify;
+        public FaultUrgency?        FaultUrgencyToRectify    { get; } = FaultUrgencyToRectify;
 
         /// <summary>
         /// A manufacturer specific code for the fault.
         /// </summary>
         [XmlElement("manufacturerFaultCode", Namespace = "http://datex2.eu/schema/3/common")]
-        public String?              ManufacturerFaultCode    { get; set; } = ManufacturerFaultCode;
+        public String?              ManufacturerFaultCode    { get; } = ManufacturerFaultCode;
 
         /// <summary>
         /// Optional extension element for additional fault information.
         /// </summary>
         [XmlElement("_faultExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            FaultExtension           { get; set; }
+        public XElement?            FaultExtension           { get; } = FaultExtension;
+
+        #endregion
 
     }
 

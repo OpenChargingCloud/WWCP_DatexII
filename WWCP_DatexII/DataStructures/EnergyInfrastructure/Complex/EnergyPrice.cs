@@ -32,7 +32,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 {
 
     /// <summary>
-    /// A price definition for energy refueling.
+    /// A price definition for energy refuelling.
     /// </summary>
     [XmlType("EnergyPrice", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
     public class EnergyPrice(PriceType            PriceType,
@@ -85,7 +85,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional energy price information.
         /// </summary>
-        [XmlElement("_energyPriceExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyPriceExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?            EnergyPriceExtension     { get; } = EnergyPriceExtension;
 
         #endregion

@@ -47,6 +47,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
     {
 
+        #region Properties
+
         /// <summary>
         /// Specification of a specific public holiday by its name.
         /// </summary>
@@ -58,6 +60,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlElement("_publicHolidayExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?           PublicHolidayExtension    { get; } = PublicHolidayExtension;
+
+        #endregion
 
     }
 

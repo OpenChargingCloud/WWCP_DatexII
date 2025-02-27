@@ -29,27 +29,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// A location defined by reference to an external/other referencing system.
     /// </summary>
     [XmlType("ExternalReferencing", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class ExternalReferencing(String  ExternalLocationCode,
-                                     String  ExternalReferencingSystem)
+    public class ExternalReferencing(String     ExternalLocationCode,
+                                     String     ExternalReferencingSystem,
+                                     XElement?  ExternalReferencingExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// A code in the external referencing system which defines the location.
         /// </summary>
         [XmlElement("externalLocationCode",           Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public String     ExternalLocationCode            { get; set; } = ExternalLocationCode;
+        public String     ExternalLocationCode            { get; } = ExternalLocationCode;
 
         /// <summary>
         /// Identification of the external/other location referencing system.
         /// </summary>
         [XmlElement("externalReferencingSystem",      Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public String     ExternalReferencingSystem       { get; set; } = ExternalReferencingSystem;
+        public String     ExternalReferencingSystem       { get; } = ExternalReferencingSystem;
 
         /// <summary>
         /// Optional extension element for additional external referencing information.
         /// </summary>
         [XmlElement("_externalReferencingExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?  ExternalReferencingExtension    { get; set; }
+        public XElement?  ExternalReferencingExtension    { get; } = ExternalReferencingExtension;
+
+        #endregion
 
     }
 

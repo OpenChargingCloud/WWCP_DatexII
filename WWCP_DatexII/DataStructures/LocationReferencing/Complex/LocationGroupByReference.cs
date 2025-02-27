@@ -31,23 +31,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// non-ordered location group.
     /// </summary>
     [XmlType("LocationGroupByReference", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class LocationGroupByReference(PredefinedLocationGroupVersionedReference PredefinedLocationGroupReference)
+    public class LocationGroupByReference(PredefinedLocationGroupVersionedReference  PredefinedLocationGroupReference,
+                                          XElement?                                  LocationGroupByReferenceExtension   = null,
 
-        : ALocationGroup
+                                          XElement?                                  LocationGroupExtension              = null,
+                                          XElement?                                  LocationReferenceExtension          = null)
+
+        : ALocationGroup(LocationGroupExtension,
+                         LocationReferenceExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// A reference to a versioned instance of a predefined location group as specified in a PredefinedLocationsPublication.
         /// </summary>
         [XmlElement("predefinedLocationGroupReference",    Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PredefinedLocationGroupVersionedReference  PredefinedLocationGroupReference     { get; set; } = PredefinedLocationGroupReference;
+        public PredefinedLocationGroupVersionedReference  PredefinedLocationGroupReference     { get; } = PredefinedLocationGroupReference;
 
         /// <summary>
         /// Optional extension element for additional LocationGroupByReference information.
         /// </summary>
         [XmlElement("_locationGroupByReferenceExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                                  LocationGroupByReferenceExtension    { get; set; }
+        public XElement?                                  LocationGroupByReferenceExtension    { get; } = LocationGroupByReferenceExtension;
+
+        #endregion
 
     }
 

@@ -32,48 +32,53 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// </summary>
     [XmlType("PaymentMethod", Namespace = "http://datex2.eu/schema/3/facilities")]
     public class PaymentMethod(IEnumerable<MeansOfPayment>?          PaymentMeans             = null,
-                               IEnumerable<PaymentTimings>?          PaymentMode              = null,
+                               IEnumerable<PaymentTiming>?           PaymentMode              = null,
                                IEnumerable<MultilingualString>?      OtherPaymentMeans        = null,
                                IEnumerable<BrandsAcceptedText>?      BrandsAcceptedText       = null,
-                               IEnumerable<BrandsAcceptedCodeList>?  BrandsAcceptedCodeList   = null)
+                               IEnumerable<BrandsAcceptedCodeList>?  BrandsAcceptedCodeList   = null,
+                               XElement?                             PaymentMethodExtension   = null)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// The means of payment available.
         /// </summary>
         [XmlElement("paymentMeans",             Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<MeansOfPayment>          PaymentMeans              { get; set; } = PaymentMeans?.          Distinct() ?? [];
+        public IEnumerable<MeansOfPayment>          PaymentMeans              { get; } = PaymentMeans?.          Distinct() ?? [];
 
         /// <summary>
         /// Defines the timing of the parking or other mobility related payment.
         /// </summary>
         [XmlElement("paymentMode",              Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<PaymentTimings>          PaymentMode               { get; set; } = PaymentMode?.           Distinct() ?? [];
+        public IEnumerable<PaymentTiming>           PaymentMode               { get; } = PaymentMode?.           Distinct() ?? [];
 
         /// <summary>
         /// Other means of payment that are available.
         /// </summary>
         [XmlElement("otherPaymentMeans",        Namespace = "http://datex2.eu/schema/3/common")]
-        public IEnumerable<MultilingualString>      OtherPaymentMeans         { get; set; } = OtherPaymentMeans?.     Distinct() ?? [];
+        public IEnumerable<MultilingualString>      OtherPaymentMeans         { get; } = OtherPaymentMeans?.     Distinct() ?? [];
 
         /// <summary>
         /// Free text elements for specifying accepted payment brands.
         /// </summary>
         [XmlElement("brandsAcceptedText",       Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<BrandsAcceptedText>      BrandsAcceptedText        { get; set; } = BrandsAcceptedText?.    Distinct() ?? [];
+        public IEnumerable<BrandsAcceptedText>      BrandsAcceptedText        { get; } = BrandsAcceptedText?.    Distinct() ?? [];
 
         /// <summary>
         /// Lists of codes representing accepted payment brands.
         /// </summary>
         [XmlElement("brandsAcceptedCodeList",   Namespace = "http://datex2.eu/schema/3/facilities")]
-        public IEnumerable<BrandsAcceptedCodeList>  BrandsAcceptedCodeList    { get; set; } = BrandsAcceptedCodeList?.Distinct() ?? [];
+        public IEnumerable<BrandsAcceptedCodeList>  BrandsAcceptedCodeList    { get; } = BrandsAcceptedCodeList?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional payment method information.
         /// </summary>
         [XmlElement("_paymentMethodExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                            PaymentMethodExtension    { get; set; }
+        public XElement?                            PaymentMethodExtension    { get; } = PaymentMethodExtension;
+
+        #endregion
 
     }
 

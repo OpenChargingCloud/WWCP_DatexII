@@ -31,32 +31,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// Gross weight characteristic of a vehicle.
     /// </summary>
     [XmlType("GrossWeightCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
-    public class GrossWeightCharacteristic
+    public class GrossWeightCharacteristic(ComparisonOperator  ComparisonOperator,
+                                           Tonne               GrossVehicleWeight,
+                                           WeightType          TypeOfWeight,
+                                           XElement?           GrossWeightCharacteristicExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The operator to be used in the vehicle characteristic comparison operation.
         /// </summary>
-        [XmlElement("comparisonOperator",  Namespace = "http://datex2.eu/schema/3/common")]
-        public ComparisonOperators  ComparisonOperator                    { get; set; }
+        [XmlElement("comparisonOperator",                   Namespace = "http://datex2.eu/schema/3/common")]
+        public ComparisonOperator  ComparisonOperator                    { get; } = ComparisonOperator;
 
         /// <summary>
         /// The gross weight of the vehicle and its load, including any trailers.
         /// </summary>
-        [XmlElement("grossVehicleWeight",  Namespace = "http://datex2.eu/schema/3/common")]
-        public Tonne                GrossVehicleWeight                    { get; set; }
+        [XmlElement("grossVehicleWeight",                   Namespace = "http://datex2.eu/schema/3/common")]
+        public Tonne               GrossVehicleWeight                    { get; } = GrossVehicleWeight;
 
         /// <summary>
         /// The meaning of the weight value.
         /// </summary>
-        [XmlElement("typeOfWeight",        Namespace = "http://datex2.eu/schema/3/common")]
-        public WeightTypes          TypeOfWeight                          { get; set; }
+        [XmlElement("typeOfWeight",                         Namespace = "http://datex2.eu/schema/3/common")]
+        public WeightType          TypeOfWeight                          { get; } = TypeOfWeight;
 
         /// <summary>
         /// Optional extension element for additional information.
         /// </summary>
-        [XmlElement("_grossWeightCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            GrossWeightCharacteristicExtension    { get; set; }
+        [XmlElement("_grossWeightCharacteristicExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        public XElement?           GrossWeightCharacteristicExtension    { get; } = GrossWeightCharacteristicExtension;
+
+        #endregion
 
     }
 

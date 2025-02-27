@@ -30,23 +30,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// no specific order and where each location is explicitly listed.
     /// </summary>
     [XmlType("LocationGroupByList", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class LocationGroupByList(IEnumerable<ALocation> LocationContainedInGroup)
+    public class LocationGroupByList(IEnumerable<ALocation>  LocationContainedInGroup,
+                                     XElement?               LocationGroupByListExtension   = null,
 
-        : ALocationGroup
+                                     XElement?               LocationGroupExtension         = null,
+                                     XElement?               LocationReferenceExtension     = null)
+
+        : ALocationGroup(LocationGroupExtension,
+                         LocationReferenceExtension)
 
     {
+
+        #region Properties
+
         /// <summary>
         /// A location contained in a non-ordered group of locations.
         /// Must have at least two locations.
         /// </summary>
         [XmlElement("locationContainedInGroup",       Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public IEnumerable<ALocation>  LocationContainedInGroup        { get; set; } = LocationContainedInGroup.Distinct();
+        public IEnumerable<ALocation>  LocationContainedInGroup        { get; } = LocationContainedInGroup.Distinct();
 
         /// <summary>
         /// Optional extension element for additional LocationGroupByList information.
         /// </summary>
         [XmlElement("_locationGroupByListExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?               LocationGroupByListExtension    { get; set; }
+        public XElement?               LocationGroupByListExtension    { get; } = LocationGroupByListExtension;
+
+        #endregion
 
     }
 

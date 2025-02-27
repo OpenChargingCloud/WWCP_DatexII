@@ -32,11 +32,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// <summary>
     /// The ISO 3166-2 representation for the named area.
     /// </summary>
-    [XmlType("IsoNamedArea", Namespace = "http://datex2.eu/schema/3/locationExtension")]
+    [XmlType("IsoNamedArea", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
     public class ISONamedArea(MultilingualString  AreaName,
-                              SubdivisionTypes    SubdivisionType,
+                              SubdivisionType     SubdivisionType,
                               SubdivisionCode     SubdivisionCode,
-                              NamedAreaTypes?     NamedAreaType           = null,
+                              NamedAreaType?      NamedAreaType           = null,
                               Country?            Country                 = null,
                               XElement?           NamedAreaExtension      = null,
                               XElement?           ISONamedAreaExtension   = null,
@@ -56,21 +56,21 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// The ISO 3166-2 subdivision type for the named area.
         /// </summary>
-        [XmlElement("subdivisionType",         Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public SubdivisionTypes  SubdivisionType          { get; } = SubdivisionType;
+        [XmlElement("subdivisionType",         Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public SubdivisionType  SubdivisionType          { get; } = SubdivisionType;
 
         /// <summary>
         /// The second part of an ISO 3166-2 subdivision code for the named area.
         /// This may be used along with the country attribute from the parent class to form a full ISO 3166-2 subdivision code.
         /// </summary>
-        [XmlElement("subdivisionCode",         Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public SubdivisionCode   SubdivisionCode          { get; } = SubdivisionCode;
+        [XmlElement("subdivisionCode",         Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public SubdivisionCode  SubdivisionCode          { get; } = SubdivisionCode;
 
         /// <summary>
         /// Optional extension element for additional ISO named area information.
         /// </summary>
         [XmlElement("_isoNamedAreaExtension",  Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?         ISONamedAreaExtension    { get; } = ISONamedAreaExtension;
+        public XElement?        ISONamedAreaExtension    { get; } = ISONamedAreaExtension;
 
         #endregion
 
@@ -82,9 +82,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
             var xml = new XElement(XMLName ?? DatexIINS.LocationReferencing + "IsoNamedArea",
 
-                           new XElement(DatexIINS.LocationReferencing + "areaName",
-                               AreaName.ToXML()
-                           )
+                                new XElement(DatexIINS.LocationReferencing + "areaName",
+                                    AreaName.ToXML()
+                                ),
+
+                          NamedAreaType.HasValue
+                              ? new XElement(DatexIINS.LocationReferencing + "namedAreaType",
+                                    NamedAreaType.ToString()
+                                )
+                              : null,
+
+                          Country is not null
+                              ? new XElement(DatexIINS.LocationReferencing + "country",
+                                    Country.Alpha2Code
+                                )
+                              : null,
+
+                          NamedAreaExtension is not null
+                              ? new XElement(DatexIINS.Common + "_namedAreaExtension",   NamedAreaExtension)
+                              : null,
+
+                                new XElement(DatexIINS.LocationReferencing + "subdivisionType",   SubdivisionType.ToString()),
+                                new XElement(DatexIINS.LocationReferencing + "subdivisionCode",   SubdivisionCode.ToString()),
+
+                          ISONamedAreaExtension is not null
+                              ? new XElement(DatexIINS.Common + "_isoNamedAreaExtension",   ISONamedAreaExtension)
+                              : null
 
                       );
 

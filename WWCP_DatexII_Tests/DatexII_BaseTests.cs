@@ -104,7 +104,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                                  )
                                                                                                                                              ),
                                                                                                              Accessibility:                  [
-                                                                                                                                                 Accessibilities.BarrierFreeAccessible
+                                                                                                                                                 Accessibility.BarrierFreeAccessible
                                                                                                                                              ],
                                                                                                              AdditionalInformation:          [
                                                                                                                                                  new MultilingualString(
@@ -124,7 +124,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                              Photos:                         [
                                                                                                                                                  new Image(
                                                                                                                                                      new Byte[100],
-                                                                                                                                                     ImageFormats.JPEG
+                                                                                                                                                     ImageFormat.JPEG
                                                                                                                                                  )
                                                                                                                                              ],
                                                                                                              OperatingHours:                 new OperatingHoursSpecification(
@@ -143,7 +143,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                                  URLLinkAddress:       URL.Parse("https://example.org/operatinghours"),
 
                                                                                                                                                  ClosureInformation:   new ClosureInformation(
-                                                                                                                                                                           PermananentlyClosed:      false,
+                                                                                                                                                                           PermanentlyClosed:        false,
                                                                                                                                                                            TemporarilyClosed:        false,
                                                                                                                                                                            ClosedFrom:               null,
                                                                                                                                                                            TemporarilyClosedUntil:   null
@@ -161,18 +161,18 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                              SupplementalFacilities:         null,
                                                                                                              DedicatedParkingSpaces:         null,
 
-                                                                                                             TypeOfSite:                     EnergyInfrastructureSiteTypes.Onstreet,
+                                                                                                             TypeOfSite:                     EnergyInfrastructureSiteType.OnStreet,
                                                                                                              Brand:                          new MultilingualString(
                                                                                                                                                  new MultilingualStringValue(
                                                                                                                                                      Languages.de,
-                                                                                                                                                     "SchönerLaden"
+                                                                                                                                                     "Schöner Laden (tm)"
                                                                                                                                                  )
                                                                                                                                              ),
-                                                                                                             ExclusiveUsers:                 [ UserTypes.Customers ],
-                                                                                                             PreferredUsers:                 [ UserTypes.Subscribers ],
+                                                                                                             ExclusiveUsers:                 [ UserType.Customers ],
+                                                                                                             PreferredUsers:                 [ UserType.Subscribers ],
                                                                                                              ServiceTypes:                   [
-                                                                                                                                                 new ServiceType(
-                                                                                                                                                     ServiceTypeValue:   ServiceTypes.Unattended,
+                                                                                                                                                 new Service(
+                                                                                                                                                     ServiceTypeValue:   ServiceType.Unattended,
                                                                                                                                                      OverallPeriod:      new OverallPeriod(
                                                                                                                                                                              OverallStartTime:   Timestamp.Now,
                                                                                                                                                                              OverallEndTime:     null,

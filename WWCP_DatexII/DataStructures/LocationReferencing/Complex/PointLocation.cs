@@ -31,38 +31,52 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// Location representing a single geospatial point.
     /// </summary>
     [XmlType("PointLocation", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public class PointLocation(IEnumerable<ExternalReferencing>?    ExternalReferencing                  = null,
+    public class PointLocation(PointByCoordinates?                  PointByCoordinates                   = null,
+                               AOpenLRPointLocationReference?       OpenLRPointLocationReference         = null,
+                               XElement?                            PointLocationExtension               = null,
+
+                               SupplementaryPositionalDescription?  SupplementaryPositionalDescription   = null,
+                               XElement?                            NetworkLocationExtension             = null,
+
+                               IEnumerable<ExternalReferencing>?    ExternalReferencing                  = null,
                                PointCoordinates?                    CoordinatesForDisplay                = null,
                                FacilityLocation?                    FacilityLocation                     = null,
-                               SupplementaryPositionalDescription?  SupplementaryPositionalDescription   = null,
+                               XElement?                            LocationExtension                    = null,
 
-                               PointByCoordinates?                  PointByCoordinates                   = null,
-                               AOpenlrPointLocationReference?       OpenlrPointLocationReference         = null)
+                               XElement?                            LocationReferenceExtension           = null)
 
-        : ANetworkLocation(ExternalReferencing,
+        : ANetworkLocation(SupplementaryPositionalDescription,
+                           NetworkLocationExtension,
+
+                           ExternalReferencing,
                            CoordinatesForDisplay,
                            FacilityLocation,
-                           SupplementaryPositionalDescription)
+                           LocationExtension,
 
+                           LocationReferenceExtension)
     {
+
+        #region Properties
 
         /// <summary>
         /// Specifies the point using coordinates.
         /// </summary>
         [XmlElement("pointByCoordinates",            Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PointByCoordinates?             PointByCoordinates              { get; set; } = PointByCoordinates;
+        public PointByCoordinates?             PointByCoordinates              { get; } = PointByCoordinates;
 
         /// <summary>
         /// Reference to an OpenLR point location.
         /// </summary>
         [XmlElement("openlrPointLocationReference",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public AOpenlrPointLocationReference?  OpenlrPointLocationReference    { get; set; } = OpenlrPointLocationReference;
+        public AOpenLRPointLocationReference?  OpenLRPointLocationReference    { get; } = OpenLRPointLocationReference;
 
         /// <summary>
         /// Optional extension element for additional point location information.
         /// </summary>
         [XmlElement("_pointLocationExtension",       Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                       PointLocationExtension          { get; set; }
+        public XElement?                       PointLocationExtension          { get; } = PointLocationExtension;
+
+        #endregion
 
     }
 

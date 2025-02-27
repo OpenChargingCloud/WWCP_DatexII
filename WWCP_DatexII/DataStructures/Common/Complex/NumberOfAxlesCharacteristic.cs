@@ -29,26 +29,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
     /// Number of axles characteristic of a vehicle.
     /// </summary>
     [XmlType("NumberOfAxlesCharacteristic", Namespace = "http://datex2.eu/schema/3/common")]
-    public class NumberOfAxlesCharacteristic
+    public class NumberOfAxlesCharacteristic(ComparisonOperator  ComparisonOperator,
+                                             Byte                NumberOfAxles,
+                                             XElement?           NumberOfAxlesCharacteristicExtension   = null)
     {
+
+        #region Properties
 
         /// <summary>
         /// The operator to be used in the vehicle characteristic comparison operation.
         /// </summary>
         [XmlElement("comparisonOperator",  Namespace = "http://datex2.eu/schema/3/common")]
-        public ComparisonOperators  ComparisonOperator                      { get; set; }
+        public ComparisonOperator  ComparisonOperator                      { get; } = ComparisonOperator;
 
         /// <summary>
         /// The total number of axles of an individual vehicle.
         /// </summary>
         [XmlElement("numberOfAxles",       Namespace = "http://datex2.eu/schema/3/common")]
-        public Byte                 NumberOfAxles                           { get; set; }
+        public Byte                NumberOfAxles                           { get; } = NumberOfAxles;
 
         /// <summary>
         /// Optional extension element for additional number of axles characteristic information.
         /// </summary>
         [XmlElement("_numberOfAxlesCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?            NumberOfAxlesCharacteristicExtension    { get; set; }
+        public XElement?           NumberOfAxlesCharacteristicExtension    { get; } = NumberOfAxlesCharacteristicExtension;
+
+        #endregion
 
     }
 

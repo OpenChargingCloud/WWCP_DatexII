@@ -32,37 +32,44 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// This may be provided in one or more referencing systems.
     /// </summary>
     [XmlType("Location", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-    public abstract class ALocation(IEnumerable<ExternalReferencing>?  ExternalReferencing     = null,
-                                    PointCoordinates?                  CoordinatesForDisplay   = null,
-                                    FacilityLocation?                  FacilityLocation        = null)
+    public abstract class ALocation(IEnumerable<ExternalReferencing>?  ExternalReferencing          = null,
+                                    PointCoordinates?                  CoordinatesForDisplay        = null,
+                                    FacilityLocation?                  FacilityLocation             = null,
+                                    XElement?                          LocationExtension            = null,
 
-        : ALocationReference
+                                    XElement?                          LocationReferenceExtension   = null)
+
+        : ALocationReference(LocationReferenceExtension)
 
     {
+
+        #region Properties
 
         /// <summary>
         /// External referencing information (zero or more entries).
         /// </summary>
         [XmlElement("externalReferencing",    Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public IEnumerable<ExternalReferencing>  ExternalReferencing      { get; set; } = ExternalReferencing?.Distinct() ?? [];
+        public IEnumerable<ExternalReferencing>  ExternalReferencing      { get; } = ExternalReferencing?.Distinct() ?? [];
 
         /// <summary>
         /// Coordinates that may be used by clients for visual display on user interfaces.
         /// </summary>
         [XmlElement("coordinatesForDisplay",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
-        public PointCoordinates?                 CoordinatesForDisplay    { get; set; } = CoordinatesForDisplay;
+        public PointCoordinates?                 CoordinatesForDisplay    { get; } = CoordinatesForDisplay;
 
         /// <summary>
         /// A facility location specification.
         /// </summary>
         [XmlElement("facilityLocation",       Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public FacilityLocation?                 FacilityLocation         { get; set; } = FacilityLocation;
+        public FacilityLocation?                 FacilityLocation         { get; } = FacilityLocation;
 
         /// <summary>
         /// Optional extension element for additional location information.
         /// </summary>
         [XmlElement("_locationExtension",     Namespace = "http://datex2.eu/schema/3/common")]
-        public XElement?                         LocationExtension        { get; set; }
+        public XElement?                         LocationExtension        { get; } = LocationExtension;
+
+        #endregion
 
     }
 

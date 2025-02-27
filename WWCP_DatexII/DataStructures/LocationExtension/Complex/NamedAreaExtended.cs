@@ -31,11 +31,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
     public class NamedAreaExtended(NamedAreaCode NamedAreaCode)
     {
 
+        #region Properties
+
         /// <summary>
         /// Code for the named area, such as a postal code or other administration-assigned code.
         /// </summary>
         [XmlElement("namedAreaCode", Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public NamedAreaCode  NamedAreaCode    { get; set; } = NamedAreaCode;
+        public NamedAreaCode  NamedAreaCode    { get; } = NamedAreaCode;
+
+        #endregion
 
     }
 
