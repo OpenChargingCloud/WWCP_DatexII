@@ -16,6 +16,8 @@ DATEXII_3_Facilities.xsd (line 101 for status version, line 255 for table versio
 </xs:element>
 ```
 
+### pyhsicalAttendance vs. physicalAttendance
+
 DATEXII_3_EnergyInfrastructure.xsd (line 463 for status version, line 1411 for table version) has the following spelling mistake within an ENUM name of the `ServiceTypeEnum` enumeration:
 ```
 <xs:enumeration value="pyhsicalAttendance">
