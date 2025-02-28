@@ -283,6 +283,60 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML()
+
+        public XElement ToXML()
+        {
+
+            var xml = new XElement(DatexIINS.D2Payload + "payload",
+
+                          new XAttribute(XNamespace.Xmlns + "d2",    DatexIINS.D2Payload),
+                          new XAttribute(XNamespace.Xmlns + "com",   DatexIINS.Common),
+                          new XAttribute(XNamespace.Xmlns + "egi",   DatexIINS.EnergyInfrastructure),
+                          new XAttribute(XNamespace.Xmlns + "fac",   DatexIINS.Facilities),
+                          new XAttribute(XNamespace.Xmlns + "locx",  DatexIINS.LocationExtension),
+                          new XAttribute(XNamespace.Xmlns + "loc",   DatexIINS.LocationReferencing),
+                          new XAttribute(XNamespace.Xmlns + "prk",   DatexIINS.Parking),
+                          new XAttribute(XNamespace.Xmlns + "xsi",   DatexIINS.XSI),
+
+                          new XAttribute(DatexIINS.XSI + "schemaLocation",    "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"),
+                          new XAttribute(DatexIINS.XSI + "type",              "egi:EnergyInfrastructureStatusPublication"),
+                          new XAttribute("lang",                               Language.AsText()),
+                          new XAttribute("modelBaseVersion",                  "3"),
+                          new XAttribute("profileName",                       "Level C profile Energy Infrastructure"),
+                          new XAttribute("profileVersion",                    "00-01-00"),
+
+                          new XElement(DatexIINS.Common + "publicationTime",   PublicationTime.ToIso8601()),
+                          new DateTime().ToIso8601(),
+                          PublicationCreator.ToXML(),
+                          HeaderInformation?.ToXML(),
+
+                          new XElement(DatexIINS.EnergyInfrastructure + "energyInfrastructureSiteStatus", "xxx"
+                          )
+
+                      );
+
+            return xml;
+
+        }
+
+        #endregion
+
+        #region ToXDocument()
+
+        public XDocument ToXDocument()
+        {
+
+            return new XDocument(
+                       new XDeclaration("1.0", "UTF-8", null),
+                       ToXML()
+                   );
+
+        }
+
+        #endregion
+
     }
 
 }

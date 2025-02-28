@@ -165,7 +165,7 @@
 
             <!-- Physikalische Anwesenheit von Personal MO-FR von 7 bis 20 Uhr -->
             <serviceType>
-                <serviceType>physicalAttendance</serviceType>
+                <serviceType>pyhsicalAttendance</serviceType>
                 <overallPeriod>
                     <com:overallStartTime>2024-01-01T00:00:00+01:00</com:overallStartTime>
                     <com:overallEndTime>2026-12-31T23:59:00+01:00</com:overallEndTime>

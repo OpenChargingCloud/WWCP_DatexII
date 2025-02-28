@@ -19,6 +19,39 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Documentation\Status\DATEXII_3_Common.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Status\DATEXII_3_D2Payload.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Status\DATEXII_3_EnergyInfrastructure.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Status\DATEXII_3_Facilities.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Table\DATEXII_3_Common.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Table\DATEXII_3_CommonExtension.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Table\DATEXII_3_D2Payload.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Table\DATEXII_3_EnergyInfrastructure.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Table\DATEXII_3_Facilities.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Table\DATEXII_3_LocationExtension.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Documentation\Table\DATEXII_3_LocationReferencing.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Examples\EnergyInfrastructureStatusPublication.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
