@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\WWCP_Core\WWCP_Core\WWCP_Core.csproj" />
+    <ProjectReference Include="..\WWCP_DatexII\WWCP_DatexII.csproj" />
+  </ItemGroup>
+
 </Project>
