@@ -408,7 +408,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Return the HashCode of this object.
         /// </summary>
-        /// <returns>The HashCode of this object.</returns>
         public override Int32 GetHashCode()
 
             => InternalId?.ToLower().GetHashCode() ?? 0;
