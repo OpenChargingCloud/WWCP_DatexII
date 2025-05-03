@@ -173,10 +173,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             var xml = new XElement(XMLName ?? DatexIINS.Common + "overallPeriod",
 
-                                new XElement(DatexIINS.Common + "overallStartTime",   OverallStartTime.    ToIso8601WithOffset()),
+                                new XElement(DatexIINS.Common + "overallStartTime",   OverallStartTime.    ToISO8601WithOffset()),
 
                           OverallEndTime.HasValue
-                              ? new XElement(DatexIINS.Common + "overallEndTime",     OverallEndTime.Value.ToIso8601WithOffset())
+                              ? new XElement(DatexIINS.Common + "overallEndTime",     OverallEndTime.Value.ToISO8601WithOffset())
                               : null
 
                           //ValidPeriod     is not null

@@ -215,11 +215,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
             var xml = new XElement(XMLName ?? DatexIINS.Common + "period",
 
                           StartOfPeriod.HasValue
-                              ? new XElement(DatexIINS.Common + "startOfPeriod",   StartOfPeriod.Value.ToIso8601WithOffset())
+                              ? new XElement(DatexIINS.Common + "startOfPeriod",   StartOfPeriod.Value.ToISO8601WithOffset())
                               : null,
 
                           EndOfPeriod.  HasValue
-                              ? new XElement(DatexIINS.Common + "endOfPeriod",     EndOfPeriod.  Value.ToIso8601WithOffset())
+                              ? new XElement(DatexIINS.Common + "endOfPeriod",     EndOfPeriod.  Value.ToISO8601WithOffset())
                               : null,
 
                           PeriodName?.ToXML(DatexIINS.Common + "periodName"),

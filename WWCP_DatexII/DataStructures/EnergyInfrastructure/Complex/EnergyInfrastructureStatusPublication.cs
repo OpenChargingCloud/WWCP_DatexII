@@ -307,8 +307,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                           new XAttribute("profileName",                       "Level C profile Energy Infrastructure"),
                           new XAttribute("profileVersion",                    "00-01-00"),
 
-                          new XElement(DatexIINS.Common + "publicationTime",   PublicationTime.ToIso8601()),
-                          new DateTime().ToIso8601(),
+                          new XElement(DatexIINS.Common + "publicationTime",   PublicationTime.ToISO8601()),
+                          new DateTime().ToISO8601(),
                           PublicationCreator.ToXML(),
                           HeaderInformation?.ToXML(),
 

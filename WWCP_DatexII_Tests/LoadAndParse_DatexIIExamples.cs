@@ -84,7 +84,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                 {
 
                     // APayloadPublication members
-                    Assert.That(energyInfrastructureStatusPublication.PublicationTime.ToIso8601WithOffset(false),   Is.EqualTo("2025-02-02T12:50:00+01:00"));
+                    Assert.That(energyInfrastructureStatusPublication.PublicationTime.ToISO8601WithOffset(false),   Is.EqualTo("2025-02-02T12:50:00+01:00"));
                     Assert.That(energyInfrastructureStatusPublication.Language,                                     Is.EqualTo(Languages.de));
                     Assert.That(energyInfrastructureStatusPublication.ModelBaseVersion,                             Is.EqualTo("3"));
                     Assert.That(energyInfrastructureStatusPublication.ExtensionName,                                Is.Null);
@@ -195,7 +195,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                 {
 
                     // APayloadPublication members
-                    Assert.That(energyInfrastructureTablePublication.PublicationTime.ToIso8601(),   Is.EqualTo("2025-01-10T10:13:51.000Z"));
+                    Assert.That(energyInfrastructureTablePublication.PublicationTime.ToISO8601(),   Is.EqualTo("2025-01-10T10:13:51.000Z"));
                     Assert.That(energyInfrastructureTablePublication.Language,                      Is.EqualTo(Languages.de));
                     Assert.That(energyInfrastructureTablePublication.ModelBaseVersion,              Is.EqualTo("3"));
                     Assert.That(energyInfrastructureTablePublication.ExtensionName,                 Is.Null);
