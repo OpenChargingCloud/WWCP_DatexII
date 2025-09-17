@@ -40,7 +40,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                           MultilingualString?                   Name                      = null,
                                           IEnumerable<MultilingualString>?      Alias                     = null,
                                           String?                               ExternalIdentifier        = null,
-                                          DateTime?                             LastUpdated               = null,
+                                          DateTimeOffset?                       LastUpdated               = null,
                                           MultilingualString?                   Description               = null,
                                           IEnumerable<Accessibility>?           Accessibility             = null,
                                           IEnumerable<MultilingualString>?      AdditionalInformation     = null,
@@ -96,7 +96,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Information on the time when the information has been updated the last time.
         /// </summary>
         [XmlElement("lastUpdated",            Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime?                            LastUpdated                { get; } = LastUpdated;
+        public DateTimeOffset?                      LastUpdated                { get; } = LastUpdated;
 
         /// <summary>
         /// A description for this facility.
