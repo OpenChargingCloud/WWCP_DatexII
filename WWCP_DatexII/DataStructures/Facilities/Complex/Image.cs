@@ -56,6 +56,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "image",
+
+                   new XElement(DatexIINS.Facilities + "imageData",     Convert.ToBase64String(Data)),
+                   new XElement(DatexIINS.Facilities + "imageFormat",   Format.ToString()),
+
+                   ImageExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_imageExtension",  ImageExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

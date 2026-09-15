@@ -160,6 +160,43 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         #endregion
 
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "closureInformation",
+
+                   // "permananentlyClosed" is how DATEX II spells it in the schema.
+                   // Writing it correctly would not validate.
+                   PermanentlyClosed.HasValue
+                       ? new XElement(DatexIINS.Facilities + "permananentlyClosed",      PermanentlyClosed.     Value ? "true" : "false")
+                       : null,
+
+                   TemporarilyClosed.HasValue
+                       ? new XElement(DatexIINS.Facilities + "temporarilyClosed",        TemporarilyClosed.     Value ? "true" : "false")
+                       : null,
+
+                   ClosedFrom.HasValue
+                       ? new XElement(DatexIINS.Facilities + "closedFrom",               ClosedFrom.            Value.ToISO8601WithOffset())
+                       : null,
+
+                   TemporarilyClosedUntil.HasValue
+                       ? new XElement(DatexIINS.Facilities + "temporarilyClosedUntil",   TemporarilyClosedUntil.Value.ToISO8601WithOffset())
+                       : null,
+
+                   ClosureInformationExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_closureInformationExtension", ClosureInformationExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

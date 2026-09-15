@@ -91,16 +91,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         public XElement ToXML(XName? XMLName = null)
         {
 
-            // C# is very strict with XML namespaces!
-            var xmlElement    = XMLName ?? DatexIINS.Common + "MultilingualString";
-            var xmlNamespace  = xmlElement.Namespace;
-
+            // The wrapper takes whatever name the containing element asks for, but
+            // values/value belong to the common schema and stay there regardless.
             var xml = new XElement(XMLName ?? DatexIINS.Common + "MultilingualString",
 
-                          new XElement(xmlNamespace + "values",
+                          new XElement(DatexIINS.Common + "values",
 
                               Values.Any()
-                                  ? Values.Select(value => value.ToXML(xmlNamespace + "value"))
+                                  ? Values.Select(value => value.ToXML(DatexIINS.Common + "value"))
                                   : null
 
                           )

@@ -214,7 +214,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// The energy infrastructure site is located alongside a street, for example some singular charging stations.
         /// </summary>
         public static EnergyInfrastructureSiteType  OnStreet         { get; }
-            = Register("onStreet");
+            = Register("onstreet");
 
         /// <summary>
         /// The energy infrastructure site is located on a company site.

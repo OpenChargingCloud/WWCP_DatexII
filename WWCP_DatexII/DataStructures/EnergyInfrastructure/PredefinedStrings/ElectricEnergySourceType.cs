@@ -238,7 +238,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// Wind energy source.
         /// </summary>
         public static ElectricEnergySourceType  Wind             { get; }
-            = Register("chademo");
+            = Register("wind");
 
         /// <summary>
         /// All kinds of green energy sources.

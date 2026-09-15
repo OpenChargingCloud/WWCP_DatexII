@@ -94,6 +94,35 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyInfrastructureTable",
+
+                   new XAttribute("id",        Id),
+                   new XAttribute("version",   Version),
+
+                   TableName is not null && TableName.Length > 0
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "tableName", TableName)
+                       : null,
+
+                   EnergyInfrastructureSites.Select(energyInfrastructureSite =>
+                       energyInfrastructureSite.ToXML(DatexIINS.EnergyInfrastructure + "energyInfrastructureSite")),
+
+                   EnergyInfrastructureTableExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureTableExtension", EnergyInfrastructureTableExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

@@ -58,6 +58,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "serviceType",
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "serviceType",   ServiceTypeValue.ToString()),
+
+                   OverallPeriod is not null
+                       ? OverallPeriod.ToXML(DatexIINS.EnergyInfrastructure + "overallPeriod")
+                       : null,
+
+                   ServiceTypeExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_serviceTypeExtension", ServiceTypeExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

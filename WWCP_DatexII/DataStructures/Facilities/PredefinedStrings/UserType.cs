@@ -226,7 +226,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Employees.
         /// </summary>
         public static UserType  Employees                   { get; }
-            = Register("xxemployeesx");
+            = Register("employees");
 
         /// <summary>
         /// Families.

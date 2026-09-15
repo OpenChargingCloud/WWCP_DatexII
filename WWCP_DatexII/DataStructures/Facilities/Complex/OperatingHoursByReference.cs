@@ -156,6 +156,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         #endregion
 
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "operatingHours",
+
+                   new XAttribute(DatexIINS.XSI + "type",   "fac:OperatingHoursByReference"),
+
+                   ClosureInformation is not null
+                       ? ClosureInformation.ToXML(DatexIINS.Facilities + "closureInformation")
+                       : null,
+
+                   OperatingHoursReference.ToXML(),
+
+                   OperatingHoursTableReference is not null
+                       ? OperatingHoursTableReference.ToXML()
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

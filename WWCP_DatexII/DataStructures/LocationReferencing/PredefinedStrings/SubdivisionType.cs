@@ -508,7 +508,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// Ward
         /// </summary>
         public static SubdivisionType  Ward                               { get; }
-            = Register("nuts1Code");
+            = Register("ward");
 
         /// <summary>
         /// Other

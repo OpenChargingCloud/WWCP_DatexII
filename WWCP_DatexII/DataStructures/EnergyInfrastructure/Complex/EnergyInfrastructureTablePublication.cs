@@ -325,9 +325,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                           PublicationCreator.ToXML(),
                           HeaderInformation?.ToXML(DatexIINS.EnergyInfrastructure),
 
-                          EnergyInfrastructureTables.Any()
-                              ? throw new NotImplementedException("Serializing EnergyInfrastructureTable is not implemented yet!")
-                              : null
+                          EnergyInfrastructureTables.Select(energyInfrastructureTable => energyInfrastructureTable.ToXML())
 
                       );
 

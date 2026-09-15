@@ -253,6 +253,51 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         #endregion
 
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "operatingHours",
+
+                   new XAttribute(DatexIINS.XSI + "type",   "fac:OperatingHoursSpecification"),
+                   new XAttribute("id",                      Id),
+                   new XAttribute("version",                 Version),
+
+                   ClosureInformation is not null
+                       ? ClosureInformation.ToXML(DatexIINS.Facilities + "closureInformation")
+                       : null,
+
+                   LastUpdated.HasValue
+                       ? new XElement(DatexIINS.Facilities + "lastUpdated",        LastUpdated.Value.ToISO8601WithOffset())
+                       : null,
+
+                   Label is not null && Label.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "label",              Label)
+                       : null,
+
+                   OperatingAllYear.HasValue
+                       ? new XElement(DatexIINS.Facilities + "operatingAllYear",   OperatingAllYear.Value ? "true" : "false")
+                       : null,
+
+                   URLLinkAddress.HasValue
+                       ? new XElement(DatexIINS.Facilities + "urlLinkAddress",     URLLinkAddress.Value.ToString())
+                       : null,
+
+                   OverallPeriod.ToXML(DatexIINS.Facilities + "overallPeriod"),
+
+                   OperatingHoursSpecificationExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_operatingHoursSpecificationExtension", OperatingHoursSpecificationExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }
