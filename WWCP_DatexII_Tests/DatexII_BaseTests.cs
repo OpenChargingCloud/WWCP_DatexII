@@ -87,9 +87,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests
             var xml          = publication.ToXML();
 
             var isValidXML   = ValidateStatusSchema(xml.ToString(), out var warning, out var errors);
-            Assert.That(isValidXML,       Is.True);
-            Assert.That(warning.Count(),  Is.EqualTo(0));
-            Assert.That(errors. Count(),  Is.EqualTo(0));
+            Assert.That(isValidXML,       Is.True,            String.Join(Environment.NewLine, errors));
+            Assert.That(warning.Count(),  Is.EqualTo(0),      String.Join(Environment.NewLine, warning));
+            Assert.That(errors. Count(),  Is.EqualTo(0),      String.Join(Environment.NewLine, errors));
 
         }
 
@@ -248,9 +248,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests
             var xml          = publication.ToXML();
 
             var isValidXML   = ValidateTableSchema(xml.ToString(), out var warning, out var errors);
-            Assert.That(isValidXML,       Is.True);
-            Assert.That(warning.Count(),  Is.EqualTo(0));
-            Assert.That(errors. Count(),  Is.EqualTo(0));
+            Assert.That(isValidXML,       Is.True,            String.Join(Environment.NewLine, errors));
+            Assert.That(warning.Count(),  Is.EqualTo(0),      String.Join(Environment.NewLine, warning));
+            Assert.That(errors. Count(),  Is.EqualTo(0),      String.Join(Environment.NewLine, errors));
 
         }
 

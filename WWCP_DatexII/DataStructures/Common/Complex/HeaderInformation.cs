@@ -140,10 +140,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #region ToXML()
 
-        public XElement ToXML()
+        /// <param name="ElementNamespace">The namespace of the surrounding element. DATEX II
+        /// declares headerInformation within the containing publication, so the wrapper carries
+        /// that publication's namespace while its children stay in the common namespace.</param>
+        public XElement ToXML(XNamespace? ElementNamespace = null)
         {
 
-            var xml = new XElement(DatexIINS.Common + "headerInformation",
+            var xml = new XElement((ElementNamespace ?? DatexIINS.Common) + "headerInformation",
 
                           Confidentiality.HasValue
                               ? new XElement(DatexIINS.Common + "confidentiality",               Confidentiality.       ToString())

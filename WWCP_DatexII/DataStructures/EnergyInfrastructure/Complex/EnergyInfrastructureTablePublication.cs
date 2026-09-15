@@ -67,7 +67,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Management information relating to the publication.
         /// </summary>
-        [XmlElement("headerInformation",                               Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("headerInformation",                               Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
         public HeaderInformation?                      HeaderInformation                                { get; } = HeaderInformation;
 
         /// <summary>
@@ -322,12 +322,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                           new XAttribute("profileVersion",                  "00-01-00"),
 
                           new XElement(DatexIINS.Common + "publicationTime",   PublicationTime.ToISO8601()),
-                          new DateTime().ToISO8601(),
                           PublicationCreator.ToXML(),
-                          HeaderInformation?.ToXML(),
+                          HeaderInformation?.ToXML(DatexIINS.EnergyInfrastructure),
 
-                          new XElement(DatexIINS.EnergyInfrastructure + "energyInfrastructureTable", "xxx"
-                          )
+                          EnergyInfrastructureTables.Any()
+                              ? throw new NotImplementedException("Serializing EnergyInfrastructureTable is not implemented yet!")
+                              : null
 
                       );
 
