@@ -141,6 +141,49 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The facility part, followed by what a refill point adds to it.
+        /// </summary>
+        protected override IEnumerable<Object?> ToXMLElements()
+        {
+
+            foreach (var element in base.ToXMLElements())
+                yield return element;
+
+            yield return new XElement(DatexIINS.EnergyInfrastructure + "deliveryUnit",                 DeliveryUnit.ToString());
+
+            if (MaximumDeliveryAmount.HasValue)
+                yield return new XElement(DatexIINS.EnergyInfrastructure + "maximumDeliveryAmount",    MaximumDeliveryAmount.Value.Value);
+
+            if (MinimumDeliveryAmount.HasValue)
+                yield return new XElement(DatexIINS.EnergyInfrastructure + "minimumDeliveryAmount",    MinimumDeliveryAmount.Value.Value);
+
+            if (ModelType is not null)
+                yield return ModelType.ToXML(DatexIINS.EnergyInfrastructure + "modelType");
+
+            if (Reservation.HasValue)
+                yield return new XElement(DatexIINS.EnergyInfrastructure + "reservation",              Reservation.Value.ToString());
+
+            if (RefillPointExtension is not null)
+                yield return new XElement(DatexIINS.EnergyInfrastructure + "_refillPointExtension",    RefillPointExtension);
+
+        }
+
+        #endregion
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public abstract XElement ToXML(XName? XMLName = null);
+
+        #endregion
+
     }
 
 }

@@ -20,6 +20,7 @@
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
@@ -187,6 +188,82 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_facilityObjectExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                            FacilityObjectExtension    { get; } = FacilityObjectExtension;
+
+        #endregion
+
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The facility object part of the XML content, in the order the schema
+        /// requires. These particles are declared in the facilities schema and keep
+        /// that namespace whatever type inherits them.
+        /// </summary>
+        protected virtual IEnumerable<Object?> ToXMLElements()
+        {
+
+            if (Name is not null)
+                yield return Name.ToXML(DatexIINS.Facilities + "name");
+
+            foreach (var alias in Alias)
+                yield return alias.ToXML(DatexIINS.Facilities + "alias");
+
+            if (ExternalIdentifier is not null && ExternalIdentifier.Length > 0)
+                yield return new XElement(DatexIINS.Facilities + "externalIdentifier",   ExternalIdentifier);
+
+            if (LastUpdated.HasValue)
+                yield return new XElement(DatexIINS.Facilities + "lastUpdated",           LastUpdated.Value.ToISO8601WithOffset());
+
+            if (Description is not null)
+                yield return Description.ToXML(DatexIINS.Facilities + "description");
+
+            foreach (var accessibility in Accessibility)
+                yield return new XElement(DatexIINS.Facilities + "accessibility",         accessibility.ToString());
+
+            foreach (var additionalInformation in AdditionalInformation)
+                yield return additionalInformation.ToXML(DatexIINS.Facilities + "additionalInformation");
+
+            // An UrlLink is a complex type, not a bare URL.
+            foreach (var informationWebsite in InformationWebsites)
+                yield return new XElement(DatexIINS.Facilities + "informationWebsite",
+                                 new XElement(DatexIINS.Common + "urlLinkAddress",        informationWebsite.ToString()));
+
+            foreach (var photoURL in PhotoURLs)
+                yield return new XElement(DatexIINS.Facilities + "photoUrl",
+                                 new XElement(DatexIINS.Common + "urlLinkAddress",        photoURL.          ToString()));
+
+            if (Photos is not null)
+                foreach (var photo in Photos)
+                    yield return photo.ToXML(DatexIINS.Facilities + "photo");
+
+            if (OperatingHours is not null)
+                yield return OperatingHours.ToXML(DatexIINS.Facilities + "operatingHours");
+
+            if (LocationReference is not null)
+                throw new NotImplementedException("Serializing a LocationReference is not implemented yet!");
+
+            if (Owner is not null)
+                throw new NotImplementedException("Serializing an Organisation is not implemented yet!");
+
+            if (Operator is not null)
+                throw new NotImplementedException("Serializing an Organisation is not implemented yet!");
+
+            if (Helpdesk is not null)
+                throw new NotImplementedException("Serializing an Organisation is not implemented yet!");
+
+            if (ApplicableForVehicles.Any())
+                throw new NotImplementedException("Serializing VehicleCharacteristics is not implemented yet!");
+
+            if (Dimension is not null)
+                throw new NotImplementedException("Serializing a Dimension is not implemented yet!");
+
+            if (Amenities is not null)
+                throw new NotImplementedException("Serializing Amenities is not implemented yet!");
+
+            if (FacilityObjectExtension is not null)
+                yield return new XElement(DatexIINS.Facilities + "_facilityObjectExtension", FacilityObjectExtension);
+
+        }
 
         #endregion
 

@@ -112,6 +112,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The facility object part, followed by what a facility adds to it.
+        /// </summary>
+        protected override IEnumerable<Object?> ToXMLElements()
+        {
+
+            foreach (var element in base.ToXMLElements())
+                yield return element;
+
+            if (SupplementalFacilities.Any())
+                throw new NotImplementedException("Serializing a SupplementalFacility is not implemented yet!");
+
+            if (DedicatedParkingSpaces.Any())
+                throw new NotImplementedException("Serializing DedicatedParkingSpaces is not implemented yet!");
+
+            if (FacilityExtension is not null)
+                yield return new XElement(DatexIINS.Facilities + "_facilityExtension", FacilityExtension);
+
+        }
+
+        #endregion
+
     }
 
 }

@@ -177,88 +177,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    new XAttribute("id",        Id),
                    new XAttribute("version",   Version),
 
-                   // --- FacilityObject ---------------------------------------
-
-                   Name is not null
-                       ? Name.ToXML(DatexIINS.Facilities + "name")
-                       : null,
-
-                   Alias.Select(alias => alias.ToXML(DatexIINS.Facilities + "alias")),
-
-                   ExternalIdentifier is not null && ExternalIdentifier.Length > 0
-                       ? new XElement(DatexIINS.Facilities + "externalIdentifier",   ExternalIdentifier)
-                       : null,
-
-                   LastUpdated.HasValue
-                       ? new XElement(DatexIINS.Facilities + "lastUpdated",          LastUpdated.Value.ToISO8601WithOffset())
-                       : null,
-
-                   Description is not null
-                       ? Description.ToXML(DatexIINS.Facilities + "description")
-                       : null,
-
-                   Accessibility.Select(accessibility => new XElement(DatexIINS.Facilities + "accessibility", accessibility.ToString())),
-
-                   AdditionalInformation.Select(additionalInformation => additionalInformation.ToXML(DatexIINS.Facilities + "additionalInformation")),
-
-                   // An UrlLink is a complex type, not a bare URL.
-                   InformationWebsites.Select(informationWebsite => new XElement(DatexIINS.Facilities + "informationWebsite",
-                                                                        new XElement(DatexIINS.Common + "urlLinkAddress", informationWebsite.ToString()))),
-
-                   PhotoURLs.          Select(photoURL           => new XElement(DatexIINS.Facilities + "photoUrl",
-                                                                        new XElement(DatexIINS.Common + "urlLinkAddress", photoURL.          ToString()))),
-
-                   Photos?.Select(photo => photo.ToXML(DatexIINS.Facilities + "photo")),
-
-                   OperatingHours is not null
-                       ? OperatingHours.ToXML(DatexIINS.Facilities + "operatingHours")
-                       : null,
-
-                   LocationReference is not null
-                       ? throw new NotImplementedException("Serializing a LocationReference is not implemented yet!")
-                       : null,
-
-                   Owner is not null
-                       ? throw new NotImplementedException("Serializing an Organisation is not implemented yet!")
-                       : null,
-
-                   Operator is not null
-                       ? throw new NotImplementedException("Serializing an Organisation is not implemented yet!")
-                       : null,
-
-                   Helpdesk is not null
-                       ? throw new NotImplementedException("Serializing an Organisation is not implemented yet!")
-                       : null,
-
-                   ApplicableForVehicles.Any()
-                       ? throw new NotImplementedException("Serializing VehicleCharacteristics is not implemented yet!")
-                       : null,
-
-                   Dimension is not null
-                       ? throw new NotImplementedException("Serializing a Dimension is not implemented yet!")
-                       : null,
-
-                   Amenities is not null
-                       ? throw new NotImplementedException("Serializing Amenities is not implemented yet!")
-                       : null,
-
-                   FacilityObjectExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_facilityObjectExtension", FacilityObjectExtension)
-                       : null,
-
-                   // --- Facility ---------------------------------------------
-
-                   SupplementalFacilities.Any()
-                       ? throw new NotImplementedException("Serializing a SupplementalFacility is not implemented yet!")
-                       : null,
-
-                   DedicatedParkingSpaces.Any()
-                       ? throw new NotImplementedException("Serializing DedicatedParkingSpaces is not implemented yet!")
-                       : null,
-
-                   FacilityExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_facilityExtension", FacilityExtension)
-                       : null,
+                   // Everything a facility object and a facility contribute, in
+                   // schema order, from the classes that declare it.
+                   ToXMLElements(),
 
                    // --- EnergyInfrastructureSite -----------------------------
 
@@ -283,9 +204,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                        ? throw new NotImplementedException("Serializing a Location is not implemented yet!")
                        : null,
 
-                   EnergyInfrastructureStations.Any()
-                       ? throw new NotImplementedException("Serializing an EnergyInfrastructureStation is not implemented yet!")
-                       : null,
+                   EnergyInfrastructureStations.Select(energyInfrastructureStation =>
+                       energyInfrastructureStation.ToXML(DatexIINS.EnergyInfrastructure + "energyInfrastructureStation")),
 
                    EnergyInfrastructureSiteExtension is not null
                        ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureSiteExtension", EnergyInfrastructureSiteExtension)

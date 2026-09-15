@@ -110,6 +110,51 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "connector",
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "connectorType",              ConnectorType.ToString()),
+
+                   OtherConnector is not null && OtherConnector.Length > 0
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "otherConnector",       OtherConnector)
+                       : null,
+
+                   CountryOfDomesticSocket?.Select(country => new XElement(DatexIINS.EnergyInfrastructure + "countryOfDomesticSocket", country.Alpha2Code)),
+
+                   ChargingMode.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "chargingMode",         ChargingMode.   Value.ToString())
+                       : null,
+
+                   ConnectorFormat.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "connectorFormat",      ConnectorFormat.Value.ToString())
+                       : null,
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "maxPowerAtSocket",           MaxPowerAtSocket.Value),
+
+                   Voltage.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "voltage",              Voltage.       Value.Value)
+                       : null,
+
+                   MaximumCurrent.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "maximumCurrent",       MaximumCurrent.Value.Value)
+                       : null,
+
+                   ConnectorExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_connectorExtension",  ConnectorExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

@@ -190,6 +190,55 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "refillPoint",
+
+                   // The schema declares refillPoint with the abstract type.
+                   new XAttribute(DatexIINS.XSI + "type",   "egi:ElectricChargingPoint"),
+                   new XAttribute("id",                      Id),
+                   new XAttribute("version",                 Version),
+
+                   ToXMLElements(),
+
+                   EVSEId is not null && EVSEId.Length > 0
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "evseId",                       EVSEId)
+                       : null,
+
+                   UsageType.                     Select(usageType     => new XElement(DatexIINS.EnergyInfrastructure + "usageType",                      usageType.    ToString())),
+                   VehicleToGridCommunicationType.Select(communication => new XElement(DatexIINS.EnergyInfrastructure + "vehicleToGridCommunicationType", communication.ToString())),
+
+                   NumberOfConnectors.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "numberOfConnectors",           NumberOfConnectors.Value)
+                       : null,
+
+                   AvailableVoltage.      Select(availableVoltage      => new XElement(DatexIINS.EnergyInfrastructure + "availableVoltage",              availableVoltage.     Value)),
+                   AvailableChargingPower.Select(availableChargingPower => new XElement(DatexIINS.EnergyInfrastructure + "availableChargingPower",       availableChargingPower.Value)),
+
+                   SmartRechargingServices.     Select(smartRechargingService => new XElement(DatexIINS.EnergyInfrastructure + "smartRechargingServices", smartRechargingService.ToString())),
+                   OtherSmartRechargingServices.Select(other                  => other.ToXML(DatexIINS.EnergyInfrastructure + "otherSmartRechargingServices")),
+
+                   Connector.Select(connector => connector.ToXML(DatexIINS.EnergyInfrastructure + "connector")),
+
+                   ElectricEnergy.Any()
+                       ? throw new NotImplementedException("Serializing ElectricEnergy is not implemented yet!")
+                       : null,
+
+                   ElectricChargingPointExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_electricChargingPointExtension", ElectricChargingPointExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

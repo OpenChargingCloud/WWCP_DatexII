@@ -193,6 +193,63 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyInfrastructureStation",
+
+                   new XAttribute("id",        Id),
+                   new XAttribute("version",   Version),
+
+                   ToXMLElements(),
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "stationIdBNetzA",       StationIdBNetzA),
+                   new XElement(DatexIINS.EnergyInfrastructure + "totalMaximumPower",     TotalMaximumPower.Value),
+
+                   AuthenticationAndIdentificationMethods.Select(method => new XElement(DatexIINS.EnergyInfrastructure + "authenticationAndIdentificationMethods", method.ToString())),
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "numberOfRefillPoints",  NumberOfRefillPoints),
+
+                   RefillPointByReference.Any()
+                       ? throw new NotImplementedException("Serializing a VersionedReference is not implemented yet!")
+                       : null,
+
+                   UserInterfaceLanguages.Select(language => new XElement(DatexIINS.EnergyInfrastructure + "userInterfaceLanguage", language.AsText())),
+
+                   EnergyDistributor is not null
+                       ? throw new NotImplementedException("Serializing an Organisation is not implemented yet!")
+                       : null,
+
+                   MobilityServiceProviders.Any()
+                       ? throw new NotImplementedException("Serializing an Organisation is not implemented yet!")
+                       : null,
+
+                   RoamingPlatforms.Any()
+                       ? throw new NotImplementedException("Serializing an Organisation is not implemented yet!")
+                       : null,
+
+                   ServiceTypes.Select(serviceType => serviceType.ToXML(DatexIINS.EnergyInfrastructure + "serviceType")),
+
+                   RefillPoints.Select(refillPoint => refillPoint.ToXML(DatexIINS.EnergyInfrastructure + "refillPoint")),
+
+                   ElectricEnergy.Any()
+                       ? throw new NotImplementedException("Serializing ElectricEnergy is not implemented yet!")
+                       : null,
+
+                   EnergyInfrastructureStationExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationExtension", EnergyInfrastructureStationExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

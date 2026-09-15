@@ -236,7 +236,65 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                               ],
                                                                                                               Entrances:                      [  ],
                                                                                                               Exits:                          [  ],
-                                                                                                              EnergyInfrastructureStations:   [  ]
+                                                                                                              EnergyInfrastructureStations:   [
+                                                                                                                                                  new EnergyInfrastructureStation(
+
+                                                                                                                                                      Id:                                       "1",
+                                                                                                                                                      Version:                                  "1",
+                                                                                                                                                      StationIdBNetzA:                          "E0001",
+                                                                                                                                                      TotalMaximumPower:                        Watt.ParseKW("300"),
+                                                                                                                                                      AuthenticationAndIdentificationMethods:   [
+                                                                                                                                                                                                    AuthenticationAndIdentificationType.ActiveRFIDChip
+                                                                                                                                                                                                ],
+                                                                                                                                                      NumberOfRefillPoints:                     1,
+                                                                                                                                                      UserInterfaceLanguages:                   [ Languages.de, Languages.en ],
+                                                                                                                                                      ServiceTypes:                             [
+                                                                                                                                                                                                    new Service(ServiceType.Unattended)
+                                                                                                                                                                                                ],
+
+                                                                                                                                                      Name:                                     new MultilingualString(
+                                                                                                                                                                                                    new MultilingualStringValue(
+                                                                                                                                                                                                        Languages.de,
+                                                                                                                                                                                                        "Ladepunktgruppe 1"
+                                                                                                                                                                                                    )
+                                                                                                                                                                                                ),
+
+                                                                                                                                                      RefillPoints:                             [
+                                                                                                                                                                                                    new ElectricChargingPoint(
+
+                                                                                                                                                                                                        Id:                        "1",
+                                                                                                                                                                                                        Version:                   "1",
+                                                                                                                                                                                                        DeliveryUnit:              DeliveryUnit.kWh,
+
+                                                                                                                                                                                                        EVSEId:                    "DE*GEF*E12345678*1",
+                                                                                                                                                                                                        UsageType:                 [ ChargingPointUsage.ElectricBike ],
+                                                                                                                                                                                                        NumberOfConnectors:        2,
+                                                                                                                                                                                                        AvailableVoltage:          [ Volt.ParseV("400") ],
+                                                                                                                                                                                                        AvailableChargingPower:    [ Watt.ParseKW("150") ],
+
+                                                                                                                                                                                                        Connector:                 [
+
+                                                                                                                                                                                                                                       new Connector(
+                                                                                                                                                                                                                                           ConnectorType:      ConnectorType.Chademo,
+                                                                                                                                                                                                                                           MaxPowerAtSocket:   Watt.ParseKW("150"),
+                                                                                                                                                                                                                                           ChargingMode:       ChargingMode.Mode1AC1p,
+                                                                                                                                                                                                                                           ConnectorFormat:    ConnectorFormat.CableMode2,
+                                                                                                                                                                                                                                           Voltage:            Volt. ParseV("400"),
+                                                                                                                                                                                                                                           MaximumCurrent:     Ampere.ParseA("375")
+                                                                                                                                                                                                                                       ),
+
+                                                                                                                                                                                                                                       new Connector(
+                                                                                                                                                                                                                                           ConnectorType:      ConnectorType.CEE3,
+                                                                                                                                                                                                                                           MaxPowerAtSocket:   Watt.ParseKW("22")
+                                                                                                                                                                                                                                       )
+
+                                                                                                                                                                                                                                   ]
+
+                                                                                                                                                                                                    )
+                                                                                                                                                                                                ]
+
+                                                                                                                                                  )
+                                                                                                                                              ]
 
                                                                                                           )
                                                                                                       ]
