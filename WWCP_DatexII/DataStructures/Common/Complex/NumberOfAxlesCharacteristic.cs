@@ -56,6 +56,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "numberOfAxlesCharacteristic",
+
+                   new XElement(DatexIINS.Common + "comparisonOperator",   ComparisonOperator.ToString()),
+                   new XElement(DatexIINS.Common + "numberOfAxles",          NumberOfAxles),
+
+                   NumberOfAxlesCharacteristicExtension is not null
+                       ? new XElement(DatexIINS.Common + "_numberOfAxlesCharacteristicExtension", NumberOfAxlesCharacteristicExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

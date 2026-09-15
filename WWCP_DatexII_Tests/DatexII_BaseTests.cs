@@ -278,7 +278,25 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
                                                                                                               Operator:                       new UnknownOrganisation(),
                                                                                                               Helpdesk:                       null,
-                                                                                                              ApplicableForVehicles:          null,
+                                                                                                              ApplicableForVehicles:          [
+                                                                                                new VehicleCharacteristics(
+                                                                                                    LoadType:                null,
+                                                                                                    YearOfFirstRegistration: 2024,
+                                                                                                    HeightCharacteristic:    [
+                                                                                                                                 new HeightCharacteristic(
+                                                                                                                                     ComparisonOperator:   ComparisonOperator.LessThanOrEqualTo,
+                                                                                                                                     VehicleHeight:        Meter.Parse("2.6")
+                                                                                                                                 )
+                                                                                                                             ],
+                                                                                                    GrossWeightCharacteristic: [
+                                                                                                                                 new GrossWeightCharacteristic(
+                                                                                                                                     ComparisonOperator:   ComparisonOperator.LessThanOrEqualTo,
+                                                                                                                                     GrossVehicleWeight:   Tonne.Parse("3.5"),
+                                                                                                                                     TypeOfWeight:         WeightType.MaximumPermitted
+                                                                                                                                 )
+                                                                                                                             ]
+                                                                                                )
+                                                                                            ],
                                                                                                               Dimension:                      new Dimension(
                                                                                                                                                   Length:       Meter.Parse("12"),
                                                                                                                                                   Width:        Meter.Parse("5"),

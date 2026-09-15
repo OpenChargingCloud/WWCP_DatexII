@@ -149,6 +149,57 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "vehicleCharacteristics",
+
+                   FuelType.         Select(fuelType         => new XElement(DatexIINS.Common + "fuelType",          fuelType.        ToString())),
+
+                   LoadType.HasValue
+                       ? new XElement(DatexIINS.Common + "loadType",                       LoadType.        Value.ToString())
+                       : null,
+
+                   VehicleEquipment.HasValue
+                       ? new XElement(DatexIINS.Common + "vehicleEquipment",               VehicleEquipment.Value.ToString())
+                       : null,
+
+                   VehicleType.      Select(vehicleType      => new XElement(DatexIINS.Common + "vehicleType",       vehicleType.     ToString())),
+                   EUVehicleCategory.Select(euVehicleCategory => new XElement(DatexIINS.Common + "euVehicleCategory", euVehicleCategory.ToString())),
+
+                   VehicleUsage.HasValue
+                       ? new XElement(DatexIINS.Common + "vehicleUsage",                   VehicleUsage.Value.ToString())
+                       : null,
+
+                   YearOfFirstRegistration.HasValue
+                       ? new XElement(DatexIINS.Common + "yearOfFirstRegistration",        YearOfFirstRegistration.Value)
+                       : null,
+
+                   GrossWeightCharacteristic.       Select(characteristic => characteristic.ToXML(DatexIINS.Common + "grossWeightCharacteristic")),
+                   HeightCharacteristic.            Select(characteristic => characteristic.ToXML(DatexIINS.Common + "heightCharacteristic")),
+                   LengthCharacteristic.            Select(characteristic => characteristic.ToXML(DatexIINS.Common + "lengthCharacteristic")),
+                   WidthCharacteristic.             Select(characteristic => characteristic.ToXML(DatexIINS.Common + "widthCharacteristic")),
+                   HeaviestAxleWeightCharacteristic.Select(characteristic => characteristic.ToXML(DatexIINS.Common + "heaviestAxleWeightCharacteristic")),
+                   NumberOfAxlesCharacteristic.     Select(characteristic => characteristic.ToXML(DatexIINS.Common + "numberOfAxlesCharacteristic")),
+
+                   Emissions is not null
+                       ? Emissions.ToXML(DatexIINS.Common + "emissions")
+                       : null,
+
+                   VehicleCharacteristicsExtension is not null
+                       ? new XElement(DatexIINS.Common + "_vehicleCharacteristicsExtension", VehicleCharacteristicsExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

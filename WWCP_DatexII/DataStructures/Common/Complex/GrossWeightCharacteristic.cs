@@ -65,6 +65,30 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "grossWeightCharacteristic",
+
+                   new XElement(DatexIINS.Common + "comparisonOperator",   ComparisonOperator.ToString()),
+                   new XElement(DatexIINS.Common + "grossVehicleWeight",          GrossVehicleWeight.Value),
+
+                   new XElement(DatexIINS.Common + "typeOfWeight",         TypeOfWeight.ToString()),
+
+                   GrossWeightCharacteristicExtension is not null
+                       ? new XElement(DatexIINS.Common + "_grossWeightCharacteristicExtension", GrossWeightCharacteristicExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

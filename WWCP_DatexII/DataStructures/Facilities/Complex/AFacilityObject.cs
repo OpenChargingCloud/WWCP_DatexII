@@ -251,8 +251,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
             if (Helpdesk is not null)
                 yield return Helpdesk.ToXML(DatexIINS.Facilities + "helpdesk");
 
-            if (ApplicableForVehicles.Any())
-                throw new NotImplementedException("Serializing VehicleCharacteristics is not implemented yet!");
+            foreach (var applicableForVehicle in ApplicableForVehicles)
+                yield return applicableForVehicle.ToXML(DatexIINS.Facilities + "applicableForVehicles");
 
             if (Dimension is not null)
                 yield return Dimension.ToXML(DatexIINS.Facilities + "dimension");

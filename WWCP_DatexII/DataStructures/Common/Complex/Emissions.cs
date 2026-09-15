@@ -64,6 +64,36 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "emissions",
+
+                   EmissionClassificationEuro.HasValue
+                       ? new XElement(DatexIINS.Common + "emissionClassificationEuro",   EmissionClassificationEuro.Value.ToString())
+                       : null,
+
+                   EmissionClassificationOther?.Select(emissionClassificationOther =>
+                       new XElement(DatexIINS.Common + "emissionClassificationOther",    emissionClassificationOther)),
+
+                   EmissionLevel.HasValue
+                       ? new XElement(DatexIINS.Common + "emissionLevel",                EmissionLevel.Value.ToString())
+                       : null,
+
+                   EmissionsExtension is not null
+                       ? new XElement(DatexIINS.Common + "_emissionsExtension",          EmissionsExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }
