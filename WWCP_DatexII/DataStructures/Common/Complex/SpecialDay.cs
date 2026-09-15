@@ -164,7 +164,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #region ToXML(XMLName = null)
 
-        public XElement ToXML(XName? XMLName = null)
+        public virtual XElement ToXML(XName? XMLName = null)
         {
 
             var xml = new XElement(XMLName ?? DatexIINS.Common + "period",

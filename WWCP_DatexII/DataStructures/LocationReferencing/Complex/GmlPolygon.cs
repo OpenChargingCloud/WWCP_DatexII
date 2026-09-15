@@ -57,6 +57,29 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "gmlPolygon",
+
+                   Exterior.ToXML(DatexIINS.LocationReferencing + "exterior"),
+
+                   Interior.Select(interior => interior.ToXML(DatexIINS.LocationReferencing + "interior")),
+
+                   GMLPolygonExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_gmlPolygonExtension", GMLPolygonExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

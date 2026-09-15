@@ -82,9 +82,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
                        ? Address.ToXML(DatexIINS.LocationExtension + "address")
                        : null,
 
-                   NutsAreas.Any()
-                       ? throw new NotImplementedException("Serializing a NutsArea is not implemented yet!")
-                       : null,
+                   NutsAreas.Select(nutsArea => nutsArea.ToXML(DatexIINS.LocationExtension + "nutsArea")),
 
                    FacilityLocationExtension is not null
                        ? new XElement(DatexIINS.LocationExtension + "_facilityLocationExtension", FacilityLocationExtension)

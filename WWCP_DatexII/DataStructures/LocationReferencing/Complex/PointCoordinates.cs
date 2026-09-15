@@ -94,16 +94,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    new XElement(DatexIINS.LocationReferencing + "latitude",    Latitude),
                    new XElement(DatexIINS.LocationReferencing + "longitude",   Longitude),
 
-                   HeightCoordinates.Any()
-                       ? throw new NotImplementedException("Serializing a HeightCoordinate is not implemented yet!")
-                       : null,
+                   HeightCoordinates.Select(heightCoordinate => heightCoordinate.ToXML(DatexIINS.LocationReferencing + "heightCoordinate")),
 
                    PositionConfidenceEllipse is not null
-                       ? throw new NotImplementedException("Serializing a PositionConfidenceEllipse is not implemented yet!")
+                       ? PositionConfidenceEllipse.ToXML(DatexIINS.LocationReferencing + "positionConfidenceEllipse")
                        : null,
 
                    HorizontalPositionAccuracy is not null
-                       ? throw new NotImplementedException("Serializing a PositionAccuracy is not implemented yet!")
+                       ? HorizontalPositionAccuracy.ToXML(DatexIINS.LocationReferencing + "horizontalPositionAccuracy")
                        : null,
 
                    PointCoordinatesExtension is not null

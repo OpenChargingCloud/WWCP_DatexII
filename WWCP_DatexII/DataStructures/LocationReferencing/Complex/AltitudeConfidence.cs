@@ -56,6 +56,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "altitudeConfidence",
+
+                   AltitudeAccuracyCodedValue.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "altitudeAccuracyCodedValue",   AltitudeAccuracyCodedValue.Value.ToString())
+                       : null,
+
+                   AltitudeAccuracyCodedError.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "altitudeAccuracyCodedError",   AltitudeAccuracyCodedError.Value.ToString())
+                       : null,
+
+                   AltitudeConfidenceExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_altitudeConfidenceExtension", AltitudeConfidenceExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

@@ -52,6 +52,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "gmlLinearRing",
+
+                   base.ToXML().Attributes(),
+                   base.ToXML().Elements(),
+
+                   GMLLinearRingExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_gmlLinearRingExtension", GMLLinearRingExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

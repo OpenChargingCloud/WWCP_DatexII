@@ -196,13 +196,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                    ServiceTypes.  Select(serviceType   => serviceType.ToXML(DatexIINS.EnergyInfrastructure + "serviceType")),
 
-                   Entrances.Any()
-                       ? throw new NotImplementedException("Serializing a Location is not implemented yet!")
-                       : null,
-
-                   Exits.Any()
-                       ? throw new NotImplementedException("Serializing a Location is not implemented yet!")
-                       : null,
+                   Entrances.Select(entrance => entrance.ToXML(DatexIINS.EnergyInfrastructure + "entrance")),
+                   Exits.    Select(exit     => exit.    ToXML(DatexIINS.EnergyInfrastructure + "exit")),
 
                    EnergyInfrastructureStations.Select(energyInfrastructureStation =>
                        energyInfrastructureStation.ToXML(DatexIINS.EnergyInfrastructure + "energyInfrastructureStation")),

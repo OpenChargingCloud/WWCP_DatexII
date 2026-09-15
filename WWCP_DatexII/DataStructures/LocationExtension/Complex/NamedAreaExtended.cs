@@ -17,6 +17,8 @@
 
 #region Usings
 
+using System.Xml.Linq;
+
 using System.Xml.Serialization;
 
 #endregion
@@ -38,6 +40,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         /// </summary>
         [XmlElement("namedAreaCode", Namespace = "http://datex2.eu/schema/3/locationExtension")]
         public NamedAreaCode  NamedAreaCode    { get; } = NamedAreaCode;
+
+        #endregion
+
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            // The schema extends NamedArea here; this class does not, so there is
+            // no inherited content to carry over.
+            => new (XMLName ?? DatexIINS.LocationExtension + "namedAreaExtended",
+
+                   new XElement(DatexIINS.LocationExtension + "namedAreaCode",   NamedAreaCode.ToString())
+
+               );
 
         #endregion
 

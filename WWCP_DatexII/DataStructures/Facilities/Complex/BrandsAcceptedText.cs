@@ -49,6 +49,27 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "brandsAcceptedText",
+
+                   new XElement(DatexIINS.Facilities + "brandsAccepted",   BrandsAccepted),
+
+                   BrandsAcceptedTextExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_brandsAcceptedTextExtension", BrandsAcceptedTextExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

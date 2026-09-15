@@ -95,13 +95,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                    PaymentMode.      Select(paymentMode       => new XElement(DatexIINS.Facilities + "paymentMode",  paymentMode. ToString())),
                    OtherPaymentMeans.Select(otherPaymentMeans => otherPaymentMeans.ToXML(DatexIINS.Facilities + "otherPaymentMeans")),
 
-                   BrandsAcceptedText.Any()
-                       ? throw new NotImplementedException("Serializing BrandsAcceptedText is not implemented yet!")
-                       : null,
-
-                   BrandsAcceptedCodeList.Any()
-                       ? throw new NotImplementedException("Serializing a BrandsAcceptedCodeList is not implemented yet!")
-                       : null,
+                   BrandsAcceptedText.    Select(brandsAcceptedText     => brandsAcceptedText.    ToXML(DatexIINS.Facilities + "brandsAcceptedText")),
+                   BrandsAcceptedCodeList.Select(brandsAcceptedCodeList => brandsAcceptedCodeList.ToXML(DatexIINS.Facilities + "brandsAcceptedCodeList")),
 
                    PaymentMethodExtension is not null
                        ? new XElement(DatexIINS.Facilities + "_paymentMethodExtension", PaymentMethodExtension)

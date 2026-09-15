@@ -72,6 +72,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "heightCoordinate",
+
+                   new XElement(DatexIINS.LocationReferencing + "heightValue",                  HeightValue.m),
+
+                   HeightType.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "heightType",             HeightType.Value.ToString())
+                       : null,
+
+                   AltitudeConfidence is not null
+                       ? AltitudeConfidence.ToXML(DatexIINS.LocationReferencing + "altitudeConfidence")
+                       : null,
+
+                   VerticalPositionAccuracy is not null
+                       ? VerticalPositionAccuracy.ToXML(DatexIINS.LocationReferencing + "verticalPositionAccuracy")
+                       : null,
+
+                   HeightCoordinateExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_heightCoordinateExtension", HeightCoordinateExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

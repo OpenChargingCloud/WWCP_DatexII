@@ -78,7 +78,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                 yield return element;
 
             if (SupplementaryPositionalDescription is not null)
-                throw new NotImplementedException("Serializing a SupplementaryPositionalDescription is not implemented yet!");
+                yield return SupplementaryPositionalDescription.ToXML(DatexIINS.LocationReferencing + "supplementaryPositionalDescription");
 
             if (NetworkLocationExtension is not null)
                 yield return new XElement(DatexIINS.LocationReferencing + "_networkLocationExtension", NetworkLocationExtension);

@@ -216,9 +216,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                    new XElement(DatexIINS.EnergyInfrastructure + "numberOfRefillPoints",  NumberOfRefillPoints),
 
-                   RefillPointByReference.Any()
-                       ? throw new NotImplementedException("Serializing a VersionedReference is not implemented yet!")
-                       : null,
+                   RefillPointByReference.Select(refillPointByReference =>
+                       refillPointByReference.ToXML(DatexIINS.EnergyInfrastructure + "refillPointByReference")),
 
                    UserInterfaceLanguages.Select(language => new XElement(DatexIINS.EnergyInfrastructure + "userInterfaceLanguage", language.AsText())),
 

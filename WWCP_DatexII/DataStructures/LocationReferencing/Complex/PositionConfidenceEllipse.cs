@@ -89,6 +89,49 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "positionConfidenceEllipse",
+
+                   SemiMajorAxisLength.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "semiMajorAxisLength",             SemiMajorAxisLength.Value.m)
+                       : null,
+
+                   SemiMajorAxisLengthCodedError.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "semiMajorAxisLengthCodedError",   SemiMajorAxisLengthCodedError.Value.ToString())
+                       : null,
+
+                   SemiMinorAxisLength.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "semiMinorAxisLength",             SemiMinorAxisLength.Value.m)
+                       : null,
+
+                   SemiMinorAxisLengthCodedError.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "semiMinorAxisLengthCodedError",   SemiMinorAxisLengthCodedError.Value.ToString())
+                       : null,
+
+                   SemiMajorAxisOrientation.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "semiMajorAxisOrientation",        SemiMajorAxisOrientation.Value.Value)
+                       : null,
+
+                   SemiMajorAxisOrientationError.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "semiMajorAxisOrientationError",   SemiMajorAxisOrientationError.Value)
+                       : null,
+
+                   PositionConfidenceEllipseExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_positionConfidenceEllipseExtension", PositionConfidenceEllipseExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

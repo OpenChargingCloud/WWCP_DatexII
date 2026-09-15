@@ -58,6 +58,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "supplementaryPositionalDescription",
+
+                   LocationPrecision.HasValue
+                       ? new XAttribute("locationPrecision",   LocationPrecision.Value)
+                       : null,
+
+                   LocationDescription is not null
+                       ? LocationDescription.ToXML(DatexIINS.LocationReferencing + "locationDescription")
+                       : null,
+
+                   SupplementaryPositionalDescriptionExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_supplementaryPositionalDescriptionExtension", SupplementaryPositionalDescriptionExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

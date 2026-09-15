@@ -63,6 +63,29 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "publicHoliday",
+
+                   base.ToXML().Elements(),
+
+                   PublicHolidayName.ToXML(DatexIINS.Common + "publicHolidayName"),
+
+                   PublicHolidayExtension is not null
+                       ? new XElement(DatexIINS.Common + "_publicHolidayExtension", PublicHolidayExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

@@ -67,6 +67,35 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public virtual XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "gmlLineString",
+
+                   SrsDimension.HasValue
+                       ? new XAttribute("srsDimension",   SrsDimension.Value)
+                       : null,
+
+                   SrsName is not null && SrsName.Length > 0
+                       ? new XAttribute("srsName",        SrsName)
+                       : null,
+
+                   new XElement(DatexIINS.LocationReferencing + "posList",      PosList.Value),
+
+                   GMLLineStringExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_gmlLineStringExtension", GMLLineStringExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

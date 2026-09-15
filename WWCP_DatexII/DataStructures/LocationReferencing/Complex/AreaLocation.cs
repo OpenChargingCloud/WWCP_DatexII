@@ -111,7 +111,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                        : null,
 
                    GMLMultiPolygon is not null
-                       ? throw new NotImplementedException("Serializing a GmlMultiPolygon is not implemented yet!")
+                       ? GMLMultiPolygon.ToXML(DatexIINS.LocationReferencing + "gmlMultiPolygon")
                        : null,
 
                    OpenLRAreaLocationReference is not null

@@ -98,7 +98,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                    Function.Select(function => function.ToXML(DatexIINS.Facilities + "function")),
 
                    LocationReference is not null
-                       ? throw new NotImplementedException("Serializing a LocationReference is not implemented yet!")
+                       ? LocationReference.ToXML(DatexIINS.Facilities + "locationReference")
                        : null,
 
                    ContactInformation.Select(contactInformation => contactInformation.ToXML(DatexIINS.Facilities + "contactInformation")),

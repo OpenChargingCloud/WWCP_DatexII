@@ -204,10 +204,24 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
                                                                                                                                               ),
                                                                                                               LocationReference:              new PointLocation(
+                                                                                                                                                  ExternalReferencing:     [
+                                                                                                      new ExternalReferencing(
+                                                                                                          ExternalLocationCode:        "AC-0001",
+                                                                                                          ExternalReferencingSystem:   "GraphDefined"
+                                                                                                      )
+                                                                                                  ],
                                                                                                                                                   PointByCoordinates:      new PointByCoordinates(
                                                                                                                                                                                new PointCoordinates(
-                                                                                                                                                                                   Latitude:    50.779599,
-                                                                                                                                                                                   Longitude:    6.104507
+                                                                                                                                                                                   Latitude:            50.779599,
+                                                                                                                                                                                   Longitude:            6.104507,
+                                                                                                                                                                                   HeightCoordinates:   [
+                                                                                                                                                  new HeightCoordinate(
+                                                                                                                                                      HeightValue:                Meter.Parse("173"),
+                                                                                                                                                      VerticalPositionAccuracy:   new PositionAccuracy(
+                                                                                                                                                                                      AccuracyPercentile50:   1.5
+                                                                                                                                                                                  )
+                                                                                                                                                  )
+                                                                                                                                              ]
                                                                                                                                                                                )
                                                                                                                                                                            ),
                                                                                                                                                   CoordinatesForDisplay:   new PointCoordinates(

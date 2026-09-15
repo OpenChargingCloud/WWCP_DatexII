@@ -59,6 +59,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationExtension + "nutsArea",
+
+                   new XElement(DatexIINS.LocationExtension + "nutsCodeType",   NutsCodeType.ToString()),
+                   new XElement(DatexIINS.LocationExtension + "nutsCode",       NutsCode.    ToString()),
+
+                   NutsAreaExtension is not null
+                       ? new XElement(DatexIINS.LocationExtension + "_nutsAreaExtension", NutsAreaExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

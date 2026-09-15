@@ -62,6 +62,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "calendarWeekWithinMonth",
+
+                   // The day and month particles come from DayWeekMonth, in its order.
+                   base.ToXML().Elements(),
+
+                   ApplicableCalendarWeekWithinMonth.Select(applicableCalendarWeekWithinMonth =>
+                       new XElement(DatexIINS.Common + "applicableCalenderWeekWithinMonth", applicableCalendarWeekWithinMonth.ToString())),
+
+                   CalendarWeekWithinMonthExtension is not null
+                       ? new XElement(DatexIINS.Common + "_calendarWeekWithinMonthExtension", CalendarWeekWithinMonthExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

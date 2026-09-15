@@ -83,8 +83,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
             foreach (var element in base.ToXMLElements())
                 yield return element;
 
-            if (ExternalReferencing.Any())
-                throw new NotImplementedException("Serializing ExternalReferencing is not implemented yet!");
+            foreach (var externalReferencing in ExternalReferencing)
+                yield return externalReferencing.ToXML(DatexIINS.LocationReferencing + "externalReferencing");
 
             if (CoordinatesForDisplay is not null)
                 yield return CoordinatesForDisplay.ToXML(DatexIINS.LocationReferencing + "coordinatesForDisplay");

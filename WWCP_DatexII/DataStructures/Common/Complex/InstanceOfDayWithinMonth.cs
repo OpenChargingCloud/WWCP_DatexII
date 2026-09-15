@@ -59,6 +59,30 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "instanceOfDayWithinMonth",
+
+                   base.ToXML().Elements(),
+
+                   ApplicableInstanceOfDayWithinMonth.Select(applicableInstanceOfDayWithinMonth =>
+                       new XElement(DatexIINS.Common + "applicableInstanceOfDayWithinMonth", applicableInstanceOfDayWithinMonth.ToString())),
+
+                   InstanceOfDayWithinMonthExtension is not null
+                       ? new XElement(DatexIINS.Common + "_instanceOfDayWithinMonthExtension", InstanceOfDayWithinMonthExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

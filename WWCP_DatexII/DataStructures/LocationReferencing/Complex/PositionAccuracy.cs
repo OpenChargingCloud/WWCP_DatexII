@@ -63,6 +63,37 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "positionAccuracy",
+
+                   AccuracyPercentile50.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "accuracyPercentile50",   AccuracyPercentile50.Value)
+                       : null,
+
+                   AccuracyPercentile75.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "accuracyPercentile75",   AccuracyPercentile75.Value)
+                       : null,
+
+                   AccuracyPercentile95.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "accuracyPercentile95",   AccuracyPercentile95.Value)
+                       : null,
+
+                   PositionAccuracyExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_positionAccuracyExtension", PositionAccuracyExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

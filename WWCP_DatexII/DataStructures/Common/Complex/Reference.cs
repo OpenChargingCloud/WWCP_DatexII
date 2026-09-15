@@ -17,6 +17,8 @@
 
 #region Usings
 
+using System.Xml.Linq;
+
 using System.Xml.Serialization;
 
 #endregion
@@ -38,6 +40,23 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlAttribute("id")]
         public String  Id    { get; } = Id;
+
+        #endregion
+
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public virtual XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "reference",
+
+                   new XAttribute("id",   Id)
+
+               );
 
         #endregion
 

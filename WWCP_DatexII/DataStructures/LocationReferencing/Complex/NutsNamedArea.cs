@@ -73,6 +73,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "namedArea",
+
+                   new XAttribute(DatexIINS.XSI + "type",   "loc:NutsNamedArea"),
+
+                   base.ToXML().Elements(),
+
+                   new XElement(DatexIINS.LocationReferencing + "nutsCodeType",   NutsCodeType.ToString()),
+                   new XElement(DatexIINS.LocationReferencing + "nutsCode",       NutsCode.    ToString()),
+
+                   NutsNamedAreaExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_nutsNamedAreaExtension", NutsNamedAreaExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }
