@@ -59,6 +59,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "pointByCoordinates",
+
+                   Bearing.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "bearing",   Bearing.Value.Value)
+                       : null,
+
+                   PointCoordinates.ToXML(DatexIINS.LocationReferencing + "pointCoordinates"),
+
+                   PointByCoordinatesExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_pointByCoordinatesExtension", PointByCoordinatesExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

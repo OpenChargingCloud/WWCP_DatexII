@@ -46,6 +46,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The location reference part, followed by what a location group adds.
+        /// </summary>
+        protected override IEnumerable<Object?> ToXMLElements()
+        {
+
+            foreach (var element in base.ToXMLElements())
+                yield return element;
+
+            if (LocationGroupExtension is not null)
+                yield return new XElement(DatexIINS.LocationReferencing + "_locationGroupExtension", LocationGroupExtension);
+
+        }
+
+        #endregion
+
     }
 
 }

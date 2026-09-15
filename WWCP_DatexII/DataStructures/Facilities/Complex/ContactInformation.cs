@@ -72,6 +72,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "contactInformation",
+
+                   Languages.Select(language => new XElement(DatexIINS.Facilities + "language",  language.AsText())),
+
+                   TelephoneNumber is not null && TelephoneNumber.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "telephoneNumber",                  TelephoneNumber)
+                       : null,
+
+                   FaxNumber is not null && FaxNumber.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "faxNumber",                        FaxNumber)
+                       : null,
+
+                   EMail is not null && EMail.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "eMail",                            EMail)
+                       : null,
+
+                   ContactInformationExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_contactInformationExtension",     ContactInformationExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

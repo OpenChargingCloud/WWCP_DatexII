@@ -52,6 +52,35 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The part every organisation variant shares, in schema order.
+        /// </summary>
+        protected virtual IEnumerable<Object?> ToXMLElements()
+        {
+
+            if (GeneralTimeValidity is not null)
+                yield return GeneralTimeValidity.ToXML(DatexIINS.Facilities + "generalTimeValidity");
+
+            if (OrganisationExtension is not null)
+                yield return new XElement(DatexIINS.Facilities + "_organisationExtension", OrganisationExtension);
+
+        }
+
+        #endregion
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public abstract XElement ToXML(XName? XMLName = null);
+
+        #endregion
+
     }
 
 }

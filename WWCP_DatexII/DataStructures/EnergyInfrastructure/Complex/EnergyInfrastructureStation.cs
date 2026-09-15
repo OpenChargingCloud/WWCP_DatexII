@@ -223,16 +223,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    UserInterfaceLanguages.Select(language => new XElement(DatexIINS.EnergyInfrastructure + "userInterfaceLanguage", language.AsText())),
 
                    EnergyDistributor is not null
-                       ? throw new NotImplementedException("Serializing an Organisation is not implemented yet!")
+                       ? EnergyDistributor.ToXML(DatexIINS.EnergyInfrastructure + "energyDistributor")
                        : null,
 
-                   MobilityServiceProviders.Any()
-                       ? throw new NotImplementedException("Serializing an Organisation is not implemented yet!")
-                       : null,
-
-                   RoamingPlatforms.Any()
-                       ? throw new NotImplementedException("Serializing an Organisation is not implemented yet!")
-                       : null,
+                   MobilityServiceProviders.Select(mobilityServiceProvider => mobilityServiceProvider.ToXML(DatexIINS.EnergyInfrastructure + "mobilityServiceProvider")),
+                   RoamingPlatforms.        Select(roamingPlatform         => roamingPlatform.        ToXML(DatexIINS.EnergyInfrastructure + "roamingPlatform")),
 
                    ServiceTypes.Select(serviceType => serviceType.ToXML(DatexIINS.EnergyInfrastructure + "serviceType")),
 

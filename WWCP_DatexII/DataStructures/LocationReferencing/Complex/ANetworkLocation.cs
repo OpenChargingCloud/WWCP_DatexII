@@ -65,6 +65,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The location part, followed by what a network location adds to it.
+        /// </summary>
+        protected override IEnumerable<Object?> ToXMLElements()
+        {
+
+            foreach (var element in base.ToXMLElements())
+                yield return element;
+
+            if (SupplementaryPositionalDescription is not null)
+                throw new NotImplementedException("Serializing a SupplementaryPositionalDescription is not implemented yet!");
+
+            if (NetworkLocationExtension is not null)
+                yield return new XElement(DatexIINS.LocationReferencing + "_networkLocationExtension", NetworkLocationExtension);
+
+        }
+
+        #endregion
+
     }
 
 }

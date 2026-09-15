@@ -71,6 +71,34 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The location reference part, followed by what a location adds to it.
+        /// </summary>
+        protected override IEnumerable<Object?> ToXMLElements()
+        {
+
+            foreach (var element in base.ToXMLElements())
+                yield return element;
+
+            if (ExternalReferencing.Any())
+                throw new NotImplementedException("Serializing ExternalReferencing is not implemented yet!");
+
+            if (CoordinatesForDisplay is not null)
+                yield return CoordinatesForDisplay.ToXML(DatexIINS.LocationReferencing + "coordinatesForDisplay");
+
+            if (FacilityLocation is not null)
+                yield return FacilityLocation.ToXML(DatexIINS.LocationReferencing + "facilityLocation");
+
+            if (LocationExtension is not null)
+                yield return new XElement(DatexIINS.LocationReferencing + "_locationExtension", LocationExtension);
+
+        }
+
+        #endregion
+
     }
 
 }

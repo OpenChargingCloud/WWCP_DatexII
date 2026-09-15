@@ -240,25 +240,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 yield return OperatingHours.ToXML(DatexIINS.Facilities + "operatingHours");
 
             if (LocationReference is not null)
-                throw new NotImplementedException("Serializing a LocationReference is not implemented yet!");
+                yield return LocationReference.ToXML(DatexIINS.Facilities + "locationReference");
 
             if (Owner is not null)
-                throw new NotImplementedException("Serializing an Organisation is not implemented yet!");
+                yield return Owner.   ToXML(DatexIINS.Facilities + "owner");
 
             if (Operator is not null)
-                throw new NotImplementedException("Serializing an Organisation is not implemented yet!");
+                yield return Operator.ToXML(DatexIINS.Facilities + "operator");
 
             if (Helpdesk is not null)
-                throw new NotImplementedException("Serializing an Organisation is not implemented yet!");
+                yield return Helpdesk.ToXML(DatexIINS.Facilities + "helpdesk");
 
             if (ApplicableForVehicles.Any())
                 throw new NotImplementedException("Serializing VehicleCharacteristics is not implemented yet!");
 
             if (Dimension is not null)
-                throw new NotImplementedException("Serializing a Dimension is not implemented yet!");
+                yield return Dimension.ToXML(DatexIINS.Facilities + "dimension");
 
             if (Amenities is not null)
-                throw new NotImplementedException("Serializing Amenities is not implemented yet!");
+                yield return Amenities.ToXML(DatexIINS.Facilities + "amenities");
 
             if (FacilityObjectExtension is not null)
                 yield return new XElement(DatexIINS.Facilities + "_facilityObjectExtension", FacilityObjectExtension);

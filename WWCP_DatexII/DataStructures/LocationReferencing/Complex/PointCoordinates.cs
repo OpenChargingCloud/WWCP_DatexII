@@ -78,6 +78,42 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "pointCoordinates",
+
+                   // Handed over as Double so that XElement formats through XmlConvert
+                   // rather than through the current culture.
+                   new XElement(DatexIINS.LocationReferencing + "latitude",    Latitude),
+                   new XElement(DatexIINS.LocationReferencing + "longitude",   Longitude),
+
+                   HeightCoordinates.Any()
+                       ? throw new NotImplementedException("Serializing a HeightCoordinate is not implemented yet!")
+                       : null,
+
+                   PositionConfidenceEllipse is not null
+                       ? throw new NotImplementedException("Serializing a PositionConfidenceEllipse is not implemented yet!")
+                       : null,
+
+                   HorizontalPositionAccuracy is not null
+                       ? throw new NotImplementedException("Serializing a PositionAccuracy is not implemented yet!")
+                       : null,
+
+                   PointCoordinatesExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_pointCoordinatesExtension", PointCoordinatesExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

@@ -74,6 +74,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationExtension + "address",
+
+                   Postcode is not null && Postcode.Length > 0
+                       ? new XElement(DatexIINS.LocationExtension + "postcode",      Postcode)
+                       : null,
+
+                   City is not null
+                       ? City.ToXML(DatexIINS.LocationExtension + "city")
+                       : null,
+
+                   CountryCode is not null
+                       ? new XElement(DatexIINS.LocationExtension + "countryCode",   CountryCode.Alpha2Code)
+                       : null,
+
+                   AddressLines.Select(addressLine => addressLine.ToXML(DatexIINS.LocationExtension + "addressLine")),
+
+                   AddressExtension is not null
+                       ? new XElement(DatexIINS.LocationExtension + "_addressExtension", AddressExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

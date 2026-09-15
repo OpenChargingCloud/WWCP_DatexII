@@ -145,6 +145,35 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         #endregion
 
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "organisation",
+
+                   new XAttribute(DatexIINS.XSI + "type",   "fac:OrganisationByReference"),
+
+                   ToXMLElements(),
+
+                   OrganisationReference.ToXML(),
+
+                   OrganisationTableReference is not null
+                       ? OrganisationTableReference.ToXML()
+                       : null,
+
+                   OrganisationByReferenceExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_organisationByReferenceExtension", OrganisationByReferenceExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

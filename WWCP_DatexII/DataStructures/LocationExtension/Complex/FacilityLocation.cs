@@ -63,6 +63,37 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.LocationReferencing + "facilityLocation",
+
+                   TimeZone.HasValue
+                       ? new XElement(DatexIINS.LocationExtension + "timeZone",   TimeZone.Value.ToString())
+                       : null,
+
+                   Address is not null
+                       ? Address.ToXML(DatexIINS.LocationExtension + "address")
+                       : null,
+
+                   NutsAreas.Any()
+                       ? throw new NotImplementedException("Serializing a NutsArea is not implemented yet!")
+                       : null,
+
+                   FacilityLocationExtension is not null
+                       ? new XElement(DatexIINS.LocationExtension + "_facilityLocationExtension", FacilityLocationExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

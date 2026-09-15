@@ -78,6 +78,38 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "locationReference",
+
+                   // The schema declares locationReference with the abstract type.
+                   new XAttribute(DatexIINS.XSI + "type",   "loc:PointLocation"),
+
+                   ToXMLElements(),
+
+                   PointByCoordinates is not null
+                       ? PointByCoordinates.ToXML(DatexIINS.LocationReferencing + "pointByCoordinates")
+                       : null,
+
+                   OpenLRPointLocationReference is not null
+                       ? throw new NotImplementedException("Serializing an OpenLR point location reference is not implemented yet!")
+                       : null,
+
+                   PointLocationExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_pointLocationExtension", PointLocationExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

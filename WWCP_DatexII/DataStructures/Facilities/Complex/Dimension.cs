@@ -73,6 +73,41 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "dimension",
+
+                   Length.HasValue
+                       ? new XElement(DatexIINS.Facilities + "length",       Length.    Value.m)
+                       : null,
+
+                   Width.HasValue
+                       ? new XElement(DatexIINS.Facilities + "width",        Width.     Value.m)
+                       : null,
+
+                   Height.HasValue
+                       ? new XElement(DatexIINS.Facilities + "height",       Height.    Value.m)
+                       : null,
+
+                   UsableArea.HasValue
+                       ? new XElement(DatexIINS.Facilities + "usableArea",   UsableArea.Value.Value)
+                       : null,
+
+                   DimensionExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_dimensionExtension", DimensionExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

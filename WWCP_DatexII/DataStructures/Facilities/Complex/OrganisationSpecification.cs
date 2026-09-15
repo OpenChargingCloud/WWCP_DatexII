@@ -20,6 +20,7 @@
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
+using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
@@ -201,6 +202,102 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_organisationSpecificationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                        OrganisationSpecificationExtension    { get; } = OrganisationSpecificationExtension;
+
+        #endregion
+
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "organisation",
+
+                   new XAttribute(DatexIINS.XSI + "type",   "fac:OrganisationSpecification"),
+                   new XAttribute("id",                      Id),
+                   new XAttribute("version",                 Version),
+
+                   ToXMLElements(),
+
+                   OperatorId is not null && OperatorId.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "operatorId",                  OperatorId)
+                       : null,
+
+                   ProviderId is not null && ProviderId.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "providerId",                  ProviderId)
+                       : null,
+
+                   OperatorIdBNetzA is not null && OperatorIdBNetzA.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "operatorIdBnetzA",            OperatorIdBNetzA)
+                       : null,
+
+                   LastUpdated.HasValue
+                       ? new XElement(DatexIINS.Facilities + "lastUpdated",                 LastUpdated.Value.ToISO8601())
+                       : null,
+
+                   Name.ToXML(DatexIINS.Facilities + "name"),
+
+                   ExternalCode is not null && ExternalCode.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "externalCode",                ExternalCode)
+                       : null,
+
+                   LegalName is not null
+                       ? LegalName.ToXML(DatexIINS.Facilities + "legalName")
+                       : null,
+
+                   Description is not null
+                       ? Description.ToXML(DatexIINS.Facilities + "description")
+                       : null,
+
+                   LinkToGeneralInformation.HasValue
+                       ? new XElement(DatexIINS.Facilities + "linkToGeneralInformation",    LinkToGeneralInformation.Value.ToString())
+                       : null,
+
+                   LinkToLogo.HasValue
+                       ? new XElement(DatexIINS.Facilities + "linkToLogo",                  LinkToLogo.              Value.ToString())
+                       : null,
+
+                   LinkToWebform.HasValue
+                       ? new XElement(DatexIINS.Facilities + "linkToWebform",               LinkToWebform.           Value.ToString())
+                       : null,
+
+                   Available24hours.HasValue
+                       ? new XElement(DatexIINS.Facilities + "available24hours",            Available24hours.   Value)
+                       : null,
+
+                   Responsibility.Select(responsibility => responsibility.ToXML(DatexIINS.Facilities + "responsibility")),
+
+                   PublishingAgreement.HasValue
+                       ? new XElement(DatexIINS.Facilities + "publishingAgreement",         PublishingAgreement.Value)
+                       : null,
+
+                   Type.HasValue
+                       ? new XElement(DatexIINS.Facilities + "type",                        Type.Value.ToString())
+                       : null,
+
+                   NationalOrganisationNumber is not null && NationalOrganisationNumber.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "nationalOrganisationNumber",  NationalOrganisationNumber)
+                       : null,
+
+                   NationalRegister is not null && NationalRegister.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "nationalRegister",            NationalRegister)
+                       : null,
+
+                   VATIdentificationNumber is not null && VATIdentificationNumber.Length > 0
+                       ? new XElement(DatexIINS.Facilities + "vatIdentificationNumber",     VATIdentificationNumber)
+                       : null,
+
+                   OrganisationUnits.Select(organisationUnit => organisationUnit.ToXML(DatexIINS.Facilities + "organisationUnit")),
+                   SubOrganisations. Select(subOrganisation  => subOrganisation. ToXML(DatexIINS.Facilities + "subOrganisation")),
+
+                   OrganisationSpecificationExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_organisationSpecificationExtension", OrganisationSpecificationExtension)
+                       : null
+
+               );
 
         #endregion
 

@@ -70,6 +70,41 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "amenities",
+
+                   Illuminated.HasValue
+                       ? new XElement(DatexIINS.Facilities + "illuminated",                          Illuminated.                       Value)
+                       : null,
+
+                   Roofed.HasValue
+                       ? new XElement(DatexIINS.Facilities + "roofed",                               Roofed.                            Value)
+                       : null,
+
+                   IlluminatedRechargingParkingNearby.HasValue
+                       ? new XElement(DatexIINS.Facilities + "illuminatedRechargingParkingNearby",   IlluminatedRechargingParkingNearby.Value)
+                       : null,
+
+                   RoofedRechargingParkingNearby.HasValue
+                       ? new XElement(DatexIINS.Facilities + "roofedRechargingParkingNearby",        RoofedRechargingParkingNearby.     Value)
+                       : null,
+
+                   AmenitiesExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_amenitiesExtension", AmenitiesExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

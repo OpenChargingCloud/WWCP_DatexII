@@ -203,13 +203,91 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                                                         )
 
                                                                                                                                               ),
-                                                                                                              LocationReference:              null,
-                                                                                                              Owner:                          null,
-                                                                                                              Operator:                       null,
+                                                                                                              LocationReference:              new PointLocation(
+                                                                                                                                                  PointByCoordinates:      new PointByCoordinates(
+                                                                                                                                                                               new PointCoordinates(
+                                                                                                                                                                                   Latitude:    50.779599,
+                                                                                                                                                                                   Longitude:    6.104507
+                                                                                                                                                                               )
+                                                                                                                                                                           ),
+                                                                                                                                                  CoordinatesForDisplay:   new PointCoordinates(
+                                                                                                                                                                               Latitude:    50.779599,
+                                                                                                                                                                               Longitude:    6.104507
+                                                                                                                                                                           ),
+                                                                                                                                                  FacilityLocation:        new FacilityLocation(
+                                                                                                                                                                               Address:   new cloud.charging.open.protocols.DatexII.v3.LocationExtension.Address(
+                                                                                                                                                                                              Postcode:       "52078",
+                                                                                                                                                                                              City:           new MultilingualString(
+                                                                                                                                                                                                                  new MultilingualStringValue(
+                                                                                                                                                                                                                      Languages.de,
+                                                                                                                                                                                                                      "Aachen"
+                                                                                                                                                                                                                  )
+                                                                                                                                                                                                              ),
+                                                                                                                                                                                              CountryCode:    Country.Germany,
+                                                                                                                                                                                              AddressLines:   [
+                                                                                                                                                                                                                  new AddressLine(
+                                                                                                                                                                                                                      Order:   0,
+                                                                                                                                                                                                                      Text:    new MultilingualString(
+                                                                                                                                                                                                                                   new MultilingualStringValue(
+                                                                                                                                                                                                                                       Languages.de,
+                                                                                                                                                                                                                                       "Hauptstraße 1"
+                                                                                                                                                                                                                                   )
+                                                                                                                                                                                                                               ),
+                                                                                                                                                                                                                      Type:    AddressLineType.Street
+                                                                                                                                                                                                                  )
+                                                                                                                                                                                                              ]
+                                                                                                                                                                                          )
+                                                                                                                                                                           )
+                                                                                                                                              ),
+                                                                                                              Owner:                          new OrganisationSpecification(
+
+                                                                                                                                                  Id:                         "1",
+                                                                                                                                                  Version:                    "1",
+                                                                                                                                                  Name:                       new MultilingualString(
+                                                                                                                                                                                  new MultilingualStringValue(
+                                                                                                                                                                                      Languages.de,
+                                                                                                                                                                                      "GraphDefined GmbH"
+                                                                                                                                                                                  )
+                                                                                                                                                                              ),
+                                                                                                                                                  OperatorId:                 "DE*GEF",
+                                                                                                                                                  LastUpdated:                DateTime.UtcNow,
+                                                                                                                                                  Available24hours:           true,
+                                                                                                                                                  PublishingAgreement:        true,
+                                                                                                                                                  LinkToGeneralInformation:   URL.Parse("https://example.org/about"),
+
+                                                                                                                                                  OrganisationUnits:          [
+                                                                                                                                                                                  new OrganisationUnit(
+                                                                                                                                                                                      Name:                 new MultilingualString(
+                                                                                                                                                                                                                new MultilingualStringValue(
+                                                                                                                                                                                                                    Languages.de,
+                                                                                                                                                                                                                    "Kundendienst"
+                                                                                                                                                                                                                )
+                                                                                                                                                                                                            ),
+                                                                                                                                                                                      ContactInformation:   [
+                                                                                                                                                                                                                new ContactInformation(
+                                                                                                                                                                                                                    Languages:         [ Languages.de ],
+                                                                                                                                                                                                                    TelephoneNumber:   "+49 241 1234567",
+                                                                                                                                                                                                                    EMail:             "info@example.org"
+                                                                                                                                                                                                                )
+                                                                                                                                                                                                            ],
+                                                                                                                                                                                      OperatingHours:       new OpenAllHours()
+                                                                                                                                                                                  )
+                                                                                                                                                                              ]
+
+                                                                                                                                              ),
+
+                                                                                                              Operator:                       new UnknownOrganisation(),
                                                                                                               Helpdesk:                       null,
                                                                                                               ApplicableForVehicles:          null,
-                                                                                                              Dimension:                      null,
-                                                                                                              Amenities:                      null,
+                                                                                                              Dimension:                      new Dimension(
+                                                                                                                                                  Length:       Meter.Parse("12"),
+                                                                                                                                                  Width:        Meter.Parse("5"),
+                                                                                                                                                  Height:       Meter.Parse("4")
+                                                                                                                                              ),
+                                                                                                              Amenities:                      new Amenities(
+                                                                                                                                                  Illuminated:   true,
+                                                                                                                                                  Roofed:        true
+                                                                                                                                              ),
 
                                                                                                               SupplementalFacilities:         null,
                                                                                                               DedicatedParkingSpaces:         null,

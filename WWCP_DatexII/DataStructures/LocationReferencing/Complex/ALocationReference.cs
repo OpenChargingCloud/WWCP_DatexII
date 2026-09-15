@@ -44,6 +44,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The part every location reference shares.
+        /// </summary>
+        protected virtual IEnumerable<Object?> ToXMLElements()
+        {
+
+            if (LocationReferenceExtension is not null)
+                yield return new XElement(DatexIINS.LocationReferencing + "_locationReferenceExtension", LocationReferenceExtension);
+
+        }
+
+        #endregion
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public abstract XElement ToXML(XName? XMLName = null);
+
+        #endregion
+
     }
 
 }

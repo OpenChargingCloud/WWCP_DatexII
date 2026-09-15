@@ -87,6 +87,45 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "locationReference",
+
+                   new XAttribute(DatexIINS.XSI + "type",   "loc:AreaLocation"),
+
+                   ToXMLElements(),
+
+                   AreasAtWhichApplicable.HasValue
+                       ? new XElement(DatexIINS.LocationReferencing + "areasAtWhichApplicable",   AreasAtWhichApplicable.Value.ToString())
+                       : null,
+
+                   NamedArea is not null
+                       ? NamedArea.ToXML(DatexIINS.LocationReferencing + "namedArea")
+                       : null,
+
+                   GMLMultiPolygon is not null
+                       ? throw new NotImplementedException("Serializing a GmlMultiPolygon is not implemented yet!")
+                       : null,
+
+                   OpenLRAreaLocationReference is not null
+                       ? throw new NotImplementedException("Serializing an OpenLR area location reference is not implemented yet!")
+                       : null,
+
+                   AreaLocationExtension is not null
+                       ? new XElement(DatexIINS.LocationReferencing + "_areaLocationExtension", AreaLocationExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

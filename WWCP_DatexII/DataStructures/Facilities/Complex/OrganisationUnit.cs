@@ -80,6 +80,41 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "organisationUnit",
+
+                   Name is not null
+                       ? Name.ToXML(DatexIINS.Facilities + "name")
+                       : null,
+
+                   Function.Select(function => function.ToXML(DatexIINS.Facilities + "function")),
+
+                   LocationReference is not null
+                       ? throw new NotImplementedException("Serializing a LocationReference is not implemented yet!")
+                       : null,
+
+                   ContactInformation.Select(contactInformation => contactInformation.ToXML(DatexIINS.Facilities + "contactInformation")),
+
+                   OperatingHours is not null
+                       ? OperatingHours.ToXML(DatexIINS.Facilities + "operatingHours")
+                       : null,
+
+                   OrganisationUnitExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_organisationUnitExtension", OrganisationUnitExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }
