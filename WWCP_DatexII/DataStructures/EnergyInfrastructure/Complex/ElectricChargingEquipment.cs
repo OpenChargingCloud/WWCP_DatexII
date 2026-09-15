@@ -117,6 +117,33 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "supplementalFacility",
+
+                   new XAttribute(DatexIINS.XSI + "type",   "egi:ElectricChargingEquipment"),
+                   new XAttribute("id",                      Id),
+                   new XAttribute("version",                 Version),
+
+                   ToXMLElements(),
+
+                   ElectricChargingPoint.ToXML(DatexIINS.EnergyInfrastructure + "electricChargingPoint"),
+
+                   ElectricChargingEquipmentExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_electricChargingEquipmentExtension", ElectricChargingEquipmentExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

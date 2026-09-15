@@ -101,6 +101,46 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "electricEnergy",
+
+                   EnergyProductName is not null
+                       ? EnergyProductName.ToXML(DatexIINS.EnergyInfrastructure + "energyProductName")
+                       : null,
+
+                   IsGreenEnergy.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "isGreenEnergy",         IsGreenEnergy.      Value)
+                       : null,
+
+                   CarbonDioxideImpact.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "carbonDioxideImpact",   CarbonDioxideImpact.Value)
+                       : null,
+
+                   NuclearWasteImpact.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "nuclearWasteImpact",    NuclearWasteImpact. Value)
+                       : null,
+
+                   EnergyRateByReference.     Select(energyRateReference      => energyRateReference.ToXML()),
+                   ElectricEnergySourceRatios.Select(electricEnergySourceRatio => electricEnergySourceRatio.ToXML(DatexIINS.EnergyInfrastructure + "electricEnergySourceRatio")),
+                   MobilityServiceProviders.  Select(mobilityServiceProvider   => mobilityServiceProvider.  ToXML(DatexIINS.EnergyInfrastructure + "mobilityServiceProvider")),
+                   EnergyRates.               Select(energyRate                => energyRate.               ToXML(DatexIINS.EnergyInfrastructure + "energyRate")),
+
+                   ElectricEnergyExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_electricEnergyExtension", ElectricEnergyExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

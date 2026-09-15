@@ -80,6 +80,37 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "paymentMethod",
+
+                   PaymentMeans.     Select(paymentMeans      => new XElement(DatexIINS.Facilities + "paymentMeans", paymentMeans.ToString())),
+                   PaymentMode.      Select(paymentMode       => new XElement(DatexIINS.Facilities + "paymentMode",  paymentMode. ToString())),
+                   OtherPaymentMeans.Select(otherPaymentMeans => otherPaymentMeans.ToXML(DatexIINS.Facilities + "otherPaymentMeans")),
+
+                   BrandsAcceptedText.Any()
+                       ? throw new NotImplementedException("Serializing BrandsAcceptedText is not implemented yet!")
+                       : null,
+
+                   BrandsAcceptedCodeList.Any()
+                       ? throw new NotImplementedException("Serializing a BrandsAcceptedCodeList is not implemented yet!")
+                       : null,
+
+                   PaymentMethodExtension is not null
+                       ? new XElement(DatexIINS.Facilities + "_paymentMethodExtension", PaymentMethodExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

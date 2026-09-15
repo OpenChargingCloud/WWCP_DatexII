@@ -233,9 +233,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                    RefillPoints.Select(refillPoint => refillPoint.ToXML(DatexIINS.EnergyInfrastructure + "refillPoint")),
 
-                   ElectricEnergy.Any()
-                       ? throw new NotImplementedException("Serializing ElectricEnergy is not implemented yet!")
-                       : null,
+                   ElectricEnergy.Select(electricEnergy => electricEnergy.ToXML(DatexIINS.EnergyInfrastructure + "electricEnergy")),
 
                    EnergyInfrastructureStationExtension is not null
                        ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationExtension", EnergyInfrastructureStationExtension)

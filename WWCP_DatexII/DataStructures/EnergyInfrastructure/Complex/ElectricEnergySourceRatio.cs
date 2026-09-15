@@ -65,6 +65,36 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "electricEnergySourceRatio",
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "energySource",              EnergySource.ToString()),
+
+                   OtherEnergySource is not null && OtherEnergySource.Length > 0
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "otherEnergySource",   OtherEnergySource)
+                       : null,
+
+                   // PercentageValue is a DataValue wrapper, not a bare number: the
+                   // figure sits in a common percentage child.
+                   new XElement(DatexIINS.EnergyInfrastructure + "sourceRatioValue",
+                       new XElement(DatexIINS.Common + "percentage",   SourceRatioValue.Value)),
+
+                   ElectricEnergySourceRatioExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_electricEnergySourceRatioExtension", ElectricEnergySourceRatioExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

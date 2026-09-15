@@ -290,7 +290,14 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                               ),
 
                                                                                                               SupplementalFacilities:         null,
-                                                                                                              DedicatedParkingSpaces:         null,
+                                                                                                              DedicatedParkingSpaces:         [
+                                                                                                new DedicatedParkingSpaces(
+                                                                                                    Id:               "1",
+                                                                                                    Version:          "1",
+                                                                                                    NumberOfSpaces:   4,
+                                                                                                    UserSpecific:     [ UserType.Customers ]
+                                                                                                )
+                                                                                            ],
 
                                                                                                               TypeOfSite:                     EnergyInfrastructureSiteType.OnStreet,
                                                                                                               Brand:                          new MultilingualString(
@@ -366,7 +373,26 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                                                                                                                            MaxPowerAtSocket:   Watt.ParseKW("22")
                                                                                                                                                                                                                                        )
 
-                                                                                                                                                                                                                                   ]
+                                                                                                                                                                                                                                   ],
+
+                                                                                                                       ElectricEnergy:            [
+                                                                                                                                                      new ElectricEnergy(
+                                                                                                                                                          EnergyProductName:            new MultilingualString(
+                                                                                                                                                                                            new MultilingualStringValue(
+                                                                                                                                                                                                Languages.de,
+                                                                                                                                                                                                "Naturstrom"
+                                                                                                                                                                                            )
+                                                                                                                                                                                        ),
+                                                                                                                                                          IsGreenEnergy:                true,
+                                                                                                                                                          CarbonDioxideImpact:          12.5,
+                                                                                                                                                          ElectricEnergySourceRatios:   [
+                                                                                                                                                                                            new ElectricEnergySourceRatio(
+                                                                                                                                                                                                EnergySource:       ElectricEnergySourceType.Wind,
+                                                                                                                                                                                                SourceRatioValue:   PercentageDouble.Parse(60)
+                                                                                                                                                                                            )
+                                                                                                                                                                                        ]
+                                                                                                                                                      )
+                                                                                                                                                  ]
 
                                                                                                                                                                                                     )
                                                                                                                                                                                                 ]

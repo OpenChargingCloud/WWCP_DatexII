@@ -109,6 +109,34 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Facilities + "dedicatedParkingSpaces",
+
+                   new XAttribute("id",        Id),
+                   new XAttribute("version",   Version),
+
+                   ToXMLElements(),
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "numberOfSpaces",   NumberOfSpaces),
+
+                   UserSpecific.Select(userSpecific => new XElement(DatexIINS.EnergyInfrastructure + "userSpecific", userSpecific.ToString())),
+
+                   DedicatedParkingSpacesExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_dedicatedParkingSpacesExtension", DedicatedParkingSpacesExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

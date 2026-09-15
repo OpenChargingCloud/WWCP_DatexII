@@ -227,9 +227,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                    Connector.Select(connector => connector.ToXML(DatexIINS.EnergyInfrastructure + "connector")),
 
-                   ElectricEnergy.Any()
-                       ? throw new NotImplementedException("Serializing ElectricEnergy is not implemented yet!")
-                       : null,
+                   ElectricEnergy.Select(electricEnergy => electricEnergy.ToXML(DatexIINS.EnergyInfrastructure + "electricEnergy")),
 
                    ElectricChargingPointExtension is not null
                        ? new XElement(DatexIINS.EnergyInfrastructure + "_electricChargingPointExtension", ElectricChargingPointExtension)

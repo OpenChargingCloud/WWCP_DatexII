@@ -215,6 +215,44 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         #endregion
 
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyPrice",
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "priceType",             PriceType.ToString()),
+                   new XElement(DatexIINS.EnergyInfrastructure + "value",                 Value.Value),
+
+                   TaxIncluded.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "taxIncluded",     TaxIncluded.Value)
+                       : null,
+
+                   TaxRate.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "taxRate",         TaxRate.    Value.Value)
+                       : null,
+
+                   AdditionalInformation is not null
+                       ? AdditionalInformation.ToXML(DatexIINS.EnergyInfrastructure + "additionalInformation")
+                       : null,
+
+                   OverallPeriod is not null
+                       ? OverallPeriod.ToXML(DatexIINS.EnergyInfrastructure + "overallPeriod")
+                       : null,
+
+                   EnergyPriceExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyPriceExtension", EnergyPriceExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }

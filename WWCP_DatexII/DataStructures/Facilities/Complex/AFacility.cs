@@ -124,11 +124,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
             foreach (var element in base.ToXMLElements())
                 yield return element;
 
-            if (SupplementalFacilities.Any())
-                throw new NotImplementedException("Serializing a SupplementalFacility is not implemented yet!");
+            foreach (var supplementalFacility in SupplementalFacilities)
+                yield return supplementalFacility.ToXML(DatexIINS.Facilities + "supplementalFacility");
 
-            if (DedicatedParkingSpaces.Any())
-                throw new NotImplementedException("Serializing DedicatedParkingSpaces is not implemented yet!");
+            foreach (var dedicatedParkingSpaces in DedicatedParkingSpaces)
+                yield return dedicatedParkingSpaces.ToXML(DatexIINS.Facilities + "dedicatedParkingSpaces");
 
             if (FacilityExtension is not null)
                 yield return new XElement(DatexIINS.Facilities + "_facilityExtension", FacilityExtension);

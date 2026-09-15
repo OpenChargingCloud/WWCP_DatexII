@@ -134,6 +134,50 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The facility object part, followed by what a supplemental facility adds.
+        /// </summary>
+        protected override IEnumerable<Object?> ToXMLElements()
+        {
+
+            foreach (var element in base.ToXMLElements())
+                yield return element;
+
+            if (Availability.HasValue)
+                yield return new XElement(DatexIINS.Facilities + "availability",        Availability.Value.ToString());
+
+            if (Quantity.HasValue)
+                yield return new XElement(DatexIINS.Facilities + "quantity",            Quantity.        Value);
+
+            if (RegularlyCleaned.HasValue)
+                yield return new XElement(DatexIINS.Facilities + "regularlyCleaned",    RegularlyCleaned.Value);
+
+            foreach (var applicableForUser in ApplicableForUser)
+                yield return new XElement(DatexIINS.Facilities + "applicableForUser",   applicableForUser.ToString());
+
+            if (Nearby.HasValue)
+                yield return new XElement(DatexIINS.Facilities + "nearby",              Nearby.Value);
+
+            if (SupplementalFacilityExtension is not null)
+                yield return new XElement(DatexIINS.Facilities + "_supplementalFacilityExtension", SupplementalFacilityExtension);
+
+        }
+
+        #endregion
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public abstract XElement ToXML(XName? XMLName = null);
+
+        #endregion
+
     }
 
 }

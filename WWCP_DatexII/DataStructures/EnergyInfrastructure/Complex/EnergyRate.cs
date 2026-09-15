@@ -131,6 +131,68 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyRate",
+
+                   new XAttribute("id",                                     Id),
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "ratePolicy",                     RatePolicy. ToString()),
+                   new XElement(DatexIINS.EnergyInfrastructure + "lastUpdated",                    LastUpdated.ToISO8601()),
+
+                   ApplicableCurrency.Select(currency => new XElement(DatexIINS.EnergyInfrastructure + "applicableCurrency", currency.ISOCode)),
+
+                   RateName is not null
+                       ? RateName.ToXML(DatexIINS.EnergyInfrastructure + "rateName")
+                       : null,
+
+                   CombinationWithParkingFee.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "combinationWithParkingFee", CombinationWithParkingFee.Value)
+                       : null,
+
+                   MaximumDeliveryFee.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "maximumDeliveryFee",        MaximumDeliveryFee.Value.Value)
+                       : null,
+
+                   MinimumDeliveryFee.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "minimumDeliveryFee",        MinimumDeliveryFee.Value.Value)
+                       : null,
+
+                   Discount.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "discount",                  Discount.          Value.Value)
+                       : null,
+
+                   AdditionalInformation is not null
+                       ? AdditionalInformation.ToXML(DatexIINS.EnergyInfrastructure + "additionalInformation")
+                       : null,
+
+                   PaymentMethod is not null
+                       ? PaymentMethod.ToXML(DatexIINS.EnergyInfrastructure + "paymentMethod")
+                       : null,
+
+                   // The schema allows energyPrice 0..n here, but EnergyRate has no
+                   // property to hold them -- only EnergyRateUpdate does. Nothing to
+                   // write until the data model carries it.
+
+                   OverallPeriod is not null
+                       ? OverallPeriod.ToXML(DatexIINS.EnergyInfrastructure + "overallPeriod")
+                       : null,
+
+                   EnergyRateExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyRateExtension", EnergyRateExtension)
+                       : null
+
+               );
+
+        #endregion
+
     }
 
 }
