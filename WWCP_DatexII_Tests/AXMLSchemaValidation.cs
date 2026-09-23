@@ -66,21 +66,37 @@ namespace cloud.charging.open.protocols.DatexII.Tests
         {
 
             StatusSchemaSet = new XmlSchemaSet();
-            StatusSchemaSet.Add("http://datex2.eu/schema/3/d2Payload",             "Documentation\\Status\\DATEXII_3_D2Payload.xsd");
-            StatusSchemaSet.Add("http://datex2.eu/schema/3/common",                "Documentation\\Status\\DATEXII_3_Common.xsd");
-            StatusSchemaSet.Add("http://datex2.eu/schema/3/energyInfrastructure",  "Documentation\\Status\\DATEXII_3_EnergyInfrastructure.xsd");
-            StatusSchemaSet.Add("http://datex2.eu/schema/3/facilities",            "Documentation\\Status\\DATEXII_3_Facilities.xsd");
+            StatusSchemaSet.Add("http://datex2.eu/schema/3/d2Payload",             Schema("Status", "DATEXII_3_D2Payload.xsd"));
+            StatusSchemaSet.Add("http://datex2.eu/schema/3/common",                Schema("Status", "DATEXII_3_Common.xsd"));
+            StatusSchemaSet.Add("http://datex2.eu/schema/3/energyInfrastructure",  Schema("Status", "DATEXII_3_EnergyInfrastructure.xsd"));
+            StatusSchemaSet.Add("http://datex2.eu/schema/3/facilities",            Schema("Status", "DATEXII_3_Facilities.xsd"));
 
             TableSchemaSet = new XmlSchemaSet();
-            TableSchemaSet.Add("http://datex2.eu/schema/3/d2Payload",             "Documentation\\Table\\DATEXII_3_D2Payload.xsd");
-            TableSchemaSet.Add("http://datex2.eu/schema/3/common",                "Documentation\\Table\\DATEXII_3_Common.xsd");
-            TableSchemaSet.Add("http://datex2.eu/schema/3/commonExtension",       "Documentation\\Table\\DATEXII_3_CommonExtension.xsd");
-            TableSchemaSet.Add("http://datex2.eu/schema/3/energyInfrastructure",  "Documentation\\Table\\DATEXII_3_EnergyInfrastructure.xsd");
-            TableSchemaSet.Add("http://datex2.eu/schema/3/facilities",            "Documentation\\Table\\DATEXII_3_Facilities.xsd");
-            TableSchemaSet.Add("http://datex2.eu/schema/3/locationExtension",     "Documentation\\Table\\DATEXII_3_LocationExtension.xsd");
-            TableSchemaSet.Add("http://datex2.eu/schema/3/locationReferencing",   "Documentation\\Table\\DATEXII_3_LocationReferencing.xsd");
+            TableSchemaSet.Add("http://datex2.eu/schema/3/d2Payload",             Schema("Table",  "DATEXII_3_D2Payload.xsd"));
+            TableSchemaSet.Add("http://datex2.eu/schema/3/common",                Schema("Table",  "DATEXII_3_Common.xsd"));
+            TableSchemaSet.Add("http://datex2.eu/schema/3/commonExtension",       Schema("Table",  "DATEXII_3_CommonExtension.xsd"));
+            TableSchemaSet.Add("http://datex2.eu/schema/3/energyInfrastructure",  Schema("Table",  "DATEXII_3_EnergyInfrastructure.xsd"));
+            TableSchemaSet.Add("http://datex2.eu/schema/3/facilities",            Schema("Table",  "DATEXII_3_Facilities.xsd"));
+            TableSchemaSet.Add("http://datex2.eu/schema/3/locationExtension",     Schema("Table",  "DATEXII_3_LocationExtension.xsd"));
+            TableSchemaSet.Add("http://datex2.eu/schema/3/locationReferencing",   Schema("Table",  "DATEXII_3_LocationReferencing.xsd"));
 
         }
+
+        #endregion
+
+        #region (private static) Schema(Kind, FileName)
+
+        /// <summary>
+        /// Where a schema copied to the output directory is.
+        /// </summary>
+        /// <remarks>
+        /// Put together by Path.Combine rather than written with backslashes,
+        /// which are a path separator on Windows and part of the file name
+        /// everywhere else; and anchored at the output directory rather than at
+        /// whatever the current directory happens to be when a test host runs.
+        /// </remarks>
+        private static String Schema(String Kind, String FileName)
+            => Path.Combine(AppContext.BaseDirectory, "Documentation", Kind, FileName);
 
         #endregion
 
