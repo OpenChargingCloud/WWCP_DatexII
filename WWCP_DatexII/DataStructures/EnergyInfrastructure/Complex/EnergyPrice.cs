@@ -34,28 +34,53 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// A price definition for energy refuelling.
     /// </summary>
-    [XmlType("EnergyPrice", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyPrice", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyPrice(PriceType            PriceType,
                              AmountOfMoney        Value,
                              Boolean?             TaxIncluded             = null,
                              Percentage?          TaxRate                 = null,
                              MultilingualString?  AdditionalInformation   = null,
                              OverallPeriod?       OverallPeriod           = null,
-                             XElement?            EnergyPriceExtension    = null)
+                             XElement?            EnergyPriceExtension    = null,
+                             UInt32               PriceGroupIndex         = 1,
+                             AmountOfMoney?       PriceCap                = null,
+                             TimeBasedApplicability?    TimeBasedApplicability    = null,
+                             EnergyBasedApplicability?  EnergyBasedApplicability  = null)
     {
 
         #region Properties
 
         /// <summary>
+        /// The group of the price: the prices of a group apply together (DATEX II 3.7).
+        /// </summary>
+        public UInt32                     PriceGroupIndex             { get; } = PriceGroupIndex;
+
+        /// <summary>
+        /// The most this price costs, e.g. of a blocking fee.
+        /// </summary>
+        public AmountOfMoney?             PriceCap                    { get; } = PriceCap;
+
+        /// <summary>
+        /// From which and up to which minute of a session the price applies.
+        /// </summary>
+        public TimeBasedApplicability?    TimeBasedApplicability      { get; } = TimeBasedApplicability;
+
+        /// <summary>
+        /// From which and up to which kWh of a session the price applies.
+        /// </summary>
+        public EnergyBasedApplicability?  EnergyBasedApplicability    { get; } = EnergyBasedApplicability;
+
+
+        /// <summary>
         /// The type of price for the energy supply.
         /// </summary>
-        [XmlElement("priceType",              Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("priceType",              Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public PriceType            PriceType                { get; } = PriceType;
 
         /// <summary>
         /// The price for the energy according to the price type.
         /// </summary>
-        [XmlElement("value",                  Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("value",                  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public AmountOfMoney        Value                    { get; } = Value;
 
         /// <summary>
@@ -108,7 +133,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             ErrorResponse  = null;
 
             // <?xml version="1.0"?>
-            // <energyPrice xmlns="http://datex2.eu/schema/3/energyInfrastructure">
+            // <energyPrice xmlns="http://datex2.eu/schema/3/afirEnergyInfrastructure">
             //     <priceType>pricePerKWh</priceType>
             //     <value>0.37</value>
             // </energyPrice>
@@ -191,6 +216,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             #endregion
 
 
+            #region TryParse PriceGroupIndex, PriceCap, Applicability  [DATEX II 3.7]
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "priceGroupIndex",           "price group index",           UInt32.TryParse,                       out UInt32                     priceGroupIndex,          out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "priceCap",                  "price cap",                   AmountOfMoney.TryParse,                out AmountOfMoney?             priceCap,                 out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "timeBasedApplicability",    "time based applicability",    EnergyInfrastructure.TimeBasedApplicability.  TryParseXML, out TimeBasedApplicability?   timeBasedApplicability,   out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "energyBasedApplicability",  "energy based applicability",  EnergyInfrastructure.EnergyBasedApplicability.TryParseXML, out EnergyBasedApplicability? energyBasedApplicability, out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+
             EnergyPrice = new EnergyPrice(
 
                               priceType,
@@ -200,7 +238,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                               additionalInformation,
                               overallPeriod,
 
-                              XML.Element(DatexIINS.EnergyInfrastructure + "_energyPriceExtension")
+                              XML.Element(DatexIINS.EnergyInfrastructure + "_energyPriceExtension"),
+                              priceGroupIndex,
+                              priceCap,
+                              timeBasedApplicability,
+                              energyBasedApplicability
 
                           );
 
@@ -222,8 +264,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyPrice",
 
+                   new XElement(DatexIINS.EnergyInfrastructure + "priceGroupIndex",       PriceGroupIndex),
                    new XElement(DatexIINS.EnergyInfrastructure + "priceType",             PriceType.ToString()),
                    new XElement(DatexIINS.EnergyInfrastructure + "value",                 Value.Value),
+
+                   PriceCap.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "priceCap",        PriceCap.Value.Value)
+                       : null,
 
                    TaxIncluded.HasValue
                        ? new XElement(DatexIINS.EnergyInfrastructure + "taxIncluded",     TaxIncluded.Value)
@@ -240,6 +287,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    OverallPeriod is not null
                        ? OverallPeriod.ToXML(DatexIINS.EnergyInfrastructure + "overallPeriod")
                        : null,
+
+                   TimeBasedApplicability?.  ToXML(DatexIINS.EnergyInfrastructure + "timeBasedApplicability"),
+                   EnergyBasedApplicability?.ToXML(DatexIINS.EnergyInfrastructure + "energyBasedApplicability"),
 
                    EnergyPriceExtension is not null
                        ? new XElement(DatexIINS.EnergyInfrastructure + "_energyPriceExtension", EnergyPriceExtension)

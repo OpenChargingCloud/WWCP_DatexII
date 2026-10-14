@@ -22,6 +22,7 @@ using System.Xml.Serialization;
 using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.LocationExtension;
+using cloud.charging.open.protocols.DatexII.v3.Facilities;
 
 #endregion
 
@@ -41,7 +42,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
                               IEnumerable<ExternalReferencing>?  ExternalReferencing           = null,
                               PointCoordinates?                  CoordinatesForDisplay         = null,
-                              FacilityLocation?                  FacilityLocation              = null,
+                              AfirFacilityLocation?              FacilityLocation              = null,
                               XElement?                          LocationExtension             = null,
 
                               XElement?                          LocationReferenceExtension    = null)
@@ -93,7 +94,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         /// <summary>
         /// Try to parse the given XML representation of an area location.
-        /// Its GML multi polygon and an OpenLR reference are not parsed yet.
+        /// An OpenLR reference is not parsed yet.
         /// </summary>
         /// <param name="XML">The XML to be parsed.</param>
         /// <param name="AreaLocation">The parsed area location.</param>
@@ -105,11 +106,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
             AreaLocation = null;
 
-            if (!XML.TryParseOptionalXMLs (DatexIINS.LocationReferencing + "externalReferencing",     "external referencing",       LocationReferencing.ExternalReferencing.TryParseXML,  out IEnumerable<LocationReferencing.ExternalReferencing>  externalReferencing,    out ErrorResponse) ||
-                !XML.TryParseOptionalXML  (DatexIINS.LocationReferencing + "coordinatesForDisplay",   "coordinates for display",    PointCoordinates.TryParseXML,                         out PointCoordinates?                                     coordinatesForDisplay,  out ErrorResponse) ||
-                !XML.TryParseOptionalXML  (DatexIINS.LocationReferencing + "facilityLocation",        "facility location",          v3.LocationExtension.FacilityLocation.TryParseXML,    out v3.LocationExtension.FacilityLocation?                facilityLocation,       out ErrorResponse) ||
-                !XML.TryParseOptionalValue(DatexIINS.LocationReferencing + "areasAtWhichApplicable",  "areas at which applicable",  LocationReferencing.AreaPlace.TryParse,               out AreaPlace?                                            areasAtWhichApplicable, out ErrorResponse) ||
-                !XML.TryParseOptionalXML  (DatexIINS.LocationReferencing + "namedArea",               "named area",                 LocationReferencing.NamedArea.TryParseXML,            out NamedArea?                                            namedArea,              out ErrorResponse))
+            if (!TryParseLocationParts(XML,
+                                       out var externalReferencing,
+                                       out var coordinatesForDisplay,
+                                       out var facilityLocation,
+                                       out var locationExtension,
+                                       out ErrorResponse))
+            {
+                return false;
+            }
+
+            if (!XML.TryParseOptionalValue(DatexIINS.LocationReferencing + "areasAtWhichApplicable",  "areas at which applicable",  LocationReferencing.AreaPlace.TryParse,           out AreaPlace?        areasAtWhichApplicable, out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.LocationReferencing + "namedArea",               "named area",                 LocationReferencing.NamedArea.TryParseXML,        out NamedArea?        namedArea,              out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.LocationReferencing + "gmlMultiPolygon",         "GML multi polygon",          LocationReferencing.GMLMultiPolygon.TryParseXML,  out GMLMultiPolygon?  gmlMultiPolygon,        out ErrorResponse))
             {
                 return false;
             }
@@ -117,13 +126,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
             AreaLocation = new AreaLocation(
                                areasAtWhichApplicable,
                                namedArea,
-                               null,
+                               gmlMultiPolygon,
                                null,
                                XML.Element(DatexIINS.LocationReferencing + "_areaLocationExtension"),
                                externalReferencing,
                                coordinatesForDisplay,
                                facilityLocation,
-                               XML.Element(DatexIINS.LocationReferencing + "_locationExtension"),
+                               locationExtension,
                                XML.Element(DatexIINS.LocationReferencing + "_locationReferenceExtension")
                            );
 

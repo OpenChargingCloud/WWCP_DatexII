@@ -35,14 +35,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// Dedicated parking spaces directly belonging to a facility (which is usually not a parking site itself).
     /// </summary>
-    [XmlType("DedicatedParkingSpaces", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("DedicatedParkingSpaces", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class DedicatedParkingSpaces(String                                Id,
                                         String                                Version,
                                         UInt16                                NumberOfSpaces,
 
                                         MultilingualString?                   Name                              = null,
                                         IEnumerable<MultilingualString>?      Alias                             = null,
-                                        String?                               ExternalIdentifier                = null,
+                                        IEnumerable<ExternalIdentifier>?       ExternalIdentifier                = null,
                                         DateTimeOffset?                       LastUpdated                       = null,
                                         MultilingualString?                   Description                       = null,
                                         IEnumerable<Accessibility>?           Accessibility                     = null,
@@ -93,13 +93,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The number of parking spaces.
         /// </summary>
-        [XmlElement(ElementName = "numberOfSpaces",      Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement(ElementName = "numberOfSpaces",      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public UInt16                 NumberOfSpaces                     { get; } = NumberOfSpaces;
 
         /// <summary>
         /// The indicated parking spaces are specifically for the given set of users.
         /// </summary>
-        [XmlElement(ElementName = "userSpecific",        Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement(ElementName = "userSpecific",        Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<UserType>  UserSpecific                       { get; } = UserSpecific ?? [];
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                          parts.Owner,
                                          parts.Operator,
                                          parts.Helpdesk,
-                                         null,
+                                         parts.ApplicableForVehicles,
                                          parts.Dimension,
                                          parts.Amenities,
                                          userSpecific,

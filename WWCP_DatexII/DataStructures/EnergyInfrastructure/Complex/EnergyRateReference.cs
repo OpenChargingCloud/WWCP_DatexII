@@ -33,7 +33,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// A reference to an EnergyRate.
     /// </summary>
-    [XmlType("_EnergyRateReference", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("_EnergyRateReference", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyRateReference(String Id) : Reference(Id)
     {
 
@@ -43,7 +43,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// Fixed attribute indicating the target class.
         /// </summary>
         [XmlAttribute("targetClass")]
-        public String  TargetClass    { get; } = "egi:EnergyRate";
+        public String  TargetClass    { get; } = "aegi:EnergyRate";
 
         #endregion
 
@@ -63,9 +63,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             EnergyRateReference = null;
 
-            // <energyRateReference xmlns       = "http://datex2.eu/schema/3/energyInfrastructure"
+            // <energyRateReference xmlns       = "http://datex2.eu/schema/3/afirEnergyInfrastructure"
             //                      id          = "74034E3E-9D2F-4410-BE6F-CAA3176D69B4"
-            //                      targetClass = "egi:EnergyRate" />
+            //                      targetClass = "aegi:EnergyRate" />
 
             #region TryParse Id             [mandatory]
 
@@ -117,9 +117,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <param name="XMLName">The XML element name: energyRateByReference in an electric energy, energyRateReference in an update.</param>
         public override XElement ToXML(XName? XMLName = null)
 
-            // <energyRateReference xmlns       = "http://datex2.eu/schema/3/energyInfrastructure"
+            // <energyRateReference xmlns       = "http://datex2.eu/schema/3/afirEnergyInfrastructure"
             //                      id          = "74034E3E-9D2F-4410-BE6F-CAA3176D69B4"
-            //                      targetClass = "egi:EnergyRate" />
+            //                      targetClass = "aegi:EnergyRate" />
 
             => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyRateReference",
                     new XAttribute("targetClass",   TargetClass),

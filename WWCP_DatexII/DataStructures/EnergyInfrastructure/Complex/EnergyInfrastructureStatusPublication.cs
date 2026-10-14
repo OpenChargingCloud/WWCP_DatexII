@@ -24,6 +24,7 @@ using System.Diagnostics.CodeAnalysis;
 using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
+using Newtonsoft.Json.Linq;
 
 #endregion
 
@@ -33,7 +34,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// Dynamic information on the status of energy supplying sites.
     /// </summary>
-    [XmlType("EnergyInfrastructureStatusPublication", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyInfrastructureStatusPublication", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyInfrastructureStatusPublication(DateTimeOffset                                             PublicationTime,
                                                        InternationalIdentifier                                    PublicationCreator,
                                                        Languages                                                  Language,
@@ -48,7 +49,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                                        String?                                                    ExtensionVersion                                 = null,
                                                        String?                                                    ProfileName                                      = null,
                                                        String?                                                    ProfileVersion                                   = null,
-                                                       XElement?                                                  PayloadPublicationExtension                      = null)
+                                                       XElement?                                                  PayloadPublicationExtension                      = null,
+                                                       Boolean                                                    IsDelta                                          = false)
 
         : APayloadPublication(PublicationTime,
                               PublicationCreator,
@@ -68,20 +70,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Reference to static tables containing the sites referenced in this publication.
         /// </summary>
-        [XmlElement("tableReference",                                   Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("tableReference",                                   Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyInfrastructureTableVersionedReference>  TableReferences                                   { get; } = TableReferences?.               Distinct() ?? [];
 
         /// <summary>
         /// Management information relating to the publication.
         /// </summary>
-        [XmlElement("headerInformation",                                Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("headerInformation",                                Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public HeaderInformation?                                        HeaderInformation                                 { get; } = HeaderInformation;
 
         /// <summary>
         /// Dynamic status information of one or more energy supplying sites.
         /// </summary>
-        [XmlElement("energyInfrastructureSiteStatus",                   Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyInfrastructureSiteStatus",                   Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyInfrastructureSiteStatus>               EnergyInfrastructureSiteStatus                    { get; } = EnergyInfrastructureSiteStatus?.Distinct() ?? [];
+
+        /// <summary>
+        /// Whether this publication has only what changed since the last one (deltaPush), or everything (snapshotPush).
+        /// Only the Mobilithek JSON dialect carries it.
+        /// </summary>
+        public Boolean                                                   IsDelta                                           { get; } = IsDelta;
 
         /// <summary>
         /// Optional extension element for additional publication information.
@@ -104,6 +112,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                           [NotNullWhen(true)]  out EnergyInfrastructureStatusPublication?  EnergyInfrastructureStatusPublication,
                                           [NotNullWhen(false)] out String?                                 ErrorResponse)
         {
+
+            XML = DatexIISchemas.ResolveExtendedValues(new XElement(XML));
 
             EnergyInfrastructureStatusPublication  = null;
             ErrorResponse                          = null;
@@ -150,7 +160,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse TableReferences                   [optional]
 
-            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "tableReference",
+            if (!XML.TryParseOptionalXMLs    (DatexIINS.EnergyInfrastructure + "tableReference",
                                               "publication table references",
                                               EnergyInfrastructureTableVersionedReference.TryParseXML,
                                               out IEnumerable<EnergyInfrastructureTableVersionedReference> tableReferences,
@@ -176,8 +186,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse EnergyInfrastructureSiteStatus    [optional]
 
-            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureSiteStatus",
-                                              "header information",
+            if (!XML.TryParseOptionalXMLs    (DatexIINS.EnergyInfrastructure + "energyInfrastructureSiteStatus",
+                                              "energy infrastructure site status",
                                               EnergyInfrastructure.EnergyInfrastructureSiteStatus.TryParseXML,
                                               out IEnumerable<EnergyInfrastructureSiteStatus> energyInfrastructureSiteStatus,
                                               out ErrorResponse))
@@ -263,7 +273,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                                          tableReferences,
                                                          headerInformation,
                                                          energyInfrastructureSiteStatus,
-                                                         XML.Element(DatexIINS.Common + "_energyInfrastructureStatusPublicationExtension"),
+                                                         XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStatusPublicationExtension"),
 
                                                          modelBaseVersion,
                                                          extensionName,
@@ -290,15 +300,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                           new XAttribute(XNamespace.Xmlns + "d2",    DatexIINS.D2Payload),
                           new XAttribute(XNamespace.Xmlns + "com",   DatexIINS.Common),
-                          new XAttribute(XNamespace.Xmlns + "egi",   DatexIINS.EnergyInfrastructure),
-                          new XAttribute(XNamespace.Xmlns + "fac",   DatexIINS.Facilities),
+                          new XAttribute(XNamespace.Xmlns + "aegi",   DatexIINS.EnergyInfrastructure),
+                          new XAttribute(XNamespace.Xmlns + "afac",   DatexIINS.Facilities),
                           new XAttribute(XNamespace.Xmlns + "locx",  DatexIINS.LocationExtension),
                           new XAttribute(XNamespace.Xmlns + "loc",   DatexIINS.LocationReferencing),
-                          new XAttribute(XNamespace.Xmlns + "prk",   DatexIINS.Parking),
+                          new XAttribute(XNamespace.Xmlns + "comx",  DatexIINS.CommonExtension),
                           new XAttribute(XNamespace.Xmlns + "xsi",   DatexIINS.XSI),
 
                           new XAttribute(DatexIINS.XSI + "schemaLocation",    "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"),
-                          new XAttribute(DatexIINS.XSI + "type",              "egi:EnergyInfrastructureStatusPublication"),
+                          new XAttribute(DatexIINS.XSI + "type",              "aegi:EnergyInfrastructureStatusPublication"),
                           new XAttribute("lang",                               Language.AsText()),
                           new XAttribute("modelBaseVersion",                  ModelBaseVersion),
                           new XAttribute("profileName",                       ProfileName),
@@ -317,7 +327,80 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                       );
 
-            return xml;
+            return DatexIISchemas.ExtendUnknownValues(xml);
+
+        }
+
+        #endregion
+
+        #region AsDelta(IsDelta = true)
+
+        /// <summary>
+        /// This publication, marked as having only what changed (or, with false, everything).
+        /// </summary>
+        /// <param name="IsDelta">Whether the publication has only what changed.</param>
+        public EnergyInfrastructureStatusPublication AsDelta(Boolean IsDelta = true)
+
+            => new (PublicationTime,
+                    PublicationCreator,
+                    Language,
+                    TableReferences,
+                    HeaderInformation,
+                    EnergyInfrastructureSiteStatus,
+                    EnergyInfrastructureStatusPublicationExtension,
+                    ModelBaseVersion,
+                    ExtensionName,
+                    ExtensionVersion,
+                    ProfileName,
+                    ProfileVersion,
+                    PayloadPublicationExtension,
+                    IsDelta);
+
+        #endregion
+
+        #region ToJSON(Dialect = DATEXII_3_7)
+
+        /// <summary>
+        /// Return a JSON representation of this publication, in the given dialect.
+        /// The Mobilithek dialect wraps it into a message container, as a snapshotPush or, when IsDelta, as a deltaPush.
+        /// </summary>
+        /// <param name="Dialect">The JSON dialect.</param>
+        public JObject ToJSON(DatexIIJSONDialect Dialect = DatexIIJSONDialect.DATEXII_3_7)
+
+            => DatexIIJSON.ToJSON(ToXML(), Dialect, IsDelta);
+
+        #endregion
+
+        #region TryParseJSON(JSON, out EnergyInfrastructureStatusPublication, out ErrorResponse, Dialect = DATEXII_3_7)
+
+        /// <summary>
+        /// Try to parse the given JSON representation of a publication, in the given dialect.
+        /// </summary>
+        /// <param name="JSON">The JSON to be parsed.</param>
+        /// <param name="EnergyInfrastructureStatusPublication">The parsed publication.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        /// <param name="Dialect">The JSON dialect.</param>
+        public static Boolean TryParseJSON(JObject                                   JSON,
+                                           [NotNullWhen(true)]  out EnergyInfrastructureStatusPublication?  EnergyInfrastructureStatusPublication,
+                                           [NotNullWhen(false)] out String?          ErrorResponse,
+                                           DatexIIJSONDialect                        Dialect   = DatexIIJSONDialect.DATEXII_3_7)
+        {
+
+            EnergyInfrastructureStatusPublication = null;
+
+            if (!DatexIIJSON.TryParse(JSON, out var payloadXML, out ErrorResponse, Dialect))
+                return false;
+
+            if (!TryParseXML(payloadXML, out EnergyInfrastructureStatusPublication, out ErrorResponse))
+                return false;
+
+            if (Dialect == DatexIIJSONDialect.Mobilithek_01_00_00 &&
+                JSON["messageContainer"]?["exchangeInformation"]?["exchangeContext"]?["codedExchangeProtocol"]?["value"]?.Value<String>() == "deltaPush")
+            {
+                EnergyInfrastructureStatusPublication = EnergyInfrastructureStatusPublication.AsDelta();
+            }
+
+            return true;
 
         }
 

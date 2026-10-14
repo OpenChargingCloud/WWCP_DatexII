@@ -301,10 +301,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
             = Register("pensioners");
 
         /// <summary>
-        /// Pregnant Women.
+        /// Pregnant persons.
         /// </summary>
-        public static UserType  PregnantWomen               { get; }
-            = Register("pregnantWomen");
+        public static UserType  PregnantPerson              { get; }
+            = Register("pregnantPerson");
 
         /// <summary>
         /// Registered Disabled Persons.

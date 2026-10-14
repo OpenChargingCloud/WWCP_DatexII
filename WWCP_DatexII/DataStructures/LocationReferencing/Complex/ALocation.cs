@@ -19,8 +19,10 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.LocationExtension;
+using cloud.charging.open.protocols.DatexII.v3.Facilities;
 
 #endregion
 
@@ -34,7 +36,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     [XmlType("Location", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
     public abstract class ALocation(IEnumerable<ExternalReferencing>?  ExternalReferencing          = null,
                                     PointCoordinates?                  CoordinatesForDisplay        = null,
-                                    FacilityLocation?                  FacilityLocation             = null,
+                                    AfirFacilityLocation?              FacilityLocation             = null,
                                     XElement?                          LocationExtension            = null,
 
                                     XElement?                          LocationReferenceExtension   = null)
@@ -60,14 +62,96 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// A facility location specification.
         /// </summary>
-        [XmlElement("facilityLocation",       Namespace = "http://datex2.eu/schema/3/locationExtension")]
-        public FacilityLocation?                 FacilityLocation         { get; } = FacilityLocation;
+        [XmlElement("afirFacilityLocation",   Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        public AfirFacilityLocation?             FacilityLocation         { get; } = FacilityLocation;
 
         /// <summary>
         /// Optional extension element for additional location information.
         /// </summary>
         [XmlElement("_locationExtension",     Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                         LocationExtension        { get; } = LocationExtension;
+
+        #endregion
+
+
+        #region (static) TryParseXML(XML, out Location, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a location, by its xsi:type.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Location">The parsed location.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                             XML,
+                                          [NotNullWhen(true)]  out ALocation?  Location,
+                                          [NotNullWhen(false)] out String?     ErrorResponse)
+        {
+
+            Location = null;
+
+            if (!ALocationReference.TryParseXML(XML, out var locationReference, out ErrorResponse))
+                return false;
+
+            if (locationReference is not ALocation location)
+            {
+                ErrorResponse = $"The location reference of the type '{XML.XSIType()}' is not a location!";
+                return false;
+            }
+
+            Location = location;
+            return true;
+
+        }
+
+        #endregion
+
+
+        #region (protected static) TryParseLocationParts(XML, out ExternalReferencing, out CoordinatesForDisplay, out FacilityLocation, out LocationExtension, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the particles every location has: its external referencing, its coordinates for display, and
+        /// its typed extension with the facility location of AFIR; other content of the extension is kept as it is.
+        /// </summary>
+        protected static Boolean TryParseLocationParts(XElement                                          XML,
+                                                       out IEnumerable<ExternalReferencing>              ExternalReferencing,
+                                                       out PointCoordinates?                             CoordinatesForDisplay,
+                                                       out AfirFacilityLocation?                         FacilityLocation,
+                                                       out XElement?                                     LocationExtension,
+                                                       [NotNullWhen(false)] out String?                  ErrorResponse)
+        {
+
+            CoordinatesForDisplay  = null;
+            FacilityLocation       = null;
+            LocationExtension      = null;
+
+            if (!XML.TryParseOptionalXMLs(DatexIINS.LocationReferencing + "externalReferencing",    "external referencing",     LocationReferencing.ExternalReferencing.TryParseXML, out ExternalReferencing,   out ErrorResponse) ||
+                !XML.TryParseOptionalXML (DatexIINS.LocationReferencing + "coordinatesForDisplay",  "coordinates for display",  PointCoordinates.TryParseXML,                        out CoordinatesForDisplay, out ErrorResponse))
+            {
+                return false;
+            }
+
+            if (XML.Element(DatexIINS.LocationReferencing + "_locationExtension") is XElement extension)
+            {
+
+                if (!extension.TryParseOptionalXML(DatexIINS.LocationReferencing + "afirFacilityLocation",
+                                                   "facility location",
+                                                   AfirFacilityLocation.TryParseXML,
+                                                   out FacilityLocation,
+                                                   out ErrorResponse))
+                {
+                    return false;
+                }
+
+                var others = extension.Elements().Where(element => element.Name != DatexIINS.LocationReferencing + "afirFacilityLocation").ToArray();
+
+                if (others.Length > 0)
+                    LocationExtension = others.Length == 1 ? others[0] : new XElement(DatexIINS.LocationReferencing + "_locationExtension", others);
+
+            }
+
+            return true;
+
+        }
 
         #endregion
 
@@ -89,11 +173,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
             if (CoordinatesForDisplay is not null)
                 yield return CoordinatesForDisplay.ToXML(DatexIINS.LocationReferencing + "coordinatesForDisplay");
 
-            if (FacilityLocation is not null)
-                yield return FacilityLocation.ToXML(DatexIINS.LocationReferencing + "facilityLocation");
-
-            if (LocationExtension is not null)
-                yield return new XElement(DatexIINS.LocationReferencing + "_locationExtension", LocationExtension);
+            // DATEX II 3.7: the facility location of AFIR is the typed extension of a location.
+            if (FacilityLocation is not null || LocationExtension is not null)
+                yield return new XElement(DatexIINS.LocationReferencing + "_locationExtension",
+                                 FacilityLocation?.ToXML(DatexIINS.LocationReferencing + "afirFacilityLocation"),
+                                 LocationExtension);
 
         }
 

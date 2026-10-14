@@ -32,7 +32,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// Information on current status and availability of supplemental facilities 
     /// (for example number of free electric charging stations).
     /// </summary>
-    [XmlType("SupplementalFacilityStatus", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("SupplementalFacilityStatus", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class SupplementalFacilityStatus(FacilityObjectVersionedReference  Reference,
 
                                             UInt16?                           QuantityOverride                      = null,
@@ -86,7 +86,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Specifies whether this supplemental equipment is available / in operation or not.
         /// </summary>
-        [XmlElement("equipmentOperationStatus",              Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("equipmentOperationStatus",              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public OperationStatus?  EquipmentOperationStatus               { get; } = EquipmentOperationStatus;
 
         /// <summary>

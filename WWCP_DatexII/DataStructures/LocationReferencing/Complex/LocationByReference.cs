@@ -21,6 +21,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 
 using cloud.charging.open.protocols.DatexII.v3.LocationExtension;
+using cloud.charging.open.protocols.DatexII.v3.Facilities;
 
 #endregion
 
@@ -36,7 +37,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
                                      IEnumerable<ExternalReferencing>?     ExternalReferencing            = null,
                                      PointCoordinates?                     CoordinatesForDisplay          = null,
-                                     FacilityLocation?                     FacilityLocation               = null,
+                                     AfirFacilityLocation?             FacilityLocation               = null,
                                      XElement?                             LocationExtension              = null,
 
                                      XElement?                             LocationReferenceExtension     = null)

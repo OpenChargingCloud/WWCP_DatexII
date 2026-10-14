@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -62,6 +63,58 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlElement("_grossWeightCharacteristicExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?           GrossWeightCharacteristicExtension    { get; } = GrossWeightCharacteristicExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out GrossWeightCharacteristic, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a GrossWeightCharacteristic.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="GrossWeightCharacteristic">The parsed GrossWeightCharacteristic.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                       XML,
+                                          [NotNullWhen(true)]  out GrossWeightCharacteristic?  GrossWeightCharacteristic,
+                                          [NotNullWhen(false)] out String?               ErrorResponse)
+        {
+
+            GrossWeightCharacteristic = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.Common + "comparisonOperator",
+                                            "comparison operator",
+                                            Common.ComparisonOperator.TryParse,
+                                            out ComparisonOperator comparisonOperator,
+                                            out ErrorResponse) ||
+                !XML.TryParseMandatoryValue(DatexIINS.Common + "grossVehicleWeight",
+                                            "gross vehicle weight",
+                                            DatexIIXMLExtensions.TryParseTonne,
+                                            out Tonne measure,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.Common + "typeOfWeight",
+                                            "type of weight",
+                                            WeightType.TryParse,
+                                            out WeightType typeOfWeight,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            GrossWeightCharacteristic = new GrossWeightCharacteristic(
+                                             comparisonOperator,
+                                                               measure,
+                                                               typeOfWeight,
+                                             XML.Element(DatexIINS.Common + "_grossWeightCharacteristicExtension")
+                                         );
+
+            return true;
+
+        }
 
         #endregion
 

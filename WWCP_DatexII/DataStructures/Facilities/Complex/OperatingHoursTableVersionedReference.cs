@@ -32,9 +32,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
     /// <summary>
     /// Represents a reference to an operating hours table.
-    /// The targetClass attribute is fixed to "fac:OperatingHoursTable".
+    /// The targetClass attribute is fixed to "afac:OperatingHoursTable".
     /// </summary>
-    [XmlType("_OperatingHoursTableVersionedReference", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("_OperatingHoursTableVersionedReference", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class OperatingHoursTableVersionedReference(String   Id,
                                                        String?  Version   = null)
 
@@ -49,7 +49,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Fixed attribute indicating the target class.
         /// </summary>
         [XmlAttribute("targetClass")]
-        public String  TargetClass    { get; } = "fac:OperatingHoursTable";
+        public String  TargetClass    { get; } = "afac:OperatingHoursTable";
 
         #endregion
 

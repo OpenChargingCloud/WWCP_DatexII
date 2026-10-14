@@ -33,14 +33,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// One type of supplemental equipment, which is available on some site, for example on a rest area.
     /// </summary>
-    [XmlType("SupplementalEquipment", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("SupplementalEquipment", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class SupplementalEquipment(String                                Id,
                                        String                                Version,
                                        EquipmentType                         EquipmentType,
 
                                        MultilingualString?                   Name                             = null,
                                        IEnumerable<MultilingualString>?      Alias                            = null,
-                                       String?                               ExternalIdentifier               = null,
+                                       IEnumerable<ExternalIdentifier>?       ExternalIdentifier               = null,
                                        DateTimeOffset?                       LastUpdated                      = null,
                                        MultilingualString?                   Description                      = null,
                                        IEnumerable<Accessibility>?           Accessibility                    = null,
@@ -105,7 +105,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// One type of equipment.
         /// </summary>
-        [XmlElement("equipmentType",                    Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("equipmentType",                    Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public EquipmentType  EquipmentType                     { get; } = EquipmentType;
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             => new (XMLName ?? DatexIINS.Facilities + "supplementalFacility",
 
-                   new XAttribute(DatexIINS.XSI + "type",   "fac:SupplementalEquipment"),
+                   new XAttribute(DatexIINS.XSI + "type",   "afac:SupplementalEquipment"),
                    new XAttribute("id",                      Id),
                    new XAttribute("version",                 Version),
 

@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// The operating hours are not known.
     /// </summary>
-    [XmlType("UnknownOperatingHours", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("UnknownOperatingHours", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class UnknownOperatingHours(XElement?            UnknownOperatingHoursExtension   = null,
                                        ClosureInformation?  ClosureInformation               = null,
                                        XElement?            OperatingHoursExtension          = null)
@@ -106,7 +106,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             => new (XMLName ?? DatexIINS.Facilities + "operatingHours",
 
-                   new XAttribute(DatexIINS.XSI + "type",   "fac:UnknownOperatingHours"),
+                   new XAttribute(DatexIINS.XSI + "type",   "afac:UnknownOperatingHours"),
 
                    ClosureInformation is not null
                        ? ClosureInformation.ToXML(DatexIINS.Facilities + "closureInformation")

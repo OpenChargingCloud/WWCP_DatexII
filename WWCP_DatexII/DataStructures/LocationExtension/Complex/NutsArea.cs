@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.LocationReferencing;
 
@@ -60,24 +61,73 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         #endregion
 
 
-        #region ToXML(XMLName = null)
+        #region TryParseXML(XML, Namespace, out NutsArea, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a NUTS area.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Namespace">The namespace of its elements: afac in DATEX II 3.7, locx before.</param>
+        /// <param name="NutsArea">The parsed NUTS area.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                            XML,
+                                          XNamespace                          Namespace,
+                                          [NotNullWhen(true)]  out NutsArea?  NutsArea,
+                                          [NotNullWhen(false)] out String?    ErrorResponse)
+        {
+
+            NutsArea = null;
+
+            if (!XML.TryParseMandatoryValue(Namespace + "nutsCodeType",
+                                            "NUTS code type",
+                                            LocationReferencing.NutsCodeType.TryParse,
+                                            out NutsCodeType nutsCodeType,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            var nutsCode = XML.OptionalText(Namespace + "nutsCode");
+
+            if (nutsCode is null)
+            {
+                ErrorResponse = "The mandatory NUTS code is missing!";
+                return false;
+            }
+
+            NutsArea = new NutsArea(
+                           new NutsCode(nutsCode),
+                           nutsCodeType,
+                           XML.Element(Namespace + "_nutsAreaExtension")
+                       );
+
+            return true;
+
+        }
+
+        #endregion
+
+        #region ToXML(XMLName = null, Namespace = null)
 
         /// <summary>
         /// Return an XML representation of this object.
         /// </summary>
         /// <param name="XMLName">An alternative XML element name.</param>
-        public XElement ToXML(XName? XMLName = null)
+        /// <param name="Namespace">The namespace of its elements: afac in DATEX II 3.7, locx before.</param>
+        public XElement ToXML(XName?       XMLName    = null,
+                              XNamespace?  Namespace  = null)
+        {
 
-            => new (XMLName ?? DatexIINS.LocationExtension + "nutsArea",
+            var ns = Namespace ?? DatexIINS.LocationExtension;
 
-                   new XElement(DatexIINS.LocationExtension + "nutsCodeType",   NutsCodeType.ToString()),
-                   new XElement(DatexIINS.LocationExtension + "nutsCode",       NutsCode.    ToString()),
+            return new (XMLName ?? ns + "nutsArea",
+                        new XElement(ns + "nutsCodeType",   NutsCodeType.ToString()),
+                        new XElement(ns + "nutsCode",       NutsCode.    ToString()),
+                        NutsAreaExtension is not null
+                            ? new XElement(ns + "_nutsAreaExtension", NutsAreaExtension)
+                            : null);
 
-                   NutsAreaExtension is not null
-                       ? new XElement(DatexIINS.LocationExtension + "_nutsAreaExtension", NutsAreaExtension)
-                       : null
-
-               );
+        }
 
         #endregion
 

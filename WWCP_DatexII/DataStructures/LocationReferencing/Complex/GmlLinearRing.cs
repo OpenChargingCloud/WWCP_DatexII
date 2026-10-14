@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -49,6 +50,65 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_gmlLinearRingExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?  GMLLinearRingExtension    { get; } = GMLLinearRingExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out GMLLinearRing, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a GML linear ring.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="GMLLinearRing">The parsed GML linear ring.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                 XML,
+                                          [NotNullWhen(true)]  out GMLLinearRing?  GMLLinearRing,
+                                          [NotNullWhen(false)] out String?         ErrorResponse)
+        {
+
+            GMLLinearRing  = null;
+            ErrorResponse  = null;
+
+            var posList = XML.Element(DatexIINS.LocationReferencing + "posList")?.Value;
+
+            if (posList is null)
+            {
+                ErrorResponse = "The mandatory position list of the GML linear ring is missing!";
+                return false;
+            }
+
+            UInt32? srsDimension = null;
+
+            if (XML.Attribute("srsDimension") is XAttribute dimension)
+            {
+                if (!UInt32.TryParse(dimension.Value, out var value))
+                {
+                    ErrorResponse = $"Invalid SRS dimension '{dimension.Value}'!";
+                    return false;
+                }
+                srsDimension = value;
+            }
+
+            try
+            {
+                GMLLinearRing = new GMLLinearRing(
+                                    new GMLPosList(posList),
+                                    srsDimension,
+                                    XML.Attribute("srsName")?.Value,
+                                    XML.Element(DatexIINS.LocationReferencing + "_gmlLineStringExtension"),
+                                    XML.Element(DatexIINS.LocationReferencing + "_gmlLinearRingExtension")
+                                );
+            }
+            catch (ArgumentException e)
+            {
+                ErrorResponse = e.Message;
+                return false;
+            }
+
+            return true;
+
+        }
 
         #endregion
 

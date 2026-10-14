@@ -30,7 +30,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Dynamic status information for a facility.
     /// </summary>
-    [XmlType("FacilityStatus", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("FacilityStatus", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class FacilityStatus(FacilityObjectVersionedReference          Reference,
                                 DateTimeOffset?                           LastUpdated                     = null,
                                 OpeningStatus?                            OpeningStatus                   = null,
@@ -61,7 +61,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Dynamic status information for supplemental facilities associated with this facility.
         /// </summary>
-        [XmlElement("supplementalFacilityStatus",  Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("supplementalFacilityStatus",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<SupplementalFacilityStatus>  SupplementalFacilityStatus    { get; } = SupplementalFacilityStatus?.Distinct() ?? [];
 
         /// <summary>

@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// Ratio for the specified energy source.
     /// </summary>
-    [XmlType("ElectricEnergySourceRatio", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("ElectricEnergySourceRatio", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class ElectricEnergySourceRatio(ElectricEnergySourceType  EnergySource,
                                            PercentageDouble          SourceRatioValue,
                                            String?                   OtherEnergySource                    = null,
@@ -43,7 +43,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// An electric energy source.
         /// </summary>
-        [XmlElement(ElementName = "energySource",       Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement(ElementName = "energySource",       Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public ElectricEnergySourceType  EnergySource                          { get; } = EnergySource;
 
         /// <summary>

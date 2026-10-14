@@ -38,6 +38,7 @@ using cloud.charging.open.protocols.WWCP.POI.tests;
 
 using POI     = cloud.charging.open.protocols.WWCP.POI;
 using Address = org.GraphDefined.Vanaheimr.Illias.Address;
+using cloud.charging.open.protocols.DatexII.v3;
 
 #endregion
 
@@ -137,6 +138,8 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             Assert.That(ValidateTableSchema(xml.ToString(), out var warnings, out var errors), Is.True, String.Join(Environment.NewLine, errors));
             Assert.That(warnings, Is.Empty, String.Join(Environment.NewLine, warnings));
 
+            AssertValidJSON(Publication.ToJSON(), Publication.ToJSON(DatexIIJSONDialect.Mobilithek_01_00_00), JSONSchemas.Mobilithek_Table);
+
             return xml;
 
         }
@@ -149,7 +152,27 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             Assert.That(ValidateStatusSchema(xml.ToString(), out var warnings, out var errors), Is.True, String.Join(Environment.NewLine, errors));
             Assert.That(warnings, Is.Empty, String.Join(Environment.NewLine, warnings));
 
+            AssertValidJSON(Publication.ToJSON(), Publication.ToJSON(DatexIIJSONDialect.Mobilithek_01_00_00), JSONSchemas.Mobilithek_StatusMessage);
+
             return xml;
+
+        }
+
+        /// <summary>
+        /// The JSON of a publication: valid DATEX II 3.7 JSON, and valid JSON of the Mobilithek profile.
+        /// </summary>
+        private static void AssertValidJSON(JObject                       JSON37,
+                                            JObject                       MobilithekJSON,
+                                            Json.Schema.JsonSchema        MobilithekSchema)
+        {
+
+            Assert.That(JSONSchemas.Validate(JSONSchemas.DATEXII_3_7_Payload, JSON37, out var errors),
+                        Is.True,
+                        String.Join(Environment.NewLine, errors) + Environment.NewLine + JSON37);
+
+            Assert.That(JSONSchemas.Validate(MobilithekSchema, MobilithekJSON, out errors),
+                        Is.True,
+                        String.Join(Environment.NewLine, errors.Where(error => !error.Contains("did not match") && !error.Contains("do not match"))) + Environment.NewLine + MobilithekJSON);
 
         }
 
@@ -184,7 +207,11 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             var publication  = POI3Mapper.ToTablePublication(ANetwork(), Creator, Languages.de, "rn1", "1", warnings,
                                                              StationIdBNetzA: station => "BNetzA-4711");
 
-            AssertValidTable(publication);
+            var xml          = AssertValidTable(publication);
+
+            // DATEX II 3.7 knows only evseId as an identifier type, as an extended value; the others are other types.
+            Assert.That(xml.Descendants(v3.DatexIINS.Facilities + "typeOfIdentifier").Select(type => type.Attribute("_extendedValue")?.Value), Is.EqualTo(new[] { "evseId" }));
+            Assert.That(xml.Descendants(v3.DatexIINS.Facilities + "otherTypeOfIdentifier").Select(type => type.Value),                        Is.EquivalentTo(new[] { "operatorId", "stationIdBNetzA" }));
 
             var site         = publication.EnergyInfrastructureTables.Single().EnergyInfrastructureSites.Single();
             var location     = (PointLocation) site.LocationReference!;
@@ -201,7 +228,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(site.Name?.Values.Single().Text,                             Is.EqualTo("Biberweg"));
                 Assert.That(site.TypeOfSite?.ToString(),                                 Is.EqualTo("openSpace"));
                 Assert.That(site.OperatingHours,                                         Is.InstanceOf<OpenAllHours>());
-                Assert.That(((OrganisationSpecification) site.Operator!).OperatorId,     Is.EqualTo("DE*GEF"));
+                Assert.That(POI3Mapper.OperatorIdOf(site.Operator),                     Is.EqualTo("DE*GEF"));
                 Assert.That(((SupplementalServiceFacility) site.SupplementalFacilities.Single()).ServiceFacilityType.ToString(), Is.EqualTo("cafe"));
                 Assert.That(location.CoordinatesForDisplay?.Latitude,                    Is.EqualTo(50.92));
                 Assert.That(location.FacilityLocation?.TimeZone?.ToString(),             Is.EqualTo("+01:00"));
@@ -210,17 +237,18 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
                 Assert.That(station.Id,                                                  Is.EqualTo("DE*GEF*S1"));
                 Assert.That(station.StationIdBNetzA,                                     Is.EqualTo("BNetzA-4711"));
-                Assert.That(station.TotalMaximumPower.Value,                             Is.EqualTo(22000));
+                Assert.That(station.TotalMaximumPower?.Value,                            Is.EqualTo(22000));
                 Assert.That(station.AuthenticationAndIdentificationMethods.Select(method => method.ToString()), Is.EquivalentTo(new[] { "rfid", "apps" }));
                 Assert.That(station.UserInterfaceLanguages,                              Is.EqualTo(new[] { Languages.de }));
 
                 Assert.That(point.Id,                                                    Is.EqualTo("DE*GEF*E1*1"));
                 Assert.That(point.EVSEId,                                                Is.EqualTo("DE*GEF*E1*1"));
                 Assert.That(point.Reservation?.ToString(),                               Is.EqualTo("optional"));
+                Assert.That(point.CurrentType.ToString(),                                Is.EqualTo("ac"));
+                Assert.That(point.ChargingMode?.ToString(),                              Is.EqualTo("mode3AC3p"));
                 Assert.That(point.AvailableChargingPower.Single().Value,                 Is.EqualTo(22000));
 
                 Assert.That(connector.ConnectorType.ToString(),                          Is.EqualTo("iec62196T2"));
-                Assert.That(connector.ChargingMode?.ToString(),                          Is.EqualTo("mode3AC3p"));
                 Assert.That(connector.MaxPowerAtSocket.Value,                            Is.EqualTo(22000));
                 Assert.That(connector.MaximumCurrent?.Value,                             Is.EqualTo(32));
 
@@ -231,6 +259,78 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(rate.EnergyPrices.First().TaxRate?.Value,                    Is.EqualTo(19));
                 Assert.That(rate.EnergyPrices.ElementAt(1).Value.Value,                  Is.EqualTo(0.1m));
 
+            });
+
+        }
+
+        #endregion
+
+        #region ThePricesOfATariffElementAreAPriceGroup()
+
+        /// <summary>
+        /// The prices of a tariff element are a price group: two elements apply apart, even when they have the same
+        /// restrictions, and come back as two.
+        /// </summary>
+        [Test]
+        public void ThePricesOfATariffElementAreAPriceGroup()
+        {
+
+            var warnings  = new List<String>();
+
+            var tariff    = new POI.ChargingTariff(T1,
+                                                   Currency.EUR,
+                                                   [
+                                                       new POI.ChargingTariffElement([ new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.ENERGY, 0.39m, StepSize: 1) ]),
+                                                       new POI.ChargingTariffElement([ new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.ENERGY, 0.49m, StepSize: 1),
+                                                                                       new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.FLAT,   1) ])
+                                                   ],
+                                                   Created: Created);
+
+            var rate      = tariff.ToDatexII(Languages.de, warnings)!;
+
+            Assert.That(rate.EnergyPrices.Select(price => price.PriceGroupIndex), Is.EqualTo(new[] { 1U, 2U, 2U }));
+
+            var again     = rate.ToPOI3(GEF, Languages.de, warnings)!;
+
+            Assert.Multiple(() => {
+                Assert.That(warnings,                                                         Is.Empty);
+                Assert.That(again.Elements.Select(element => element.PriceComponents.Count()), Is.EqualTo(new[] { 1, 2 }));
+            });
+
+        }
+
+        #endregion
+
+        #region PricesWithoutGroupsAreGroupedByTheirPeriod()
+
+        /// <summary>
+        /// The Mobilithek profile has no price groups: all prices of a rate are of one group, and those with the same
+        /// overall period make one tariff element.
+        /// </summary>
+        [Test]
+        public void PricesWithoutGroupsAreGroupedByTheirPeriod()
+        {
+
+            var warnings  = new List<String>();
+            var night     = new OverallPeriod(DateTimeOffset.Parse("2026-01-01T00:00:00Z"),
+                                              ValidPeriod: [ new Period(RecurringTimePeriodOfDay: [ new TimePeriodOfDay(Time.Parse("22:00:00"), Time.Parse("06:00:00")) ]) ]);
+
+            var rate      = new EnergyRate("DE*GEF*T1",
+                                           Created,
+                                           RatePolicy.Parse("adHoc"),
+                                           [ Currency.EUR ],
+                                           EnergyPrices: [
+                                               new EnergyPrice(PriceType.Parse("pricePerKWh"), new AmountOfMoney(0.39m)),
+                                               new EnergyPrice(PriceType.Parse("pricePerKWh"), new AmountOfMoney(0.29m), OverallPeriod: night),
+                                               new EnergyPrice(PriceType.Parse("basePrice"),   new AmountOfMoney(1m))
+                                           ]);
+
+            var tariff    = rate.ToPOI3(GEF, Languages.de, warnings)!;
+
+            Assert.Multiple(() => {
+                Assert.That(warnings,                                                            Is.Empty);
+                Assert.That(tariff.Elements.Select(element => element.PriceComponents.Count()),  Is.EqualTo(new[] { 2, 1 }));
+                Assert.That(tariff.Elements.Last().Restrictions?.StartTime,                       Is.EqualTo(new TimeOnly(22, 0)));
             });
 
         }
@@ -410,6 +510,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             AssertValidStatus(delta);
 
             Assert.Multiple(() => {
+                Assert.That(delta.IsDelta,                                                                                                                          Is.True);
+                Assert.That(delta.ToJSON(DatexIIJSONDialect.Mobilithek_01_00_00).SelectToken("$..codedExchangeProtocol.value")?.Value<String>(),                    Is.EqualTo("deltaPush"));
+                Assert.That(publisher.CurrentStatusPublication!.IsDelta,                                                                                            Is.False);
                 Assert.That(delta.EnergyInfrastructureSiteStatus.Single().EnergyInfrastructureStationStatus.Single().RefillPointStatus.Single().Status.ToString(), Is.EqualTo("charging"));
                 Assert.That(delta.TableReferences.Single().Version,                                                                                                 Is.EqualTo(publisher.TableVersion));
             });

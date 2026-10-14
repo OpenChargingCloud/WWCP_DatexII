@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -55,6 +56,48 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlElement("_heightCharacteristicExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?           HeightCharacteristicExtension    { get; } = HeightCharacteristicExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out HeightCharacteristic, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a HeightCharacteristic.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="HeightCharacteristic">The parsed HeightCharacteristic.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                       XML,
+                                          [NotNullWhen(true)]  out HeightCharacteristic?  HeightCharacteristic,
+                                          [NotNullWhen(false)] out String?               ErrorResponse)
+        {
+
+            HeightCharacteristic = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.Common + "comparisonOperator",
+                                            "comparison operator",
+                                            Common.ComparisonOperator.TryParse,
+                                            out ComparisonOperator comparisonOperator,
+                                            out ErrorResponse) ||
+                !XML.TryParseMandatoryValue(DatexIINS.Common + "vehicleHeight",
+                                            "vehicle height",
+                                            DatexIIXMLExtensions.TryParseMeter,
+                                            out Meter measure,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            HeightCharacteristic = new HeightCharacteristic(
+                                        comparisonOperator,
+                                                          measure,
+                                        XML.Element(DatexIINS.Common + "_heightCharacteristicExtension")
+                                    );
+
+            return true;
+
+        }
 
         #endregion
 

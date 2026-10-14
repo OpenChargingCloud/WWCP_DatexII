@@ -55,7 +55,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
     /// </summary>
     /// <param name="Sender">The publisher.</param>
     /// <param name="Publication">The status publication.</param>
-    /// <param name="IsDelta">Whether it has only what changed, rather than the status of every refill point.</param>
+    /// <param name="IsDelta">Whether it has only what changed, rather than the status of every refill point (as Publication.IsDelta).</param>
     public delegate Task OnStatusPublicationDelegate(POI3ToDatexIIPublisher                 Sender,
                                                      EnergyInfrastructureStatusPublication  Publication,
                                                      Boolean                                IsDelta);
@@ -352,7 +352,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                        TableId,
                                                        TableVersion,
                                                        OperatorIds,
-                                                       [ EVSEId ]);
+                                                       [ EVSEId ]).
+                            // Its Mobilithek JSON is a deltaPush.
+                            AsDelta();
 
             if (delta.EnergyInfrastructureSiteStatus.Any())
                 await Raise(OnStatusPublication, handler => handler(this, delta, true));

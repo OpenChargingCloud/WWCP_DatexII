@@ -89,8 +89,8 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                     Assert.That(energyInfrastructureStatusPublication.ModelBaseVersion,                             Is.EqualTo("3"));
                     Assert.That(energyInfrastructureStatusPublication.ExtensionName,                                Is.Null);
                     Assert.That(energyInfrastructureStatusPublication.ExtensionVersion,                             Is.Null);
-                    Assert.That(energyInfrastructureStatusPublication.ProfileName,                                  Is.EqualTo("Level C profile Energy Infrastructure"));
-                    Assert.That(energyInfrastructureStatusPublication.ProfileVersion,                               Is.EqualTo("00-01-00"));
+                    Assert.That(energyInfrastructureStatusPublication.ProfileName,                                  Is.EqualTo("AFIR Energy Infrastructure"));
+                    Assert.That(energyInfrastructureStatusPublication.ProfileVersion,                               Is.EqualTo("01-00-00"));
                     Assert.That(energyInfrastructureStatusPublication.PayloadPublicationExtension,                  Is.Null);
 
 
@@ -126,7 +126,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                         Assert.That(tableReferences.   Count(),                                                     Is.EqualTo(1));
                         Assert.That(tableReferences.   First().Id,                                                  Is.EqualTo("2474A514-0E5D-48F9-A908-F185DD4177A2"));
                         Assert.That(tableReferences.   First().Version,                                             Is.EqualTo("2"));
-                        Assert.That(tableReferences.   First().TargetClass,                                         Is.EqualTo("egi:EnergyInfrastructureTable"));
+                        Assert.That(tableReferences.   First().TargetClass,                                         Is.EqualTo("aegi:EnergyInfrastructureTable"));
                     }
 
 
@@ -200,8 +200,8 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                     Assert.That(energyInfrastructureTablePublication.ModelBaseVersion,              Is.EqualTo("3"));
                     Assert.That(energyInfrastructureTablePublication.ExtensionName,                 Is.Null);
                     Assert.That(energyInfrastructureTablePublication.ExtensionVersion,              Is.Null);
-                    Assert.That(energyInfrastructureTablePublication.ProfileName,                   Is.EqualTo("Level C profile Energy Infrastructure"));
-                    Assert.That(energyInfrastructureTablePublication.ProfileVersion,                Is.EqualTo("00-01-00"));
+                    Assert.That(energyInfrastructureTablePublication.ProfileName,                   Is.EqualTo("AFIR Energy Infrastructure"));
+                    Assert.That(energyInfrastructureTablePublication.ProfileVersion,                Is.EqualTo("01-00-00"));
                     Assert.That(energyInfrastructureTablePublication.PayloadPublicationExtension,   Is.Null);
 
 

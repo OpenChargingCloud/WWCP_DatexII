@@ -35,13 +35,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// Provides information about a facility, which may represent any kind of site, building, or structure, 
     /// and may be a composite facility that includes supplemental facilities.
     /// </summary>
-    [XmlType("Facility", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("Facility", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public abstract class Facility(String                                Id,
                                    String                                Version,
 
                                    MultilingualString?                   Name                      = null,
                                    IEnumerable<MultilingualString>?      Alias                     = null,
-                                   String?                               ExternalIdentifier        = null,
+                                   IEnumerable<ExternalIdentifier>?       ExternalIdentifier        = null,
                                    DateTimeOffset?                       LastUpdated               = null,
                                    MultilingualString?                   Description               = null,
                                    IEnumerable<Accessibility>?           Accessibility             = null,
@@ -95,13 +95,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Supplemental facilities, e.g. additional service or equipment available on the site.
         /// </summary>
-        [XmlElement("supplementalFacility",    Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("supplementalFacility",    Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<ASupplementalFacility>   SupplementalFacilities    { get; } = SupplementalFacilities?.Distinct() ?? [];
 
         /// <summary>
         /// Dedicated parking spaces associated with the facility.
         /// </summary>
-        [XmlElement("dedicatedParkingSpaces",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("dedicatedParkingSpaces",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<DedicatedParkingSpaces>  DedicatedParkingSpaces    { get; } = DedicatedParkingSpaces?.Distinct() ?? [];
 
         /// <summary>

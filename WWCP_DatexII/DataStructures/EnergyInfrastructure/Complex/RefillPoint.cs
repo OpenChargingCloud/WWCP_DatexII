@@ -36,14 +36,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// Technical infrastructure at a specific location that facilitates an energy refilling process
     /// being connected to at most one vehicle at a time.
     /// </summary>
-    [XmlType("RefillPoint", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("RefillPoint", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public abstract class RefillPoint(String                                Id,
                                       String                                Version,
                                       DeliveryUnit                          DeliveryUnit,
 
                                       MultilingualString?                   Name                      = null,
                                       IEnumerable<MultilingualString>?      Alias                     = null,
-                                      String?                               ExternalIdentifier        = null,
+                                      IEnumerable<ExternalIdentifier>?       ExternalIdentifier        = null,
                                       DateTimeOffset?                       LastUpdated               = null,
                                       MultilingualString?                   Description               = null,
                                       IEnumerable<Accessibility>?           Accessibility             = null,
@@ -70,7 +70,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                                       XElement?                             FacilityObjectExtension   = null,
                                       XElement?                             FacilityExtension         = null,
-                                      XElement?                             RefillPointExtension      = null)
+                                      XElement?                             RefillPointExtension      = null,
+                                      IEnumerable<EnergyProduct>?           EnergyProducts            = null)
 
         : Facility(Id,
                    Version,
@@ -107,19 +108,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Measurement unit used for delivery and accounting of the energy provided at this refill point.
         /// </summary>
-        [XmlElement("deliveryUnit",           Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("deliveryUnit",           Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public DeliveryUnit         DeliveryUnit             { get; } = DeliveryUnit;
 
         /// <summary>
         /// Minimum delivery amount.
         /// </summary>
-        [XmlElement("minimumDeliveryAmount",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("minimumDeliveryAmount",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Units?               MinimumDeliveryAmount    { get; } = MinimumDeliveryAmount;
 
         /// <summary>
         /// Maximum delivery amount.
         /// </summary>
-        [XmlElement("maximumDeliveryAmount",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("maximumDeliveryAmount",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Units?               MaximumDeliveryAmount    { get; } = MaximumDeliveryAmount;
 
         /// <summary>
@@ -131,7 +132,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Information regarding options for reservation of a time frame.
         /// </summary>
-        [XmlElement("reservation",            Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("reservation",            Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public ReservationType?     Reservation              { get; } = Reservation;
 
         /// <summary>
@@ -139,6 +140,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// </summary>
         [XmlElement("_refillPointExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?            RefillPointExtension     { get; } = RefillPointExtension;
+
+        /// <summary>
+        /// The energy products of the refill point, e.g. its electric energy with its rates (DATEX II 3.7).
+        /// </summary>
+        public IEnumerable<EnergyProduct>  EnergyProducts    { get; } = EnergyProducts?.Distinct() ?? [];
 
         #endregion
 
@@ -201,6 +207,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             if (Reservation.HasValue)
                 yield return new XElement(DatexIINS.EnergyInfrastructure + "reservation",              Reservation.Value.ToString());
+
+            foreach (var energyProduct in EnergyProducts)
+                yield return energyProduct.ToXML(DatexIINS.EnergyInfrastructure + "energyProduct");
 
             if (RefillPointExtension is not null)
                 yield return new XElement(DatexIINS.EnergyInfrastructure + "_refillPointExtension",    RefillPointExtension);

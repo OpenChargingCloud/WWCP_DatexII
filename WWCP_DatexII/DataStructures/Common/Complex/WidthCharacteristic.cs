@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -55,6 +56,48 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlElement("_widthCharacteristicExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?           WidthCharacteristicExtension    { get; } = WidthCharacteristicExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out WidthCharacteristic, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a WidthCharacteristic.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="WidthCharacteristic">The parsed WidthCharacteristic.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                       XML,
+                                          [NotNullWhen(true)]  out WidthCharacteristic?  WidthCharacteristic,
+                                          [NotNullWhen(false)] out String?               ErrorResponse)
+        {
+
+            WidthCharacteristic = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.Common + "comparisonOperator",
+                                            "comparison operator",
+                                            Common.ComparisonOperator.TryParse,
+                                            out ComparisonOperator comparisonOperator,
+                                            out ErrorResponse) ||
+                !XML.TryParseMandatoryValue(DatexIINS.Common + "vehicleWidth",
+                                            "vehicle width",
+                                            DatexIIXMLExtensions.TryParseMeter,
+                                            out Meter measure,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            WidthCharacteristic = new WidthCharacteristic(
+                                       comparisonOperator,
+                                                         measure,
+                                       XML.Element(DatexIINS.Common + "_widthCharacteristicExtension")
+                                   );
+
+            return true;
+
+        }
 
         #endregion
 

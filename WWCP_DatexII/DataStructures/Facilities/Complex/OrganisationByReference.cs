@@ -33,8 +33,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Organisation information that is based on a reference.
     /// </summary>
-    [XmlType("OrganisationByReference", Namespace = "http://datex2.eu/schema/3/facilities")]
-    public class OrganisationByReference(OrganisationSpecificationVersionedReference  OrganisationReference,
+    [XmlType("OrganisationByReference", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+    public class OrganisationByReference(ReferenceableOrganisationVersionedReference  OrganisationReference,
                                          OrganisationTableVersionedReference?         OrganisationTableReference         = null,
                                          XElement?                                    OrganisationByReferenceExtension   = null,
 
@@ -52,13 +52,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Organisation information provided by a reference.
         /// </summary>
-        [XmlElement("organisationReference",              Namespace = "http://datex2.eu/schema/3/facilities")]
-        public OrganisationSpecificationVersionedReference  OrganisationReference               { get; } = OrganisationReference;
+        [XmlElement("organisationReference",              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        public ReferenceableOrganisationVersionedReference  OrganisationReference               { get; } = OrganisationReference;
 
         /// <summary>
         /// Organisation table in question defined by a reference.
         /// </summary>
-        [XmlElement("organisationTableReference",         Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("organisationTableReference",         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public OrganisationTableVersionedReference?         OrganisationTableReference          { get; } = OrganisationTableReference;
 
         /// <summary>
@@ -89,8 +89,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             if (!XML.TryParseMandatory(DatexIINS.Facilities + "organisationReference",
                                        "organisation reference",
-                                       OrganisationSpecificationVersionedReference.TryParseXML,
-                                       out OrganisationSpecificationVersionedReference? organisationReference,
+                                       ReferenceableOrganisationVersionedReference.TryParseXML,
+                                       out ReferenceableOrganisationVersionedReference? organisationReference,
                                        out ErrorResponse))
             {
                 return false;
@@ -154,7 +154,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             => new (XMLName ?? DatexIINS.Facilities + "organisation",
 
-                   new XAttribute(DatexIINS.XSI + "type",   "fac:OrganisationByReference"),
+                   new XAttribute(DatexIINS.XSI + "type",   "afac:OrganisationByReference"),
 
                    ToXMLElements(),
 

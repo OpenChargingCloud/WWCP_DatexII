@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Contact information.
     /// </summary>
-    [XmlType("ContactInformation", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("ContactInformation", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class ContactInformation(IEnumerable<Languages>?  Languages                     = null,
                                     String?                  TelephoneNumber               = null,
                                     String?                  FaxNumber                     = null,
@@ -88,6 +88,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         {
 
             ContactInformation = null;
+
+            if (XML.XSIType() == "ContactPerson")
+            {
+                if (ContactPerson.TryParseXML(XML, out var contactPerson, out ErrorResponse))
+                {
+                    ContactInformation = contactPerson;
+                    return true;
+                }
+                return false;
+            }
 
             if (!XML.TryParseOptionalValues(DatexIINS.Facilities + "language",
                                             "language",

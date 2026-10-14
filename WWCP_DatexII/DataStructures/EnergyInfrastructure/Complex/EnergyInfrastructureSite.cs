@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2014-2025 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * Copyright (c) 2014-2026 GraphDefined GmbH <achim.friedland@graphdefined.com>
  * This file is part of WWCP DatexII <https://github.com/OpenChargingCloud/WWCP_DatexII>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
@@ -37,13 +37,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// A site where vehicles can be supplied with energy, including all buildings, stations,
     /// parking spaces and other associated services.
     /// </summary>
-    [XmlType("EnergyInfrastructureSite", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyInfrastructureSite", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyInfrastructureSite(String                                     Id,
                                           String                                     Version,
 
                                           MultilingualString?                        Name                                = null,
                                           IEnumerable<MultilingualString>?           Alias                               = null,
-                                          String?                                    ExternalIdentifier                  = null,
+                                          IEnumerable<ExternalIdentifier>?            ExternalIdentifier                  = null,
                                           DateTimeOffset?                            LastUpdated                         = null,
                                           MultilingualString?                        Description                         = null,
                                           IEnumerable<Accessibility>?                Accessibility                       = null,
@@ -71,6 +71,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                           IEnumerable<ALocation>?                    Entrances                           = null,
                                           IEnumerable<ALocation>?                    Exits                               = null,
                                           IEnumerable<EnergyInfrastructureStation>?  EnergyInfrastructureStations        = null,
+                                          AOrganisation?                             EnergyDistributor                   = null,
+                                          IEnumerable<AOrganisation>?                MobilityServiceProviders            = null,
+                                          IEnumerable<AOrganisation>?                RoamingPlatforms                    = null,
 
                                           XElement?                                  FacilityObjectExtension             = null,
                                           XElement?                                  FacilityExtension                   = null,
@@ -111,7 +114,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Specifies the type of the site.
         /// </summary>
-        [XmlElement("typeOfSite",                          Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("typeOfSite",                          Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public EnergyInfrastructureSiteType?             TypeOfSite                           { get; } = TypeOfSite;
 
         /// <summary>
@@ -123,19 +126,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Limitation to a set of users (exclusive).
         /// </summary>
-        [XmlElement("exclusiveUsers",                      Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("exclusiveUsers",                      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<UserType>                     ExclusiveUsers                       { get; } = ExclusiveUsers?.              Distinct() ?? [];
 
         /// <summary>
         /// Users that are preferred at this site (but not exclusive).
         /// </summary>
-        [XmlElement("preferredUsers",                      Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("preferredUsers",                      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<UserType>                     PreferredUsers                       { get; } = PreferredUsers?.              Distinct() ?? [];
 
         /// <summary>
         /// Specifies the type of service available at an EnergyInfrastructureSite.
         /// </summary>
-        [XmlElement("serviceType",                         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("serviceType",                         Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<Service>                      ServiceTypes                         { get; } = ServiceTypes?.                Distinct() ?? [];
 
         /// <summary>
@@ -153,8 +156,23 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Specifications of charging stations on the site.
         /// </summary>
-        [XmlElement("energyInfrastructureStation",         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyInfrastructureStation",         Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyInfrastructureStation>  EnergyInfrastructureStations         { get; } = EnergyInfrastructureStations?.Distinct() ?? [];
+
+        /// <summary>
+        /// The distributor of the energy (DATEX II 3.7).
+        /// </summary>
+        public AOrganisation?                            EnergyDistributor                    { get; } = EnergyDistributor;
+
+        /// <summary>
+        /// Mobility service providers offering contract-based recharging at the site (DATEX II 3.7).
+        /// </summary>
+        public IEnumerable<AOrganisation>                MobilityServiceProviders             { get; } = MobilityServiceProviders?.    Distinct() ?? [];
+
+        /// <summary>
+        /// Roaming platforms the site is connected to (DATEX II 3.7).
+        /// </summary>
+        public IEnumerable<AOrganisation>                RoamingPlatforms                     { get; } = RoamingPlatforms?.            Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional EnergyInfrastructureSite information.
@@ -188,7 +206,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                 !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "exclusiveUsers",               "exclusive users",                UserType.TryParse,                      out IEnumerable<UserType>                  exclusiveUsers, out ErrorResponse) ||
                 !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "preferredUsers",               "preferred users",                UserType.TryParse,                      out IEnumerable<UserType>                  preferredUsers, out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "serviceType",                  "service type",                   Service.TryParseXML,                    out IEnumerable<Service>                   serviceTypes, out ErrorResponse) ||
-                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "energyInfrastructureStation",  "energy infrastructure station",  EnergyInfrastructureStation.TryParseXML, out IEnumerable<EnergyInfrastructureStation> stations,  out ErrorResponse))
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "energyInfrastructureStation",  "energy infrastructure station",  EnergyInfrastructureStation.TryParseXML, out IEnumerable<EnergyInfrastructureStation> stations,  out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "entrance",                     "entrance",                       ALocation.TryParseXML,                  out IEnumerable<ALocation>                 entrances,    out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "exit",                         "exit",                           ALocation.TryParseXML,                  out IEnumerable<ALocation>                 exits,        out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "energyDistributor",            "energy distributor",             AOrganisation.TryParseXML,              out AOrganisation?                         energyDistributor,        out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "mobilityServiceProvider",      "mobility service provider",      AOrganisation.TryParseXML,              out IEnumerable<AOrganisation>             mobilityServiceProviders, out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "roamingPlatform",              "roaming platform",               AOrganisation.TryParseXML,              out IEnumerable<AOrganisation>             roamingPlatforms,         out ErrorResponse))
             {
                 return false;
             }
@@ -213,7 +236,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                            parts.Owner,
                                            parts.Operator,
                                            parts.Helpdesk,
-                                           null,
+                                           parts.ApplicableForVehicles,
                                            parts.Dimension,
                                            parts.Amenities,
                                            facility.SupplementalFacilities,
@@ -223,9 +246,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                            exclusiveUsers,
                                            preferredUsers,
                                            serviceTypes,
-                                           null,
-                                           null,
+                                           entrances,
+                                           exits,
                                            stations,
+                                           energyDistributor,
+                                           mobilityServiceProviders,
+                                           roamingPlatforms,
                                            parts.FacilityObjectExtension,
                                            facility.FacilityExtension,
                                            XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureSiteExtension")
@@ -275,6 +301,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                    EnergyInfrastructureStations.Select(energyInfrastructureStation =>
                        energyInfrastructureStation.ToXML(DatexIINS.EnergyInfrastructure + "energyInfrastructureStation")),
+
+                   EnergyDistributor?.ToXML(DatexIINS.EnergyInfrastructure + "energyDistributor"),
+
+                   MobilityServiceProviders.Select(mobilityServiceProvider => mobilityServiceProvider.ToXML(DatexIINS.EnergyInfrastructure + "mobilityServiceProvider")),
+                   RoamingPlatforms.        Select(roamingPlatform         => roamingPlatform.        ToXML(DatexIINS.EnergyInfrastructure + "roamingPlatform")),
 
                    EnergyInfrastructureSiteExtension is not null
                        ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureSiteExtension", EnergyInfrastructureSiteExtension)

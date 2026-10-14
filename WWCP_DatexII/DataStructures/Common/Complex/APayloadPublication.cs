@@ -44,6 +44,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                               XElement?                PayloadPublicationExtension   = null)
     {
 
+        #region Data
+
+        /// <summary>
+        /// The default profile: the AFIR Energy Infrastructure profile of DATEX II 3.7, as the German NAP (Mobilithek) uses it.
+        /// </summary>
+        public const String DefaultProfileName     = "AFIR Energy Infrastructure";
+
+        /// <summary>
+        /// The default profile version.
+        /// </summary>
+        public const String DefaultProfileVersion  = "01-00-00";
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -83,16 +97,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         public String?                  ExtensionVersion               { get; } = ExtensionVersion;
 
         /// <summary>
-        /// The profile name, default "Level C profile Energy Infrastructure".
+        /// The profile name, default "AFIR Energy Infrastructure".
         /// </summary>
         [XmlAttribute("profileName")]
-        public String                   ProfileName                    { get; } = ProfileName      ?? "Level C profile Energy Infrastructure";
+        public String                   ProfileName                    { get; } = ProfileName      ?? DefaultProfileName;
 
         /// <summary>
-        /// The profile version, default "00-02-00".
+        /// The profile version, default "01-00-00".
         /// </summary>
         [XmlAttribute("profileVersion")]
-        public String                   ProfileVersion                 { get; } = ProfileVersion   ?? "00-02-00";
+        public String                   ProfileVersion                 { get; } = ProfileVersion   ?? DefaultProfileVersion;
 
         /// <summary>
         /// Optional extension element for additional payload publication information.

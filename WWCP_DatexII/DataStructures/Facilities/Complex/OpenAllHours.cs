@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Open or available all the time (24/7).
     /// </summary>
-    [XmlType("OpenAllHours", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("OpenAllHours", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class OpenAllHours(XElement?            OpenAllHoursExtension     = null,
                               ClosureInformation?  ClosureInformation        = null,
                               XElement?            OperatingHoursExtension   = null)
@@ -106,7 +106,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             => new (XMLName ?? DatexIINS.Facilities + "operatingHours",
 
-                   new XAttribute(DatexIINS.XSI + "type",   "fac:OpenAllHours"),
+                   new XAttribute(DatexIINS.XSI + "type",   "afac:OpenAllHours"),
 
                    ClosureInformation is not null
                        ? ClosureInformation.ToXML(DatexIINS.Facilities + "closureInformation")

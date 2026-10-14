@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -53,6 +54,48 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlElement("_numberOfAxlesCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?           NumberOfAxlesCharacteristicExtension    { get; } = NumberOfAxlesCharacteristicExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out NumberOfAxlesCharacteristic, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a NumberOfAxlesCharacteristic.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="NumberOfAxlesCharacteristic">The parsed NumberOfAxlesCharacteristic.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                       XML,
+                                          [NotNullWhen(true)]  out NumberOfAxlesCharacteristic?  NumberOfAxlesCharacteristic,
+                                          [NotNullWhen(false)] out String?               ErrorResponse)
+        {
+
+            NumberOfAxlesCharacteristic = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.Common + "comparisonOperator",
+                                            "comparison operator",
+                                            Common.ComparisonOperator.TryParse,
+                                            out ComparisonOperator comparisonOperator,
+                                            out ErrorResponse) ||
+                !XML.TryParseMandatoryValue(DatexIINS.Common + "numberOfAxles",
+                                            "number of axles",
+                                            DatexIIXMLExtensions.TryParseByte,
+                                            out Byte measure,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            NumberOfAxlesCharacteristic = new NumberOfAxlesCharacteristic(
+                                               comparisonOperator,
+                                                                 measure,
+                                               XML.Element(DatexIINS.Common + "_numberOfAxlesCharacteristicExtension")
+                                           );
+
+            return true;
+
+        }
 
         #endregion
 

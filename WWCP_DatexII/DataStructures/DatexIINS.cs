@@ -61,10 +61,16 @@ namespace cloud.charging.open.protocols.DatexII.v3
         public static readonly XNamespace LocationReferencing   = "http://datex2.eu/schema/3/locationReferencing";
 
         /// <summary>
-        /// DatexII Facilities
-        /// http://datex2.eu/schema/3/facilities
+        /// DatexII Common Extension
+        /// http://datex2.eu/schema/3/commonExtension
         /// </summary>
-        public static readonly XNamespace Facilities            = "http://datex2.eu/schema/3/facilities";
+        public static readonly XNamespace CommonExtension       = "http://datex2.eu/schema/3/commonExtension";
+
+        /// <summary>
+        /// DatexII AFIR Facilities (DATEX II 3.7)
+        /// http://datex2.eu/schema/3/afirFacilities
+        /// </summary>
+        public static readonly XNamespace Facilities            = "http://datex2.eu/schema/3/afirFacilities";
 
         /// <summary>
         /// DatexII Parking
@@ -73,10 +79,10 @@ namespace cloud.charging.open.protocols.DatexII.v3
         public static readonly XNamespace Parking               = "http://datex2.eu/schema/3/parking";
 
         /// <summary>
-        /// DatexII Energy Infrastructure
-        /// http://datex2.eu/schema/3/energyInfrastructure
+        /// DatexII AFIR Energy Infrastructure (DATEX II 3.7)
+        /// http://datex2.eu/schema/3/afirEnergyInfrastructure
         /// </summary>
-        public static readonly XNamespace EnergyInfrastructure  = "http://datex2.eu/schema/3/energyInfrastructure";
+        public static readonly XNamespace EnergyInfrastructure  = "http://datex2.eu/schema/3/afirEnergyInfrastructure";
 
     }
 

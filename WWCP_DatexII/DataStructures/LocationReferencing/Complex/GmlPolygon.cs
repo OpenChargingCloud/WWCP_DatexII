@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -54,6 +55,40 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_gmlPolygonExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                   GMLPolygonExtension    { get; } = GMLPolygonExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out GMLPolygon, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a GML polygon.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="GMLPolygon">The parsed GML polygon.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                              XML,
+                                          [NotNullWhen(true)]  out GMLPolygon?  GMLPolygon,
+                                          [NotNullWhen(false)] out String?      ErrorResponse)
+        {
+
+            GMLPolygon = null;
+
+            if (!XML.TryParseMandatoryXML(DatexIINS.LocationReferencing + "exterior",  "exterior",  GMLLinearRing.TryParseXML,  out GMLLinearRing?               exterior,  out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs(DatexIINS.LocationReferencing + "interior",  "interior",  GMLLinearRing.TryParseXML,  out IEnumerable<GMLLinearRing>  interior,  out ErrorResponse))
+            {
+                return false;
+            }
+
+            GMLPolygon = new GMLPolygon(
+                             exterior,
+                             interior,
+                             XML.Element(DatexIINS.LocationReferencing + "_gmlPolygonExtension")
+                         );
+
+            return true;
+
+        }
 
         #endregion
 

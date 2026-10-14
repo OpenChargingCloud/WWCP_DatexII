@@ -29,7 +29,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Amenities such as the facility (or a facility in the surrounding) being roofed or illuminated.
     /// </summary>
-    [XmlType("Amenities", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("Amenities", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class Amenities(Boolean?   Illuminated                          = null,
                            Boolean?   Roofed                               = null,
                            Boolean?   IlluminatedRechargingParkingNearby   = null,

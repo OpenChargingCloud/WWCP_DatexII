@@ -121,7 +121,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             var xml = new XElement(DatexIINS.Common + "publicationCreator",
 
-                                new XElement(DatexIINS.Common + "country",                             Country.Alpha2Code.ToLower()),
+                                // ISO 3166-1 alpha-2, as the Mobilithek profile writes it.
+                                new XElement(DatexIINS.Common + "country",                             Country.Alpha2Code.ToUpperInvariant()),
                                 new XElement(DatexIINS.Common + "nationalIdentifier",                  NationalIdentifier),
 
                           InternationalIdentifierExtension is not null

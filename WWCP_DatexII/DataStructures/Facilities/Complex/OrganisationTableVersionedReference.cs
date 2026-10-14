@@ -31,9 +31,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 {
 
     /// <summary>
-    /// A versioned reference to an OrganisationTable. The targetClass attribute is fixed to "fac:OrganisationTable".
+    /// A versioned reference to an OrganisationTable. The targetClass attribute is fixed to "afac:OrganisationTable".
     /// </summary>
-    [XmlType("_OrganisationTableVersionedReference", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("_OrganisationTableVersionedReference", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class OrganisationTableVersionedReference(String  Id,
                                                      String? Version = null)
 
@@ -47,7 +47,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Fixed attribute indicating the target class.
         /// </summary>
         [XmlAttribute("targetClass")]
-        public String  TargetClass    { get; } = "fac:OrganisationTable";
+        public String  TargetClass    { get; } = "afac:OrganisationTable";
 
         #endregion
 

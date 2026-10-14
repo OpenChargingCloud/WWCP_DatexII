@@ -24,6 +24,7 @@ using System.Diagnostics.CodeAnalysis;
 using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
+using Newtonsoft.Json.Linq;
 
 #endregion
 
@@ -33,7 +34,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// A publication of static information on the infrastructure for vehicle energy supply.
     /// </summary>
-    [XmlType("EnergyInfrastructureTablePublication", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyInfrastructureTablePublication", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyInfrastructureTablePublication(DateTimeOffset                           PublicationTime,
                                                       InternationalIdentifier                  PublicationCreator,
                                                       Languages                                Language,
@@ -67,13 +68,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Management information relating to the publication.
         /// </summary>
-        [XmlElement("headerInformation",                               Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("headerInformation",                               Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public HeaderInformation?                      HeaderInformation                                { get; } = HeaderInformation;
 
         /// <summary>
         /// A collection of EnergyInfrastructureTable instances.
         /// </summary>
-        [XmlElement("energyInfrastructureTable",                       Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyInfrastructureTable",                       Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyInfrastructureTable>  EnergyInfrastructureTables                       { get; } = EnergyInfrastructureTables?.Distinct() ?? [];
 
         /// <summary>
@@ -90,13 +91,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         //             xmlns:com           = "http://datex2.eu/schema/3/common"
         //             xmlns:locx          = "http://datex2.eu/schema/3/locationExtension"
         //             xmlns:loc           = "http://datex2.eu/schema/3/locationReferencing"
-        //             xmlns               = "http://datex2.eu/schema/3/energyInfrastructure"
-        //             xmlns:fac           = "http://datex2.eu/schema/3/facilities"
+        //             xmlns               = "http://datex2.eu/schema/3/afirEnergyInfrastructure"
+        //             xmlns:fac           = "http://datex2.eu/schema/3/afirFacilities"
         //             xmlns:prk           = "http://datex2.eu/schema/3/parking"
         //             xmlns:xsi           = "http://www.w3.org/2001/XMLSchema-instance"
         //             xsi:schemaLocation  = "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"
-        //             xmlns:egi           = "http://datex2.eu/schema/3/energyInfrastructure"
-        //             xsi:type            = "egi:EnergyInfrastructureTablePublication"
+        //             xmlns:egi           = "http://datex2.eu/schema/3/afirEnergyInfrastructure"
+        //             xsi:type            = "aegi:EnergyInfrastructureTablePublication"
         //             lang                = "de"
         //             modelBaseVersion    = "3"
         //             profileName         = "Level C profile Energy Infrastructure"
@@ -134,6 +135,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                           [NotNullWhen(true)]  out EnergyInfrastructureTablePublication?  EnergyInfrastructureTablePublication,
                                           [NotNullWhen(false)] out String?                                ErrorResponse)
         {
+
+            XML = DatexIISchemas.ResolveExtendedValues(new XElement(XML));
 
             EnergyInfrastructureTablePublication  = null;
             ErrorResponse                         = null;
@@ -193,8 +196,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse EnergyInfrastructureTables    [optional]
 
-            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureTable",
-                                              "header information",
+            if (!XML.TryParseOptionalXMLs    (DatexIINS.EnergyInfrastructure + "energyInfrastructureTable",
+                                              "energy infrastructure table",
                                               EnergyInfrastructureTable.TryParseXML,
                                               out IEnumerable<EnergyInfrastructureTable> energyInfrastructureTables,
                                               out ErrorResponse))
@@ -279,7 +282,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                                                         headerInformation,
                                                         energyInfrastructureTables,
-                                                        XML.Element(DatexIINS.Common + "_energyInfrastructureTablePublicationExtension"),
+                                                        XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureTablePublicationExtension"),
 
                                                         modelBaseVersion,
                                                         extensionName,
@@ -305,15 +308,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                           new XAttribute(XNamespace.Xmlns + "d2",    DatexIINS.D2Payload),
                           new XAttribute(XNamespace.Xmlns + "com",   DatexIINS.Common),
-                          new XAttribute(XNamespace.Xmlns + "egi",   DatexIINS.EnergyInfrastructure),
-                          new XAttribute(XNamespace.Xmlns + "fac",   DatexIINS.Facilities),
+                          new XAttribute(XNamespace.Xmlns + "aegi",   DatexIINS.EnergyInfrastructure),
+                          new XAttribute(XNamespace.Xmlns + "afac",   DatexIINS.Facilities),
                           new XAttribute(XNamespace.Xmlns + "locx",  DatexIINS.LocationExtension),
                           new XAttribute(XNamespace.Xmlns + "loc",   DatexIINS.LocationReferencing),
-                          new XAttribute(XNamespace.Xmlns + "prk",   DatexIINS.Parking),
+                          new XAttribute(XNamespace.Xmlns + "comx",  DatexIINS.CommonExtension),
                           new XAttribute(XNamespace.Xmlns + "xsi",   DatexIINS.XSI),
 
                           new XAttribute(DatexIINS.XSI + "schemaLocation",  "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"),
-                          new XAttribute(DatexIINS.XSI + "type",            "egi:EnergyInfrastructureTablePublication"),
+                          new XAttribute(DatexIINS.XSI + "type",            "aegi:EnergyInfrastructureTablePublication"),
                           new XAttribute("lang",                             Language.AsText()),
                           new XAttribute("modelBaseVersion",                ModelBaseVersion),
                           new XAttribute("profileName",                     ProfileName),
@@ -323,11 +326,56 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                           PublicationCreator.ToXML(),
                           HeaderInformation?.ToXML(DatexIINS.EnergyInfrastructure),
 
-                          EnergyInfrastructureTables.Select(energyInfrastructureTable => energyInfrastructureTable.ToXML())
+                          EnergyInfrastructureTables.Select(energyInfrastructureTable => energyInfrastructureTable.ToXML()),
+
+                          EnergyInfrastructureTablePublicationExtension is not null
+                              ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureTablePublicationExtension", EnergyInfrastructureTablePublicationExtension)
+                              : null
 
                       );
 
-            return xml;
+            return DatexIISchemas.ExtendUnknownValues(xml);
+
+        }
+
+        #endregion
+
+        #region ToJSON(Dialect = DATEXII_3_7)
+
+        /// <summary>
+        /// Return a JSON representation of this publication, in the given dialect.
+        /// </summary>
+        /// <param name="Dialect">The JSON dialect.</param>
+        public JObject ToJSON(DatexIIJSONDialect Dialect = DatexIIJSONDialect.DATEXII_3_7)
+
+            => DatexIIJSON.ToJSON(ToXML(), Dialect);
+
+        #endregion
+
+        #region TryParseJSON(JSON, out EnergyInfrastructureTablePublication, out ErrorResponse, Dialect = DATEXII_3_7)
+
+        /// <summary>
+        /// Try to parse the given JSON representation of a publication, in the given dialect.
+        /// </summary>
+        /// <param name="JSON">The JSON to be parsed.</param>
+        /// <param name="EnergyInfrastructureTablePublication">The parsed publication.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        /// <param name="Dialect">The JSON dialect.</param>
+        public static Boolean TryParseJSON(JObject                                   JSON,
+                                           [NotNullWhen(true)]  out EnergyInfrastructureTablePublication?  EnergyInfrastructureTablePublication,
+                                           [NotNullWhen(false)] out String?          ErrorResponse,
+                                           DatexIIJSONDialect                        Dialect   = DatexIIJSONDialect.DATEXII_3_7)
+        {
+
+            EnergyInfrastructureTablePublication = null;
+
+            if (!DatexIIJSON.TryParse(JSON, out var payloadXML, out ErrorResponse, Dialect))
+                return false;
+
+            if (!TryParseXML(payloadXML, out EnergyInfrastructureTablePublication, out ErrorResponse))
+                return false;
+
+            return true;
 
         }
 

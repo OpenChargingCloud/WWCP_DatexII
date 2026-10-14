@@ -34,7 +34,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// A specification of operating hours (e.g. for a parking site, a service facility, an access or the availability for equipment).
     /// </summary>
-    [XmlType("OperatingHoursSpecification", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("OperatingHoursSpecification", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class OperatingHoursSpecification(String               Id,
                                              String               Version,
                                              OverallPeriod        OverallPeriod,
@@ -195,7 +195,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             => new (XMLName ?? DatexIINS.Facilities + "operatingHours",
 
-                   new XAttribute(DatexIINS.XSI + "type",   "fac:OperatingHoursSpecification"),
+                   new XAttribute(DatexIINS.XSI + "type",   "afac:OperatingHoursSpecification"),
                    new XAttribute("id",                      Id),
                    new XAttribute("version",                 Version),
 

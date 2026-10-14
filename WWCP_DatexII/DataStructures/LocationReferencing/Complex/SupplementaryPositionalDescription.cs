@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -55,6 +56,56 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_supplementaryPositionalDescriptionExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?            SupplementaryPositionalDescriptionExtension    { get; } = SupplementaryPositionalDescriptionExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out SupplementaryPositionalDescription, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a supplementary positional description: its precision and description.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="SupplementaryPositionalDescription">The parsed supplementary positional description.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                                      XML,
+                                          [NotNullWhen(true)]  out SupplementaryPositionalDescription?  SupplementaryPositionalDescription,
+                                          [NotNullWhen(false)] out String?                              ErrorResponse)
+        {
+
+            SupplementaryPositionalDescription = null;
+            ErrorResponse                      = null;
+
+            UInt32? locationPrecision = null;
+
+            if (XML.Attribute("locationPrecision") is XAttribute precision)
+            {
+                if (!UInt32.TryParse(precision.Value, out var value))
+                {
+                    ErrorResponse = $"Invalid location precision '{precision.Value}'!";
+                    return false;
+                }
+                locationPrecision = value;
+            }
+
+            if (!XML.TryParseOptionalXML(DatexIINS.LocationReferencing + "locationDescription",
+                                         "location description",
+                                         MultilingualString.TryParseXML,
+                                         out MultilingualString? locationDescription,
+                                         out ErrorResponse))
+            {
+                return false;
+            }
+
+            SupplementaryPositionalDescription = new SupplementaryPositionalDescription(
+                                                     locationDescription,
+                                                     locationPrecision,
+                                                     XML.Element(DatexIINS.LocationReferencing + "_supplementaryPositionalDescriptionExtension")
+                                                 );
+
+            return true;
+
+        }
 
         #endregion
 

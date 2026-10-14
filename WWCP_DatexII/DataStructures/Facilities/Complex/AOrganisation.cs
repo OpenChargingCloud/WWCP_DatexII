@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Provides information about an organisation including its units and contact information.
     /// </summary>
-    [XmlType("Organisation", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("Organisation", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public abstract class AOrganisation(OverallPeriod?  GeneralTimeValidity     = null,
                                         XElement?       OrganisationExtension   = null)
     {
@@ -73,8 +73,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
             switch (XML.XSIType())
             {
 
-                case "OrganisationSpecification":
-                    if (OrganisationSpecification.TryParseXML(XML, out var specification, out ErrorResponse)) { Organisation = specification; return true; }
+                case "AnOrganisation":
+                    if (AnOrganisation.           TryParseXML(XML, out var anOrganisation,  out ErrorResponse)) { Organisation = anOrganisation;  return true; }
+                    return false;
+
+                case "ReferenceableOrganisation":
+                    if (ReferenceableOrganisation.TryParseXML(XML, out var referenceable,   out ErrorResponse)) { Organisation = referenceable;   return true; }
                     return false;
 
                 case "OrganisationByReference":

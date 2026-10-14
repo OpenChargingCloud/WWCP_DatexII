@@ -34,13 +34,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// One type of supplemental facility which can be supplemental equipment or a supplemental service facility.
     /// </summary>
-    [XmlType("SupplementalFacility", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("SupplementalFacility", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public abstract class ASupplementalFacility(String                                Id,
                                                 String                                Version,
 
                                                 MultilingualString?                   Name                            = null,
                                                 IEnumerable<MultilingualString>?      Alias                           = null,
-                                                String?                               ExternalIdentifier              = null,
+                                                IEnumerable<ExternalIdentifier>?       ExternalIdentifier              = null,
                                                 DateTimeOffset?                       LastUpdated                     = null,
                                                 MultilingualString?                   Description                     = null,
                                                 IEnumerable<Accessibility>?           Accessibility                   = null,
@@ -98,7 +98,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Specifies whether the supplemental facility is available or not.
         /// Note that this is no dynamic information!
         /// </summary>
-        [XmlElement("availability",                    Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("availability",                    Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Availability?          Availability                     { get; } = Availability;
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Limitation to a set of special users.
         /// </summary>
-        [XmlElement("applicableForUser",               Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("applicableForUser",               Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<UserType>  ApplicableForUser                { get; } = ApplicableForUser?.Distinct() ?? [];
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                            parts.Owner,
                                            parts.Operator,
                                            parts.Helpdesk,
-                                           null,
+                                           parts.ApplicableForVehicles,
                                            parts.Dimension,
                                            parts.Amenities,
                                            availability,
@@ -251,7 +251,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                        parts.Owner,
                                        parts.Operator,
                                        parts.Helpdesk,
-                                       null,
+                                       parts.ApplicableForVehicles,
                                        parts.Dimension,
                                        parts.Amenities,
                                        availability,

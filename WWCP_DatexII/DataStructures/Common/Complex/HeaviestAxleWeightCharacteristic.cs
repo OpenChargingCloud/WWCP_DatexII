@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -55,6 +56,48 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlElement("_heaviestAxleWeightCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?           HeaviestAxleWeightCharacteristicExtension    { get; } = HeaviestAxleWeightCharacteristicExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out HeaviestAxleWeightCharacteristic, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a HeaviestAxleWeightCharacteristic.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="HeaviestAxleWeightCharacteristic">The parsed HeaviestAxleWeightCharacteristic.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                       XML,
+                                          [NotNullWhen(true)]  out HeaviestAxleWeightCharacteristic?  HeaviestAxleWeightCharacteristic,
+                                          [NotNullWhen(false)] out String?               ErrorResponse)
+        {
+
+            HeaviestAxleWeightCharacteristic = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.Common + "comparisonOperator",
+                                            "comparison operator",
+                                            Common.ComparisonOperator.TryParse,
+                                            out ComparisonOperator comparisonOperator,
+                                            out ErrorResponse) ||
+                !XML.TryParseMandatoryValue(DatexIINS.Common + "heaviestAxleWeight",
+                                            "heaviest axle weight",
+                                            DatexIIXMLExtensions.TryParseTonne,
+                                            out Tonne measure,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            HeaviestAxleWeightCharacteristic = new HeaviestAxleWeightCharacteristic(
+                                                    comparisonOperator,
+                                                                      measure,
+                                                    XML.Element(DatexIINS.Common + "_heaviestAxleWeightCharacteristicExtension")
+                                                );
+
+            return true;
+
+        }
 
         #endregion
 

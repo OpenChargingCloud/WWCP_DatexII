@@ -240,6 +240,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         public static PriceType  Other                                   { get; }
             = Register("other");
 
+        /// <summary>
+        /// A price per kilogram.
+        /// </summary>
+        public static PriceType  PricePerKg    { get; }
+            = Register("pricePerKg");
+
         #endregion
 
 

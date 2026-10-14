@@ -1,263 +1,49 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<d2:payload xmlns:d2="http://datex2.eu/schema/3/d2Payload"
- xmlns:com="http://datex2.eu/schema/3/common"
- xmlns:locx="http://datex2.eu/schema/3/locationExtension"
- xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
- xmlns="http://datex2.eu/schema/3/energyInfrastructure"
- xmlns:fac="http://datex2.eu/schema/3/facilities"
- xmlns:prk="http://datex2.eu/schema/3/parking"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"
- xmlns:egi="http://datex2.eu/schema/3/energyInfrastructure"
- xsi:type="egi:EnergyInfrastructureTablePublication"
- lang="de"
- modelBaseVersion="3"
- profileName="Level C profile Energy Infrastructure"
- profileVersion="00-01-00">
+<?xml version='1.0' encoding='UTF-8'?>
+<d2:payload xmlns:aegi="http://datex2.eu/schema/3/afirEnergyInfrastructure" xmlns:afac="http://datex2.eu/schema/3/afirFacilities" xmlns:com="http://datex2.eu/schema/3/common" xmlns:comx="http://datex2.eu/schema/3/commonExtension" xmlns:d2="http://datex2.eu/schema/3/d2Payload" xmlns:loc="http://datex2.eu/schema/3/locationReferencing" xmlns:locx="http://datex2.eu/schema/3/locationExtension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd" xsi:type="aegi:EnergyInfrastructureTablePublication" lang="de" modelBaseVersion="3" profileName="AFIR Energy Infrastructure" profileVersion="01-00-00">
     <com:publicationTime>2025-01-10T11:13:51+01:00</com:publicationTime>
     <com:publicationCreator>
         <com:country>de</com:country>
         <com:nationalIdentifier>DE-NAP-OrganisationXY</com:nationalIdentifier>
     </com:publicationCreator>
-    <headerInformation>
+    <aegi:headerInformation>
         <com:confidentiality>noRestriction</com:confidentiality>
         <com:allowedDeliveryChannel>anyGeneralDeliveryService</com:allowedDeliveryChannel>
         <com:informationStatus>test</com:informationStatus>
-    </headerInformation>
-
+    </aegi:headerInformation>
     <!-- Ein Table als reines Hierarchieelement -->
-    <energyInfrastructureTable id="2474A514-0E5D-48F9-A908-F185DD4177A2" version="2">
-        <tableName>Region Nord</tableName>
-        
+    <aegi:energyInfrastructureTable id="2474A514-0E5D-48F9-A908-F185DD4177A2" version="2">
+        <aegi:tableName>Region Nord</aegi:tableName>
         <!-- Ein Ladehub - Ansammlung von Ladestationen, auch in Verbindung mit Parkplätzen -->
-        <energyInfrastructureSite id="21F02723-CF84-4380-84D4-050917836C7C" version="1">
-            
-            <fac:accessibility>barrierFreeAccessible</fac:accessibility>
-            
-            <fac:additionalInformation>
+        <aegi:energyInfrastructureSite id="21F02723-CF84-4380-84D4-050917836C7C" version="1">
+            <afac:accessibility>barrierFreeAccessible</afac:accessibility>
+            <afac:additionalInformation>
                 <com:values>
                     <com:value lang="de">Zusatzinformationen</com:value>
                 </com:values>
-            </fac:additionalInformation>
-            
-            <fac:informationWebsite>
+            </afac:additionalInformation>
+            <afac:informationWebsite>
                 <com:urlLinkAddress>https://---.com</com:urlLinkAddress>
-            </fac:informationWebsite>
-            
-            <fac:operatingHours xsi:type="fac:OpenAllHours" />
-            
+            </afac:informationWebsite>
+            <afac:operatingHours xsi:type="afac:OpenAllHours" />
             <!-- Georeferenzierung der Site - Optional, aber empfohlen.
                  Möglichkeiten: WGS84-Koordinaten, OpenLR Punkt oder Fläche, GML Polygon, Adresse.
                  Wird eine Flächendefinition verwendet, können Punkt-Koordinaten über coordinatesForDisplay mitgegeben werden.
                  Falls kein geeigneterer Punkt bekannt ist, können die Koordinaten der ersten Ladestation verwendet werden.
                  Ein- und Ausfahrten können bei Bedarf an anderer Stelle eigenständig spezifiziert werden -->
-                 
-            <fac:locationReference xsi:type="loc:AreaLocation">  <!-- Alternative: loc:PointLocation --> 
-                
+            <afac:locationReference xsi:type="loc:AreaLocation">
+                <!-- Alternative: loc:PointLocation -->
                 <loc:coordinatesForDisplay>
                     <loc:latitude>50.779599</loc:latitude>
                     <loc:longitude>6.104507</loc:longitude>
                 </loc:coordinatesForDisplay>
-
-                <loc:facilityLocation>
-                    <locx:address>
-                        <locx:postcode>55555</locx:postcode>
-                        <locx:city>
-                            <com:values>
-                                <com:value lang="de">Musterstadt</com:value>
-                            </com:values>
-                        </locx:city>
-                        <locx:countryCode>DE</locx:countryCode>
-                        <locx:addressLine order="0">
-                            <locx:type>street</locx:type>
-                            <locx:text>
-                                <com:values>
-                                    <com:value lang="de">Hauptstraße</com:value>
-                                </com:values>
-                            </locx:text>
-                        </locx:addressLine>
-                        <locx:addressLine order="1">
-                            <locx:type>houseNumber</locx:type>
-                            <locx:text>
-                                <com:values>
-                                    <com:value lang="de">12</com:value>
-                                </com:values>
-                            </locx:text>
-                        </locx:addressLine>
-                    </locx:address>
-                </loc:facilityLocation>
-                                
-                <loc:gmlMultiPolygon>
-                    <loc:gmlPolygon>
-                        <loc:exterior srsDimension="2" srsName="EPSG 4326 WGS84">
-                            <!-- Hinweis: Ungenaue Beispielkoordinaten -->
-                            <!-- Das Polygon sollte gegen den Uhrzeigersinn gebildet werden und geschlossen sein (gleiche Anfangs- und Endkoordinaten) -->
-                            <loc:posList>50.77978 6.10437 50.7797 6.10411 50.7795 6.10422 50.77956 6.10473 50.77982 6.10469 50.77978 6.10437</loc:posList>
-                        </loc:exterior>
-                    </loc:gmlPolygon>
-                </loc:gmlMultiPolygon>
-                
                 <!-- Hir auch OpenLR möglich
                 <loc:openlrAreaLocationReference xsi:type="loc:OpenlrPolygonLocationReference">
 
                 </loc:openlrAreaLocationReference>
                 -->
-              
-            </fac:locationReference>
-                        
-            <!-- Die Angabe eines Betreibers mit Operator ID und Operator ID der Bundesnetzagentur ist verpflichtend,
-                 außerdem auch Commercial- und legal name -->
-            <fac:operator xsi:type="fac:OrganisationSpecification" id="8AD0A7EE-7403-401F-B8D3-60264A0DDBCD" version="1">
-                <fac:operatorId>[Operator-ID, 3-stellig]</fac:operatorId>
-                <fac:operatorIdBnetzA>[BNetzA-ID des Operators]</fac:operatorIdBnetzA>
-                <fac:name>  <!-- commercial name; zu beachten: Die EU-Regulierung verlangt sowohl den Commercial name als auch den Legal name des Betreibers (nachfolgendes Element) -->
-                    <com:values>
-                        <com:value lang="de">Operator XYZ</com:value>
-                    </com:values>
-                </fac:name>
-                <fac:legalName>
-                    <com:values>
-                        <com:value lang="de">Operator XYZ</com:value>
-                    </com:values>
-                </fac:legalName>
-                <fac:organisationUnit>
-                    <fac:name>
-                        <com:values>
-                            <com:value lang="de">Niederlassung West</com:value>
-                        </com:values>
-                    </fac:name>
-                    <fac:contactInformation>
-                        <fac:eMail>email@operator.com</fac:eMail>
-                    </fac:contactInformation>
-                </fac:organisationUnit>
-            
-            </fac:operator>
-            
-            <!-- Auf Site-Ebene, optional: Anzahl der Parkplätze, die insgesamt auf dem Gelände zur Verfügung stehen (hier: 25 für PKW, 0 für LKW)
-                 Es handelt sich um ein eigenes Facility-Objekt, d.h. die Parklätze könnten hier sehr umfangreich weiter beschrieben werden,
-                 z.B. mit Lage, Abmessungen, erlaubten Fahrzeugarten, Betriebszeiten
-                 ID und Version sind in diesem Fall technisch verpflichtend, aber nicht von Bedeutung -->
-            <fac:dedicatedParkingSpaces id="13D7BE2D-07BC-4358-B3E3-AD0C75FB3A18" version="1">
-                <fac:applicableForVehicles>
-                    <com:vehicleType>car</com:vehicleType>
-                </fac:applicableForVehicles>
-                <numberOfSpaces>25</numberOfSpaces>
-            </fac:dedicatedParkingSpaces>
-            <fac:dedicatedParkingSpaces id="0F6682EC-0884-499B-AE29-8DFFF510945F" version="1">
-                <fac:applicableForVehicles>
-                    <com:vehicleType>lorry</com:vehicleType>
-                </fac:applicableForVehicles>
-                <numberOfSpaces>0</numberOfSpaces>
-            </fac:dedicatedParkingSpaces>
-            
-            
-            <typeOfSite>openSpace</typeOfSite>
-
-            <brand>
-                <com:values>
-                    <com:value lang="de">E-Energy</com:value>
-                </com:values>
-            </brand>
-
-            <!-- Hier wäre es möglich, bestimmte Nutzergruppen vorzugeben, z.B. nur subscribers --> 
-            <exclusiveUsers>allUsers</exclusiveUsers>
-
-
-            <!-- Physikalische Anwesenheit von Personal MO-FR von 7 bis 20 Uhr -->
-            <serviceType>
-                <serviceType>physicalAttendance</serviceType>
-                <overallPeriod>
-                    <com:overallStartTime>2024-01-01T00:00:00+01:00</com:overallStartTime>
-                    <com:overallEndTime>2026-12-31T23:59:00+01:00</com:overallEndTime>
-                    <com:validPeriod>
-                        <com:recurringTimePeriodOfDay>
-                            <com:startTimeOfPeriod>07:00:00</com:startTimeOfPeriod>
-                            <com:endTimeOfPeriod>20:00:00</com:endTimeOfPeriod>
-                        </com:recurringTimePeriodOfDay>
-                        <com:recurringDayWeekMonthPeriod>
-                            <com:applicableDay>monday</com:applicableDay>
-                            <com:applicableDay>tuesday</com:applicableDay>
-                            <com:applicableDay>wednesday</com:applicableDay>
-                            <com:applicableDay>thursday</com:applicableDay>
-                            <com:applicableDay>friday</com:applicableDay>
-                        </com:recurringDayWeekMonthPeriod>
-                    </com:validPeriod>
-                </overallPeriod>
-            </serviceType>
-            
-            <!-- Optional: Zufahrt zur Site (es können mehrere Zu- und Abfahrten angegeben werden)
-                 Zunäxht Koordinaten für eine Map-Ansicht
-                 (hier im Beispiel unverändert zur Site, sonst aber sinnvollerweise nicht exakt identisch -->
-            <entrance xsi:type="loc:PointLocation">
-                <loc:coordinatesForDisplay>
-                    <loc:latitude>50.77959</loc:latitude>
-                    <loc:longitude>6.10450</loc:longitude>
-                </loc:coordinatesForDisplay>
-                
-                <!-- Optionale Zusatzinformationen (Freitext) -->
-                <loc:supplementaryPositionalDescription>
-                    <loc:locationDescription>
-                        <com:values>
-                            <com:value lang="de">Zusatzinformationen zur Einfahrt</com:value>
-                        </com:values>
-                    </loc:locationDescription>
-                </loc:supplementaryPositionalDescription>
-                
-                <!-- WGS84 Koordinaten 
-                     (hier im Beispiel unverändert zur Site, sonst aber sinnvollerweise nicht exakt identisch -->
-                <loc:pointByCoordinates>
-                    <loc:pointCoordinates>
-                        <loc:latitude>50.779599</loc:latitude>
-                        <loc:longitude>6.104507</loc:longitude>
-                    </loc:pointCoordinates>
-                </loc:pointByCoordinates>
-            </entrance>
-            
-            <!-- Erste Ladestation -->
-            <energyInfrastructureStation id="68722A13-ECD6-4A51-8D6D-01A933F2D3DF" version="1">
-                
-                <fac:lastUpdated>2025-01-10T11:13:51+01:00</fac:lastUpdated>
-
-                <fac:description>
-                    <com:values>
-                        <com:value lang="de">evt. genauere Beschreibung</com:value>
-                    </com:values>
-                </fac:description>
-                
-                <fac:accessibility>barrierFreeAccessible</fac:accessibility>
-                
-                <fac:additionalInformation>
-                    <com:values>
-                        <com:value lang="de">evt. Zusatzinformationen</com:value>
-                    </com:values>
-                </fac:additionalInformation>
-                
-                <fac:informationWebsite>
-                    <com:urlLinkAddress>https://--------</com:urlLinkAddress>
-                </fac:informationWebsite>
-                
-                <fac:photoUrl>
-                    <com:urlLinkAddress>https://--------</com:urlLinkAddress>
-                </fac:photoUrl>
-                
-                <fac:operatingHours xsi:type="fac:OpenAllHours" />
-                
-                <!-- Für eine Ladestation sind verpflichtend: WGS84 Koordinaten, Adresse, NUTS1-Code, ggf. Zusatz-Informationen.
-                     Zusätzlich möglich: OpenLR -->
-                <fac:locationReference xsi:type="loc:PointLocation">
-                    
-                    <!-- Optional: Zusatzinformation für Kartendarstellen (evt. etwas abweichend von der detaillierten Punkt-Angabe -->
-                    <loc:coordinatesForDisplay>
-                        <loc:latitude>50.77959</loc:latitude>
-                        <loc:longitude>6.10450</loc:longitude>
-                    </loc:coordinatesForDisplay>
-
-                    <!-- Verpflichtende Angabe: Zeitzone sowie Adresse inkl. Land, Stadt, ggf. Straße und Hausnummer -->
-                    <loc:facilityLocation>
-
-                        <locx:timeZone>+01:00</locx:timeZone>
-                        
-                        <locx:address>
+                <loc:_locationExtension>
+                    <loc:afirFacilityLocation>
+                        <afac:address>
                             <locx:postcode>55555</locx:postcode>
                             <locx:city>
                                 <com:values>
@@ -281,17 +67,195 @@
                                     </com:values>
                                 </locx:text>
                             </locx:addressLine>
-                        </locx:address>
-                        
-                        <!-- Verpflichtender NUTS1-Code -->
-                        <locx:nutsArea>
-                            <locx:nutsCodeType>nuts1Code</locx:nutsCodeType>
-                            <!-- NUTS1-Code; hier: Nordrhein-Westfalen -->
-                            <locx:nutsCode>DEA</locx:nutsCode>
-                        </locx:nutsArea>
-                        
-                    </loc:facilityLocation>                    
-
+                        </afac:address>
+                    </loc:afirFacilityLocation>
+                </loc:_locationExtension>
+                <loc:gmlMultiPolygon>
+                    <loc:gmlPolygon>
+                        <loc:exterior srsDimension="2" srsName="EPSG 4326 WGS84">
+                            <!-- Hinweis: Ungenaue Beispielkoordinaten -->
+                            <!-- Das Polygon sollte gegen den Uhrzeigersinn gebildet werden und geschlossen sein (gleiche Anfangs- und Endkoordinaten) -->
+                            <loc:posList>50.77978 6.10437 50.7797 6.10411 50.7795 6.10422 50.77956 6.10473 50.77982 6.10469 50.77978 6.10437</loc:posList>
+                        </loc:exterior>
+                    </loc:gmlPolygon>
+                </loc:gmlMultiPolygon>
+            </afac:locationReference>
+            <!-- Die Angabe eines Betreibers mit Operator ID und Operator ID der Bundesnetzagentur ist verpflichtend,
+                 außerdem auch Commercial- und legal name -->
+            <afac:operator xsi:type="afac:AnOrganisation">
+                <afac:name>
+                    <!-- commercial name; zu beachten: Die EU-Regulierung verlangt sowohl den Commercial name als auch den Legal name des Betreibers (nachfolgendes Element) -->
+                    <com:values>
+                        <com:value lang="de">Operator XYZ</com:value>
+                    </com:values>
+                </afac:name>
+                <afac:legalName>
+                    <com:values>
+                        <com:value lang="de">Operator XYZ</com:value>
+                    </com:values>
+                </afac:legalName>
+                <afac:organisationUnit>
+                    <afac:name>
+                        <com:values>
+                            <com:value lang="de">Niederlassung West</com:value>
+                        </com:values>
+                    </afac:name>
+                    <afac:contactInformation>
+                        <afac:eMail>email@operator.com</afac:eMail>
+                    </afac:contactInformation>
+                </afac:organisationUnit>
+                <afac:externalIdentifier>
+                    <afac:identifier>[Operator-ID, 3-stellig]</afac:identifier>
+                    <afac:otherTypeOfIdentifier>operatorId</afac:otherTypeOfIdentifier>
+                </afac:externalIdentifier>
+                <afac:externalIdentifier>
+                    <afac:identifier>[BNetzA-ID des Operators]</afac:identifier>
+                    <afac:otherTypeOfIdentifier>operatorIdBNetzA</afac:otherTypeOfIdentifier>
+                </afac:externalIdentifier>
+            </afac:operator>
+            <!-- Auf Site-Ebene, optional: Anzahl der Parkplätze, die insgesamt auf dem Gelände zur Verfügung stehen (hier: 25 für PKW, 0 für LKW)
+                 Es handelt sich um ein eigenes Facility-Objekt, d.h. die Parklätze könnten hier sehr umfangreich weiter beschrieben werden,
+                 z.B. mit Lage, Abmessungen, erlaubten Fahrzeugarten, Betriebszeiten
+                 ID und Version sind in diesem Fall technisch verpflichtend, aber nicht von Bedeutung -->
+            <afac:dedicatedParkingSpaces id="13D7BE2D-07BC-4358-B3E3-AD0C75FB3A18" version="1">
+                <afac:applicableForVehicles>
+                    <com:vehicleType>car</com:vehicleType>
+                </afac:applicableForVehicles>
+                <aegi:numberOfSpaces>25</aegi:numberOfSpaces>
+            </afac:dedicatedParkingSpaces>
+            <afac:dedicatedParkingSpaces id="0F6682EC-0884-499B-AE29-8DFFF510945F" version="1">
+                <afac:applicableForVehicles>
+                    <com:vehicleType>lorry</com:vehicleType>
+                </afac:applicableForVehicles>
+                <aegi:numberOfSpaces>0</aegi:numberOfSpaces>
+            </afac:dedicatedParkingSpaces>
+            <aegi:typeOfSite>openSpace</aegi:typeOfSite>
+            <aegi:brand>
+                <com:values>
+                    <com:value lang="de">E-Energy</com:value>
+                </com:values>
+            </aegi:brand>
+            <!-- Hier wäre es möglich, bestimmte Nutzergruppen vorzugeben, z.B. nur subscribers -->
+            <aegi:exclusiveUsers>allUsers</aegi:exclusiveUsers>
+            <!-- Physikalische Anwesenheit von Personal MO-FR von 7 bis 20 Uhr -->
+            <aegi:serviceType>
+                <aegi:serviceType>physicalAttendance</aegi:serviceType>
+                <aegi:overallPeriod>
+                    <com:overallStartTime>2024-01-01T00:00:00+01:00</com:overallStartTime>
+                    <com:overallEndTime>2026-12-31T23:59:00+01:00</com:overallEndTime>
+                    <com:validPeriod>
+                        <com:recurringTimePeriodOfDay>
+                            <com:startTimeOfPeriod>07:00:00</com:startTimeOfPeriod>
+                            <com:endTimeOfPeriod>20:00:00</com:endTimeOfPeriod>
+                        </com:recurringTimePeriodOfDay>
+                        <com:recurringDayWeekMonthPeriod>
+                            <com:applicableDay>monday</com:applicableDay>
+                            <com:applicableDay>tuesday</com:applicableDay>
+                            <com:applicableDay>wednesday</com:applicableDay>
+                            <com:applicableDay>thursday</com:applicableDay>
+                            <com:applicableDay>friday</com:applicableDay>
+                        </com:recurringDayWeekMonthPeriod>
+                    </com:validPeriod>
+                </aegi:overallPeriod>
+            </aegi:serviceType>
+            <!-- Optional: Zufahrt zur Site (es können mehrere Zu- und Abfahrten angegeben werden)
+                 Zunäxht Koordinaten für eine Map-Ansicht
+                 (hier im Beispiel unverändert zur Site, sonst aber sinnvollerweise nicht exakt identisch -->
+            <aegi:entrance xsi:type="loc:PointLocation">
+                <loc:coordinatesForDisplay>
+                    <loc:latitude>50.77959</loc:latitude>
+                    <loc:longitude>6.10450</loc:longitude>
+                </loc:coordinatesForDisplay>
+                <!-- Optionale Zusatzinformationen (Freitext) -->
+                <loc:supplementaryPositionalDescription>
+                    <loc:locationDescription>
+                        <com:values>
+                            <com:value lang="de">Zusatzinformationen zur Einfahrt</com:value>
+                        </com:values>
+                    </loc:locationDescription>
+                </loc:supplementaryPositionalDescription>
+                <!-- WGS84 Koordinaten 
+                     (hier im Beispiel unverändert zur Site, sonst aber sinnvollerweise nicht exakt identisch -->
+                <loc:pointByCoordinates>
+                    <loc:pointCoordinates>
+                        <loc:latitude>50.779599</loc:latitude>
+                        <loc:longitude>6.104507</loc:longitude>
+                    </loc:pointCoordinates>
+                </loc:pointByCoordinates>
+            </aegi:entrance>
+            <!-- Erste Ladestation -->
+            <aegi:energyInfrastructureStation id="68722A13-ECD6-4A51-8D6D-01A933F2D3DF" version="1">
+                <afac:lastUpdated>2025-01-10T11:13:51+01:00</afac:lastUpdated>
+                <afac:description>
+                    <com:values>
+                        <com:value lang="de">evt. genauere Beschreibung</com:value>
+                    </com:values>
+                </afac:description>
+                <afac:accessibility>barrierFreeAccessible</afac:accessibility>
+                <afac:additionalInformation>
+                    <com:values>
+                        <com:value lang="de">evt. Zusatzinformationen</com:value>
+                    </com:values>
+                </afac:additionalInformation>
+                <afac:externalIdentifier>
+                    <afac:identifier>[Ladestations-ID der Bundesnetzagentur]</afac:identifier>
+                    <afac:otherTypeOfIdentifier>stationIdBNetzA</afac:otherTypeOfIdentifier>
+                </afac:externalIdentifier>
+                <afac:informationWebsite>
+                    <com:urlLinkAddress>https://--------</com:urlLinkAddress>
+                </afac:informationWebsite>
+                <afac:photoUrl>
+                    <com:urlLinkAddress>https://--------</com:urlLinkAddress>
+                </afac:photoUrl>
+                <afac:operatingHours xsi:type="afac:OpenAllHours" />
+                <!-- Für eine Ladestation sind verpflichtend: WGS84 Koordinaten, Adresse, NUTS1-Code, ggf. Zusatz-Informationen.
+                     Zusätzlich möglich: OpenLR -->
+                <afac:locationReference xsi:type="loc:PointLocation">
+                    <!-- Optional: Zusatzinformation für Kartendarstellen (evt. etwas abweichend von der detaillierten Punkt-Angabe -->
+                    <loc:coordinatesForDisplay>
+                        <loc:latitude>50.77959</loc:latitude>
+                        <loc:longitude>6.10450</loc:longitude>
+                    </loc:coordinatesForDisplay>
+                    <!-- Hier OpenLR möglich: 
+                    <loc:openlrPointLocationReference xsi:type="loc:OpenlrGeoCoordinate">
+                        .....
+                    </loc:openlrPointLocationReference> -->
+                    <loc:_locationExtension>
+                        <loc:afirFacilityLocation>
+                            <afac:timeZone>+01:00</afac:timeZone>
+                            <afac:address>
+                                <locx:postcode>55555</locx:postcode>
+                                <locx:city>
+                                    <com:values>
+                                        <com:value lang="de">Musterstadt</com:value>
+                                    </com:values>
+                                </locx:city>
+                                <locx:countryCode>DE</locx:countryCode>
+                                <locx:addressLine order="0">
+                                    <locx:type>street</locx:type>
+                                    <locx:text>
+                                        <com:values>
+                                            <com:value lang="de">Hauptstraße</com:value>
+                                        </com:values>
+                                    </locx:text>
+                                </locx:addressLine>
+                                <locx:addressLine order="1">
+                                    <locx:type>houseNumber</locx:type>
+                                    <locx:text>
+                                        <com:values>
+                                            <com:value lang="de">12</com:value>
+                                        </com:values>
+                                    </locx:text>
+                                </locx:addressLine>
+                            </afac:address>
+                            <afac:nutsArea>
+                                <afac:nutsCodeType>nuts1Code</afac:nutsCodeType>
+                                <!-- NUTS1-Code; hier: Nordrhein-Westfalen -->
+                                <afac:nutsCode>DEA</afac:nutsCode>
+                            </afac:nutsArea>
+                        </loc:afirFacilityLocation>
+                    </loc:_locationExtension>
+                    <!-- Verpflichtende Angabe: Zeitzone sowie Adresse inkl. Land, Stadt, ggf. Straße und Hausnummer -->
                     <!-- Zusatzinformationen (Freitext), z.B. auch über Parkdeck etc.; außerdem Präzisionsangabe f.d. Georeferenzierung möglich -->
                     <loc:supplementaryPositionalDescription locationPrecision="1">
                         <loc:locationDescription>
@@ -300,7 +264,6 @@
                             </com:values>
                         </loc:locationDescription>
                     </loc:supplementaryPositionalDescription>
-                    
                     <!-- WGS84 Koordinaten -->
                     <loc:pointByCoordinates>
                         <loc:pointCoordinates>
@@ -308,60 +271,56 @@
                             <loc:longitude>6.104507</loc:longitude>
                         </loc:pointCoordinates>
                     </loc:pointByCoordinates>
-                    
-                    <!-- Hier OpenLR möglich: 
-                    <loc:openlrPointLocationReference xsi:type="loc:OpenlrGeoCoordinate">
-                        .....
-                    </loc:openlrPointLocationReference> -->
-                    
-                </fac:locationReference>
-
-                <fac:owner xsi:type="fac:OrganisationSpecification" id="CC24BBDA-D730-487E-BE23-1F5E2B254878" version="1">
-                    <fac:name>
+                </afac:locationReference>
+                <afac:owner xsi:type="afac:AnOrganisation">
+                    <afac:name>
                         <com:values>
                             <com:value lang="de">Eigentümer XYZ</com:value>
                         </com:values>
-                    </fac:name>
-                </fac:owner>
-                
+                    </afac:name>
+                </afac:owner>
                 <!-- verpflichtende Angabe -->
-                <fac:operator xsi:type="fac:OrganisationSpecification" id="AFD8D81F-B0C8-43EC-B3DC-BDB91545FD1C" version="4">
+                <afac:operator xsi:type="afac:AnOrganisation">
                     <!-- verpflichtende Angabe, siehe https://bdew-codes.de/Codenumbers/EMobilityId -->
-                    <fac:operatorId>[3stellige Operator-ID]</fac:operatorId>
                     <!-- verpflichtende Angabe -->
-                    <fac:operatorIdBnetzA>[Operator-ID der Bundesnetzagentur]</fac:operatorIdBnetzA>
                     <!-- verpflichtende Angabe, kommerzieller Name -->
-                    <fac:name>
+                    <afac:name>
                         <com:values>
                             <com:value lang="de">[Name des Betreibers]</com:value>
                         </com:values>
-                    </fac:name>
+                    </afac:name>
                     <!-- verpflichtende Angabe -->
-                    <fac:legalName>
+                    <afac:legalName>
                         <com:values>
                             <com:value lang="de">[Offizielle Bezeichnung des Betreibers]</com:value>
                         </com:values>
-                    </fac:legalName>
+                    </afac:legalName>
                     <!-- Viele weitere Angaben hier möglich, mit Geschäftsbereichen und Kontaktinformationen -->
-                </fac:operator>
-                
+                    <afac:externalIdentifier>
+                        <afac:identifier>[3stellige Operator-ID]</afac:identifier>
+                        <afac:otherTypeOfIdentifier>operatorId</afac:otherTypeOfIdentifier>
+                    </afac:externalIdentifier>
+                    <afac:externalIdentifier>
+                        <afac:identifier>[Operator-ID der Bundesnetzagentur]</afac:identifier>
+                        <afac:otherTypeOfIdentifier>operatorIdBNetzA</afac:otherTypeOfIdentifier>
+                    </afac:externalIdentifier>
+                </afac:operator>
                 <!-- verpflichtende Angabe -->
-                <fac:helpdesk xsi:type="fac:OrganisationSpecification" id="DCC5768C-6852-4AB2-880D-E0409A3CC239" version="2">
-                    <fac:name>
+                <afac:helpdesk xsi:type="afac:AnOrganisation">
+                    <afac:name>
                         <com:values>
                             <com:value lang="de">Ihre Helpdesk GmbH</com:value>
                         </com:values>
-                    </fac:name>
-                    <fac:organisationUnit>
+                    </afac:name>
+                    <afac:organisationUnit>
                         <!-- Verpflichtende Angabe -->
-                        <fac:contactInformation>
-                            <fac:telephoneNumber>+4924100000000</fac:telephoneNumber>
-                        </fac:contactInformation>
-                        
+                        <afac:contactInformation>
+                            <afac:telephoneNumber>+4924100000000</afac:telephoneNumber>
+                        </afac:contactInformation>
                         <!-- Verfügbarkeit des Helpdesks im Jahr 2025: Täglich von 6 bis 23 Uhr
                              außer an Sonn- und Feiertagen, außerdem nicht vom 15.-22. Juli 2025 -->
-                        <fac:operatingHours xsi:type="fac:OperatingHoursSpecification" id="D3AD3210-CCD0-4AD5-9E70-B582251F69AA" version="3">
-                            <fac:overallPeriod>
+                        <afac:operatingHours xsi:type="afac:OperatingHoursSpecification" id="D3AD3210-CCD0-4AD5-9E70-B582251F69AA" version="3">
+                            <afac:overallPeriod>
                                 <com:overallStartTime>2025-01-01T00:00:00+01:00</com:overallStartTime>
                                 <com:overallEndTime>2025-12-31T23:59:59+01:00</com:overallEndTime>
                                 <com:validPeriod>
@@ -383,231 +342,188 @@
                                     <com:startOfPeriod>2025-07-15T00:00:00+02:00</com:startOfPeriod>
                                     <com:endOfPeriod>2025-07-22T23:59:59+02:00</com:endOfPeriod>
                                 </com:exceptionPeriod>
-                            </fac:overallPeriod>
-                        </fac:operatingHours>
-                    </fac:organisationUnit>
-
-                </fac:helpdesk>
-                
+                            </afac:overallPeriod>
+                        </afac:operatingHours>
+                    </afac:organisationUnit>
+                </afac:helpdesk>
                 <!-- Erlaubt wären hier nur Fahrzeuge der EU Kategorie L und M1 mit einem aktuellen Gesamtgewicht unter 2 Tonnen -->
-                <fac:applicableForVehicles>
-                    <com:euVehicleCategory>l</com:euVehicleCategory>
-                    <com:euVehicleCategory>m1</com:euVehicleCategory>
+                <afac:applicableForVehicles>
                     <com:grossWeightCharacteristic>
                         <com:comparisonOperator>lessThan</com:comparisonOperator>
                         <com:grossVehicleWeight>2</com:grossVehicleWeight>
                         <com:typeOfWeight>actual</com:typeOfWeight>
                     </com:grossWeightCharacteristic>
-                </fac:applicableForVehicles>
-                
+                    <com:_vehicleCharacteristicsExtension>
+                        <com:vehicleCharacteristicsExtended>
+                            <comx:regulatedCharacteristics>
+                                <comx:euVehicleCategory _extendedValue="l">_extended</comx:euVehicleCategory>
+                                <comx:euVehicleCategory>m1</comx:euVehicleCategory>
+                            </comx:regulatedCharacteristics>
+                        </com:vehicleCharacteristicsExtended>
+                    </com:_vehicleCharacteristicsExtension>
+                </afac:applicableForVehicles>
                 <!-- Überdacht aber nicht beleuchtet. Es existiren aber ein beleuchteter Ladeplatz in der Nähe -->
-                <fac:amenities>
-                    <fac:illuminated>false</fac:illuminated>
-                    <fac:roofed>true</fac:roofed>
-                    <fac:illuminatedRechargingParkingNearby>true</fac:illuminatedRechargingParkingNearby>
-                </fac:amenities>
-                
+                <afac:amenities>
+                    <afac:illuminated>false</afac:illuminated>
+                    <afac:roofed>true</afac:roofed>
+                    <afac:illuminatedRechargingParkingNearby>true</afac:illuminatedRechargingParkingNearby>
+                </afac:amenities>
                 <!-- Es gibt einen Aufenthaltsraum -->
-                <fac:supplementalFacility xsi:type="fac:SupplementalEquipment" id="60527483-026C-4745-ACEA-E8D27E0D95B3" version="1">
-                    <fac:equipmentType>restingFacilities</fac:equipmentType>
-                </fac:supplementalFacility>
-                
-                <!-- Es gibt zwei Bezahlautomaten (es sei mal dahingestellt, ob externe Bezahlautomaten der Praxis entsprechen) --> 
-                <fac:supplementalFacility xsi:type="fac:SupplementalEquipment" id="AF09B7AC-B5B1-4FA1-AACF-E098AFB7EFC0" version="1">
-                    <fac:quantity>2</fac:quantity>
-                    <fac:equipmentType>paymentMachine</fac:equipmentType>
-                </fac:supplementalFacility>
-                
+                <afac:supplementalFacility xsi:type="afac:SupplementalEquipment" id="60527483-026C-4745-ACEA-E8D27E0D95B3" version="1">
+                    <afac:equipmentType>restingFacilities</afac:equipmentType>
+                </afac:supplementalFacility>
+                <!-- Es gibt zwei Bezahlautomaten (es sei mal dahingestellt, ob externe Bezahlautomaten der Praxis entsprechen) -->
+                <afac:supplementalFacility xsi:type="afac:SupplementalEquipment" id="AF09B7AC-B5B1-4FA1-AACF-E098AFB7EFC0" version="1">
+                    <afac:quantity>2</afac:quantity>
+                    <afac:equipmentType>paymentMachine</afac:equipmentType>
+                </afac:supplementalFacility>
                 <!-- Unmittelbar zur Ladestation gehören 2 Parkplätze für die EU-Vehicle Kategorie m1,
                      barrierefrei, überdacht aber nicht beleuchtet: -->
-                <fac:dedicatedParkingSpaces id="A6450D0F-1B74-4B8E-9388-E7A252FC0B66" version="1">
-                    <fac:accessibility>barrierFreeAccessible</fac:accessibility>
-                    <fac:applicableForVehicles>
-                        <com:euVehicleCategory>m1</com:euVehicleCategory>
-                    </fac:applicableForVehicles>
-                    <fac:amenities>
-                        <fac:illuminated>false</fac:illuminated>
-                        <fac:roofed>true</fac:roofed>
-                    </fac:amenities>
-                    <numberOfSpaces>2</numberOfSpaces>
-                </fac:dedicatedParkingSpaces>
-                
+                <afac:dedicatedParkingSpaces id="A6450D0F-1B74-4B8E-9388-E7A252FC0B66" version="1">
+                    <afac:accessibility>barrierFreeAccessible</afac:accessibility>
+                    <afac:applicableForVehicles>
+                        <com:_vehicleCharacteristicsExtension>
+                            <com:vehicleCharacteristicsExtended>
+                                <comx:regulatedCharacteristics>
+                                    <comx:euVehicleCategory>m1</comx:euVehicleCategory>
+                                </comx:regulatedCharacteristics>
+                            </com:vehicleCharacteristicsExtended>
+                        </com:_vehicleCharacteristicsExtension>
+                    </afac:applicableForVehicles>
+                    <afac:amenities>
+                        <afac:illuminated>false</afac:illuminated>
+                        <afac:roofed>true</afac:roofed>
+                    </afac:amenities>
+                    <aegi:numberOfSpaces>2</aegi:numberOfSpaces>
+                </afac:dedicatedParkingSpaces>
                 <!-- Ein weiterer Platz speziell für Nutzer mit Einschränkungen, hier auch noch mit Breiten-Info und Koordinaten -->
-                <fac:dedicatedParkingSpaces id="4EF8E593-1694-4A7A-9BEC-EE927CC2D380" version="1">
-                    <fac:locationReference xsi:type="loc:PointLocation">
+                <afac:dedicatedParkingSpaces id="4EF8E593-1694-4A7A-9BEC-EE927CC2D380" version="1">
+                    <afac:locationReference xsi:type="loc:PointLocation">
                         <loc:pointByCoordinates>
-                            <loc:pointCoordinates>  <!-- Koordinaten nur beispielhaft -->
+                            <loc:pointCoordinates>
+                                <!-- Koordinaten nur beispielhaft -->
                                 <loc:latitude>50.779599</loc:latitude>
                                 <loc:longitude>6.104507</loc:longitude>
                             </loc:pointCoordinates>
                         </loc:pointByCoordinates>
-                    </fac:locationReference>
-                    <fac:dimension>
-                        <fac:width>4</fac:width>
-                    </fac:dimension>
-                                        
-                    <numberOfSpaces>1</numberOfSpaces>
-                    <userSpecific>personsWithDisabilities</userSpecific>
-                </fac:dedicatedParkingSpaces>
-                
-                <stationIdBNetzA>[Ladestations-ID der Bundesnetzagentur]</stationIdBNetzA>
-                <totalMaximumPower>100000</totalMaximumPower> <!-- 100 kW -->
-               
-                <authenticationAndIdentificationMethods>activeRFIDChip</authenticationAndIdentificationMethods>
-                <authenticationAndIdentificationMethods>creditCard</authenticationAndIdentificationMethods>
-                
+                    </afac:locationReference>
+                    <afac:dimension>
+                        <afac:width>4</afac:width>
+                    </afac:dimension>
+                    <aegi:numberOfSpaces>1</aegi:numberOfSpaces>
+                    <aegi:userSpecific>personsWithDisabilities</aegi:userSpecific>
+                </afac:dedicatedParkingSpaces>
+                <aegi:totalMaximumPower>100000</aegi:totalMaximumPower>
+                <!-- 100 kW -->
+                <aegi:authenticationAndIdentificationMethods>activeRFIDChip</aegi:authenticationAndIdentificationMethods>
+                <aegi:authenticationAndIdentificationMethods>creditCard</aegi:authenticationAndIdentificationMethods>
                 <!-- Die Ladestation hat 2 Lade-Plätze -->
-                <numberOfRefillPoints>2</numberOfRefillPoints>
-                
-                <userInterfaceLanguage>de</userInterfaceLanguage>
-                
+                <aegi:numberOfRefillPoints>2</aegi:numberOfRefillPoints>
+                <aegi:userInterfaceLanguage>de</aegi:userInterfaceLanguage>
                 <!-- Netzbetreiber, sei andernorts bereits spezifiziert und wird nur referenziert -->
-                <energyDistributor xsi:type="fac:OrganisationByReference">
-                    <fac:organisationReference targetClass="fac:OrganisationSpecification" id="01B5CCA0-E746-4084-9EEB-47F0DB297AB0" version="1"/>
-                </energyDistributor>
-                
-                <mobilityServiceProvider xsi:type="fac:OrganisationSpecification" id="A1633959-F0BE-4F48-85CC-1A9FAE2BF34B" version="1">
-                    <fac:name>
+                <aegi:energyDistributor xsi:type="afac:OrganisationByReference">
+                    <afac:organisationReference targetClass="afac:ReferenceableOrganisation" id="01B5CCA0-E746-4084-9EEB-47F0DB297AB0" version="1" />
+                </aegi:energyDistributor>
+                <aegi:mobilityServiceProvider xsi:type="afac:AnOrganisation">
+                    <afac:name>
                         <com:values>
                             <com:value lang="de">Stromanbieter ABC3</com:value>
                         </com:values>
-                    </fac:name>
-                </mobilityServiceProvider>
-                
-                <roamingPlatform xsi:type="fac:OrganisationSpecification" id="F349837C-DE25-4467-9264-29027A6298AE" version="1">
-                    <fac:name>
+                    </afac:name>
+                </aegi:mobilityServiceProvider>
+                <aegi:roamingPlatform xsi:type="afac:AnOrganisation">
+                    <afac:name>
                         <com:values>
                             <com:value lang="de">Roaming1</com:value>
                         </com:values>
-                    </fac:name>
-                </roamingPlatform>
-                <roamingPlatform xsi:type="fac:OrganisationSpecification" id="7CD6F722-14D2-4B7B-A606-E20BE67D202F" version="1">
-                    <fac:name>
+                    </afac:name>
+                </aegi:roamingPlatform>
+                <aegi:roamingPlatform xsi:type="afac:AnOrganisation">
+                    <afac:name>
                         <com:values>
                             <com:value lang="de">Roaming2</com:value>
                         </com:values>
-                    </fac:name>
-                </roamingPlatform>
-                <roamingPlatform xsi:type="fac:OrganisationSpecification" id="32110A97-393F-4A91-B2A5-BAFE1C2A9BAE" version="1">
-                    <fac:name>
+                    </afac:name>
+                </aegi:roamingPlatform>
+                <aegi:roamingPlatform xsi:type="afac:AnOrganisation">
+                    <afac:name>
                         <com:values>
                             <com:value lang="de">Roaming3</com:value>
                         </com:values>
-                    </fac:name>
-                </roamingPlatform>
-                
-                <serviceType>
-                    <serviceType>unattended</serviceType>
-                </serviceType>
-                
+                    </afac:name>
+                </aegi:roamingPlatform>
+                <aegi:serviceType>
+                    <aegi:serviceType>unattended</aegi:serviceType>
+                </aegi:serviceType>
                 <!-- 1. Ladepunkt -->
-                <refillPoint xsi:type="egi:ElectricChargingPoint"
-                    id="73ABE928-707D-4A99-8043-4293EE685504" version="2">
-
-                    <deliveryUnit>kWh</deliveryUnit>
-                    
-                    <modelType>
+                <aegi:refillPoint xsi:type="aegi:ElectricChargingPoint" id="73ABE928-707D-4A99-8043-4293EE685504" version="2">
+                    <!-- Die EVS-ID nach ISO 15118-2 muss verpflichtend
+                         entweder beim Point oder den Connectoren angegeben werden -->
+                    <afac:externalIdentifier>
+                        <afac:identifier>DEABCEXXXXXXXX12345</afac:identifier>
+                        <afac:typeOfIdentifier _extendedValue="evseId">_extended</afac:typeOfIdentifier>
+                    </afac:externalIdentifier>
+                    <aegi:deliveryUnit>kWh</aegi:deliveryUnit>
+                    <aegi:modelType>
                         <com:values>
                             <com:value lang="de">Anschlusstyp AB123</com:value>
                         </com:values>
-                    </modelType>
-                    
-                    <!-- Die EVS-ID nach ISO 15118-2 muss verpflichtend
-                         entweder beim Point oder den Connectoren angegeben werden -->
-                    <evseId>DEABCEXXXXXXXX12345</evseId>
-                    
-                    <usageType>electricVehicle</usageType>
-                    <vehicleToGridCommunicationType>iso15118</vehicleToGridCommunicationType>
-                    
-                    <!-- 2 verschiedene Stecker verfügbar (Einzeldefinition weiter unten) -->
-                    <numberOfConnectors>2</numberOfConnectors>
-                    
-                    <availableVoltage>200</availableVoltage>
-                    <availableVoltage>400</availableVoltage>
-                    <availableChargingPower>11000</availableChargingPower>
-                    <availableChargingPower>22000</availableChargingPower>
-                    <availableChargingPower>50000</availableChargingPower>
-                    <smartRechargingServices>remoteMonitoring</smartRechargingServices>
-                    <smartRechargingServices>bidirectionalRecharging</smartRechargingServices>
-                    <smartRechargingServices>powerOptimisationByUser</smartRechargingServices>
-                    <otherSmartRechargingServices>
-                        <com:values>
-                            <com:value lang="de">weitere smart recharging Services</com:value>
-                        </com:values>
-                    </otherSmartRechargingServices>
-                    
-                    <connector>
-                        <connectorType>iec62196T2</connectorType>
-                        <maxPowerAtSocket>22000</maxPowerAtSocket>
-                    </connector>
-                    <connector>
-                        <connectorType>chademo</connectorType>
-                        <maxPowerAtSocket>50000</maxPowerAtSocket>
-                    </connector>
-                    
+                    </aegi:modelType>
                     <!-- Eine (nicht näher spezifizierte) Energieform/Stromart, die per adHoc-Preis angeboten wird.
                          Electric Energy kann sowohl an einem ElectricChargingPoint definiert werden (wie hier) oder
                          direkt an der E.I.Station -->
-                    <electricEnergy>
-                        <energyProductName>
+                    <aegi:energyProduct xsi:type="aegi:ElectricEnergy">
+                        <aegi:energyProductName>
                             <com:values>
                                 <com:value lang="de">1a Strommix</com:value>
                             </com:values>
-                        </energyProductName>
-                        
+                        </aegi:energyProductName>
                         <!-- Preisgestaltung für diese Stromart -->
                         <!-- Ad-Hoc Preis, zahlbar mit VISA oder über die Webseite -->
                         <!-- Achtung: Eine AdHoc-Preisdefinition wird durch die EU-Regulierung gefordert, und insbesondere
-                             muss der AdHoc-Preis auch im dynamischen Datenteil angegeben (d.h. überschrieben) werden --> 
-                             
-                        <energyRate id="74034E3E-9D2F-4410-BE6F-CAA3176D69B4">
-                            <ratePolicy>adHoc</ratePolicy>
-                            <lastUpdated>2025-01-10T11:13:51+01:00</lastUpdated>
-                            <applicableCurrency>EUR</applicableCurrency>
-                            <paymentMethod>
-                                <fac:paymentMeans>emv</fac:paymentMeans>
-                                <fac:paymentMeans>website</fac:paymentMeans>
-                                <fac:brandsAcceptedCodeList>
-                                    <fac:brandsAcceptedList>visa</fac:brandsAcceptedList>
-                                </fac:brandsAcceptedCodeList>
-                            </paymentMethod>
-                            
-                            <energyPrice>
-                                <priceType>pricePerKWh</priceType>
-                                <value>0.35</value>
-                            </energyPrice>
-                            
-                        </energyRate>
-                    </electricEnergy>
-                    
+                             muss der AdHoc-Preis auch im dynamischen Datenteil angegeben (d.h. überschrieben) werden -->
+                        <aegi:energyRate id="74034E3E-9D2F-4410-BE6F-CAA3176D69B4">
+                            <aegi:ratePolicy>adHoc</aegi:ratePolicy>
+                            <aegi:lastUpdated>2025-01-10T11:13:51+01:00</aegi:lastUpdated>
+                            <aegi:applicableCurrency>EUR</aegi:applicableCurrency>
+                            <aegi:payment>
+                                <afac:paymentMeans>emv</afac:paymentMeans>
+                                <afac:paymentMeans>website</afac:paymentMeans>
+                                <afac:brandsAccepted>visa</afac:brandsAccepted>
+                            </aegi:payment>
+                            <aegi:energyPrice>
+                                <aegi:priceGroupIndex>1</aegi:priceGroupIndex>
+                                <aegi:priceType>pricePerKWh</aegi:priceType>
+                                <aegi:value>0.35</aegi:value>
+                            </aegi:energyPrice>
+                        </aegi:energyRate>
+                    </aegi:energyProduct>
                     <!-- Eine weitere Stromart: Grüne Energie, per Vertrag beziehbar -->
-                    <electricEnergy>
-                        <energyProductName>
+                    <aegi:energyProduct xsi:type="aegi:ElectricEnergy">
+                        <aegi:energyProductName>
                             <com:values>
                                 <com:value lang="de">Grüner Strom</com:value>
                             </com:values>
-                        </energyProductName>
-                        <isGreenEnergy>true</isGreenEnergy>
-                        
+                        </aegi:energyProductName>
+                        <aegi:isGreenEnergy>true</aegi:isGreenEnergy>
                         <!-- Referenz auf den zuvor bereits definierten Vertragspartner -->
-                        <mobilityServiceProvider xsi:type="fac:OrganisationByReference">
-                            <fac:organisationReference targetClass="fac:OrganisationSpecification" id="A1633959-F0BE-4F48-85CC-1A9FAE2BF34B"/>
-                        </mobilityServiceProvider>
-                        
-                        <energyRate id="9C07640B-7ECE-46EC-A23F-417E99C53F33">
-                            <ratePolicy>contract</ratePolicy>
-                            <lastUpdated>2025-01-10T11:13:51+01:00</lastUpdated>
-                            <applicableCurrency>EUR</applicableCurrency>
-                            <rateName>
+                        <aegi:mobilityServiceProvider xsi:type="afac:OrganisationByReference">
+                            <afac:organisationReference targetClass="afac:ReferenceableOrganisation" id="A1633959-F0BE-4F48-85CC-1A9FAE2BF34B" />
+                        </aegi:mobilityServiceProvider>
+                        <aegi:energyRate id="9C07640B-7ECE-46EC-A23F-417E99C53F33">
+                            <aegi:ratePolicy>contract</aegi:ratePolicy>
+                            <aegi:lastUpdated>2025-01-10T11:13:51+01:00</aegi:lastUpdated>
+                            <aegi:applicableCurrency>EUR</aegi:applicableCurrency>
+                            <aegi:rateName>
                                 <com:values>
                                     <com:value lang="de">GrünTarif 1AB</com:value>
                                 </com:values>
-                            </rateName>
-
-                            <energyPrice>
-                                <priceType>pricePerKWh</priceType>
-                                <value>0.30</value>
-                                <overallPeriod>
+                            </aegi:rateName>
+                            <aegi:energyPrice>
+                                <aegi:priceGroupIndex>1</aegi:priceGroupIndex>
+                                <aegi:priceType>pricePerKWh</aegi:priceType>
+                                <aegi:value>0.30</aegi:value>
+                                <aegi:overallPeriod>
                                     <com:overallStartTime>2025-01-01T00:00:00+01:00</com:overallStartTime>
                                     <com:overallEndTime>2025-12-31T23:59:59+01:00</com:overallEndTime>
                                     <com:validPeriod>
@@ -616,14 +532,14 @@
                                             <com:endTimeOfPeriod>06:00:00</com:endTimeOfPeriod>
                                         </com:recurringTimePeriodOfDay>
                                     </com:validPeriod>
-                                </overallPeriod>
-                            </energyPrice>
-                            
+                                </aegi:overallPeriod>
+                            </aegi:energyPrice>
                             <!-- Nachtpreis -->
-                            <energyPrice>
-                                <priceType>pricePerKWh</priceType>
-                                <value>0.27</value>
-                                <overallPeriod>
+                            <aegi:energyPrice>
+                                <aegi:priceGroupIndex>1</aegi:priceGroupIndex>
+                                <aegi:priceType>pricePerKWh</aegi:priceType>
+                                <aegi:value>0.27</aegi:value>
+                                <aegi:overallPeriod>
                                     <com:overallStartTime>2025-01-01T00:00:00+01:00</com:overallStartTime>
                                     <com:overallEndTime>2025-12-31T23:59:59+01:00</com:overallEndTime>
                                     <com:validPeriod>
@@ -632,116 +548,129 @@
                                             <com:endTimeOfPeriod>06:00:00</com:endTimeOfPeriod>
                                         </com:recurringTimePeriodOfDay>
                                     </com:validPeriod>
-                                </overallPeriod>
-                            </energyPrice>
-
-                        </energyRate>
-                    </electricEnergy>
-
-                </refillPoint>
-                
+                                </aegi:overallPeriod>
+                            </aegi:energyPrice>
+                        </aegi:energyRate>
+                    </aegi:energyProduct>
+                    <aegi:currentType>dc</aegi:currentType>
+                    <aegi:usageType>electricVehicle</aegi:usageType>
+                    <aegi:vehicleToGridCommunicationType>iso15118</aegi:vehicleToGridCommunicationType>
+                    <!-- 2 verschiedene Stecker verfügbar (Einzeldefinition weiter unten) -->
+                    <aegi:numberOfConnectors>2</aegi:numberOfConnectors>
+                    <aegi:availableVoltage>200</aegi:availableVoltage>
+                    <aegi:availableVoltage>400</aegi:availableVoltage>
+                    <aegi:availableChargingPower>11000</aegi:availableChargingPower>
+                    <aegi:availableChargingPower>22000</aegi:availableChargingPower>
+                    <aegi:availableChargingPower>50000</aegi:availableChargingPower>
+                    <aegi:smartRechargingServices>remoteMonitoring</aegi:smartRechargingServices>
+                    <aegi:smartRechargingServices>bidirectionalRecharging</aegi:smartRechargingServices>
+                    <aegi:smartRechargingServices>powerOptimisationByUser</aegi:smartRechargingServices>
+                    <aegi:otherSmartRechargingServices>
+                        <com:values>
+                            <com:value lang="de">weitere smart recharging Services</com:value>
+                        </com:values>
+                    </aegi:otherSmartRechargingServices>
+                    <aegi:connector>
+                        <aegi:connectorType>iec62196T2</aegi:connectorType>
+                        <aegi:maxPowerAtSocket>22000</aegi:maxPowerAtSocket>
+                    </aegi:connector>
+                    <aegi:connector>
+                        <aegi:connectorType>chademo</aegi:connectorType>
+                        <aegi:maxPowerAtSocket>50000</aegi:maxPowerAtSocket>
+                    </aegi:connector>
+                </aegi:refillPoint>
                 <!-- 2. Ladepunkt -->
-                <refillPoint xsi:type="egi:ElectricChargingPoint" id="35E5FC89-E2C9-4946-8E70-6A2C56E0BD7E" version="1">
-                    <deliveryUnit>kWh</deliveryUnit>
-                    <usageType>electricVehicle</usageType>
-                    <vehicleToGridCommunicationType>iec619802</vehicleToGridCommunicationType>
-                    <numberOfConnectors>1</numberOfConnectors>
-                    <availableVoltage>400</availableVoltage>
-                    <availableChargingPower>40000</availableChargingPower>
-                    <smartRechargingServices>remoteMonitoring</smartRechargingServices>
-                    <connector>
-                        <connectorType>other</connectorType>
-                        <otherConnector>Some other connector type</otherConnector>
-                        <maxPowerAtSocket>40000</maxPowerAtSocket>
-                    </connector>
-                    
+                <aegi:refillPoint xsi:type="aegi:ElectricChargingPoint" id="35E5FC89-E2C9-4946-8E70-6A2C56E0BD7E" version="1">
+                    <aegi:deliveryUnit>kWh</aegi:deliveryUnit>
                     <!-- Der 2. Ladepunkt nutzt den gleichen Tarif "GrünTarif 1AB" wie zuvor schon definiert beim 1. Punkt.
-                         Die Referenz dürfte auch auf eine Tarifdefinition in einer anderen EnergyInfrastructureSite oder EnergyInfrastructureTable verweisen --> 
-                    <electricEnergy>
-                        <energyRateByReference targetClass="egi:EnergyRate" id="9C07640B-7ECE-46EC-A23F-417E99C53F33"/>
-                    </electricEnergy>
-                    
-                </refillPoint>
-                
+                         Die Referenz dürfte auch auf eine Tarifdefinition in einer anderen EnergyInfrastructureSite oder EnergyInfrastructureTable verweisen -->
+                    <aegi:energyProduct xsi:type="aegi:ElectricEnergy">
+                        <aegi:energyRateByReference targetClass="aegi:EnergyRate" id="9C07640B-7ECE-46EC-A23F-417E99C53F33" />
+                    </aegi:energyProduct>
+                    <aegi:currentType>ac</aegi:currentType>
+                    <aegi:usageType>electricVehicle</aegi:usageType>
+                    <aegi:vehicleToGridCommunicationType>iec619802</aegi:vehicleToGridCommunicationType>
+                    <aegi:numberOfConnectors>1</aegi:numberOfConnectors>
+                    <aegi:availableVoltage>400</aegi:availableVoltage>
+                    <aegi:availableChargingPower>40000</aegi:availableChargingPower>
+                    <aegi:smartRechargingServices>remoteMonitoring</aegi:smartRechargingServices>
+                    <aegi:connector>
+                        <aegi:connectorType>other</aegi:connectorType>
+                        <aegi:otherConnector>Some other connector type</aegi:otherConnector>
+                        <aegi:maxPowerAtSocket>40000</aegi:maxPowerAtSocket>
+                    </aegi:connector>
+                </aegi:refillPoint>
                 <!-- Auf Station-Ebene: 
                      Verpflichtende Angaben bezügl. Bezahlmöglichkeiten und Vertragspartnern 
                      AdHoc-Strom wird durch den Provider "ABC3" (mittels Referenz)
                      angeboten; es handelt sich um 100% erneuerbaren Strom.
                      Dieser kann mit EMV-Chip oder per NFC bezahlt werden. -->
-                <electricEnergy>
-                    <isGreenEnergy>true</isGreenEnergy>
-                    <mobilityServiceProvider xsi:type="fac:OrganisationByReference">
-                        <fac:organisationReference targetClass="fac:OrganisationSpecification" id="A1633959-F0BE-4F48-85CC-1A9FAE2BF34B" version="1" />    
-                    </mobilityServiceProvider>
-                    <energyRate id="A5633A27-2F12-4B5D-AD4A-969335347D8C">
-                        <ratePolicy>adHoc</ratePolicy>
-                        <lastUpdated>2025-01-10T11:13:51+01:00</lastUpdated>
-                        <applicableCurrency>EUR</applicableCurrency>
-                        
-                        <paymentMethod> <!-- Hinweis: Diese Bezahlmethoden implizieren im Sinne der 
+                <aegi:energyProduct xsi:type="aegi:ElectricEnergy">
+                    <aegi:isGreenEnergy>true</aegi:isGreenEnergy>
+                    <aegi:mobilityServiceProvider xsi:type="afac:OrganisationByReference">
+                        <afac:organisationReference targetClass="afac:ReferenceableOrganisation" id="A1633959-F0BE-4F48-85CC-1A9FAE2BF34B" version="1" />
+                    </aegi:mobilityServiceProvider>
+                    <aegi:energyRate id="A5633A27-2F12-4B5D-AD4A-969335347D8C">
+                        <aegi:ratePolicy>adHoc</aegi:ratePolicy>
+                        <aegi:lastUpdated>2025-01-10T11:13:51+01:00</aegi:lastUpdated>
+                        <aegi:applicableCurrency>EUR</aegi:applicableCurrency>
+                        <aegi:payment>
+                            <!-- Hinweis: Diese Bezahlmethoden implizieren im Sinne der 
                             EU-Regulierung, dass ein entsprechender Bezahl-Automat (vermutlich integriert in
                             die Ladestation) vorhanden ist -->
-                            <fac:paymentMeans>emv</fac:paymentMeans>
-                            <fac:paymentMeans>nfc</fac:paymentMeans>
-                        </paymentMethod>
-                    </energyRate> 
-                
-                </electricEnergy>
-                
+                            <afac:paymentMeans>emv</afac:paymentMeans>
+                            <afac:paymentMeans>nfc</afac:paymentMeans>
+                        </aegi:payment>
+                    </aegi:energyRate>
+                </aegi:energyProduct>
                 <!-- Vertrags-Strom wird durch den Vertragspartner XY
                 angeboten; Dieser kann mit QR-Code oder über die Webseite bezahlt werden -->
-                
-                <electricEnergy>
-                    <mobilityServiceProvider xsi:type="fac:OrganisationSpecification" id="A1633959-F0BE-4F48-85CC-1A9FAE2BF34B" version="1">
-                        <fac:name>
+                <aegi:energyProduct xsi:type="aegi:ElectricEnergy">
+                    <aegi:mobilityServiceProvider xsi:type="afac:AnOrganisation">
+                        <afac:name>
                             <com:values>
                                 <com:value lang="de">Vertragsparter XY</com:value>
                             </com:values>
-                        </fac:name>
-                        <fac:linkToGeneralInformation>https://PartnerX.y</fac:linkToGeneralInformation>
-                        <fac:linkToWebform>https://contact.me</fac:linkToWebform>
-                    </mobilityServiceProvider>
-                    <energyRate id="4C55D08A-20D5-4A7A-8067-81AB5E15E738">
-                        <ratePolicy>contract</ratePolicy>
-                        <lastUpdated>2025-01-10T11:13:51+01:00</lastUpdated>
-                        <applicableCurrency>EUR</applicableCurrency>
-                        
-                        <paymentMethod> 
-                            <fac:paymentMeans>qrCode</fac:paymentMeans>
-                            <fac:paymentMeans>website</fac:paymentMeans>
-                        </paymentMethod>
-                    </energyRate> 
-                    
-                </electricEnergy>
-                
-            </energyInfrastructureStation>
-                       
-            
-            
+                        </afac:name>
+                        <afac:linkToGeneralInformation>https://PartnerX.y</afac:linkToGeneralInformation>
+                        <afac:linkToWebform>https://contact.me</afac:linkToWebform>
+                    </aegi:mobilityServiceProvider>
+                    <aegi:energyRate id="4C55D08A-20D5-4A7A-8067-81AB5E15E738">
+                        <aegi:ratePolicy>contract</aegi:ratePolicy>
+                        <aegi:lastUpdated>2025-01-10T11:13:51+01:00</aegi:lastUpdated>
+                        <aegi:applicableCurrency>EUR</aegi:applicableCurrency>
+                        <aegi:payment>
+                            <afac:paymentMeans>qrCode</afac:paymentMeans>
+                            <afac:paymentMeans>website</afac:paymentMeans>
+                        </aegi:payment>
+                    </aegi:energyRate>
+                </aegi:energyProduct>
+            </aegi:energyInfrastructureStation>
             <!-- Zweite Ladestation
             ***************************************************************************************
             Das Beispiel der 2. Ladestation ist noch unvollständig.
             Es ist syntaktisch korrekt, enthält aber noch nicht alle verpflichtenden Elemente
             ***************************************************************************************
             -->
-            
-            <energyInfrastructureStation id="0563BFAD-646D-4A19-9E5C-6D4599FAAF6A" version="3">
-               
+            <aegi:energyInfrastructureStation id="0563BFAD-646D-4A19-9E5C-6D4599FAAF6A" version="3">
+                <afac:externalIdentifier>
+                    <afac:identifier>[Ladestations-ID der Bundesnetzagentur]</afac:identifier>
+                    <afac:otherTypeOfIdentifier>stationIdBNetzA</afac:otherTypeOfIdentifier>
+                </afac:externalIdentifier>
                 <!-- Exakte Punkt-Koordinaten der Ladestation (WGS84; DATEX verlangt eigentlich ETRS89, WGS84 als Rückfallebene) -->
-                <fac:locationReference xsi:type="loc:PointLocation">
+                <afac:locationReference xsi:type="loc:PointLocation">
                     <loc:pointByCoordinates>
                         <loc:pointCoordinates>
                             <loc:latitude>50.779594</loc:latitude>
                             <loc:longitude>6.104478</loc:longitude>
                         </loc:pointCoordinates>
                     </loc:pointByCoordinates>
-                </fac:locationReference>
-                
+                </afac:locationReference>
                 <!-- Unmittelbar zur Ladestation gehört 1 Parkplatz (serh detaillierte Beschreibung) und keiner für Nutzer mit Beeinträchtigung -->
-                <fac:dedicatedParkingSpaces id="BC3BBA0E-14B1-461E-83B2-1CF5A0118B9F" version="1">
-                    <fac:accessibility>barrierFreeAccessible</fac:accessibility>
+                <afac:dedicatedParkingSpaces id="BC3BBA0E-14B1-461E-83B2-1CF5A0118B9F" version="1">
+                    <afac:accessibility>barrierFreeAccessible</afac:accessibility>
                     <!-- Beschreibung des einzelnen Stellplatzes durch eine Flächenbeschreibung (Polygon). -->
-                    <fac:locationReference xsi:type="loc:AreaLocation">
+                    <afac:locationReference xsi:type="loc:AreaLocation">
                         <loc:gmlMultiPolygon>
                             <loc:gmlPolygon>
                                 <loc:exterior srsDimension="2" srsName="EPSG 4326 WGS84">
@@ -751,173 +680,127 @@
                                 </loc:exterior>
                             </loc:gmlPolygon>
                         </loc:gmlMultiPolygon>
-                    </fac:locationReference>
+                    </afac:locationReference>
                     <!-- Stellplatz Nur für Batterie-Fahrzeuge, "Cars", nicht höher als 3m -->
-                    <fac:applicableForVehicles>
+                    <afac:applicableForVehicles>
                         <com:fuelType>battery</com:fuelType>
                         <com:vehicleType>car</com:vehicleType>
                         <com:heightCharacteristic>
                             <com:comparisonOperator>lessThan</com:comparisonOperator>
                             <com:vehicleHeight>3</com:vehicleHeight>
                         </com:heightCharacteristic>
-                    </fac:applicableForVehicles>
+                    </afac:applicableForVehicles>
                     <!-- Genaue Abmessungen des Stellplatzes -->
-                    <fac:dimension>
-                        <fac:length>6</fac:length>
-                        <fac:width>3</fac:width>
-                    </fac:dimension>
-                    <numberOfSpaces>1</numberOfSpaces>
-                </fac:dedicatedParkingSpaces>
-                
+                    <afac:dimension>
+                        <afac:length>6</afac:length>
+                        <afac:width>3</afac:width>
+                    </afac:dimension>
+                    <aegi:numberOfSpaces>1</aegi:numberOfSpaces>
+                </afac:dedicatedParkingSpaces>
                 <!-- Kein Extra-Platz für Nutzer mit Beeinträchtigung -->
-                <fac:dedicatedParkingSpaces id="BC44BBE7-DFD5-4822-BF51-30D213A4CF9F" version="1">
-                    <numberOfSpaces>0</numberOfSpaces>
-                    <userSpecific>personsWithDisabilities</userSpecific>
-                </fac:dedicatedParkingSpaces>
-                
-                <stationIdBNetzA>[Ladestations-ID der Bundesnetzagentur]</stationIdBNetzA>
-                <totalMaximumPower>200000</totalMaximumPower> <!-- 200 kW -->
-                
-                <authenticationAndIdentificationMethods>apps</authenticationAndIdentificationMethods>
-                
+                <afac:dedicatedParkingSpaces id="BC44BBE7-DFD5-4822-BF51-30D213A4CF9F" version="1">
+                    <aegi:numberOfSpaces>0</aegi:numberOfSpaces>
+                    <aegi:userSpecific>personsWithDisabilities</aegi:userSpecific>
+                </afac:dedicatedParkingSpaces>
+                <aegi:totalMaximumPower>200000</aegi:totalMaximumPower>
+                <!-- 200 kW -->
+                <aegi:authenticationAndIdentificationMethods>apps</aegi:authenticationAndIdentificationMethods>
                 <!-- Die Ladestation hat 2 Lade-Plätze -->
-                <numberOfRefillPoints>2</numberOfRefillPoints>
-                <userInterfaceLanguage>de</userInterfaceLanguage>
-                
-                <mobilityServiceProvider xsi:type="fac:OrganisationSpecification" id="A1633959-F0BE-4F48-85CC-1A9FAE2BF34B" version="1">
-                    <fac:name>
+                <aegi:numberOfRefillPoints>2</aegi:numberOfRefillPoints>
+                <aegi:userInterfaceLanguage>de</aegi:userInterfaceLanguage>
+                <aegi:mobilityServiceProvider xsi:type="afac:AnOrganisation">
+                    <afac:name>
                         <com:values>
                             <com:value lang="de">Stromanbieter ABC3</com:value>
                         </com:values>
-                    </fac:name>
-                </mobilityServiceProvider>
-
-                <roamingPlatform xsi:type="fac:OrganisationSpecification" id="0D44DDF2-97DB-4267-89FF-DF4B9B7FBCDA" version="1">
-                    <fac:name>
+                    </afac:name>
+                </aegi:mobilityServiceProvider>
+                <aegi:roamingPlatform xsi:type="afac:AnOrganisation">
+                    <afac:name>
                         <com:values>
                             <com:value lang="en">RPT1</com:value>
                         </com:values>
-                    </fac:name>
-                </roamingPlatform>
-                
-                <roamingPlatform xsi:type="fac:OrganisationSpecification" id="3A09F1C7-7721-40EF-B379-D7358A7E2F0E" version="1">
-                    <fac:name>
+                    </afac:name>
+                </aegi:roamingPlatform>
+                <aegi:roamingPlatform xsi:type="afac:AnOrganisation">
+                    <afac:name>
                         <com:values>
                             <com:value lang="en">RPT2</com:value>
                         </com:values>
-                    </fac:name>
-                </roamingPlatform>
-                
-                <serviceType>
-                    <serviceType>unattended</serviceType>
-                </serviceType>
-                
+                    </afac:name>
+                </aegi:roamingPlatform>
+                <aegi:serviceType>
+                    <aegi:serviceType>unattended</aegi:serviceType>
+                </aegi:serviceType>
                 <!-- 1. Ladepunkt -->
-                <refillPoint xsi:type="egi:ElectricChargingPoint" id="CAEBDA8A-210A-48EA-856A-EA9595FDDD10" version="2">
-                    
-                    <deliveryUnit>kWh</deliveryUnit>
-                    <modelType>
+                <aegi:refillPoint xsi:type="aegi:ElectricChargingPoint" id="CAEBDA8A-210A-48EA-856A-EA9595FDDD10" version="2">
+                    <!-- Die EVS-ID nach ISO 15118-2 muss verpflichtend
+                         entweder beim Point oder den Connectoren angegeben werden -->
+                    <afac:externalIdentifier>
+                        <afac:identifier>DEABCEXXXXXXXX54321</afac:identifier>
+                        <afac:typeOfIdentifier _extendedValue="evseId">_extended</afac:typeOfIdentifier>
+                    </afac:externalIdentifier>
+                    <aegi:deliveryUnit>kWh</aegi:deliveryUnit>
+                    <aegi:modelType>
                         <com:values>
                             <com:value lang="de">Anschlusstyp XY</com:value>
                         </com:values>
-                    </modelType>
-                    
-                    <!-- Die EVS-ID nach ISO 15118-2 muss verpflichtend
-                         entweder beim Point oder den Connectoren angegeben werden -->
-                    <evseId>DEABCEXXXXXXXX54321</evseId>
-                    
-                    <usageType>electricVehicle</usageType>
-                    <vehicleToGridCommunicationType>iso15118</vehicleToGridCommunicationType>
-                    
-                    <!-- 2 verschiedene Stecker verfügbar (Einzeldefinition weiter unten) -->
-                    <numberOfConnectors>2</numberOfConnectors>
-                    
-                    <availableVoltage>200</availableVoltage>
-                    <availableVoltage>400</availableVoltage>
-                    <availableChargingPower>11000</availableChargingPower>
-                    <availableChargingPower>22000</availableChargingPower>
-                    <availableChargingPower>50000</availableChargingPower>
-                    <smartRechargingServices>remoteMonitoring</smartRechargingServices>
-                    <smartRechargingServices>bidirectionalRecharging</smartRechargingServices>
-                    <smartRechargingServices>powerOptimisationByUser</smartRechargingServices>
-                    <otherSmartRechargingServices>
-                        <com:values>
-                            <com:value lang="de">weitere smart recharging Services</com:value>
-                        </com:values>
-                    </otherSmartRechargingServices>
-                    
-                    <connector>
-                        <connectorType>iec62196T2</connectorType>
-                        <maxPowerAtSocket>22000</maxPowerAtSocket>
-                    </connector>
-                    <connector>
-                        <connectorType>chademo</connectorType>
-                        <maxPowerAtSocket>50000</maxPowerAtSocket>
-                    </connector>
-                    
+                    </aegi:modelType>
                     <!-- Eine (nicht näher spezifizierte) Energieform/Stromart, die per adHoc-Preis angeboten wird.
                          Electric Energy kann sowohl an einem ElectricChargingPoint definiert werden (wie hier) oder
                          direkt an der E.I.Station -->
-                    <electricEnergy>
-                        <energyProductName>
+                    <aegi:energyProduct xsi:type="aegi:ElectricEnergy">
+                        <aegi:energyProductName>
                             <com:values>
                                 <com:value lang="de">1a Strommix</com:value>
                             </com:values>
-                        </energyProductName>
-                        
+                        </aegi:energyProductName>
                         <!-- Preisgestaltung für diese Stromart -->
                         <!-- Ad-Hoc Preis, zahlbar mit VISA oder über die Webseite -->
                         <!-- Achtung: Eine AdHoc-Preisdefinition wird durch die EU-Regulierung gefordert, und insbesondere
-                             muss der AdHoc-Preis auch im dynamischen Datenteil angegeben (d.h. überschrieben) werden --> 
-                        
-                        <energyRate id="39E6F05D-070E-47EF-94D7-6DEDE1332B2B">
-                            <ratePolicy>adHoc</ratePolicy>
-                            <lastUpdated>2025-01-10T11:13:51+01:00</lastUpdated>
-                            <applicableCurrency>EUR</applicableCurrency>
-                            <paymentMethod>
-                                <fac:paymentMeans>emv</fac:paymentMeans>
-                                <fac:paymentMeans>website</fac:paymentMeans>
-                                <fac:brandsAcceptedCodeList>
-                                    <fac:brandsAcceptedList>visa</fac:brandsAcceptedList>
-                                </fac:brandsAcceptedCodeList>
-                            </paymentMethod>
-                            
-                            <energyPrice>
-                                <priceType>pricePerKWh</priceType>
-                                <value>0.35</value>
-                            </energyPrice>
-                            
-                        </energyRate>
-                    </electricEnergy>
-                    
+                             muss der AdHoc-Preis auch im dynamischen Datenteil angegeben (d.h. überschrieben) werden -->
+                        <aegi:energyRate id="39E6F05D-070E-47EF-94D7-6DEDE1332B2B">
+                            <aegi:ratePolicy>adHoc</aegi:ratePolicy>
+                            <aegi:lastUpdated>2025-01-10T11:13:51+01:00</aegi:lastUpdated>
+                            <aegi:applicableCurrency>EUR</aegi:applicableCurrency>
+                            <aegi:payment>
+                                <afac:paymentMeans>emv</afac:paymentMeans>
+                                <afac:paymentMeans>website</afac:paymentMeans>
+                                <afac:brandsAccepted>visa</afac:brandsAccepted>
+                            </aegi:payment>
+                            <aegi:energyPrice>
+                                <aegi:priceGroupIndex>1</aegi:priceGroupIndex>
+                                <aegi:priceType>pricePerKWh</aegi:priceType>
+                                <aegi:value>0.35</aegi:value>
+                            </aegi:energyPrice>
+                        </aegi:energyRate>
+                    </aegi:energyProduct>
                     <!-- Eine weitere Stromart: Grüne Energie, per Vertrag beziehbar -->
-                    <electricEnergy>
-                        <energyProductName>
+                    <aegi:energyProduct xsi:type="aegi:ElectricEnergy">
+                        <aegi:energyProductName>
                             <com:values>
                                 <com:value lang="de">Grüner Strom</com:value>
                             </com:values>
-                        </energyProductName>
-                        <isGreenEnergy>true</isGreenEnergy>
-                        
+                        </aegi:energyProductName>
+                        <aegi:isGreenEnergy>true</aegi:isGreenEnergy>
                         <!-- Referenz auf den zuvor bereits definierten Vertragspartner -->
-                        <mobilityServiceProvider xsi:type="fac:OrganisationByReference">
-                            <fac:organisationReference targetClass="fac:OrganisationSpecification" id="A1633959-F0BE-4F48-85CC-1A9FAE2BF34B"/>
-                        </mobilityServiceProvider>
-                        
-                        <energyRate id="7DE39FF9-8F26-48FE-9981-07131534ACC2">
-                            <ratePolicy>contract</ratePolicy>
-                            <lastUpdated>2025-01-10T11:13:51+01:00</lastUpdated>
-                            <applicableCurrency>EUR</applicableCurrency>
-                            <rateName>
+                        <aegi:mobilityServiceProvider xsi:type="afac:OrganisationByReference">
+                            <afac:organisationReference targetClass="afac:ReferenceableOrganisation" id="A1633959-F0BE-4F48-85CC-1A9FAE2BF34B" />
+                        </aegi:mobilityServiceProvider>
+                        <aegi:energyRate id="7DE39FF9-8F26-48FE-9981-07131534ACC2">
+                            <aegi:ratePolicy>contract</aegi:ratePolicy>
+                            <aegi:lastUpdated>2025-01-10T11:13:51+01:00</aegi:lastUpdated>
+                            <aegi:applicableCurrency>EUR</aegi:applicableCurrency>
+                            <aegi:rateName>
                                 <com:values>
                                     <com:value lang="de">GrünTarif 1AB</com:value>
                                 </com:values>
-                            </rateName>
-                            
-                            <energyPrice>
-                                <priceType>pricePerKWh</priceType>
-                                <value>0.30</value>
-                                <overallPeriod>
+                            </aegi:rateName>
+                            <aegi:energyPrice>
+                                <aegi:priceGroupIndex>1</aegi:priceGroupIndex>
+                                <aegi:priceType>pricePerKWh</aegi:priceType>
+                                <aegi:value>0.30</aegi:value>
+                                <aegi:overallPeriod>
                                     <com:overallStartTime>2025-01-01T00:00:00+01:00</com:overallStartTime>
                                     <com:overallEndTime>2025-12-31T23:59:59+01:00</com:overallEndTime>
                                     <com:validPeriod>
@@ -926,14 +809,14 @@
                                             <com:endTimeOfPeriod>06:00:00</com:endTimeOfPeriod>
                                         </com:recurringTimePeriodOfDay>
                                     </com:validPeriod>
-                                </overallPeriod>
-                            </energyPrice>
-                            
+                                </aegi:overallPeriod>
+                            </aegi:energyPrice>
                             <!-- Nachtpreis -->
-                            <energyPrice>
-                                <priceType>pricePerKWh</priceType>
-                                <value>0.27</value>
-                                <overallPeriod>
+                            <aegi:energyPrice>
+                                <aegi:priceGroupIndex>1</aegi:priceGroupIndex>
+                                <aegi:priceType>pricePerKWh</aegi:priceType>
+                                <aegi:value>0.27</aegi:value>
+                                <aegi:overallPeriod>
                                     <com:overallStartTime>2025-01-01T00:00:00+01:00</com:overallStartTime>
                                     <com:overallEndTime>2025-12-31T23:59:59+01:00</com:overallEndTime>
                                     <com:validPeriod>
@@ -942,41 +825,61 @@
                                             <com:endTimeOfPeriod>06:00:00</com:endTimeOfPeriod>
                                         </com:recurringTimePeriodOfDay>
                                     </com:validPeriod>
-                                </overallPeriod>
-                            </energyPrice>
-                            
-                        </energyRate>
-                    </electricEnergy>
-                    
-                </refillPoint>
-                
+                                </aegi:overallPeriod>
+                            </aegi:energyPrice>
+                        </aegi:energyRate>
+                    </aegi:energyProduct>
+                    <aegi:currentType>dc</aegi:currentType>
+                    <aegi:usageType>electricVehicle</aegi:usageType>
+                    <aegi:vehicleToGridCommunicationType>iso15118</aegi:vehicleToGridCommunicationType>
+                    <!-- 2 verschiedene Stecker verfügbar (Einzeldefinition weiter unten) -->
+                    <aegi:numberOfConnectors>2</aegi:numberOfConnectors>
+                    <aegi:availableVoltage>200</aegi:availableVoltage>
+                    <aegi:availableVoltage>400</aegi:availableVoltage>
+                    <aegi:availableChargingPower>11000</aegi:availableChargingPower>
+                    <aegi:availableChargingPower>22000</aegi:availableChargingPower>
+                    <aegi:availableChargingPower>50000</aegi:availableChargingPower>
+                    <aegi:smartRechargingServices>remoteMonitoring</aegi:smartRechargingServices>
+                    <aegi:smartRechargingServices>bidirectionalRecharging</aegi:smartRechargingServices>
+                    <aegi:smartRechargingServices>powerOptimisationByUser</aegi:smartRechargingServices>
+                    <aegi:otherSmartRechargingServices>
+                        <com:values>
+                            <com:value lang="de">weitere smart recharging Services</com:value>
+                        </com:values>
+                    </aegi:otherSmartRechargingServices>
+                    <aegi:connector>
+                        <aegi:connectorType>iec62196T2</aegi:connectorType>
+                        <aegi:maxPowerAtSocket>22000</aegi:maxPowerAtSocket>
+                    </aegi:connector>
+                    <aegi:connector>
+                        <aegi:connectorType>chademo</aegi:connectorType>
+                        <aegi:maxPowerAtSocket>50000</aegi:maxPowerAtSocket>
+                    </aegi:connector>
+                </aegi:refillPoint>
                 <!-- 2. Ladepunkt -->
-                <refillPoint xsi:type="egi:ElectricChargingPoint" id="D8CF0A86-037F-449C-8BE2-5820EECC9036" version="1">
-                    <deliveryUnit>kWh</deliveryUnit>
-                    <usageType>electricVehicle</usageType>
-                    <vehicleToGridCommunicationType>iec619802</vehicleToGridCommunicationType>
-                    <numberOfConnectors>1</numberOfConnectors>
-                    <availableVoltage>400</availableVoltage>
-                    <availableChargingPower>40000</availableChargingPower>
-                    <smartRechargingServices>remoteMonitoring</smartRechargingServices>
-                    <connector>
-                        <connectorType>other</connectorType>
-                        <otherConnector>Some other connector type</otherConnector>
-                        <maxPowerAtSocket>40000</maxPowerAtSocket>
-                    </connector>
-                                        
-                </refillPoint>
-                
+                <aegi:refillPoint xsi:type="aegi:ElectricChargingPoint" id="D8CF0A86-037F-449C-8BE2-5820EECC9036" version="1">
+                    <aegi:deliveryUnit>kWh</aegi:deliveryUnit>
+                    <aegi:currentType>ac</aegi:currentType>
+                    <aegi:usageType>electricVehicle</aegi:usageType>
+                    <aegi:vehicleToGridCommunicationType>iec619802</aegi:vehicleToGridCommunicationType>
+                    <aegi:numberOfConnectors>1</aegi:numberOfConnectors>
+                    <aegi:availableVoltage>400</aegi:availableVoltage>
+                    <aegi:availableChargingPower>40000</aegi:availableChargingPower>
+                    <aegi:smartRechargingServices>remoteMonitoring</aegi:smartRechargingServices>
+                    <aegi:connector>
+                        <aegi:connectorType>other</aegi:connectorType>
+                        <aegi:otherConnector>Some other connector type</aegi:otherConnector>
+                        <aegi:maxPowerAtSocket>40000</aegi:maxPowerAtSocket>
+                    </aegi:connector>
+                </aegi:refillPoint>
                 <!-- Definition auf Station-Ebene: Die gesamte 2. Ladestation nutzt den gleichen Tarif "GrünTarif 1AB"
                     wie zuvor schon definiert bei der Anschlüsse der ersten Ladestation.
                     Achtung: Jegliches Preisupdate im dynamischen Modellteil wirkt sich auf sämtliche Referenzierungen aus!
                 -->
-                <electricEnergy>
-                    <energyRateByReference targetClass="egi:EnergyRate" id="9C07640B-7ECE-46EC-A23F-417E99C53F33"/>
-                </electricEnergy>
-                
-            </energyInfrastructureStation>
-            
-        </energyInfrastructureSite>
-    </energyInfrastructureTable>
+                <aegi:energyProduct xsi:type="aegi:ElectricEnergy">
+                    <aegi:energyRateByReference targetClass="aegi:EnergyRate" id="9C07640B-7ECE-46EC-A23F-417E99C53F33" />
+                </aegi:energyProduct>
+            </aegi:energyInfrastructureStation>
+        </aegi:energyInfrastructureSite>
+    </aegi:energyInfrastructureTable>
 </d2:payload>

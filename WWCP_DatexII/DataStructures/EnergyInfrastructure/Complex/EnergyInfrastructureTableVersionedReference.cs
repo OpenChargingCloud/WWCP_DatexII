@@ -32,9 +32,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
     /// <summary>
     /// A versioned reference to an EnergyInfrastructureTable.
-    /// The targetClass attribute is fixed to "egi:EnergyInfrastructureTable".
+    /// The targetClass attribute is fixed to "aegi:EnergyInfrastructureTable".
     /// </summary>
-    [XmlType("_EnergyInfrastructureTableVersionedReference", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("_EnergyInfrastructureTableVersionedReference", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyInfrastructureTableVersionedReference(String   Id,
                                                              String?  Version = null)
 
@@ -49,7 +49,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// Fixed attribute indicating the target class.
         /// </summary>
         [XmlAttribute("targetClass")]
-        public String  TargetClass    { get; } = "egi:EnergyInfrastructureTable";
+        public String  TargetClass    { get; } = "aegi:EnergyInfrastructureTable";
 
         #endregion
 
@@ -69,10 +69,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             EnergyInfrastructureTableVersionedReference = null;
 
-            // <tableReference xmlns       = "http://datex2.eu/schema/3/energyInfrastructure"
+            // <tableReference xmlns       = "http://datex2.eu/schema/3/afirEnergyInfrastructure"
             //                 version     = "2"
             //                 id          = "2474A514-0E5D-48F9-A908-F185DD4177A2"
-            //                 targetClass = "egi:EnergyInfrastructureTable" />
+            //                 targetClass = "aegi:EnergyInfrastructureTable" />
 
             #region TryParse Id             [mandatory]
 
@@ -135,10 +135,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         public XElement ToXML()
         {
 
-            // <tableReference xmlns       = "http://datex2.eu/schema/3/energyInfrastructure"
+            // <tableReference xmlns       = "http://datex2.eu/schema/3/afirEnergyInfrastructure"
             //                 version     = "2"
             //                 id          = "2474A514-0E5D-48F9-A908-F185DD4177A2"
-            //                 targetClass = "egi:EnergyInfrastructureTable" />
+            //                 targetClass = "aegi:EnergyInfrastructureTable" />
 
             var xml = new XElement(DatexIINS.EnergyInfrastructure + "tableReference",
 

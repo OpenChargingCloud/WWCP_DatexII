@@ -91,7 +91,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             OverallPeriod = null;
 
-            // <overallPeriod xmlns="http://datex2.eu/schema/3/energyInfrastructure">
+            // <overallPeriod xmlns="http://datex2.eu/schema/3/afirEnergyInfrastructure">
             //     <com:overallStartTime xmlns:com="http://datex2.eu/schema/3/common">2025-02-02T15:00:00+01:00</com:overallStartTime>
             //     <com:overallEndTime   xmlns:com="http://datex2.eu/schema/3/common">2025-02-02T17:00:00+01:00</com:overallEndTime>
             // </overallPeriod>

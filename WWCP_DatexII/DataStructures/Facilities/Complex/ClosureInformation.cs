@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Information about temporary or permanent closure.
     /// </summary>
-    [XmlType("ClosureInformation", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("ClosureInformation", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class ClosureInformation(Boolean?         PermanentlyClosed             = null,
                                     Boolean?         TemporarilyClosed             = null,
                                     DateTimeOffset?  ClosedFrom                    = null,

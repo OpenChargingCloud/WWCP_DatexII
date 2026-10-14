@@ -34,14 +34,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// One type of supplemental service facility. You can specify the number of this service facility type (e.g. 5 restaurants)
     /// as well as the number of subitems (e.g. 200 restaurant places).
     /// </summary>
-    [XmlType("SupplementalServiceFacility", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("SupplementalServiceFacility", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class SupplementalServiceFacility(String                                Id,
                                              String                                Version,
                                              ServiceFacilityType                   ServiceFacilityType,
 
                                              MultilingualString?                   Name                                   = null,
                                              IEnumerable<MultilingualString>?      Alias                                  = null,
-                                             String?                               ExternalIdentifier                     = null,
+                                             IEnumerable<ExternalIdentifier>?       ExternalIdentifier                     = null,
                                              DateTimeOffset?                       LastUpdated                            = null,
                                              MultilingualString?                   Description                            = null,
                                              IEnumerable<Accessibility>?           Accessibility                          = null,
@@ -109,7 +109,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// One type of service.
         /// </summary>
-        [XmlElement("serviceFacilityType",                    Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("serviceFacilityType",                    Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public ServiceFacilityType  ServiceFacilityType                     { get; } = ServiceFacilityType;
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             => new (XMLName ?? DatexIINS.Facilities + "supplementalFacility",
 
-                   new XAttribute(DatexIINS.XSI + "type",   "fac:SupplementalServiceFacility"),
+                   new XAttribute(DatexIINS.XSI + "type",   "afac:SupplementalServiceFacility"),
                    new XAttribute("id",                      Id),
                    new XAttribute("version",                 Version),
 

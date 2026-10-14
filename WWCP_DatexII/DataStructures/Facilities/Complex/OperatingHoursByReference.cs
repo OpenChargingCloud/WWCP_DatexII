@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Operating hours information that is addressed via a reference.
     /// </summary>
-    [XmlType("OperatingHoursByReference", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("OperatingHoursByReference", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class OperatingHoursByReference(OperatingHoursSpecificationVersionedReference  OperatingHoursReference,
                                            OperatingHoursTableVersionedReference?         OperatingHoursTableReference         = null,
                                            XElement?                                      OperatingHoursByReferenceExtension   = null,
@@ -49,13 +49,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// The reference to an operating hours specification.
         /// </summary>
-        [XmlElement("operatingHoursReference",              Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("operatingHoursReference",              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public OperatingHoursSpecificationVersionedReference  OperatingHoursReference               { get; } = OperatingHoursReference;
 
         /// <summary>
         /// Operation hours table in question defined by a reference.
         /// </summary>
-        [XmlElement("operatingHoursTableReference",         Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("operatingHoursTableReference",         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public OperatingHoursTableVersionedReference?         OperatingHoursTableReference          { get; } = OperatingHoursTableReference;
 
         /// <summary>
@@ -84,11 +84,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
             ErrorResponse               = null;
 
             // <?xml version="1.0" encoding="UTF-8"?>
-            // <operatingHoursByReference xmlns     = "http://datex2.eu/schema/3/facilities" 
+            // <operatingHoursByReference xmlns     = "http://datex2.eu/schema/3/afirFacilities" 
             //                            xmlns:com = "http://datex2.eu/schema/3/common">
             //
-            //   <operatingHoursReference      id="spec123"  version="1" targetClass="fac:OperatingHoursSpecification" />
-            //   <operatingHoursTableReference id="table456" version="2" targetClass="fac:OperatingHoursTable" />
+            //   <operatingHoursReference      id="spec123"  version="1" targetClass="afac:OperatingHoursSpecification" />
+            //   <operatingHoursTableReference id="table456" version="2" targetClass="afac:OperatingHoursTable" />
             //
             //   <_operatingHoursByReferenceExtension>
             //     <!-- Additional extension details go here -->
@@ -165,7 +165,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             => new (XMLName ?? DatexIINS.Facilities + "operatingHours",
 
-                   new XAttribute(DatexIINS.XSI + "type",   "fac:OperatingHoursByReference"),
+                   new XAttribute(DatexIINS.XSI + "type",   "afac:OperatingHoursByReference"),
 
                    ClosureInformation is not null
                        ? ClosureInformation.ToXML(DatexIINS.Facilities + "closureInformation")

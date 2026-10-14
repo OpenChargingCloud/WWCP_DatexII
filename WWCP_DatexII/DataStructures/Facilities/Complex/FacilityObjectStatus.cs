@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Dynamic status information for a facility object.
     /// </summary>
-    [XmlType("FacilityObjectStatus", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("FacilityObjectStatus", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class FacilityObjectStatus(FacilityObjectVersionedReference  Reference,
                                       DateTimeOffset?                   LastUpdated                     = null,
                                       OpeningStatus?                    OpeningStatus                   = null,
@@ -49,7 +49,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Reference to the corresponding static facility object.
         /// </summary>
-        [XmlElement("reference",                       Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("reference",                       Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public FacilityObjectVersionedReference  Reference                        { get; } = Reference;
 
         /// <summary>
@@ -61,13 +61,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// The opening status of this facility (open or closed).
         /// </summary>
-        [XmlElement("openingStatus",                   Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("openingStatus",                   Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public OpeningStatus?                    OpeningStatus                    { get; } = OpeningStatus;
 
         /// <summary>
         /// The operation status of this facility.
         /// </summary>
-        [XmlElement("operationStatus",                 Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("operationStatus",                 Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public OperationStatus?                  OperationStatus                  { get; } = OperationStatus;
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Overrides the operating hours information specified in the static part either with a new reference or with a new defined version.
         /// </summary>
-        [XmlElement("newOperatingHours",               Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("newOperatingHours",               Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public AOperatingHours?                  NewOperatingHours                { get; } = NewOperatingHours;
 
         /// <summary>

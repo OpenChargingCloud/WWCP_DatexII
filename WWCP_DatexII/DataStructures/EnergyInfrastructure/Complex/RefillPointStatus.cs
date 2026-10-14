@@ -32,7 +32,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// Dynamic information on the status of the refill point.
     /// </summary>
-    [XmlType("RefillPointStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("RefillPointStatus", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class RefillPointStatus(RefillPointStatusEnum                   Status,
                                    FacilityObjectVersionedReference        Reference,
 
@@ -68,31 +68,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Status of the refill point.
         /// </summary>
-        [XmlElement("status",                       Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("status",                       Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public RefillPointStatusEnum                  Status                        { get; } = Status;
 
         /// <summary>
         /// Amount of delivery units still in stock (with delivery units as defined in the static information model).
         /// </summary>
-        [XmlElement("unitsInStock",                 Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("unitsInStock",                 Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Double?                                UnitsInStock                  { get; } = UnitsInStock;
 
         /// <summary>
         /// Updates to the energy rate applicable at this refill point.
         /// </summary>
-        [XmlElement("energyRateUpdate",             Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyRateUpdate",             Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyRateUpdate>          EnergyRateUpdates             { get; } = EnergyRateUpdates?.       Distinct() ?? [];
 
         /// <summary>
         /// Estimated waiting time for customers without reservation.
         /// </summary>
-        [XmlElement("waitingTime",                  Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("waitingTime",                  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public TimeSpan?                              WaitingTime                   { get; } = WaitingTime;
 
         /// <summary>
         /// Planned status information for the refill point (e.g. reservations).
         /// </summary>
-        [XmlElement("plannedRefillPointStatus",     Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("plannedRefillPointStatus",     Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<PlannedRefillPointStatus>  PlannedRefillPointStatus      { get; } = PlannedRefillPointStatus?.Distinct() ?? [];
 
         /// <summary>

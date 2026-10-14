@@ -31,9 +31,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 {
 
     /// <summary>
-    /// A versioned reference to a FacilityObject. The targetClass attribute is fixed to "fac:FacilityObject".
+    /// A versioned reference to a FacilityObject. The targetClass attribute is fixed to "afac:FacilityObject".
     /// </summary>
-    [XmlType("_FacilityObjectVersionedReference", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("_FacilityObjectVersionedReference", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class FacilityObjectVersionedReference(String   Id,
                                                   String?  Version = null)
 
@@ -48,7 +48,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Fixed attribute indicating the target class.
         /// </summary>
         [XmlAttribute("targetClass")]
-        public String  TargetClass    { get; } = "fac:FacilityObject";
+        public String  TargetClass    { get; } = "afac:FacilityObject";
 
         #endregion
 
@@ -68,7 +68,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             FacilityObjectVersionedReference = null;
 
-            // <fac:reference targetClass = "fac:FacilityObject"
+            // <fac:reference targetClass = "afac:FacilityObject"
             //                id          = "21F02723-CF84-4380-84D4-050917836C7C"
             //                version     = "1" />
 
@@ -132,7 +132,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         public XElement ToXML()
         {
 
-            // <fac:reference targetClass = "fac:FacilityObject"
+            // <fac:reference targetClass = "afac:FacilityObject"
             //                id          = "21F02723-CF84-4380-84D4-050917836C7C"
             //                version     = "1" />
 

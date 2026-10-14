@@ -216,6 +216,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         public static SmartRechargingService  BidirectionalRecharging    { get; }
             = Register("bidirectionalRecharging");
 
+        /// <summary>
+        /// Plug and charge, e.g. according to ISO 15118.
+        /// </summary>
+        public static SmartRechargingService  PlugAndCharge    { get; }
+            = Register("plugAndCharge");
+
         #endregion
 
 

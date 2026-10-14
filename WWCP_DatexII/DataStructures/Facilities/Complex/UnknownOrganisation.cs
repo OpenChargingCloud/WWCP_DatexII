@@ -30,7 +30,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// The organisation for the specified association end (within the specified validity if applicable) is unknown.
     /// </summary>
-    [XmlType("UnknownOrganisation", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("UnknownOrganisation", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class UnknownOrganisation(XElement?       UnknownOrganisationExtension   = null,
                                      OverallPeriod?  GeneralTimeValidity            = null,
                                      XElement?       OrganisationExtension          = null)
@@ -61,7 +61,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             => new (XMLName ?? DatexIINS.Facilities + "organisation",
 
-                   new XAttribute(DatexIINS.XSI + "type",   "fac:UnknownOrganisation"),
+                   new XAttribute(DatexIINS.XSI + "type",   "afac:UnknownOrganisation"),
 
                    ToXMLElements(),
 

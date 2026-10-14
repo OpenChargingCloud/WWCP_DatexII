@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -55,6 +56,48 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlElement("_lengthCharacteristicExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?           LengthCharacteristicExtension    { get; } = LengthCharacteristicExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out LengthCharacteristic, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a LengthCharacteristic.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="LengthCharacteristic">The parsed LengthCharacteristic.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                       XML,
+                                          [NotNullWhen(true)]  out LengthCharacteristic?  LengthCharacteristic,
+                                          [NotNullWhen(false)] out String?               ErrorResponse)
+        {
+
+            LengthCharacteristic = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.Common + "comparisonOperator",
+                                            "comparison operator",
+                                            Common.ComparisonOperator.TryParse,
+                                            out ComparisonOperator comparisonOperator,
+                                            out ErrorResponse) ||
+                !XML.TryParseMandatoryValue(DatexIINS.Common + "vehicleLength",
+                                            "vehicle length",
+                                            DatexIIXMLExtensions.TryParseMeter,
+                                            out Meter measure,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            LengthCharacteristic = new LengthCharacteristic(
+                                        comparisonOperator,
+                                                          measure,
+                                        XML.Element(DatexIINS.Common + "_lengthCharacteristicExtension")
+                                    );
+
+            return true;
+
+        }
 
         #endregion
 

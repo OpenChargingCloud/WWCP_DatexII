@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2014-2025 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * Copyright (c) 2014-2026 GraphDefined GmbH <achim.friedland@graphdefined.com>
  * This file is part of WWCP DatexII <https://github.com/OpenChargingCloud/WWCP_DatexII>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
@@ -36,19 +36,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <param name="MaxPowerAtSocket">Maximum power at the socket.</param>
     /// <param name="OtherConnector">Some other connector / charging interface.</param>
     /// <param name="CountryOfDomesticSocket">Countries for which the domestic socket is applicable. Only needed if explicit type of a domestic socket is not specified.</param>
-    /// <param name="ChargingMode">Available charging modes.</param>
     /// <param name="ConnectorFormat">Information on the cable type used.</param>
     /// <param name="Voltage">Possible degrees of voltage.</param>
     /// <param name="MaximumCurrent">Maximum current.</param>
-    [XmlType("Connector", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    /// <param name="ExternalIdentifier">External identifiers of the connector (DATEX II 3.7).</param>
+    [XmlType("Connector", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class Connector(ConnectorType          ConnectorType,
                            Watt                   MaxPowerAtSocket,
                            String?                OtherConnector           = null,
                            IEnumerable<Country>?  CountryOfDomesticSocket  = null,
-                           ChargingMode?          ChargingMode             = null,
                            ConnectorFormat?       ConnectorFormat          = null,
                            Volt?                  Voltage                  = null,
                            Ampere?                MaximumCurrent           = null,
+                           IEnumerable<Facilities.ExternalIdentifier>?  ExternalIdentifier  = null,
                            XElement?              ConnectorExtension       = null)
     {
 
@@ -57,19 +57,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Specification of the connector, i.e. the charging interface type.
         /// </summary>
-        [XmlElement(ElementName = "connectorType",            Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement(ElementName = "connectorType",            Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public ConnectorType          ConnectorType              { get; } = ConnectorType;
 
         /// <summary>
         /// Maximum power at the socket.
         /// </summary>
-        [XmlElement(ElementName = "maxPowerAtSocket",         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement(ElementName = "maxPowerAtSocket",         Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Watt                   MaxPowerAtSocket           { get; } = MaxPowerAtSocket;
 
         /// <summary>
         /// Some other connector / charging interface.
         /// </summary>
-        [XmlElement(ElementName = "otherConnector",           Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement(ElementName = "otherConnector",           Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public String?                OtherConnector             { get; } = OtherConnector;
 
         /// <summary>
@@ -80,28 +80,27 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         public IEnumerable<Country>?  CountryOfDomesticSocket    { get; } = CountryOfDomesticSocket ?? [];  // 2-Letter-Code
 
         /// <summary>
-        /// Available charging modes.
-        /// </summary>
-        [XmlElement(ElementName = "chargingMode",             Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public ChargingMode?          ChargingMode               { get; } = ChargingMode;
-
-        /// <summary>
         /// Information on the cable type used.
         /// </summary>
-        [XmlElement(ElementName = "connectorFormat",          Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement(ElementName = "connectorFormat",          Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public ConnectorFormat?       ConnectorFormat            { get; } = ConnectorFormat;
 
         /// <summary>
         /// Possible degrees of voltage.
         /// </summary>
-        [XmlElement(ElementName = "voltage",                  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement(ElementName = "voltage",                  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Volt?                  Voltage                    { get; } = Voltage;
 
         /// <summary>
         /// Maximum current.
         /// </summary>
-        [XmlElement(ElementName = "maximumCurrent",           Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement(ElementName = "maximumCurrent",           Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Ampere?                MaximumCurrent             { get; } = MaximumCurrent;
+
+        /// <summary>
+        /// External identifiers of the connector (DATEX II 3.7).
+        /// </summary>
+        public IEnumerable<Facilities.ExternalIdentifier>  ExternalIdentifier  { get; } = ExternalIdentifier?.ToArray() ?? [];
 
         /// <summary>
         /// Optional extension element for additional content.
@@ -129,10 +128,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             if (!XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "connectorType",     "connector type",       EnergyInfrastructure.ConnectorType.TryParse,    out ConnectorType     connectorType,    out ErrorResponse) ||
                 !XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "maxPowerAtSocket",  "max power at socket",  DatexIIXMLExtensions.TryParseWatt,               out Watt              maxPowerAtSocket, out ErrorResponse) ||
-                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "chargingMode",      "charging mode",        EnergyInfrastructure.ChargingMode.TryParse,     out ChargingMode?     chargingMode,     out ErrorResponse) ||
                 !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "connectorFormat",   "connector format",     EnergyInfrastructure.ConnectorFormat.TryParse,  out ConnectorFormat?  connectorFormat,  out ErrorResponse) ||
                 !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "voltage",           "voltage",              DatexIIXMLExtensions.TryParseVolt,               out Volt?             voltage,          out ErrorResponse) ||
-                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "maximumCurrent",    "maximum current",      DatexIIXMLExtensions.TryParseAmpere,             out Ampere?           maximumCurrent,   out ErrorResponse))
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "maximumCurrent",    "maximum current",      DatexIIXMLExtensions.TryParseAmpere,             out Ampere?           maximumCurrent,   out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "externalIdentifier","external identifier",  Facilities.ExternalIdentifier.TryParseXML,       out IEnumerable<Facilities.ExternalIdentifier> externalIdentifiers, out ErrorResponse))
             {
                 return false;
             }
@@ -157,10 +156,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                             maxPowerAtSocket,
                             XML.OptionalText(DatexIINS.EnergyInfrastructure + "otherConnector"),
                             countries,
-                            chargingMode,
                             connectorFormat,
                             voltage,
                             maximumCurrent,
+                            externalIdentifiers,
                             XML.Element(DatexIINS.EnergyInfrastructure + "_connectorExtension")
                         );
 
@@ -189,10 +188,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                    CountryOfDomesticSocket?.Select(country => new XElement(DatexIINS.EnergyInfrastructure + "countryOfDomesticSocket", country.Alpha2Code)),
 
-                   ChargingMode.HasValue
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "chargingMode",         ChargingMode.   Value.ToString())
-                       : null,
-
                    ConnectorFormat.HasValue
                        ? new XElement(DatexIINS.EnergyInfrastructure + "connectorFormat",      ConnectorFormat.Value.ToString())
                        : null,
@@ -206,6 +201,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    MaximumCurrent.HasValue
                        ? new XElement(DatexIINS.EnergyInfrastructure + "maximumCurrent",       MaximumCurrent.Value.Value)
                        : null,
+
+                   ExternalIdentifier.Select(identifier => identifier.ToXML(DatexIINS.EnergyInfrastructure + "externalIdentifier")),
 
                    ConnectorExtension is not null
                        ? new XElement(DatexIINS.EnergyInfrastructure + "_connectorExtension",  ConnectorExtension)

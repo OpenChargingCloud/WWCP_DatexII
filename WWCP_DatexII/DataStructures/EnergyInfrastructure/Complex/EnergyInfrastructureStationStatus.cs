@@ -34,7 +34,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// Dynamic information on the status of the station.
     /// </summary>
-    [XmlType("EnergyInfrastructureStationStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyInfrastructureStationStatus", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyInfrastructureStationStatus(FacilityObjectVersionedReference          Reference,
                                                    DateTimeOffset?                           LastUpdated                                  = null,
                                                    OpeningStatus?                            OpeningStatus                                = null,
@@ -52,7 +52,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                                    IEnumerable<RefillPointStatus>?           RefillPointStatus                            = null,
                                                    IEnumerable<Service>?                     Services                                     = null,
                                                    IEnumerable<EnergyRateUpdate>?            EnergyRateUpdates                            = null,
-                                                   XElement?                                 EnergyInfrastructureStationStatusExtension   = null)
+                                                   XElement?                                 EnergyInfrastructureStationStatusExtension   = null,
+                                                   Boolean?                                  LimitedHydrogenAmount                        = null)
 
         : FacilityStatus(Reference,
                          LastUpdated,
@@ -80,22 +81,27 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         public Boolean?                        IsAvailable                                   { get; } = IsAvailable;
 
         /// <summary>
+        /// Whether only a limited amount of hydrogen is available (DATEX II 3.7).
+        /// </summary>
+        public Boolean?                        LimitedHydrogenAmount                         { get; } = LimitedHydrogenAmount;
+
+        /// <summary>
         /// Specifies the dynamic status information of one or more refill points.
         /// </summary>
-        [XmlElement("refillPointStatus",                            Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("refillPointStatus",                            Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<RefillPointStatus>  RefillPointStatus                             { get; } = RefillPointStatus?.Distinct() ?? [];
 
         /// <summary>
         /// The service type for the station.
         /// If no period is given, the currently available service is meant.
         /// </summary>
-        [XmlElement("serviceType",                                  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("serviceType",                                  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<Service>            Services                                      { get; } = Services?.         Distinct() ?? [];
 
         /// <summary>
         /// Updates to the energy rate applicable at the station.
         /// </summary>
-        [XmlElement("energyRateUpdate",                             Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyRateUpdate",                             Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyRateUpdate>   EnergyRateUpdates                             { get; } = EnergyRateUpdates?.Distinct() ?? [];
 
         /// <summary>
@@ -126,6 +132,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                 return false;
 
             if (!XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "isAvailable",        "is available",         DatexIIXMLExtensions.TryParseBoolean,                 out Boolean?                        isAvailable,       out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "limitedHydrogenAmount", "limited hydrogen amount", DatexIIXMLExtensions.TryParseBoolean,         out Boolean?                        limitedHydrogenAmount, out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "refillPointStatus",  "refill point status",  EnergyInfrastructure.RefillPointStatus.TryParseXML,   out IEnumerable<RefillPointStatus>  refillPointStatus, out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "serviceType",        "service type",         Service.TryParseXML,                                  out IEnumerable<Service>            services,          out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "energyRateUpdate",   "energy rate update",   EnergyRateUpdate.TryParseXML,                         out IEnumerable<EnergyRateUpdate>   energyRateUpdates, out ErrorResponse))
@@ -151,7 +158,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                                     refillPointStatus,
                                                     services,
                                                     energyRateUpdates,
-                                                    XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationStatusExtension")
+                                                    XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationStatusExtension"),
+                                                    limitedHydrogenAmount
                                                 );
 
             return true;
@@ -175,6 +183,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                    IsAvailable.HasValue
                        ? new XElement(DatexIINS.EnergyInfrastructure + "isAvailable",   IsAvailable.Value ? "true" : "false")
+                       : null,
+
+                   LimitedHydrogenAmount.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "limitedHydrogenAmount", LimitedHydrogenAmount.Value ? "true" : "false")
                        : null,
 
                    RefillPointStatus.Select(refillPointStatus => refillPointStatus.ToXML(DatexIINS.EnergyInfrastructure + "refillPointStatus")),

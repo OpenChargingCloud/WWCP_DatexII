@@ -71,7 +71,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                 Assert.That(points.Sum(point => point.Connector.Count()),                Is.EqualTo(6));
                 Assert.That(site.OperatingHours,                                         Is.InstanceOf<OpenAllHours>());
                 // The helpdesk is open from 6 to 23, but not on Sundays and public holidays.
-                Assert.That(((OperatingHoursSpecification) ((OrganisationSpecification) site.EnergyInfrastructureStations.First().Helpdesk!).OrganisationUnits.First().OperatingHours!).OverallPeriod.ValidPeriod, Is.Not.Empty);
+                Assert.That(((OperatingHoursSpecification) ((AnOrganisation) site.EnergyInfrastructureStations.First().Helpdesk!).OrganisationUnits.First().OperatingHours!).OverallPeriod.ValidPeriod, Is.Not.Empty);
                 Assert.That(rate.RatePolicy.ToString(),                                  Is.EqualTo("adHoc"));
                 Assert.That(rate.EnergyPrices.Single().Value.Value,                      Is.EqualTo(0.35m));
                 Assert.That(site.EnergyInfrastructureStations.First().StationIdBNetzA,   Is.EqualTo("[Ladestations-ID der Bundesnetzagentur]"));

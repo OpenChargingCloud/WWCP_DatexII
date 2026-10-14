@@ -29,7 +29,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// Identifies a time zone by specifying the difference to UTC in hours and minutes, as defined in ISO 8601.
     /// Valid formats are either "Z" or a signed offset like "+02:00" or "-05:00".
     /// </summary>
-    [XmlType("TimeZone", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("TimeZone", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public readonly struct TimeZone
     {
 

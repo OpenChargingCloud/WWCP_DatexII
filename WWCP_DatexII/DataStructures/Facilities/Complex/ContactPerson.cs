@@ -18,11 +18,12 @@
 #region Usings
 
 using System.Xml.Serialization;
+using System.Xml.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
-using System.Xml.Linq;
 
 #endregion
 
@@ -32,7 +33,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// A specific contact person.
     /// </summary>
-    [XmlType("ContactPerson", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("ContactPerson", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class ContactPerson(String                   Name,
 
                                String?                  FirstName                = null,
@@ -87,6 +88,55 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         #endregion
 
 
+        #region TryParseXML(XML, out ContactPerson, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a contact person.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="ContactPerson">The parsed contact person.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                 XML,
+                                          [NotNullWhen(true)]  out ContactPerson?  ContactPerson,
+                                          [NotNullWhen(false)] out String?         ErrorResponse)
+        {
+
+            ContactPerson = null;
+
+            var name = XML.OptionalText(DatexIINS.Facilities + "name");
+
+            if (name is null)
+            {
+                ErrorResponse = "The mandatory name of the contact person is missing!";
+                return false;
+            }
+
+            if (!XML.TryParseOptionalValues(DatexIINS.Facilities + "language",  "language",  DatexIIXMLExtensions.TryParseLanguage,  out IEnumerable<Languages>  languages, out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.Facilities + "title",     "title",     MultilingualString.TryParseXML,         out MultilingualString?     title,     out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.Facilities + "position",  "position",  MultilingualString.TryParseXML,         out MultilingualString?     position,  out ErrorResponse))
+            {
+                return false;
+            }
+
+            ContactPerson = new ContactPerson(
+                                name,
+                                XML.OptionalText(DatexIINS.Facilities + "firstName"),
+                                title,
+                                position,
+                                languages,
+                                XML.OptionalText(DatexIINS.Facilities + "telephoneNumber"),
+                                XML.OptionalText(DatexIINS.Facilities + "faxNumber"),
+                                XML.OptionalText(DatexIINS.Facilities + "eMail"),
+                                XML.Element(DatexIINS.Facilities + "_contactPersonExtension")
+                            );
+
+            return true;
+
+        }
+
+        #endregion
+
+
         #region ToXML(XMLName = null)
 
         /// <summary>
@@ -95,7 +145,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <param name="XMLName">An alternative XML element name.</param>
         public override XElement ToXML(XName? XMLName = null)
 
-            => new (XMLName ?? DatexIINS.Facilities + "contactPerson",
+            => new (XMLName ?? DatexIINS.Facilities + "contactInformation",
+
+                   // A contact information of the derived type.
+                   new XAttribute(DatexIINS.XSI + "type", "afac:ContactPerson"),
 
                    base.ToXML().Elements(),
 

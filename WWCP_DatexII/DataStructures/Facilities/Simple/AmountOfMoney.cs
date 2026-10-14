@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// A monetary value expressed to two decimal places with a maximum
     /// of 8 total digits (including 2 fractional digits).
     /// </summary>
-    [XmlType("AmountOfMoney", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("AmountOfMoney", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public readonly struct AmountOfMoney(Decimal Value)
     {
 

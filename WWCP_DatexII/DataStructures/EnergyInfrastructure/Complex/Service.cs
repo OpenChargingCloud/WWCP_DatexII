@@ -31,7 +31,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// A specification of service types for the fuelling/charging and payment process.
     /// </summary>
-    [XmlType("ServiceType", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("ServiceType", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class Service(ServiceType     ServiceTypeValue,
                          OverallPeriod?  OverallPeriod          = null,
                          XElement?       ServiceTypeExtension   = null)
@@ -42,7 +42,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Information on different service types for the fuelling/charging and payment process.
         /// </summary>
-        [XmlElement("serviceType",            Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("serviceType",            Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public ServiceType     ServiceTypeValue        { get; } = ServiceTypeValue;
 
         /// <summary>

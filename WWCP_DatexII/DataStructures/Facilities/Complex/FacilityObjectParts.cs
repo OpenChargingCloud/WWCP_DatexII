@@ -35,13 +35,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// What every facility object has, as parsed: the particles of fac:FacilityObject.
     /// </summary>
     /// <remarks>
-    /// applicableForVehicles is not parsed: VehicleCharacteristics can only be written so far.
+    /// associatedFacility and rates are not parsed yet.
     /// </remarks>
     public sealed record FacilityObjectParts(String                           Id,
                                              String                           Version,
                                              MultilingualString?              Name,
                                              IEnumerable<MultilingualString>  Alias,
-                                             String?                          ExternalIdentifier,
+                                             IEnumerable<ExternalIdentifier>  ExternalIdentifier,
                                              DateTimeOffset?                  LastUpdated,
                                              MultilingualString?              Description,
                                              IEnumerable<Accessibility>       Accessibility,
@@ -54,6 +54,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                              AOrganisation?                   Owner,
                                              AOrganisation?                   Operator,
                                              AOrganisation?                   Helpdesk,
+                                             IEnumerable<VehicleCharacteristics> ApplicableForVehicles,
                                              Dimension?                       Dimension,
                                              Amenities?                       Amenities,
                                              XElement?                        FacilityObjectExtension)
@@ -244,6 +245,24 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             #endregion
 
+            #region TryParse ExternalIdentifier, ApplicableForVehicles  [optional]
+
+            if (!XML.TryParseOptionalXMLs(DatexIINS.Facilities + "externalIdentifier",
+                                          "external identifier",
+                                          Facilities.ExternalIdentifier.TryParseXML,
+                                          out IEnumerable<ExternalIdentifier> externalIdentifiers,
+                                          out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs(DatexIINS.Facilities + "applicableForVehicles",
+                                          "applicable for vehicles",
+                                          VehicleCharacteristics.TryParseXML,
+                                          out IEnumerable<VehicleCharacteristics> applicableForVehicles,
+                                          out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
             #region TryParse Dimension, Amenities         [optional]
 
             if (!XML.TryParseOptionalXML(DatexIINS.Facilities + "dimension",
@@ -272,7 +291,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                         version,
                         name,
                         aliases,
-                        XML.OptionalText(DatexIINS.Facilities + "externalIdentifier"),
+                        externalIdentifiers,
                         lastUpdated,
                         description,
                         accessibility,
@@ -285,6 +304,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                         owner,
                         @operator,
                         helpdesk,
+                        applicableForVehicles,
                         dimension,
                         amenities,
                         XML.Element(DatexIINS.Facilities + "_facilityObjectExtension")

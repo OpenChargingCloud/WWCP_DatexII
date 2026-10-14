@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Documentation\Table\" />
+    <!-- The DATEX II 3.7 schemas (docs.datex2.eu): for validation and the JSON encoding. -->
+    <EmbeddedResource Include="Schemas\3.7\*.xsd" LogicalName="DatexII.Schemas.3.7.%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

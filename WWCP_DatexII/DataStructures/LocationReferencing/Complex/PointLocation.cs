@@ -22,6 +22,7 @@ using System.Xml.Serialization;
 using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.LocationExtension;
+using cloud.charging.open.protocols.DatexII.v3.Facilities;
 
 #endregion
 
@@ -41,7 +42,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
                                IEnumerable<ExternalReferencing>?    ExternalReferencing                  = null,
                                PointCoordinates?                    CoordinatesForDisplay                = null,
-                               FacilityLocation?                    FacilityLocation                     = null,
+                               AfirFacilityLocation?                FacilityLocation                     = null,
                                XElement?                            LocationExtension                    = null,
 
                                XElement?                            LocationReferenceExtension           = null)
@@ -96,38 +97,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
             PointLocation = null;
 
-            #region TryParse ExternalReferencing      [optional]
+            #region TryParse the location                 [optional]
 
-            if (!XML.TryParseOptionalXMLs(DatexIINS.LocationReferencing + "externalReferencing",
-                                          "external referencing",
-                                          LocationReferencing.ExternalReferencing.TryParseXML,
-                                          out IEnumerable<LocationReferencing.ExternalReferencing> externalReferencing,
-                                          out ErrorResponse))
+            if (!TryParseLocationParts(XML,
+                                       out var externalReferencing,
+                                       out var coordinatesForDisplay,
+                                       out var facilityLocation,
+                                       out var locationExtension,
+                                       out ErrorResponse))
             {
                 return false;
             }
 
             #endregion
 
-            #region TryParse CoordinatesForDisplay    [optional]
+            #region TryParse SupplementaryPositionalDescription  [optional]
 
-            if (!XML.TryParseOptionalXML(DatexIINS.LocationReferencing + "coordinatesForDisplay",
-                                         "coordinates for display",
-                                         PointCoordinates.TryParseXML,
-                                         out PointCoordinates? coordinatesForDisplay,
-                                         out ErrorResponse))
-            {
-                return false;
-            }
-
-            #endregion
-
-            #region TryParse FacilityLocation         [optional]
-
-            if (!XML.TryParseOptionalXML(DatexIINS.LocationReferencing + "facilityLocation",
-                                         "facility location",
-                                         v3.LocationExtension.FacilityLocation.TryParseXML,
-                                         out v3.LocationExtension.FacilityLocation? facilityLocation,
+            if (!XML.TryParseOptionalXML(DatexIINS.LocationReferencing + "supplementaryPositionalDescription",
+                                         "supplementary positional description",
+                                         LocationReferencing.SupplementaryPositionalDescription.TryParseXML,
+                                         out SupplementaryPositionalDescription? supplementaryPositionalDescription,
                                          out ErrorResponse))
             {
                 return false;
@@ -152,11 +141,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
             PointLocation = new PointLocation(
                                 PointByCoordinates:          pointByCoordinates,
                                 PointLocationExtension:      XML.Element(DatexIINS.LocationReferencing + "_pointLocationExtension"),
+                                SupplementaryPositionalDescription: supplementaryPositionalDescription,
                                 NetworkLocationExtension:    XML.Element(DatexIINS.LocationReferencing + "_networkLocationExtension"),
                                 ExternalReferencing:         externalReferencing,
                                 CoordinatesForDisplay:       coordinatesForDisplay,
                                 FacilityLocation:            facilityLocation,
-                                LocationExtension:           XML.Element(DatexIINS.LocationReferencing + "_locationExtension"),
+                                LocationExtension:           locationExtension,
                                 LocationReferenceExtension:  XML.Element(DatexIINS.LocationReferencing + "_locationReferenceExtension")
                             );
 

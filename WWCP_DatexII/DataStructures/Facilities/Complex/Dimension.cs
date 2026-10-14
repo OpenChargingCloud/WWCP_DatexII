@@ -32,7 +32,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// A component that provides dimension information. Especially for multi-storey buildings, 
     /// the usable area might be larger than the product from its length and width.
     /// </summary>
-    [XmlType("Dimension", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("Dimension", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class Dimension(Meter?        Length               = null,
                            Meter?        Width                = null,
                            Meter?        Height               = null,
@@ -63,7 +63,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// The area measured in square metres that is available for some specific purpose.
         /// </summary>
-        [XmlElement("usableArea",           Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("usableArea",           Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public SquareMeter?  UsableArea            { get; } = UsableArea;
 
         /// <summary>

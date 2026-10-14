@@ -232,91 +232,91 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// Domestic socket type A (mainly used in the USA, Canada, Mexico &amp; Japan).
         /// </summary>
         public static ConnectorType  DomesticA                { get; }
-            = Register("domesticA");
+            = Register("domesticAType");
 
         /// <summary>
         /// Domestic socket type B (mainly used in the USA, Canada &amp; Mexico).
         /// </summary>
         public static ConnectorType  DomesticB                { get; }
-            = Register("domesticB");
+            = Register("domesticBType");
 
         /// <summary>
         /// Domestic socket type C (commonly used in Europe, South America &amp; Asia).
         /// </summary>
         public static ConnectorType  DomesticC                { get; }
-            = Register("domesticC");
+            = Register("domesticCType");
 
         /// <summary>
         /// Domestic socket type D (mainly used in India).
         /// </summary>
         public static ConnectorType  DomesticD                { get; }
-            = Register("domesticD");
+            = Register("domesticDType");
 
         /// <summary>
         /// Domestic socket type E (primarily used in France, Belgium, Poland, Slovakia &amp; Czechia).
         /// </summary>
         public static ConnectorType  DomesticE                { get; }
-            = Register("domesticE");
+            = Register("domesticEType");
 
         /// <summary>
         /// Domestic socket type F (used almost everywhere in Europe &amp; Russia, except for the UK &amp; Ireland).
         /// </summary>
         public static ConnectorType  DomesticF                { get; }
-            = Register("domesticF");
+            = Register("domesticFType");
 
         /// <summary>
         /// Domestic socket type G (mainly used in the United Kingdom, Ireland, Malta, Malaysia, Singapore &amp; the Arabian Peninsula).
         /// </summary>
         public static ConnectorType  DomesticG                { get; }
-            = Register("domesticG");
+            = Register("domesticGType");
 
         /// <summary>
         /// Domestic socket type H (used exclusively in Israel, the West Bank &amp; the Gaza Strip).
         /// </summary>
         public static ConnectorType  DomesticH                { get; }
-            = Register("domesticH");
+            = Register("domesticHType");
 
         /// <summary>
         /// Domestic socket type I (mainly used in Australia, New Zealand, China &amp; Argentina).
         /// </summary>
         public static ConnectorType  DomesticI                { get; }
-            = Register("domesticI");
+            = Register("domesticIType");
 
         /// <summary>
         /// Domestic socket type J (used almost exclusively in Switzerland &amp; Liechtenstein).
         /// </summary>
         public static ConnectorType  DomesticJ                { get; }
-            = Register("domesticJ");
+            = Register("domesticJType");
 
         /// <summary>
         /// Domestic socket type K (used almost exclusively in Denmark &amp; Greenland).
         /// </summary>
         public static ConnectorType  DomesticK                { get; }
-            = Register("domesticK");
+            = Register("domesticKType");
 
         /// <summary>
         /// Domestic socket type L (used almost exclusively in Italy &amp; Chile).
         /// </summary>
         public static ConnectorType  DomesticL                { get; }
-            = Register("domesticL");
+            = Register("domesticLType");
 
         /// <summary>
         /// Domestic socket type M (mainly used in South Africa).
         /// </summary>
         public static ConnectorType  DomesticM                { get; }
-            = Register("domesticM");
+            = Register("domesticMType");
 
         /// <summary>
         /// Domestic socket type N (used in Brazil and South Africa).
         /// </summary>
         public static ConnectorType  DomesticN                { get; }
-            = Register("domesticN");
+            = Register("domesticNType");
 
         /// <summary>
         /// Domestic socket type O (used exclusively in Thailand).
         /// </summary>
         public static ConnectorType  DomesticO                { get; }
-            = Register("domesticO");
+            = Register("domesticOType");
 
         /// <summary>
         /// IEC 60309-2 Industrial Connector single phase 16 amperes (usually blue).

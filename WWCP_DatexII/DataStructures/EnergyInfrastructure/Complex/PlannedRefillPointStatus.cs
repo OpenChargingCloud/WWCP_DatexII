@@ -33,7 +33,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// Planned status information for a refill point, for example reservations.
     /// </summary>
-    [XmlType("PlannedRefillPointStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("PlannedRefillPointStatus", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class PlannedRefillPointStatus(RefillPointStatusEnum  Status,
                                           OverallPeriod          OverallPeriod,
                                           XElement?              PlannedRefillPointStatusExtension   = null)
@@ -44,7 +44,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Status of the refill point.
         /// </summary>
-        [XmlElement("status",                              Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("status",                              Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public RefillPointStatusEnum  Status                               { get; } = Status;
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             ErrorResponse             = null;
 
             // <?xml version="1.0"?>
-            // <plannedRefillPointStatus xmlns="http://datex2.eu/schema/3/energyInfrastructure">
+            // <plannedRefillPointStatus xmlns="http://datex2.eu/schema/3/afirEnergyInfrastructure">
             //     <status>reserved</status>
             //     <overallPeriod>
             //         <com:overallStartTime xmlns:com="http://datex2.eu/schema/3/common">2025-02-02T15:00:00+01:00</com:overallStartTime>

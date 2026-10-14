@@ -57,12 +57,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.D2Payload
         //            xmlns:comx      = "http://datex2.eu/schema/3/commonExtension"
         //            xmlns:locx      = "http://datex2.eu/schema/3/locationExtension"
         //            xmlns:loc       = "http://datex2.eu/schema/3/locationReferencing"
-        //            xmlns:egi       = "http://datex2.eu/schema/3/energyInfrastructure"
-        //            xmlns:fac       = "http://datex2.eu/schema/3/facilities"
+        //            xmlns:egi       = "http://datex2.eu/schema/3/afirEnergyInfrastructure"
+        //            xmlns:fac       = "http://datex2.eu/schema/3/afirFacilities"
         //            xmlns:xs        = "http://www.w3.org/2001/XMLSchema">
         //
-        //   <xs:import namespace="http://datex2.eu/schema/3/facilities"           schemaLocation="DATEXII_3_Facilities.xsd" />
-        //   <xs:import namespace="http://datex2.eu/schema/3/energyInfrastructure" schemaLocation="DATEXII_3_EnergyInfrastructure.xsd" />
+        //   <xs:import namespace="http://datex2.eu/schema/3/afirFacilities"           schemaLocation="DATEXII_3_Facilities.xsd" />
+        //   <xs:import namespace="http://datex2.eu/schema/3/afirEnergyInfrastructure" schemaLocation="DATEXII_3_EnergyInfrastructure.xsd" />
         //   <xs:import namespace="http://datex2.eu/schema/3/locationReferencing"  schemaLocation="DATEXII_3_LocationReferencing.xsd" />
         //   <xs:import namespace="http://datex2.eu/schema/3/locationExtension"    schemaLocation="DATEXII_3_LocationExtension.xsd" />
         //   <xs:import namespace="http://datex2.eu/schema/3/commonExtension"      schemaLocation="DATEXII_3_CommonExtension.xsd" />

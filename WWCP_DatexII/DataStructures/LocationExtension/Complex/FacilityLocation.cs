@@ -41,7 +41,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         /// <summary>
         /// The time zone the facility is located in.
         /// </summary>
-        [XmlElement("timeZone",                    Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("timeZone",                    Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Facilities.TimeZone?   TimeZone                     { get; } = TimeZone;
 
         /// <summary>

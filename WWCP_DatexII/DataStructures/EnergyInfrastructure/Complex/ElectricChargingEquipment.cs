@@ -34,14 +34,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// A specialization of the SupplementalFacility class adding an ElectricChargingPoint.
     /// </summary>
-    [XmlType("ElectricChargingEquipment", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("ElectricChargingEquipment", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class ElectricChargingEquipment(String                                Id,
                                            String                                Version,
                                            ElectricChargingPoint                 ElectricChargingPoint,
 
                                            MultilingualString?                   Name                                 = null,
                                            IEnumerable<MultilingualString>?      Alias                                = null,
-                                           String?                               ExternalIdentifier                   = null,
+                                           IEnumerable<ExternalIdentifier>?       ExternalIdentifier                   = null,
                                            DateTimeOffset?                       LastUpdated                          = null,
                                            MultilingualString?                   Description                          = null,
                                            IEnumerable<Accessibility>?           Accessibility                        = null,
@@ -106,7 +106,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The electric charging point.
         /// </summary>
-        [XmlElement("electricChargingPoint",                Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("electricChargingPoint",                Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public ElectricChargingPoint  ElectricChargingPoint                 { get; } = ElectricChargingPoint;
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             => new (XMLName ?? DatexIINS.Facilities + "supplementalFacility",
 
-                   new XAttribute(DatexIINS.XSI + "type",   "egi:ElectricChargingEquipment"),
+                   new XAttribute(DatexIINS.XSI + "type",   "aegi:ElectricChargingEquipment"),
                    new XAttribute("id",                      Id),
                    new XAttribute("version",                 Version),
 

@@ -420,6 +420,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         public static EUVehicleCategory  Other              { get; }
             = Register("other");
 
+        /// <summary>
+        /// Agricultural trailers.
+        /// </summary>
+        public static EUVehicleCategory  R    { get; }
+            = Register("r");
+
         #endregion
 
 

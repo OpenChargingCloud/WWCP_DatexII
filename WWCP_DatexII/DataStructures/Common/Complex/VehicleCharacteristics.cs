@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure;
 
@@ -78,7 +79,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Vehicle categories as defined in EU Directive 2007/46/EG and Regulation (EU) No 168/2013.
         /// </summary>
-        [XmlElement("euVehicleCategory",                 Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("euVehicleCategory",                 Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EUVehicleCategory>                 EUVehicleCategory                   { get; } = EUVehicleCategory?.               Distinct() ?? [];
 
         /// <summary>
@@ -150,6 +151,95 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         #endregion
 
 
+        #region TryParseXML(XML, out VehicleCharacteristics, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of vehicle characteristics, with the EU vehicle categories of its
+        /// regulated characteristics (DATEX II 3.7).
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="VehicleCharacteristics">The parsed vehicle characteristics.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                          XML,
+                                          [NotNullWhen(true)]  out VehicleCharacteristics?  VehicleCharacteristics,
+                                          [NotNullWhen(false)] out String?                  ErrorResponse)
+        {
+
+            VehicleCharacteristics = null;
+
+            if (!XML.TryParseOptionalValues(DatexIINS.Common + "fuelType",                          "fuel type",                     Common.FuelType.TryParse,                    out IEnumerable<FuelType>                          fuelTypes,          out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.Common + "loadType",                          "load type",                     Common.LoadType.TryParse,                    out LoadType?                                      loadType,           out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.Common + "vehicleEquipment",                  "vehicle equipment",             Common.VehicleEquipment.TryParse,            out VehicleEquipment?                              vehicleEquipment,   out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.Common + "vehicleType",                       "vehicle type",                  Common.VehicleType.TryParse,                 out IEnumerable<VehicleType>                       vehicleTypes,       out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.Common + "vehicleUsage",                      "vehicle usage",                 Common.VehicleUsage.TryParse,                out VehicleUsage?                                  vehicleUsage,       out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.Common + "yearOfFirstRegistration",           "year of first registration",    DatexIIXMLExtensions.TryParseUInt16,         out UInt16?                                        year,               out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.Common + "grossWeightCharacteristic",         "gross weight characteristic",   Common.GrossWeightCharacteristic.TryParseXML,        out IEnumerable<GrossWeightCharacteristic>        grossWeight,        out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.Common + "heightCharacteristic",              "height characteristic",         Common.HeightCharacteristic.TryParseXML,             out IEnumerable<HeightCharacteristic>             height,             out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.Common + "lengthCharacteristic",              "length characteristic",         Common.LengthCharacteristic.TryParseXML,             out IEnumerable<LengthCharacteristic>             length,             out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.Common + "widthCharacteristic",               "width characteristic",          Common.WidthCharacteristic.TryParseXML,              out IEnumerable<WidthCharacteristic>              width,              out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.Common + "heaviestAxleWeightCharacteristic",  "heaviest axle weight",          Common.HeaviestAxleWeightCharacteristic.TryParseXML, out IEnumerable<HeaviestAxleWeightCharacteristic> heaviestAxleWeight, out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.Common + "numberOfAxlesCharacteristic",       "number of axles",               Common.NumberOfAxlesCharacteristic.TryParseXML,      out IEnumerable<NumberOfAxlesCharacteristic>      numberOfAxles,      out ErrorResponse))
+            {
+                return false;
+            }
+
+            #region The EU vehicle categories of the typed extension
+
+            var euVehicleCategories  = new List<EUVehicleCategory>();
+            XElement? extension      = null;
+
+            if (XML.Element(DatexIINS.Common + "_vehicleCharacteristicsExtension") is XElement extensionXML)
+            {
+
+                foreach (var category in extensionXML.Elements(DatexIINS.Common + "vehicleCharacteristicsExtended").
+                                                      Elements(DatexIINS.CommonExtension + "regulatedCharacteristics").
+                                                      Elements(DatexIINS.CommonExtension + "euVehicleCategory"))
+                {
+
+                    if (!EnergyInfrastructure.EUVehicleCategory.TryParse(category.Value, out var euVehicleCategory))
+                    {
+                        ErrorResponse = $"Invalid EU vehicle category '{category.Value}'!";
+                        return false;
+                    }
+
+                    euVehicleCategories.Add(euVehicleCategory);
+
+                }
+
+                var others = extensionXML.Elements().Where(element => element.Name != DatexIINS.Common + "vehicleCharacteristicsExtended").ToArray();
+
+                if (others.Length > 0)
+                    extension = others.Length == 1 ? others[0] : new XElement(DatexIINS.Common + "_vehicleCharacteristicsExtension", others);
+
+            }
+
+            #endregion
+
+            VehicleCharacteristics = new VehicleCharacteristics(
+                                         fuelTypes,
+                                         loadType,
+                                         vehicleEquipment,
+                                         vehicleTypes,
+                                         euVehicleCategories,
+                                         vehicleUsage,
+                                         year,
+                                         grossWeight,
+                                         height,
+                                         length,
+                                         width,
+                                         heaviestAxleWeight,
+                                         numberOfAxles,
+                                         null,
+                                         extension
+                                     );
+
+            return true;
+
+        }
+
+        #endregion
+
+
         #region ToXML(XMLName = null)
 
         /// <summary>
@@ -171,7 +261,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                        : null,
 
                    VehicleType.      Select(vehicleType      => new XElement(DatexIINS.Common + "vehicleType",       vehicleType.     ToString())),
-                   EUVehicleCategory.Select(euVehicleCategory => new XElement(DatexIINS.Common + "euVehicleCategory", euVehicleCategory.ToString())),
 
                    VehicleUsage.HasValue
                        ? new XElement(DatexIINS.Common + "vehicleUsage",                   VehicleUsage.Value.ToString())
@@ -192,8 +281,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                        ? Emissions.ToXML(DatexIINS.Common + "emissions")
                        : null,
 
-                   VehicleCharacteristicsExtension is not null
-                       ? new XElement(DatexIINS.Common + "_vehicleCharacteristicsExtension", VehicleCharacteristicsExtension)
+                   // DATEX II 3.7: the EU vehicle categories are regulated characteristics of the typed extension.
+                   EUVehicleCategory.Any() || VehicleCharacteristicsExtension is not null
+                       ? new XElement(DatexIINS.Common + "_vehicleCharacteristicsExtension",
+                             EUVehicleCategory.Any()
+                                 ? new XElement(DatexIINS.Common + "vehicleCharacteristicsExtended",
+                                       new XElement(DatexIINS.CommonExtension + "regulatedCharacteristics",
+                                           EUVehicleCategory.Select(euVehicleCategory => new XElement(DatexIINS.CommonExtension + "euVehicleCategory", euVehicleCategory.ToString()))))
+                                 : null,
+                             VehicleCharacteristicsExtension)
                        : null
 
                );

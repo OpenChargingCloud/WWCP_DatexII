@@ -208,6 +208,42 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
 #pragma warning restore IDE1006 // Naming Styles
 
+        /// <summary>
+        /// Litre.
+        /// </summary>
+        public static DeliveryUnit  Litre    { get; }
+            = Register("litre");
+
+        /// <summary>
+        /// Kilogram.
+        /// </summary>
+        public static DeliveryUnit  kg    { get; }
+            = Register("kg");
+
+        /// <summary>
+        /// Cubic metre.
+        /// </summary>
+        public static DeliveryUnit  m3    { get; }
+            = Register("m3");
+
+        /// <summary>
+        /// Imperial gallon.
+        /// </summary>
+        public static DeliveryUnit  ImperialGallon    { get; }
+            = Register("imperialGallon");
+
+        /// <summary>
+        /// US gallon.
+        /// </summary>
+        public static DeliveryUnit  USGallon    { get; }
+            = Register("usGallon");
+
+        /// <summary>
+        /// Gasoline gallon equivalent.
+        /// </summary>
+        public static DeliveryUnit  GasGallonEquivalent    { get; }
+            = Register("gasGallonEquivalent");
+
         #endregion
 
 

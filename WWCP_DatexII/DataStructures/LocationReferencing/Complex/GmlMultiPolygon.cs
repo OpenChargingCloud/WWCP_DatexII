@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -55,6 +56,46 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_gmlMultiPolygonExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                GMLMultiPolygonExtension    { get; } = GMLMultiPolygonExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out GMLMultiPolygon, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a GML multi polygon.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="GMLMultiPolygon">The parsed GML multi polygon.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                   XML,
+                                          [NotNullWhen(true)]  out GMLMultiPolygon?  GMLMultiPolygon,
+                                          [NotNullWhen(false)] out String?           ErrorResponse)
+        {
+
+            GMLMultiPolygon = null;
+
+            if (!XML.TryParseOptionalXML (DatexIINS.LocationReferencing + "gmlAreaName",  "GML area name",  MultilingualString.TryParseXML,  out MultilingualString?    gmlAreaName,  out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs(DatexIINS.LocationReferencing + "gmlPolygon",   "GML polygon",    GMLPolygon.TryParseXML,          out IEnumerable<GMLPolygon> gmlPolygons, out ErrorResponse))
+            {
+                return false;
+            }
+
+            if (!gmlPolygons.Any())
+            {
+                ErrorResponse = "A GML multi polygon must have at least one polygon!";
+                return false;
+            }
+
+            GMLMultiPolygon = new GMLMultiPolygon(
+                                  gmlAreaName,
+                                  gmlPolygons,
+                                  XML.Element(DatexIINS.LocationReferencing + "_gmlMultiPolygonExtension")
+                              );
+
+            return true;
+
+        }
 
         #endregion
 

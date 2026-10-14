@@ -32,7 +32,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// Updates a rate defined in the static part of the model.
     /// </summary>
-    [XmlType("EnergyRateUpdate", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyRateUpdate", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyRateUpdate(DateTimeOffset             LastUpdated,
                                   EnergyRateReference        EnergyRateReference,
                                   MultilingualString?        AdditionalInformation       = null,
@@ -51,7 +51,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Specifies the EnergyRate that is updated here.
         /// </summary>
-        [XmlElement("energyRateReference",         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyRateReference",         Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public EnergyRateReference       EnergyRateReference          { get; } = EnergyRateReference;
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// A collection of energy price definitions.
         /// </summary>
-        [XmlElement("energyPrice",                 Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyPrice",                 Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyPrice>  EnergyPrices                 { get; } = EnergyPrices ?? [];
 
         /// <summary>
@@ -92,9 +92,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             ErrorResponse     = null;
 
             // <?xml version="1.0"?>
-            // <energyRateUpdate xmlns="http://datex2.eu/schema/3/energyInfrastructure">
+            // <energyRateUpdate xmlns="http://datex2.eu/schema/3/afirEnergyInfrastructure">
             //     <lastUpdated>2025-02-02T12:50:00+01:00</lastUpdated>
-            //     <energyRateReference id="74034E3E-9D2F-4410-BE6F-CAA3176D69B4" targetClass="egi:EnergyRate"/>
+            //     <energyRateReference id="74034E3E-9D2F-4410-BE6F-CAA3176D69B4" targetClass="aegi:EnergyRate"/>
             //     <energyPrice>
             //         <priceType>pricePerKWh</priceType>
             //         <value>0.37</value>
@@ -141,7 +141,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse EnergyPrices             [optional]
 
-            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyPrice",
+            if (!XML.TryParseOptionalXMLs    (DatexIINS.EnergyInfrastructure + "energyPrice",
                                               "energy prices",
                                               EnergyPrice.TryParseXML,
                                               out IEnumerable<EnergyPrice> energyPrices,

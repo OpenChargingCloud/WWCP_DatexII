@@ -32,7 +32,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// A unit within the organisation, which has a separate location, operating hours, address and/or contacts.
     /// </summary>
-    [XmlType("OrganisationUnit", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("OrganisationUnit", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class OrganisationUnit(MultilingualString?               Name                        = null,
                                   IEnumerable<MultilingualString>?  Function                    = null,
                                   ALocationReference?               LocationReference           = null,
@@ -64,13 +64,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Contact information for this organisation unit.
         /// </summary>
-        [XmlElement("contactInformation",          Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("contactInformation",          Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<ContactInformation>  ContactInformation           { get; } = ContactInformation?.Distinct() ?? [];
 
         /// <summary>
         /// Operating hours of this organisation unit.
         /// </summary>
-        [XmlElement("operatingHours",              Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("operatingHours",              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public AOperatingHours?                 OperatingHours               { get; } = OperatingHours;
 
         /// <summary>

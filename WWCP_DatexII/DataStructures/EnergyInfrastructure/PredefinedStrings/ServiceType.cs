@@ -202,13 +202,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// Presence of physical persons attending the recharging or refuelling station.
         /// </summary>
         public static ServiceType  PhysicalAttendance    { get; }
-            = Register("pyhsicalAttendance");
+            = Register("physicalAttendance");
 
         /// <summary>
         /// Unattended station, fuelling and payment to be done without assistance.
         /// </summary>
         public static ServiceType  Unattended            { get; }
             = Register("unattended");
+
+        /// <summary>
+        /// The station is operated by staff who refill the vehicle.
+        /// </summary>
+        public static ServiceType  FullService    { get; }
+            = Register("fullService");
+
+        /// <summary>
+        /// The user refills the vehicle, staff are present.
+        /// </summary>
+        public static ServiceType  SelfService    { get; }
+            = Register("selfService");
 
         #endregion
 

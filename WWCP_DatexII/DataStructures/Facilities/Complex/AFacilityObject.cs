@@ -34,13 +34,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// Provides information about a facility object, which may represent any kind of site, building, or structure, including those which supplement a main facility.
     /// </summary>
-    [XmlType("FacilityObject", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("FacilityObject", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public abstract class AFacilityObject(String                                Id,
                                           String                                Version,
 
                                           MultilingualString?                   Name                      = null,
                                           IEnumerable<MultilingualString>?      Alias                     = null,
-                                          String?                               ExternalIdentifier        = null,
+                                          IEnumerable<ExternalIdentifier>?       ExternalIdentifier        = null,
                                           DateTimeOffset?                       LastUpdated               = null,
                                           MultilingualString?                   Description               = null,
                                           IEnumerable<Accessibility>?           Accessibility             = null,
@@ -90,8 +90,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// An external identifier for this facility.
         /// </summary>
-        [XmlElement("externalIdentifier",     Namespace = "http://datex2.eu/schema/3/common")]
-        public String?                              ExternalIdentifier         { get; } = ExternalIdentifier;
+        [XmlElement("externalIdentifier",     Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        public IEnumerable<ExternalIdentifier>      ExternalIdentifier         { get; } = ExternalIdentifier?.Distinct() ?? [];
 
         /// <summary>
         /// Information on the time when the information has been updated the last time.
@@ -108,7 +108,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Information on accessibility and facilities for persons with disabilities.
         /// </summary>
-        [XmlElement("accessibility",          Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("accessibility",          Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<Accessibility>           Accessibility              { get; } = Accessibility?.        Distinct() ?? [];
 
         /// <summary>
@@ -132,13 +132,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// A binary photo of the facility or its surrounding.
         /// </summary>
-        [XmlElement("photo",                  Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("photo",                  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<Image>?                  Photos                     { get; } = Photos?.               Distinct() ?? [];
 
         /// <summary>
         /// Operating hours of the facility.
         /// </summary>
-        [XmlElement("operatingHours",         Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("operatingHours",         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public AOperatingHours?                     OperatingHours             { get; } = OperatingHours;
 
         /// <summary>
@@ -150,19 +150,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// The owner of this facility.
         /// </summary>
-        [XmlElement("owner",                  Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("owner",                  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public AOrganisation?                       Owner                      { get; } = Owner;
 
         /// <summary>
         /// The operator of this facility.
         /// </summary>
-        [XmlElement("operator",               Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("operator",               Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public AOrganisation?                       Operator                   { get; } = Operator;
 
         /// <summary>
         /// A helpdesk service for the facility.
         /// </summary>
-        [XmlElement("helpdesk",               Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("helpdesk",               Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public AOrganisation?                       Helpdesk                   { get; } = Helpdesk;
 
         /// <summary>
@@ -174,13 +174,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Dimensions of the facility.
         /// </summary>
-        [XmlElement("dimension",              Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("dimension",              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Dimension?                           Dimension                  { get; } = Dimension;
 
         /// <summary>
         /// Amenities available at the facility.
         /// </summary>
-        [XmlElement("amenities",              Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("amenities",              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Amenities?                           Amenities                  { get; } = Amenities;
 
         /// <summary>
@@ -208,9 +208,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
             foreach (var alias in Alias)
                 yield return alias.ToXML(DatexIINS.Facilities + "alias");
 
-            if (ExternalIdentifier is not null && ExternalIdentifier.Length > 0)
-                yield return new XElement(DatexIINS.Facilities + "externalIdentifier",   ExternalIdentifier);
-
             if (LastUpdated.HasValue)
                 yield return new XElement(DatexIINS.Facilities + "lastUpdated",           LastUpdated.Value.ToISO8601WithOffset());
 
@@ -222,6 +219,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             foreach (var additionalInformation in AdditionalInformation)
                 yield return additionalInformation.ToXML(DatexIINS.Facilities + "additionalInformation");
+
+            foreach (var externalIdentifier in ExternalIdentifier)
+                yield return externalIdentifier.ToXML(DatexIINS.Facilities + "externalIdentifier");
 
             // An UrlLink is a complex type, not a bare URL.
             foreach (var informationWebsite in InformationWebsites)

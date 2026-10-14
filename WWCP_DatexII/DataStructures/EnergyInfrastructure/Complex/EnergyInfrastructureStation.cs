@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2014-2025 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * Copyright (c) 2014-2026 GraphDefined GmbH <achim.friedland@graphdefined.com>
  * This file is part of WWCP DatexII <https://github.com/OpenChargingCloud/WWCP_DatexII>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
@@ -36,20 +36,21 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// A collection of associated refill points (which can be of different type). An example would be a fuel dispenser that serves different types of fuel.
     /// Often the vehicle space of the station is shared between the different refill points.
+    /// DATEX II 3.7: the BNetzA station identification is an external identifier of the type stationIdBNetzA,
+    /// and the energy of the station are energy products.
     /// </summary>
-    [XmlType("EnergyInfrastructureStation", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyInfrastructureStation", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyInfrastructureStation(String                                            Id,
                                              String                                            Version,
-                                             String                                            StationIdBNetzA,
-                                             Watt                                              TotalMaximumPower,
-                                             IEnumerable<AuthenticationAndIdentificationType>  AuthenticationAndIdentificationMethods,
-                                             UInt16                                            NumberOfRefillPoints,
-                                             IEnumerable<Languages>                            UserInterfaceLanguages,
-                                             IEnumerable<Service>                              ServiceTypes,
+                                             Watt?                                             TotalMaximumPower                      = null,
+                                             IEnumerable<AuthenticationAndIdentificationType>? AuthenticationAndIdentificationMethods = null,
+                                             UInt16?                                           NumberOfRefillPoints                   = null,
+                                             IEnumerable<Languages>?                           UserInterfaceLanguages                 = null,
+                                             IEnumerable<Service>?                             ServiceTypes                           = null,
 
                                              MultilingualString?                               Name                                   = null,
                                              IEnumerable<MultilingualString>?                  Alias                                  = null,
-                                             String?                                           ExternalIdentifier                     = null,
+                                             IEnumerable<ExternalIdentifier>?                   ExternalIdentifier                     = null,
                                              DateTimeOffset?                                   LastUpdated                            = null,
                                              MultilingualString?                               Description                            = null,
                                              IEnumerable<Accessibility>?                       Accessibility                          = null,
@@ -69,12 +70,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                              IEnumerable<ASupplementalFacility>?               SupplementalFacilities                 = null,
                                              IEnumerable<DedicatedParkingSpaces>?              DedicatedParkingSpaces                 = null,
 
-                                             IEnumerable<VersionedReference>?                  RefillPointByReference                 = null,
+                                             Boolean?                                          RenewableSources                       = null,
                                              AOrganisation?                                    EnergyDistributor                      = null,
                                              IEnumerable<AOrganisation>?                       MobilityServiceProviders               = null,
                                              IEnumerable<AOrganisation>?                       RoamingPlatforms                       = null,
+                                             Hydrogen?                                         Hydrogen                               = null,
                                              IEnumerable<RefillPoint>?                         RefillPoints                           = null,
-                                             IEnumerable<ElectricEnergy>?                      ElectricEnergy                         = null,
+                                             IEnumerable<EnergyProduct>?                       EnergyProducts                         = null,
 
                                              XElement?                                         FacilityObjectExtension                = null,
                                              XElement?                                         FacilityExtension                      = null,
@@ -113,83 +115,83 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         #region Properties
 
         /// <summary>
-        /// Ladeeinrichtungs-ID der Bundesnetzagentur.
+        /// Ladeeinrichtungs-ID der Bundesnetzagentur: the external identifier of the type stationIdBNetzA.
         /// (See https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/E-Mobilitaet/AnzeigeNEU/start.html)
         /// </summary>
-        [XmlElement("stationIdBNetzA",                         Namespace = "http://datex2.eu/schema/3/common")]
-        public String                                            StationIdBNetzA                           { get; } = StationIdBNetzA;
+        public String?                                           StationIdBNetzA
+
+            => ExternalIdentifier.FirstOrDefault(identifier => identifier.Type == TypeOfIdentifier.StationIdBNetzA)?.Identifier;
 
         /// <summary>
         /// The total maximum power of the station.
         /// </summary>
-        [XmlElement("totalMaximumPower",                       Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public Watt                                              TotalMaximumPower                         { get; } = TotalMaximumPower;
+        public Watt?                                             TotalMaximumPower                         { get; } = TotalMaximumPower;
 
         /// <summary>
         /// Information on what methods of identification and/or authentication are accepted.
         /// </summary>
-        [XmlElement("authenticationAndIdentificationMethods",  Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<AuthenticationAndIdentificationType>  AuthenticationAndIdentificationMethods    { get; } = AuthenticationAndIdentificationMethods.Distinct();
+        public IEnumerable<AuthenticationAndIdentificationType>  AuthenticationAndIdentificationMethods    { get; } = AuthenticationAndIdentificationMethods?.Distinct() ?? [];
 
         /// <summary>
         /// Information on the number of refill points at the station.
         /// </summary>
-        [XmlElement("numberOfRefillPoints",                    Namespace = "http://datex2.eu/schema/3/common")]
-        public UInt16                                            NumberOfRefillPoints                      { get; } = NumberOfRefillPoints;
-
-        /// <summary>
-        /// Refill points can be attached to an EnergyInfrastructureStation instance either directly or by reference.
-        /// </summary>
-        [XmlElement("refillPointByReference",                  Namespace = "http://datex2.eu/schema/3/common")]
-        public IEnumerable<VersionedReference>                   RefillPointByReference                    { get; } = RefillPointByReference?.               Distinct() ?? [];
+        public UInt16?                                           NumberOfRefillPoints                      { get; } = NumberOfRefillPoints;
 
         /// <summary>
         /// Languages in which a user interface is available.
         /// </summary>
-        [XmlElement("userInterfaceLanguage",                   Namespace = "http://datex2.eu/schema/3/common")]
         public IEnumerable<Languages>                            UserInterfaceLanguages                    { get; } = UserInterfaceLanguages?.               Distinct() ?? [];
+
+        /// <summary>
+        /// Whether the station is supplied by renewable sources only.
+        /// </summary>
+        public Boolean?                                          RenewableSources                          { get; } = RenewableSources;
 
         /// <summary>
         /// The distributor of the energy.
         /// </summary>
-        [XmlElement("energyDistributor",                       Namespace = "http://datex2.eu/schema/3/facilities")]
         public AOrganisation?                                    EnergyDistributor                         { get; } = EnergyDistributor;
 
         /// <summary>
         /// Mobility service providers offering contract-based recharging.
         /// </summary>
-        [XmlElement("mobilityServiceProvider",                 Namespace = "http://datex2.eu/schema/3/facilities")]
         public IEnumerable<AOrganisation>                        MobilityServiceProviders                  { get; } = MobilityServiceProviders?.             Distinct() ?? [];
 
         /// <summary>
         /// Supported roaming platforms.
         /// </summary>
-        [XmlElement("roamingPlatform",                         Namespace = "http://datex2.eu/schema/3/facilities")]
         public IEnumerable<AOrganisation>                        RoamingPlatforms                          { get; } = RoamingPlatforms?.                     Distinct() ?? [];
+
+        /// <summary>
+        /// The hydrogen offered at the station.
+        /// </summary>
+        public Hydrogen?                                         Hydrogen                                  { get; } = Hydrogen;
 
         /// <summary>
         /// Specify the type of service available at the EnergyInfrastructureStation.
         /// </summary>
-        [XmlElement("serviceType",                             Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<Service>                              ServiceTypes                              { get; } = ServiceTypes.                          Distinct();
+        public IEnumerable<Service>                              ServiceTypes                              { get; } = ServiceTypes?.                         Distinct() ?? [];
 
         /// <summary>
         /// Specifications of refill points at a charging station.
-        /// Note that the refillPointIndex must be unique within the complete site!
         /// </summary>
-        [XmlElement("refillPoint",                             Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
         public IEnumerable<RefillPoint>                          RefillPoints                              { get; } = RefillPoints?.                         Distinct() ?? [];
 
         /// <summary>
-        /// Electric energy definitions applicable at the station.
+        /// The energy products offered at the station.
         /// </summary>
-        [XmlElement("electricEnergy",                          Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
-        public IEnumerable<ElectricEnergy>                       ElectricEnergy                            { get; } = ElectricEnergy?.                       Distinct() ?? [];
+        public IEnumerable<EnergyProduct>                        EnergyProducts                            { get; } = EnergyProducts?.                       ToArray()  ?? [];
+
+        /// <summary>
+        /// The electric energy offered at the station: its energy products of that type.
+        /// </summary>
+        public IEnumerable<ElectricEnergy>                       ElectricEnergy
+
+            => EnergyProducts.OfType<ElectricEnergy>();
 
         /// <summary>
         /// Optional extension element for additional EnergyInfrastructureStation information.
         /// </summary>
-        [XmlElement("_energyInfrastructureStationExtension",   Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                                         EnergyInfrastructureStationExtension      { get; } = EnergyInfrastructureStationExtension;
 
         #endregion
@@ -199,7 +201,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         /// <summary>
         /// Try to parse the given XML representation of an energy infrastructure station.
-        /// Refill points by reference are not parsed yet.
         /// </summary>
         /// <param name="XML">The XML to be parsed.</param>
         /// <param name="EnergyInfrastructureStation">The parsed energy infrastructure station.</param>
@@ -214,34 +215,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             if (!FacilityParts.TryParseXML(XML, out var facility, out ErrorResponse))
                 return false;
 
-            #region TryParse StationIdBNetzA, TotalMaximumPower, NumberOfRefillPoints   [mandatory]
+            #region TryParse the station
 
-            var stationIdBNetzA = XML.Element(DatexIINS.EnergyInfrastructure + "stationIdBNetzA")?.Value.Trim();
-
-            if (stationIdBNetzA is null)
-            {
-                ErrorResponse = "The mandatory station identification of the BNetzA is missing!";
-                return false;
-            }
-
-            if (!XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "totalMaximumPower",     "total maximum power",      DatexIIXMLExtensions.TryParseWatt,    out Watt    totalMaximumPower,    out ErrorResponse) ||
-                !XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "numberOfRefillPoints",  "number of refill points",  DatexIIXMLExtensions.TryParseUInt16,  out UInt16  numberOfRefillPoints, out ErrorResponse))
-            {
-                return false;
-            }
-
-            #endregion
-
-            #region TryParse the lists
-
-            if (!XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "authenticationAndIdentificationMethods",  "authentication and identification method",  AuthenticationAndIdentificationType.TryParse,  out IEnumerable<AuthenticationAndIdentificationType>  authenticationAndIdentificationMethods, out ErrorResponse) ||
+            if (!XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "totalMaximumPower",                       "total maximum power",                       DatexIIXMLExtensions.TryParseWatt,             out Watt?                                             totalMaximumPower,                      out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "authenticationAndIdentificationMethods",  "authentication and identification method",  AuthenticationAndIdentificationType.TryParse,  out IEnumerable<AuthenticationAndIdentificationType>  authenticationAndIdentificationMethods, out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "numberOfRefillPoints",                    "number of refill points",                   DatexIIXMLExtensions.TryParseUInt16,           out UInt16?                                           numberOfRefillPoints,                   out ErrorResponse) ||
                 !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "userInterfaceLanguage",                   "user interface language",                   DatexIIXMLExtensions.TryParseLanguage,         out IEnumerable<Languages>                            userInterfaceLanguages,                 out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "renewableSources",                        "renewable sources",                         DatexIIXMLExtensions.TryParseBoolean,          out Boolean?                                          renewableSources,                       out ErrorResponse) ||
                 !XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "energyDistributor",                       "energy distributor",                        AOrganisation.TryParseXML,                     out AOrganisation?                                    energyDistributor,                      out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "mobilityServiceProvider",                 "mobility service provider",                 AOrganisation.TryParseXML,                     out IEnumerable<AOrganisation>                        mobilityServiceProviders,               out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "roamingPlatform",                         "roaming platform",                          AOrganisation.TryParseXML,                     out IEnumerable<AOrganisation>                        roamingPlatforms,                       out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "hydrogen",                                "hydrogen",                                  EnergyInfrastructure.Hydrogen.TryParseXML,     out Hydrogen?                                         hydrogen,                               out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "serviceType",                             "service type",                              Service.TryParseXML,                           out IEnumerable<Service>                              serviceTypes,                           out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "refillPoint",                             "refill point",                              RefillPoint.TryParseXML,                       out IEnumerable<RefillPoint>                          refillPoints,                           out ErrorResponse) ||
-                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "electricEnergy",                          "electric energy",                           EnergyInfrastructure.ElectricEnergy.TryParseXML, out IEnumerable<ElectricEnergy>                    electricEnergy,                         out ErrorResponse))
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "energyProduct",                           "energy product",                            EnergyProduct.TryParseXML,                     out IEnumerable<EnergyProduct>                        energyProducts,                         out ErrorResponse))
             {
                 return false;
             }
@@ -253,7 +240,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             EnergyInfrastructureStation = new EnergyInfrastructureStation(
                                               parts.Id,
                                               parts.Version,
-                                              stationIdBNetzA,
                                               totalMaximumPower,
                                               authenticationAndIdentificationMethods,
                                               numberOfRefillPoints,
@@ -274,17 +260,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                               parts.Owner,
                                               parts.Operator,
                                               parts.Helpdesk,
-                                              null,
+                                              parts.ApplicableForVehicles,
                                               parts.Dimension,
                                               parts.Amenities,
                                               facility.SupplementalFacilities,
                                               facility.DedicatedParkingSpaces,
-                                              null,
+                                              renewableSources,
                                               energyDistributor,
                                               mobilityServiceProviders,
                                               roamingPlatforms,
+                                              hydrogen,
                                               refillPoints,
-                                              electricEnergy,
+                                              energyProducts,
                                               parts.FacilityObjectExtension,
                                               facility.FacilityExtension,
                                               XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationExtension")
@@ -312,30 +299,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                    ToXMLElements(),
 
-                   new XElement(DatexIINS.EnergyInfrastructure + "stationIdBNetzA",       StationIdBNetzA),
-                   new XElement(DatexIINS.EnergyInfrastructure + "totalMaximumPower",     TotalMaximumPower.Value),
+                   TotalMaximumPower.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "totalMaximumPower",     TotalMaximumPower.Value.Value)
+                       : null,
 
                    AuthenticationAndIdentificationMethods.Select(method => new XElement(DatexIINS.EnergyInfrastructure + "authenticationAndIdentificationMethods", method.ToString())),
 
-                   new XElement(DatexIINS.EnergyInfrastructure + "numberOfRefillPoints",  NumberOfRefillPoints),
-
-                   RefillPointByReference.Select(refillPointByReference =>
-                       refillPointByReference.ToXML(DatexIINS.EnergyInfrastructure + "refillPointByReference")),
+                   NumberOfRefillPoints.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "numberOfRefillPoints",  NumberOfRefillPoints.Value)
+                       : null,
 
                    UserInterfaceLanguages.Select(language => new XElement(DatexIINS.EnergyInfrastructure + "userInterfaceLanguage", language.AsText())),
 
-                   EnergyDistributor is not null
-                       ? EnergyDistributor.ToXML(DatexIINS.EnergyInfrastructure + "energyDistributor")
+                   RenewableSources.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "renewableSources",      RenewableSources.Value ? "true" : "false")
                        : null,
+
+                   EnergyDistributor?.ToXML(DatexIINS.EnergyInfrastructure + "energyDistributor"),
 
                    MobilityServiceProviders.Select(mobilityServiceProvider => mobilityServiceProvider.ToXML(DatexIINS.EnergyInfrastructure + "mobilityServiceProvider")),
                    RoamingPlatforms.        Select(roamingPlatform         => roamingPlatform.        ToXML(DatexIINS.EnergyInfrastructure + "roamingPlatform")),
 
-                   ServiceTypes.Select(serviceType => serviceType.ToXML(DatexIINS.EnergyInfrastructure + "serviceType")),
+                   Hydrogen?.ToXML(DatexIINS.EnergyInfrastructure + "hydrogen"),
 
-                   RefillPoints.Select(refillPoint => refillPoint.ToXML(DatexIINS.EnergyInfrastructure + "refillPoint")),
-
-                   ElectricEnergy.Select(electricEnergy => electricEnergy.ToXML(DatexIINS.EnergyInfrastructure + "electricEnergy")),
+                   ServiceTypes.  Select(serviceType   => serviceType.  ToXML(DatexIINS.EnergyInfrastructure + "serviceType")),
+                   RefillPoints.  Select(refillPoint   => refillPoint.  ToXML(DatexIINS.EnergyInfrastructure + "refillPoint")),
+                   EnergyProducts.Select(energyProduct => energyProduct.ToXML(DatexIINS.EnergyInfrastructure + "energyProduct")),
 
                    EnergyInfrastructureStationExtension is not null
                        ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationExtension", EnergyInfrastructureStationExtension)

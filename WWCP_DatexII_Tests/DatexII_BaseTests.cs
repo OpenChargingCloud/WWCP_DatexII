@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2014-2025 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * Copyright (c) 2014-2026 GraphDefined GmbH <achim.friedland@graphdefined.com>
  * This file is part of WWCP DatexII <https://github.com/OpenChargingCloud/WWCP_DatexII>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
@@ -148,7 +148,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                                       )
                                                                                                                                                   )
                                                                                                                                               ],
-                                                                                                              ExternalIdentifier:             "Ext1",
+                                                                                                              ExternalIdentifier:             [ new ExternalIdentifier("Ext1") ],
                                                                                                               LastUpdated:                    Timestamp.Now,
                                                                                                               Description:                    new MultilingualString(
                                                                                                                                                   new MultilingualStringValue(
@@ -228,7 +228,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                                                                Latitude:    50.779599,
                                                                                                                                                                                Longitude:    6.104507
                                                                                                                                                                            ),
-                                                                                                                                                  FacilityLocation:        new FacilityLocation(
+                                                                                                                                                  FacilityLocation:        new AfirFacilityLocation(
                                                                                                                                                                                Address:   new cloud.charging.open.protocols.DatexII.v3.LocationExtension.Address(
                                                                                                                                                                                               Postcode:       "52078",
                                                                                                                                                                                               City:           new MultilingualString(
@@ -253,17 +253,15 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                                                                           )
                                                                                                                                                                            )
                                                                                                                                               ),
-                                                                                                              Owner:                          new OrganisationSpecification(
+                                                                                                              Owner:                          new AnOrganisation(
 
-                                                                                                                                                  Id:                         "1",
-                                                                                                                                                  Version:                    "1",
                                                                                                                                                   Name:                       new MultilingualString(
                                                                                                                                                                                   new MultilingualStringValue(
                                                                                                                                                                                       Languages.de,
                                                                                                                                                                                       "GraphDefined GmbH"
                                                                                                                                                                                   )
                                                                                                                                                                               ),
-                                                                                                                                                  OperatorId:                 "DE*GEF",
+                                                                                                                                                  ExternalIdentifier:         [ ExternalIdentifier.Of("DE*GEF", TypeOfIdentifier.OperatorId) ],
                                                                                                                                                   LastUpdated:                DateTime.UtcNow,
                                                                                                                                                   Available24hours:           true,
                                                                                                                                                   PublishingAgreement:        true,
@@ -358,7 +356,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
                                                                                                                                                       Id:                                       "1",
                                                                                                                                                       Version:                                  "1",
-                                                                                                                                                      StationIdBNetzA:                          "E0001",
+                                                                                                                                                      ExternalIdentifier:                       [ ExternalIdentifier.Of("E0001", TypeOfIdentifier.StationIdBNetzA) ],
                                                                                                                                                       TotalMaximumPower:                        Watt.ParseKW("300"),
                                                                                                                                                       AuthenticationAndIdentificationMethods:   [
                                                                                                                                                                                                     AuthenticationAndIdentificationType.ActiveRFIDChip
@@ -383,7 +381,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                                                                                         Version:                   "1",
                                                                                                                                                                                                         DeliveryUnit:              DeliveryUnit.kWh,
 
-                                                                                                                                                                                                        EVSEId:                    "DE*GEF*E12345678*1",
+                                                                                                                                                                                                        CurrentType:               CurrentType.DC,
+                                                                                                                                                                                                        ExternalIdentifier:        [ ExternalIdentifier.Of("DE*GEF*E12345678*1", TypeOfIdentifier.EVSEId) ],
+                                                                                                                                                                                                        ChargingMode:              ChargingMode.Mode1AC1p,
                                                                                                                                                                                                         UsageType:                 [ ChargingPointUsage.ElectricBike ],
                                                                                                                                                                                                         NumberOfConnectors:        2,
                                                                                                                                                                                                         AvailableVoltage:          [ Volt.ParseV("400") ],
@@ -394,7 +394,6 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                                                                                                                                                                                                                        new Connector(
                                                                                                                                                                                                                                            ConnectorType:      ConnectorType.Chademo,
                                                                                                                                                                                                                                            MaxPowerAtSocket:   Watt.ParseKW("150"),
-                                                                                                                                                                                                                                           ChargingMode:       ChargingMode.Mode1AC1p,
                                                                                                                                                                                                                                            ConnectorFormat:    ConnectorFormat.CableMode2,
                                                                                                                                                                                                                                            Voltage:            Volt. ParseV("400"),
                                                                                                                                                                                                                                            MaximumCurrent:     Ampere.ParseA("375")
@@ -407,7 +406,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
                                                                                                                                                                                                                                    ],
 
-                                                                                                                       ElectricEnergy:            [
+                                                                                                                       EnergyProducts:            [
                                                                                                                                                       new ElectricEnergy(
                                                                                                                                                           EnergyProductName:            new MultilingualString(
                                                                                                                                                                                             new MultilingualStringValue(

@@ -29,7 +29,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// A table of sites where vehicles can be supplied with energy.
     /// </summary>
-    [XmlType("EnergyInfrastructureTable", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyInfrastructureTable", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyInfrastructureTable(String                                 Id,
                                            String                                 Version,
                                            IEnumerable<EnergyInfrastructureSite>  EnergyInfrastructureSites,
@@ -54,7 +54,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// A collection of EnergyInfrastructureSite instances.
         /// </summary>
-        [XmlElement("energyInfrastructureSite",             Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyInfrastructureSite",             Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyInfrastructureSite>  EnergyInfrastructureSites             { get; } = EnergyInfrastructureSites.Distinct();
 
         /// <summary>

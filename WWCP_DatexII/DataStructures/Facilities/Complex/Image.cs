@@ -29,7 +29,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// <summary>
     /// An image, with encoded data and identification of format.
     /// </summary>
-    [XmlType("Image", Namespace = "http://datex2.eu/schema/3/facilities")]
+    [XmlType("Image", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class Image(Byte[]       Data,
                        ImageFormat  Format,
                        XElement?    ImageExtension   = null)
@@ -46,7 +46,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Identifies the image format of the associated image data.
         /// </summary>
-        [XmlElement("imageFormat",      Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("imageFormat",      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public ImageFormat  Format            { get; } = Format;
 
         /// <summary>

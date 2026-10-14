@@ -34,7 +34,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// Dynamic information on the status of the charging point.
     /// </summary>
-    [XmlType("ElectricChargingPointStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("ElectricChargingPointStatus", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class ElectricChargingPointStatus(RefillPointStatusEnum                   Status,
                                              FacilityObjectVersionedReference        Reference,
 
@@ -90,13 +90,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The current used voltage.
         /// </summary>
-        [XmlElement("currentVoltage",                         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("currentVoltage",                         Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Volt?                        CurrentVoltage                          { get; } = CurrentVoltage;
 
         /// <summary>
         /// The current charging power in Watts.
         /// </summary>
-        [XmlElement("currentChargingPower",                   Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("currentChargingPower",                   Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Watt?                        CurrentChargingPower                    { get; } = CurrentChargingPower;
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse EnergyRateUpdates               [optional]
 
-            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyRateUpdate",
+            if (!XML.TryParseOptionalXMLs    (DatexIINS.EnergyInfrastructure + "energyRateUpdate",
                                               "energy rate updates",
                                               EnergyRateUpdate.TryParseXML,
                                               out IEnumerable<EnergyRateUpdate> energyRateUpdates,
@@ -206,7 +206,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse PlannedRefillPointStatus        [optional]
 
-            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "plannedRefillPointStatus",
+            if (!XML.TryParseOptionalXMLs    (DatexIINS.EnergyInfrastructure + "plannedRefillPointStatus",
                                               "planned refill point status",
                                               EnergyInfrastructure.PlannedRefillPointStatus.TryParseXML,
                                               out IEnumerable<PlannedRefillPointStatus> plannedRefillPointStatus,
@@ -401,7 +401,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             => new (XMLName ?? DatexIINS.EnergyInfrastructure + "refillPointStatus",
 
                    // The schema declares refillPointStatus with the abstract type.
-                   new XAttribute(DatexIINS.XSI + "type",   "egi:ElectricChargingPointStatus"),
+                   new XAttribute(DatexIINS.XSI + "type",   "aegi:ElectricChargingPointStatus"),
 
                    ToXMLElements(),
 

@@ -34,7 +34,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// A rate dedicated for Energy.
     /// </summary>
-    [XmlType("EnergyRate", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyRate", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyRate(String                 Id,
                             DateTimeOffset         LastUpdated,
                             RatePolicy             RatePolicy,
@@ -45,7 +45,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                             AmountOfMoney?         MaximumDeliveryFee          = null,
                             Percentage?            Discount                    = null,
                             MultilingualString?    AdditionalInformation       = null,
-                            PaymentMethod?         PaymentMethod               = null,
+                            Payment?               Payment                     = null,
                             OverallPeriod?         OverallPeriod               = null,
                             XElement?              EnergyRateExtension         = null,
                             IEnumerable<EnergyPrice>? EnergyPrices             = null)
@@ -68,13 +68,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Indication if the price is contract based or ad hoc.
         /// </summary>
-        [XmlElement("ratePolicy",                 Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("ratePolicy",                 Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public RatePolicy             RatePolicy                   { get; } = RatePolicy;
 
         /// <summary>
         /// A general information on the applicable monetary currency.
         /// </summary>
-        [XmlElement("applicableCurrency",         Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("applicableCurrency",         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<Currency>  ApplicableCurrency           { get; } = ApplicableCurrency.Distinct() ?? [];
 
         /// <summary>
@@ -92,13 +92,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// A minimum delivery fee.
         /// </summary>
-        [XmlElement("minimumDeliveryFee",         Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("minimumDeliveryFee",         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public AmountOfMoney?         MinimumDeliveryFee           { get; } = MinimumDeliveryFee;
 
         /// <summary>
         /// A maximum delivery fee.
         /// </summary>
-        [XmlElement("maximumDeliveryFee",         Namespace = "http://datex2.eu/schema/3/facilities")]
+        [XmlElement("maximumDeliveryFee",         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public AmountOfMoney?         MaximumDeliveryFee           { get; } = MaximumDeliveryFee;
 
         /// <summary>
@@ -116,8 +116,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Payment method information.
         /// </summary>
-        [XmlElement("paymentMethod",              Namespace = "http://datex2.eu/schema/3/facilities")]
-        public PaymentMethod?         PaymentMethod                { get; } = PaymentMethod;
+        [XmlElement("paymentMethod",              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        public Payment?               Payment                      { get; } = Payment;
 
         /// <summary>
         /// The specification of the period during which the energy rate is valid.
@@ -134,7 +134,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The prices of this rate.
         /// </summary>
-        [XmlElement("energyPrice",            Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyPrice",            Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyPrice>  EnergyPrices         { get; } = EnergyPrices?.Distinct() ?? [];
 
         #endregion
@@ -206,7 +206,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                 !XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "minimumDeliveryFee",         "minimum delivery fee",          AmountOfMoney.TryParse,                out AmountOfMoney?            minimumDeliveryFee,        out ErrorResponse) ||
                 !XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "discount",                   "discount",                      Percentage.TryParse,                   out Percentage?               discount,                  out ErrorResponse) ||
                 !XML.TryParseOptionalXML  (DatexIINS.EnergyInfrastructure + "additionalInformation",      "additional information",        MultilingualString.TryParseXML,        out MultilingualString?       additionalInformation,     out ErrorResponse) ||
-                !XML.TryParseOptionalXML  (DatexIINS.EnergyInfrastructure + "paymentMethod",              "payment method",                Facilities.PaymentMethod.TryParseXML,  out PaymentMethod?            paymentMethod,             out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.EnergyInfrastructure + "payment",                    "payment",                       Facilities.Payment.TryParseXML,        out Payment?                  payment,             out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "energyPrice",                "energy price",                  EnergyPrice.TryParseXML,               out IEnumerable<EnergyPrice>  energyPrices,              out ErrorResponse) ||
                 !XML.TryParseOptionalXML  (DatexIINS.EnergyInfrastructure + "overallPeriod",              "overall period",                Common.OverallPeriod.TryParseXML,      out OverallPeriod?            overallPeriod,             out ErrorResponse))
             {
@@ -227,7 +227,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                              maximumDeliveryFee,
                              discount,
                              additionalInformation,
-                             paymentMethod,
+                             payment,
                              overallPeriod,
                              XML.Element(DatexIINS.EnergyInfrastructure + "_energyRateExtension"),
                              energyPrices
@@ -281,8 +281,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                        ? AdditionalInformation.ToXML(DatexIINS.EnergyInfrastructure + "additionalInformation")
                        : null,
 
-                   PaymentMethod is not null
-                       ? PaymentMethod.ToXML(DatexIINS.EnergyInfrastructure + "paymentMethod")
+                   Payment is not null
+                       ? Payment.ToXML(DatexIINS.EnergyInfrastructure + "payment")
                        : null,
 
                    EnergyPrices.Select(energyPrice => energyPrice.ToXML(DatexIINS.EnergyInfrastructure + "energyPrice")),

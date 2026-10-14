@@ -292,7 +292,7 @@ namespace cloud.charging.open.protocols.DatexII.v3
         #region XSIType(XML)
 
         /// <summary>
-        /// The local name of the xsi:type of the given element, e.g. "ElectricChargingPoint" for "egi:ElectricChargingPoint".
+        /// The local name of the xsi:type of the given element, e.g. "ElectricChargingPoint" for "aegi:ElectricChargingPoint".
         /// </summary>
         public static String? XSIType(this XElement XML)
         {
@@ -397,6 +397,20 @@ namespace cloud.charging.open.protocols.DatexII.v3
         public static Boolean TryParseMeter(String Text, out Meter Value)
 
             => Meter.TryParse(Text, out Value);
+
+        /// <summary>
+        /// Parse a number of tonnes.
+        /// </summary>
+        public static Boolean TryParseTonne(String Text, out Tonne Value)
+
+            => Tonne.TryParse(Text, out Value);
+
+        /// <summary>
+        /// Parse a byte.
+        /// </summary>
+        public static Boolean TryParseByte(String Text, out Byte Value)
+
+            => Byte.TryParse(Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out Value);
 
         /// <summary>
         /// Parse a language code, e.g. "de".

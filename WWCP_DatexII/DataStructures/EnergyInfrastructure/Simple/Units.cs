@@ -27,7 +27,7 @@ namespace cloud.charging.open.protocols.DatexII
     /// <summary>
     /// Amount in units, which are specified by unitTypeEnum.
     /// </summary>
-    [XmlType("Units", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("Units", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public readonly struct Units
     {
 

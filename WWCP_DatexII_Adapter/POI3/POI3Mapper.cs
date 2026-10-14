@@ -50,8 +50,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
 
     /// <summary>
-    /// The mapping between the charging infrastructure and tariffs of a POI3 roaming network and DATEX II v3
-    /// Energy Infrastructure: charging pools and sites, charging stations and stations, EVSEs and electric charging
+    /// The mapping between the charging infrastructure and tariffs of a POI3 roaming network and DATEX II 3.7
+    /// AFIR Energy Infrastructure: charging pools and sites, charging stations and stations, EVSEs and electric charging
     /// points, charging connectors and connectors, charging tariffs and energy rates, and the status of EVSEs and
     /// refill points. See README.md for what does not map.
     /// </summary>
@@ -171,16 +171,24 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         }
 
         /// <summary>
-        /// The operator of the given site: the operator identification of its operator organisation, else the operator
-        /// of the first EVSE identification of its charging points.
+        /// The operator identification of the given organisation: its external identifier of the type operatorId.
+        /// </summary>
+        public static String? OperatorIdOf(AOrganisation? Organisation)
+
+            => (Organisation as AnOrganisation)?.ExternalIdentifier.
+                   FirstOrDefault(identifier => identifier.Type == TypeOfIdentifier.OperatorId)?.Identifier;
+
+        /// <summary>
+        /// The operator of the given site: the operator identification (operatorId) of its operator organisation or
+        /// of that of one of its stations, else the operator of the first EVSE identification of its charging points.
         /// </summary>
         public static POI.ChargingStationOperator_Id? OperatorIdOf(EnergyInfrastructureSite Site)
         {
 
-            if (Site.Operator is OrganisationSpecification organisation &&
-                POI.ChargingStationOperator_Id.TryParse(organisation.OperatorId ?? "") is POI.ChargingStationOperator_Id operatorId)
+            foreach (var organisation in new[] { Site.Operator }.Concat(Site.EnergyInfrastructureStations.Select(station => station.Operator)))
             {
-                return operatorId;
+                if (POI.ChargingStationOperator_Id.TryParse(OperatorIdOf(organisation) ?? "") is POI.ChargingStationOperator_Id operatorId)
+                    return operatorId;
             }
 
             foreach (var chargingPoint in Site.EnergyInfrastructureStations.SelectMany(station => station.RefillPoints).OfType<ElectricChargingPoint>())
@@ -323,10 +331,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        PublicationTime ?? Timestamp.Now,
                        PublicationCreator,
                        Language,
+                       // No allowed delivery channel: the Mobilithek profile has none.
                        new HeaderInformation(
                            InformationStatus.Parse("real"),
-                           Confidentiality.  Parse("noRestriction"),
-                           [ InformationDeliveryService.Parse("anyGeneralDeliveryService") ]
+                           Confidentiality.  Parse("noRestriction")
                        ),
                        [
                            new EnergyInfrastructureTable(
@@ -398,16 +406,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        LocationReference:             new PointLocation(
                                                           PointByCoordinates:     new PointByCoordinates(ToDatexII(ChargingPool.GeoLocation.Value)),
                                                           CoordinatesForDisplay:  ToDatexII(ChargingPool.GeoLocation.Value),
-                                                          FacilityLocation:       new FacilityLocation(
+                                                          FacilityLocation:       new AfirFacilityLocation(
                                                                                       TimeZone:  ToDatexII(ChargingPool.TimeZone ?? ChargingPool.Address?.TimeZone, ChargingPool.Id.ToString(), Warnings),
                                                                                       Address:   ChargingPool.Address?.ToDatexII()
                                                                                   )
                                                       ),
                        Operator:                      chargingStationOperator.ToDatexII(Language),
                        Helpdesk:                      helpdesk.HasValue
-                                                          ? new OrganisationSpecification(
-                                                                Id:                 $"{chargingStationOperator.Id}*HELPDESK",
-                                                                Version:            VersionOf(chargingStationOperator.LastChangeDate),
+                                                          ? new AnOrganisation(
                                                                 Name:               new MultilingualString(new MultilingualStringValue(Language, "Hotline")),
                                                                 OrganisationUnits:  [
                                                                                         new OrganisationUnit(
@@ -467,13 +473,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
                        Id:                                      ChargingStation.Id.ToString(),
                        Version:                                 VersionOf(ChargingStation.LastChangeDate),
-                       StationIdBNetzA:                         stationIdBNetzA ?? "",
                        TotalMaximumPower:                       totalMaximumPower,
                        AuthenticationAndIdentificationMethods:  AuthenticationMethodsOf(ChargingPool),
                        NumberOfRefillPoints:                    (UInt16) chargingPoints.Length,
                        UserInterfaceLanguages:                  languages,
                        ServiceTypes:                            [ new Service(ServiceType.Parse("unattended")) ],
                        Name:                                    ToMultilingualString(ChargingStation.Name),
+                       ExternalIdentifier:                      stationIdBNetzA is not null
+                                                                    ? [ ExternalIdentifier.Of(stationIdBNetzA, TypeOfIdentifier.StationIdBNetzA) ]
+                                                                    : null,
                        LastUpdated:                             ChargingStation.LastChangeDate,
                        Description:                             ToMultilingualString(ChargingStation.Description),
                        PhotoURLs:                               ChargingStation.Images.Select(image => image.URL),
@@ -517,6 +525,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                       Cast<EnergyRate>().
                                       ToArray();
 
+            // The prices of a tariff element apply together: one price group each.
             var electricEnergy  = ChargingPool.EnergyMix is not null || energyRates.Length > 0
                                       ? new ElectricEnergy(
                                             EnergyProductName:          ChargingPool.EnergyMix is not null
@@ -538,7 +547,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        Id:                              EVSE.Id.ToString(),
                        Version:                         VersionOf(EVSE.LastChangeDate),
                        DeliveryUnit:                    DeliveryUnit.Parse("kWh"),
+                       CurrentType:                     EVSE.CurrentTypes.HasFlag(POI.CurrentTypes.DC)
+                                                            ? CurrentType.DC
+                                                            : CurrentType.AC,
                        Name:                            ToMultilingualString(EVSE.Name),
+                       ExternalIdentifier:              [ ExternalIdentifier.Of(EVSE.Id.ToString(), TypeOfIdentifier.EVSEId) ],
                        LastUpdated:                     EVSE.LastChangeDate,
                        Description:                     ToMultilingualString(EVSE.Description),
                        PhotoURLs:                       EVSE.Images.Select(image => image.URL),
@@ -551,7 +564,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        Reservation:                     ChargingStation.Features.Contains(POI.ChargingStationFeature.Reservable)
                                                             ? ReservationType.Parse("optional")
                                                             : null,
-                       EVSEId:                          EVSE.Id.ToString(),
+                       EnergyProducts:                  electricEnergy is not null ? [ electricEnergy ] : null,
                        UsageType:                       [ ChargingPointUsage.Parse("electricVehicle") ],
                        VehicleToGridCommunicationType:  ChargingPool.AuthenticationModes.Any(mode => mode.Type is POI.AuthenticationMode.ISO15118_PLCType or POI.AuthenticationMode.ISO15118_AirType)
                                                             ? [ VehicleToGridCommunication.Parse("iso15118") ]
@@ -559,8 +572,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        NumberOfConnectors:              (Byte) connectors.Length,
                        AvailableVoltage:                EVSE.MaxVoltage.HasValue ? [ EVSE.MaxVoltage.Value ] : null,
                        AvailableChargingPower:          EVSE.MaxPower.  HasValue ? [ EVSE.MaxPower.  Value ] : null,
-                       Connector:                       connectors,
-                       ElectricEnergy:                  electricEnergy is not null ? [ electricEnergy ] : null
+                       ChargingMode:                    ChargingModeOf(EVSE, EVSE.ChargingConnectors.Select(chargingConnector => chargingConnector.Type)),
+                       Connector:                       connectors
 
                    );
 
@@ -571,8 +584,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         #region ToDatexII(ChargingConnector, EVSE, Warnings)
 
         /// <summary>
-        /// The connector of the given charging connector: its plug type, and the charging mode, maximum power, voltage
-        /// and current of its EVSE.
+        /// The connector of the given charging connector: its plug type, and the maximum power, voltage and current of
+        /// its EVSE.
         /// </summary>
         public static Connector ToDatexII(this POI.ChargingConnector  ChargingConnector,
                                           POI.EVSE                    EVSE,
@@ -588,7 +601,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        ConnectorType:     connectorType ?? EnergyInfrastructure.ConnectorType.Parse("other"),
                        MaxPowerAtSocket:  EVSE.MaxPower ?? Watt.FromW(0),
                        OtherConnector:    connectorType.HasValue ? null : ChargingConnector.Type.ToString(),
-                       ChargingMode:      ChargingModeOf(EVSE, ChargingConnector.Type),
                        Voltage:           EVSE.MaxVoltage,
                        MaximumCurrent:    EVSE.MaxCurrent
                    );
@@ -602,17 +614,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// <summary>
         /// The ad hoc energy rate of the given charging tariff, or null when none of its prices has a counterpart.
         /// A price per hour becomes a price per minute; time of day, weekdays and dates of an element become the
-        /// overall period of its prices.
+        /// overall period of its prices, and the number of the element their price group index.
         /// </summary>
         public static EnergyRate? ToDatexII(this POI.ChargingTariff  ChargingTariff,
                                             Languages                Language,
                                             ICollection<String>      Warnings)
         {
 
-            var prices = new List<EnergyPrice>();
+            var prices      = new List<EnergyPrice>();
+            var priceGroup  = 0U;
 
             foreach (var element in ChargingTariff.Elements)
             {
+
+                priceGroup++;
 
                 var overallPeriod = element.Restrictions is not null
                                         ? ToDatexII(element.Restrictions, ChargingTariff.Created, ChargingTariff.Id, Warnings)
@@ -642,7 +657,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                    Value:          new AmountOfMoney(price.Value.Price),
                                    TaxIncluded:    priceComponent.VAT.HasValue ? false : null,
                                    TaxRate:        priceComponent.VAT.HasValue ? Percentage.Parse(priceComponent.VAT.Value) : null,
-                                   OverallPeriod:  overallPeriod
+                                   OverallPeriod:    overallPeriod,
+                                   PriceGroupIndex:  priceGroup
                                ));
 
                 }
@@ -715,10 +731,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        PublicationCreator,
                        Language,
                        [ new EnergyInfrastructureTableVersionedReference(TableId, TableVersion) ],
+                       // No allowed delivery channel: the Mobilithek profile has none.
                        new HeaderInformation(
                            InformationStatus.Parse("real"),
-                           Confidentiality.  Parse("noRestriction"),
-                           [ InformationDeliveryService.Parse("anyGeneralDeliveryService") ]
+                           Confidentiality.  Parse("noRestriction")
                        ),
                        siteStatus
                    );
@@ -988,9 +1004,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                          ? [ POI.ChargingStationFeature.Reservable ]
                                          : null,
                        // Only a total maximum power of its own: the sum of the charging points is what POI3 tells anyway.
-                       MaxPower:     Station.TotalMaximumPower.Value > 0 &&
-                                     Station.TotalMaximumPower.Value != evses.Sum(evse => evse.MaxPower?.Value ?? 0)
-                                         ? Station.TotalMaximumPower
+                       MaxPower:     Station.TotalMaximumPower is Watt totalMaximumPower &&
+                                     totalMaximumPower.Value > 0 &&
+                                     totalMaximumPower.Value != evses.Sum(evse => evse.MaxPower?.Value ?? 0)
+                                         ? totalMaximumPower
                                          : null,
                        LastChange:   Station.LastUpdated
                    );
@@ -1003,8 +1020,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         /// <summary>
         /// The EVSE of the given electric charging point: its maximum voltage and power from its available ones or its
-        /// connectors, its current types and charging modes from the charging modes of its connectors, and its charging
-        /// tariffs from its energy rates.
+        /// connectors, its current types and charging modes from its charging mode, else its current type, and its
+        /// charging tariffs from the energy rates of its energy products.
         /// </summary>
         public static POI.EVSE? ToPOI3(this ElectricChargingPoint      ChargingPoint,
                                        POI.ChargingStationOperator_Id  OperatorId,
@@ -1036,18 +1053,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 else
                     connectors.Add(new POI.ChargingConnector(POI.ChargingConnector_Id.Parse((number++).ToString()), type.Value));
 
-                (currentTypes, chargingModes) = connector.ChargingMode?.ToString() switch {
-                    "mode1AC1p"  => (currentTypes | POI.CurrentTypes.AC_OnePhase,    chargingModes | POI.ChargingModes.Mode_1),
-                    "mode1AC3p"  => (currentTypes | POI.CurrentTypes.AC_ThreePhases, chargingModes | POI.ChargingModes.Mode_1),
-                    "mode2AC1p"  => (currentTypes | POI.CurrentTypes.AC_OnePhase,    chargingModes | POI.ChargingModes.Mode_2),
-                    "mode2AC3p"  => (currentTypes | POI.CurrentTypes.AC_ThreePhases, chargingModes | POI.ChargingModes.Mode_2),
-                    "mode3AC3p"  => (currentTypes | POI.CurrentTypes.AC_ThreePhases, chargingModes | POI.ChargingModes.Mode_3),
-                    "mode4DC"    => (currentTypes | POI.CurrentTypes.DC,             chargingModes | POI.ChargingModes.Mode_4),
-                    "ccs"        => (currentTypes | POI.CurrentTypes.DC,             chargingModes | POI.ChargingModes.Mode_4),
-                    _            => (currentTypes, chargingModes)
-                };
-
             }
+
+            (currentTypes, chargingModes) = ChargingPoint.ChargingMode?.ToString() switch {
+                "mode1AC1p"  => (POI.CurrentTypes.AC_OnePhase,    POI.ChargingModes.Mode_1),
+                "mode1AC3p"  => (POI.CurrentTypes.AC_ThreePhases, POI.ChargingModes.Mode_1),
+                "mode2AC1p"  => (POI.CurrentTypes.AC_OnePhase,    POI.ChargingModes.Mode_2),
+                "mode2AC3p"  => (POI.CurrentTypes.AC_ThreePhases, POI.ChargingModes.Mode_2),
+                "mode3AC3p"  => (POI.CurrentTypes.AC_ThreePhases, POI.ChargingModes.Mode_3),
+                "mode4DC"    => (POI.CurrentTypes.DC,             POI.ChargingModes.Mode_4),
+                "ccs"        => (POI.CurrentTypes.DC,             POI.ChargingModes.Mode_4),
+                _            => ChargingPoint.CurrentType == CurrentType.DC
+                                    ? (POI.CurrentTypes.DC, chargingModes)
+                                    : (currentTypes, chargingModes)
+            };
 
             var tariffIds = ChargingPoint.ElectricEnergy.
                                 SelectMany(energy => energy.EnergyRates.Select(rate => rate.Id).Concat(energy.EnergyRateByReference.Select(reference => reference.Id))).
@@ -1089,8 +1108,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         #region ToPOI3(EnergyRate, OperatorId, Language, Warnings)
 
         /// <summary>
-        /// The charging tariff of the given energy rate: a price per minute becomes a price per hour. Its prices with
-        /// the same overall period make one element, whose restrictions are the dates, times of day and weekdays of it.
+        /// The charging tariff of the given energy rate: a price per minute becomes a price per hour. Its prices of the
+        /// same price group make one element (of the same overall period, when they all are of one group, as in the
+        /// Mobilithek profile), whose restrictions are the dates, times of day and weekdays of it.
         /// </summary>
         public static POI.ChargingTariff? ToPOI3(this EnergyRate                 EnergyRate,
                                                  POI.ChargingStationOperator_Id  OperatorId,
@@ -1111,7 +1131,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             var elements = new List<POI.ChargingTariffElement>();
 
-            foreach (var group in GroupByPeriod(EnergyRate.EnergyPrices))
+            foreach (var group in GroupPrices(EnergyRate.EnergyPrices))
             {
 
                 var components = new List<POI.ChargingPriceComponent>();
@@ -1361,7 +1381,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         private static PhoneNumber? HotlineOf(AOrganisation? Helpdesk)
 
-            => Helpdesk is OrganisationSpecification organisation
+            => Helpdesk is AnOrganisation organisation
                    ? organisation.OrganisationUnits.
                          SelectMany(unit => unit.ContactInformation).
                          Select    (contact => contact.TelephoneNumber).
@@ -1370,15 +1390,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                          FirstOrDefault(number => number.HasValue)
                    : null;
 
-        private static OrganisationSpecification ToDatexII(this POI.ChargingStationOperator  Operator,
-                                                           Languages                         Language)
+        /// <summary>
+        /// The operator as an organisation, identified by its operator identification (operatorId), as the Mobilithek profile wants it.
+        /// </summary>
+        private static AnOrganisation ToDatexII(this POI.ChargingStationOperator  Operator,
+                                                Languages                         Language)
 
             => new (
-                   Id:                        Operator.Id.ToString(),
-                   Version:                   VersionOf(Operator.LastChangeDate),
                    Name:                      ToMultilingualString(Operator.Name) ??
                                               new MultilingualString(new MultilingualStringValue(Language, Operator.Id.ToString())),
-                   OperatorId:                Operator.Id.ToString(),
+                   ExternalIdentifier:        [ ExternalIdentifier.Of(Operator.Id.ToString(), TypeOfIdentifier.OperatorId) ],
                    LastUpdated:               Operator.LastChangeDate,
                    Description:               ToMultilingualString(Operator.Description),
                    LinkToGeneralInformation:  Operator.Homepage,
@@ -1589,6 +1610,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                         : null,
                        DaysOfWeek:  period?.RecurringDayWeekMonthPeriod.SelectMany(dayWeekMonth => dayWeekMonth.ApplicableDays).Select(ToDayOfWeek)
                    );
+
+        }
+
+        /// <summary>
+        /// The prices of the same price group, in their order; when all are of one group, those with the same overall period.
+        /// </summary>
+        private static IEnumerable<IReadOnlyList<EnergyPrice>> GroupPrices(IEnumerable<EnergyPrice> Prices)
+        {
+
+            var priceGroups = Prices.GroupBy(price => price.PriceGroupIndex).ToArray();
+
+            return priceGroups.Length > 1
+                       ? priceGroups.OrderBy(group => group.Key).Select(group => (IReadOnlyList<EnergyPrice>) group.ToArray()).ToArray()
+                       : GroupByPeriod(Prices);
 
         }
 
@@ -1873,21 +1908,21 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         private static readonly (String POI3, String DatexII)[] ConnectorTypes = [
             ("CHADEMO",                "chademo"),
-            ("DOMESTIC_A",             "domesticA"),
-            ("DOMESTIC_B",             "domesticB"),
-            ("DOMESTIC_C",             "domesticC"),
-            ("DOMESTIC_D",             "domesticD"),
-            ("DOMESTIC_E",             "domesticE"),
-            ("DOMESTIC_F",             "domesticF"),
-            ("DOMESTIC_G",             "domesticG"),
-            ("DOMESTIC_H",             "domesticH"),
-            ("DOMESTIC_I",             "domesticI"),
-            ("DOMESTIC_J",             "domesticJ"),
-            ("DOMESTIC_K",             "domesticK"),
-            ("DOMESTIC_L",             "domesticL"),
-            ("DOMESTIC_M",             "domesticM"),
-            ("DOMESTIC_N",             "domesticN"),
-            ("DOMESTIC_O",             "domesticO"),
+            ("DOMESTIC_A",             "domesticAType"),
+            ("DOMESTIC_B",             "domesticBType"),
+            ("DOMESTIC_C",             "domesticCType"),
+            ("DOMESTIC_D",             "domesticDType"),
+            ("DOMESTIC_E",             "domesticEType"),
+            ("DOMESTIC_F",             "domesticFType"),
+            ("DOMESTIC_G",             "domesticGType"),
+            ("DOMESTIC_H",             "domesticHType"),
+            ("DOMESTIC_I",             "domesticIType"),
+            ("DOMESTIC_J",             "domesticJType"),
+            ("DOMESTIC_K",             "domesticKType"),
+            ("DOMESTIC_L",             "domesticLType"),
+            ("DOMESTIC_M",             "domesticMType"),
+            ("DOMESTIC_N",             "domesticNType"),
+            ("DOMESTIC_O",             "domesticOType"),
             ("IEC_60309_2_single_16",  "iec60309x2single16"),
             ("IEC_60309_2_three_16",   "iec60309x2three16"),
             ("IEC_60309_2_three_32",   "iec60309x2three32"),
@@ -1933,17 +1968,17 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         }
 
         /// <summary>
-        /// The charging mode of a connector of the given EVSE: CCS for a combo plug, mode 4 for direct current, mode 3
-        /// for three phases, mode 2 for one phase where the EVSE says mode 2. DATEX II has no mode 3 with one phase.
+        /// The charging mode of the given EVSE with connectors of the given types: CCS for a combo plug, mode 4 for direct
+        /// current, mode 3 for three phases, mode 2 for one phase where the EVSE says mode 2. DATEX II has no mode 3 with one phase.
         /// </summary>
-        private static ChargingMode? ChargingModeOf(POI.EVSE                   EVSE,
-                                                    POI.ChargingConnectorType  Type)
+        private static ChargingMode? ChargingModeOf(POI.EVSE                                EVSE,
+                                                    IEnumerable<POI.ChargingConnectorType>  Types)
         {
 
             var currentTypes   = EVSE.CurrentTypes;
             var chargingModes  = EVSE.ChargingModes;
 
-            if (Type.ToString() is "IEC_62196_T1_COMBO" or "IEC_62196_T2_COMBO")
+            if (Types.Any(type => type.ToString() is "IEC_62196_T1_COMBO" or "IEC_62196_T2_COMBO"))
                 return ChargingMode.Parse("ccs");
 
             if (currentTypes.HasFlag(POI.CurrentTypes.DC))

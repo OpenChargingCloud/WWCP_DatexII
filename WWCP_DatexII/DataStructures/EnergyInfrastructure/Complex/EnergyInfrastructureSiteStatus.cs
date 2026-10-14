@@ -34,7 +34,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <summary>
     /// Dynamic information on the status of the energy supplying site.
     /// </summary>
-    [XmlType("EnergyInfrastructureSiteStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+    [XmlType("EnergyInfrastructureSiteStatus", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
     public class EnergyInfrastructureSiteStatus(FacilityObjectVersionedReference                 Reference,
                                                 DateTimeOffset?                                  LastUpdated                               = null,
                                                 OpeningStatus?                                   OpeningStatus                             = null,
@@ -86,13 +86,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Specify the status of a charging station with dynamic information.
         /// </summary>
-        [XmlElement("energyInfrastructureStationStatus",         Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("energyInfrastructureStationStatus",         Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<EnergyInfrastructureStationStatus>  EnergyInfrastructureStationStatus          { get; } = EnergyInfrastructureStationStatus?.Distinct() ?? [];
 
         /// <summary>
         /// The service type for the site. If no period is given, the currently available service is meant.
         /// </summary>
-        [XmlElement("serviceType",                               Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        [XmlElement("serviceType",                               Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<Service>                            Services                                   { get; } = Services?.                         Distinct() ?? [];
 
         /// <summary>
