@@ -64,11 +64,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse Values    [mandatory]
 
-            if (!XML.TryParseMandatoryElements("values",
-                                               "multilingual string values",
-                                               MultilingualStringValue.TryParseXML,
-                                               out IEnumerable<MultilingualStringValue> values,
-                                               out ErrorResponse))
+            var valuesXML = XML.Element(DatexIINS.Common + "values");
+
+            if (valuesXML is null)
+            {
+                ErrorResponse = "The mandatory multilingual string values are missing!";
+                return false;
+            }
+
+            if (!valuesXML.TryParseOptionalXMLs(DatexIINS.Common + "value",
+                                                "multilingual string value",
+                                                MultilingualStringValue.TryParseXML,
+                                                out IEnumerable<MultilingualStringValue> values,
+                                                out ErrorResponse))
             {
                 return false;
             }

@@ -72,7 +72,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                   out var errorResponse
                               );
 
-                Assert.That(success,                                Is.True);
+                Assert.That(success,                                Is.True, errorResponse);
                 Assert.That(payload,                                Is.Not.Null);
                 Assert.That(errorResponse,                          Is.Null);
 
@@ -178,7 +178,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                                   out var errorResponse
                               );
 
-                Assert.That(success,                               Is.True);
+                Assert.That(success,                               Is.True, errorResponse);
                 Assert.That(payload,                               Is.Not.Null);
                 Assert.That(errorResponse,                         Is.Null);
 

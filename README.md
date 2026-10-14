@@ -2,8 +2,13 @@
 
 This software libraries allow you to build EU [DatexII](https://github.com/DATEX-II-EU) services and use case specific gateways between Datex II and the World Wide Charging Protocol (WWCP).
 
+The data model implements the DATEX II v3 *Energy Infrastructure* table and status publications in the namespaces `energyInfrastructure` and `facilities`, as the German "Level C" profile (00-01-00/00-02-00) defined them, and reads and writes both as XML.
+[WWCP_DatexII_Adapter/POI3](WWCP_DatexII_Adapter/POI3/README.md) maps them to and from a POI3 roaming network, and documents how this implementation compares with the current standard: DATEX II 3.7 with its own AFIR namespaces, and the Mobilithek profile "AFIR Energy Infrastructure" 01-00-00.
+
 
 ## Known DatexII Specification Issues
+
+The schemas misspell four names. The library writes them as the schemas spell them. As of DATEX II 3.7, only `pyhsicalAttendance` is fixed, and only in the new `afirEnergyInfrastructure` namespace.
 
 
 ### applicableCalenderWeekWithinMonth vs. applicableCalendarWeekWithinMonth

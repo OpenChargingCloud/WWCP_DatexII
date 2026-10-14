@@ -87,7 +87,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             #region TryParse OrganisationReference         [mandatory]
 
-            if (!XML.TryParseMandatory("organisationReference",
+            if (!XML.TryParseMandatory(DatexIINS.Facilities + "organisationReference",
                                        "organisation reference",
                                        OrganisationSpecificationVersionedReference.TryParseXML,
                                        out OrganisationSpecificationVersionedReference? organisationReference,
@@ -100,28 +100,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             #region TryParse OrganisationTableReference    [optional]
 
-            if (XML.TryParseOptional("organisationTableReference",
-                                     "organisation table reference",
-                                     OrganisationTableVersionedReference.TryParseXML,
-                                     out OrganisationTableVersionedReference? organisationTableReference,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Facilities + "organisationTableReference",
+                                      "organisation table reference",
+                                      OrganisationTableVersionedReference.TryParseXML,
+                                      out OrganisationTableVersionedReference? organisationTableReference,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse GeneralTimeValidity           [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "generalTimeValidity",
-                                     "general time validity",
-                                     OverallPeriod.TryParseXML,
-                                     out OverallPeriod? generalTimeValidity,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Facilities + "generalTimeValidity",
+                                      "general time validity",
+                                      OverallPeriod.TryParseXML,
+                                      out OverallPeriod? generalTimeValidity,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -131,10 +129,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
                                               organisationReference,
                                               organisationTableReference,
-                                              XML.Element(DatexIINS.Common + "_organisationByReferenceExtension"),
+                                              XML.Element(DatexIINS.Facilities + "_organisationByReferenceExtension"),
 
                                               generalTimeValidity,
-                                              XML.Element(DatexIINS.Common + "_organisationExtension")
+                                              XML.Element(DatexIINS.Facilities + "_organisationExtension")
 
                                           );
 

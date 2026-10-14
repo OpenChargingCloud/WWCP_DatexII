@@ -128,28 +128,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse AdditionalInformation    [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "additionalInformation",
-                                     "overall period",
-                                     MultilingualString.TryParseXML,
-                                     out MultilingualString? additionalInformation,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "additionalInformation",
+                                      "overall period",
+                                      MultilingualString.TryParseXML,
+                                      out MultilingualString? additionalInformation,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse EnergyPrices             [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyPrice",
-                                             "energy prices",
-                                             EnergyPrice.TryParseXML,
-                                             out IEnumerable<EnergyPrice> energyPrices,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyPrice",
+                                              "energy prices",
+                                              EnergyPrice.TryParseXML,
+                                              out IEnumerable<EnergyPrice> energyPrices,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -162,7 +160,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                    additionalInformation,
                                    energyPrices,
 
-                                   XML.Element(DatexIINS.Common + "_energyRateUpdateExtension")
+                                   XML.Element(DatexIINS.EnergyInfrastructure + "_energyRateUpdateExtension")
 
                                );
 
@@ -172,6 +170,34 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyRateUpdate",
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "lastUpdated",   LastUpdated.ToISO8601WithOffset()),
+
+                   EnergyRateReference.ToXML(DatexIINS.EnergyInfrastructure + "energyRateReference"),
+
+                   AdditionalInformation is not null
+                       ? AdditionalInformation.ToXML(DatexIINS.EnergyInfrastructure + "additionalInformation")
+                       : null,
+
+                   EnergyPrices.Select(energyPrice => energyPrice.ToXML(DatexIINS.EnergyInfrastructure + "energyPrice")),
+
+                   EnergyRateUpdateExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyRateUpdateExtension", EnergyRateUpdateExtension)
+                       : null
+
+               );
+
+        #endregion
 
     }
 

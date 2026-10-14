@@ -121,109 +121,40 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             OperatingHoursSpecification = null;
 
+            #region TryParse Id, Version         [mandatory attributes]
 
-            #region TryParse Id                 [mandatory]
+            var id       = XML.Attribute("id")?.     Value.Trim();
+            var version  = XML.Attribute("version")?.Value.Trim();
 
-            if (!XML.TryParseMandatoryText("id",
-                                           "id",
-                                           out String? id,
-                                           out ErrorResponse))
+            if (id is null || version is null)
+            {
+                ErrorResponse = "The mandatory 'id' or 'version' attribute of the operating hours specification is missing!";
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse OverallPeriod       [mandatory]
+
+            if (!XML.TryParseMandatoryXML(DatexIINS.Facilities + "overallPeriod",
+                                          "overall period",
+                                          Common.OverallPeriod.TryParseXML,
+                                          out OverallPeriod? overallPeriod,
+                                          out ErrorResponse))
             {
                 return false;
             }
 
             #endregion
 
-            #region TryParse Version            [mandatory]
+            #region TryParse the optional values
 
-            if (!XML.TryParseMandatoryText("version",
-                                           "version",
-                                           out String? version,
-                                           out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.Facilities + "lastUpdated",         "last updated",         DatexIIXMLExtensions.TryParseTimestamp,  out DateTimeOffset?      lastUpdated,        out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "operatingAllYear",    "operating all year",   DatexIIXMLExtensions.TryParseBoolean,    out Boolean?             operatingAllYear,   out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "urlLinkAddress",      "URL link address",     URL.TryParse,                            out URL?                 urlLinkAddress,     out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.Facilities + "closureInformation",  "closure information",  Facilities.ClosureInformation.TryParseXML, out ClosureInformation? closureInformation, out ErrorResponse))
             {
                 return false;
-            }
-
-            #endregion
-
-            #region TryParse OverallPeriod      [mandatory]
-
-            if (!XML.TryParseMandatory("overallPeriod",
-                                       "overall period",
-                                       OverallPeriod.TryParseXML,
-                                       out OverallPeriod? overallPeriod,
-                                       out ErrorResponse))
-            {
-                return false;
-            }
-
-            #endregion
-
-
-            #region TryParse LastUpdated         [optional]
-
-            if (XML.TryParseOptionalTimestamp("lastUpdated",
-                                              "last updated",
-                                              out DateTimeOffset? lastUpdated,
-                                              out ErrorResponse))
-            {
-                if (ErrorResponse is not null)
-                    return false;
-            }
-
-            #endregion
-
-            #region TryParse Label               [optional]
-
-            if (XML.TryParseOptionalText("label",
-                                         "label",
-                                         out String? label,
-                                         out ErrorResponse))
-            {
-                if (ErrorResponse is not null)
-                    return false;
-            }
-
-            #endregion
-
-            #region TryParse OperatingAllYear    [optional]
-
-            if (XML.TryParseOptional("operatingAllYear",
-                                     "operating all year",
-                                     out Boolean? operatingAllYear,
-                                     out ErrorResponse))
-            {
-                if (ErrorResponse is not null)
-                    return false;
-            }
-
-            #endregion
-
-            #region TryParse URLLinkAddress      [optional]
-
-            if (XML.TryParseOptional("urlLinkAddress",
-                                     "url link address",
-                                     URL.TryParse,
-                                     out URL? urlLinkAddress,
-                                     out ErrorResponse))
-            {
-                if (ErrorResponse is not null)
-                    return false;
-            }
-
-            #endregion
-
-
-            #region TryParse ClosureInformation    [optional]
-
-            if (XML.TryParseOptional("closureInformation",
-                                     "closure information",
-                                     ClosureInformation.TryParseXML,
-                                     out ClosureInformation? closureInformation,
-                                     out ErrorResponse))
-            {
-                if (ErrorResponse is not null)
-                    return false;
             }
 
             #endregion
@@ -236,13 +167,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                               overallPeriod,
 
                                               lastUpdated,
-                                              label,
+                                              XML.OptionalText(DatexIINS.Facilities + "label"),
                                               operatingAllYear,
                                               urlLinkAddress,
-                                              XML.Element(DatexIINS.Common + "_operatingHoursSpecificationExtension"),
+                                              XML.Element(DatexIINS.Facilities + "_operatingHoursSpecificationExtension"),
 
                                               closureInformation,
-                                              XML.Element(DatexIINS.Common + "_operatingHoursExtension")
+                                              XML.Element(DatexIINS.Facilities + "_operatingHoursExtension")
 
                                           );
 

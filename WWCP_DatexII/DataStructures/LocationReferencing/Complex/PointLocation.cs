@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.LocationExtension;
 
@@ -75,6 +76,93 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_pointLocationExtension",       Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                       PointLocationExtension          { get; } = PointLocationExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out PointLocation, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a point location.
+        /// Its supplementary positional description and an OpenLR reference are not parsed yet.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="PointLocation">The parsed point location.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                 XML,
+                                          [NotNullWhen(true)]  out PointLocation?  PointLocation,
+                                          [NotNullWhen(false)] out String?         ErrorResponse)
+        {
+
+            PointLocation = null;
+
+            #region TryParse ExternalReferencing      [optional]
+
+            if (!XML.TryParseOptionalXMLs(DatexIINS.LocationReferencing + "externalReferencing",
+                                          "external referencing",
+                                          LocationReferencing.ExternalReferencing.TryParseXML,
+                                          out IEnumerable<LocationReferencing.ExternalReferencing> externalReferencing,
+                                          out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse CoordinatesForDisplay    [optional]
+
+            if (!XML.TryParseOptionalXML(DatexIINS.LocationReferencing + "coordinatesForDisplay",
+                                         "coordinates for display",
+                                         PointCoordinates.TryParseXML,
+                                         out PointCoordinates? coordinatesForDisplay,
+                                         out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse FacilityLocation         [optional]
+
+            if (!XML.TryParseOptionalXML(DatexIINS.LocationReferencing + "facilityLocation",
+                                         "facility location",
+                                         v3.LocationExtension.FacilityLocation.TryParseXML,
+                                         out v3.LocationExtension.FacilityLocation? facilityLocation,
+                                         out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse PointByCoordinates       [optional]
+
+            if (!XML.TryParseOptionalXML(DatexIINS.LocationReferencing + "pointByCoordinates",
+                                         "point by coordinates",
+                                         LocationReferencing.PointByCoordinates.TryParseXML,
+                                         out PointByCoordinates? pointByCoordinates,
+                                         out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+
+            PointLocation = new PointLocation(
+                                PointByCoordinates:          pointByCoordinates,
+                                PointLocationExtension:      XML.Element(DatexIINS.LocationReferencing + "_pointLocationExtension"),
+                                NetworkLocationExtension:    XML.Element(DatexIINS.LocationReferencing + "_networkLocationExtension"),
+                                ExternalReferencing:         externalReferencing,
+                                CoordinatesForDisplay:       coordinatesForDisplay,
+                                FacilityLocation:            facilityLocation,
+                                LocationExtension:           XML.Element(DatexIINS.LocationReferencing + "_locationExtension"),
+                                LocationReferenceExtension:  XML.Element(DatexIINS.LocationReferencing + "_locationReferenceExtension")
+                            );
+
+            return true;
+
+        }
 
         #endregion
 

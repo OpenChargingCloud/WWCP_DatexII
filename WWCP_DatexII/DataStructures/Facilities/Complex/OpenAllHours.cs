@@ -70,23 +70,22 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             #region TryParse ClosureInformation    [optional]
 
-            if (XML.TryParseOptional("closureInformation",
-                                     "closure information",
-                                     ClosureInformation.TryParseXML,
-                                     out ClosureInformation? closureInformation,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Facilities + "closureInformation",
+                                      "closure information",
+                                      ClosureInformation.TryParseXML,
+                                      out ClosureInformation? closureInformation,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
 
             OpenAllHours = new OpenAllHours(
-                               XML.Element(DatexIINS.Common + "_openAllHoursExtension"),
+                               XML.Element(DatexIINS.Facilities + "_openAllHoursExtension"),
                                closureInformation,
-                               XML.Element(DatexIINS.Common + "_payloadPublicationExtension")
+                               XML.Element(DatexIINS.Facilities + "_operatingHoursExtension")
                            );
 
             return true;

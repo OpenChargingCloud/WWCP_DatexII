@@ -150,42 +150,39 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse TableReferences                   [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "tableReference",
-                                             "publication table references",
-                                             EnergyInfrastructureTableVersionedReference.TryParseXML,
-                                             out IEnumerable<EnergyInfrastructureTableVersionedReference> tableReferences,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "tableReference",
+                                              "publication table references",
+                                              EnergyInfrastructureTableVersionedReference.TryParseXML,
+                                              out IEnumerable<EnergyInfrastructureTableVersionedReference> tableReferences,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse HeaderInformation                 [optional]
 
-            if (XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "headerInformation",
-                                     "header information",
-                                     HeaderInformation.TryParseXML,
-                                     out HeaderInformation? headerInformation,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "headerInformation",
+                                      "header information",
+                                      HeaderInformation.TryParseXML,
+                                      out HeaderInformation? headerInformation,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse EnergyInfrastructureSiteStatus    [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureSiteStatus",
-                                             "header information",
-                                             EnergyInfrastructure.EnergyInfrastructureSiteStatus.TryParseXML,
-                                             out IEnumerable<EnergyInfrastructureSiteStatus> energyInfrastructureSiteStatus,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureSiteStatus",
+                                              "header information",
+                                              EnergyInfrastructure.EnergyInfrastructureSiteStatus.TryParseXML,
+                                              out IEnumerable<EnergyInfrastructureSiteStatus> energyInfrastructureSiteStatus,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -303,17 +300,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                           new XAttribute(DatexIINS.XSI + "schemaLocation",    "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"),
                           new XAttribute(DatexIINS.XSI + "type",              "egi:EnergyInfrastructureStatusPublication"),
                           new XAttribute("lang",                               Language.AsText()),
-                          new XAttribute("modelBaseVersion",                  "3"),
-                          new XAttribute("profileName",                       "Level C profile Energy Infrastructure"),
-                          new XAttribute("profileVersion",                    "00-01-00"),
+                          new XAttribute("modelBaseVersion",                  ModelBaseVersion),
+                          new XAttribute("profileName",                       ProfileName),
+                          new XAttribute("profileVersion",                    ProfileVersion),
 
                           new XElement(DatexIINS.Common + "publicationTime",   PublicationTime.ToISO8601()),
                           PublicationCreator.ToXML(),
                           TableReferences.Select(tableReference => tableReference.ToXML()),
                           HeaderInformation?.ToXML(DatexIINS.EnergyInfrastructure),
 
-                          EnergyInfrastructureSiteStatus.Any()
-                              ? throw new NotImplementedException("Serializing EnergyInfrastructureSiteStatus is not implemented yet!")
+                          EnergyInfrastructureSiteStatus.Select(siteStatus => siteStatus.ToXML(DatexIINS.EnergyInfrastructure + "energyInfrastructureSiteStatus")),
+
+                          EnergyInfrastructureStatusPublicationExtension is not null
+                              ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStatusPublicationExtension", EnergyInfrastructureStatusPublicationExtension)
                               : null
 
                       );

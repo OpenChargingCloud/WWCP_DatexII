@@ -91,52 +91,48 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             #region TryParse PermananentlyClosed       [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "permananentlyClosed",
-                                     "permananently closed",
-                                     out Boolean? permananentlyClosed,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Facilities + "permananentlyClosed",
+                                      "permananently closed",
+                                      out Boolean? permananentlyClosed,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse TemporarilyClosed         [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "temporarilyClosed",
-                                     "temporarily closed",
-                                     out Boolean? temporarilyClosed,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Facilities + "temporarilyClosed",
+                                      "temporarily closed",
+                                      out Boolean? temporarilyClosed,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse ClosedFrom                [optional]
 
-            if (XML.TryParseOptionalTimestamp(DatexIINS.Common + "closedFrom",
-                                              "closed from",
-                                              out DateTimeOffset? closedFrom,
-                                              out ErrorResponse))
+            if (!XML.TryParseOptionalTimestamp(DatexIINS.Facilities + "closedFrom",
+                                               "closed from",
+                                               out DateTimeOffset? closedFrom,
+                                               out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse TemporarilyClosedUntil    [optional]
 
-            if (XML.TryParseOptionalTimestamp(DatexIINS.Common + "temporarilyClosedUntil",
-                                              "temporarily closed until",
-                                              out DateTimeOffset? temporarilyClosedUntil,
-                                              out ErrorResponse))
+            if (!XML.TryParseOptionalTimestamp(DatexIINS.Facilities + "temporarilyClosedUntil",
+                                               "temporarily closed until",
+                                               out DateTimeOffset? temporarilyClosedUntil,
+                                               out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -149,7 +145,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                      closedFrom,
                                      temporarilyClosedUntil,
 
-                                     XML.Element(DatexIINS.Common + "_closureInformationExtension")
+                                     XML.Element(DatexIINS.Facilities + "_closureInformationExtension")
 
                                  );
 

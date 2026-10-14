@@ -19,6 +19,8 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
+using org.GraphDefined.Vanaheimr.Illias;
 
 #endregion
 
@@ -89,6 +91,92 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// </summary>
         [XmlElement("_faultExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?            FaultExtension           { get; } = FaultExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out Fault, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a fault.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Fault">The parsed fault.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                          XML,
+                                          [NotNullWhen(true)]  out Fault?   Fault,
+                                          [NotNullWhen(false)] out String?  ErrorResponse)
+        {
+
+            Fault = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.Common + "faultLastUpdateTime",    "fault last update time",     DatexIIXMLExtensions.TryParseTimestamp,  out DateTimeOffset       faultLastUpdateTime,   out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.Common + "faultDescription",       "fault description",          MultilingualString.TryParseXML,          out MultilingualString?  faultDescription,      out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Common + "faultCreationTime",      "fault creation time",        DatexIIXMLExtensions.TryParseTimestamp,  out DateTimeOffset?      faultCreationTime,     out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Common + "faultImpactSeverity",    "fault impact severity",      FaultSeverity.TryParse,                  out FaultSeverity?       faultImpactSeverity,   out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Common + "faultUrgencyToRectify",  "fault urgency to rectify",   FaultUrgency.TryParse,                   out FaultUrgency?        faultUrgencyToRectify, out ErrorResponse))
+            {
+                return false;
+            }
+
+            Fault = new Fault(
+                        faultLastUpdateTime.UtcDateTime,
+                        XML.OptionalText(DatexIINS.Common + "faultIdentifier"),
+                        faultDescription,
+                        faultCreationTime?.UtcDateTime,
+                        faultImpactSeverity,
+                        faultUrgencyToRectify,
+                        XML.OptionalText(DatexIINS.Common + "manufacturerFaultCode"),
+                        XML.Element(DatexIINS.Common + "_faultExtension")
+                    );
+
+            return true;
+
+        }
+
+        #endregion
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "fault",
+
+                   FaultIdentifier is not null && FaultIdentifier.Length > 0
+                       ? new XElement(DatexIINS.Common + "faultIdentifier",         FaultIdentifier)
+                       : null,
+
+                   FaultDescription is not null
+                       ? FaultDescription.ToXML(DatexIINS.Common + "faultDescription")
+                       : null,
+
+                   FaultCreationTime.HasValue
+                       ? new XElement(DatexIINS.Common + "faultCreationTime",       FaultCreationTime.Value.ToISO8601WithOffset())
+                       : null,
+
+                   new XElement(DatexIINS.Common + "faultLastUpdateTime",           FaultLastUpdateTime.ToISO8601WithOffset()),
+
+                   FaultImpactSeverity.HasValue
+                       ? new XElement(DatexIINS.Common + "faultImpactSeverity",     FaultImpactSeverity.  Value.ToString())
+                       : null,
+
+                   FaultUrgencyToRectify.HasValue
+                       ? new XElement(DatexIINS.Common + "faultUrgencyToRectify",   FaultUrgencyToRectify.Value.ToString())
+                       : null,
+
+                   ManufacturerFaultCode is not null && ManufacturerFaultCode.Length > 0
+                       ? new XElement(DatexIINS.Common + "manufacturerFaultCode",   ManufacturerFaultCode)
+                       : null,
+
+                   FaultExtension is not null
+                       ? new XElement(DatexIINS.Common + "_faultExtension",         FaultExtension)
+                       : null
+
+               );
 
         #endregion
 

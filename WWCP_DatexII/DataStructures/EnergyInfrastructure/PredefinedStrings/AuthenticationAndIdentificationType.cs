@@ -244,7 +244,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// RFID Card / Phone NFC - Mifare Desfire
         /// </summary>
         public static AuthenticationAndIdentificationType  MifareDesfire      { get; }
-            = Register("xxx");
+            = Register("mifareDesfire");
 
         /// <summary>
         /// Nearfield communication

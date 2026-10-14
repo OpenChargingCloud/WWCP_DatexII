@@ -42,7 +42,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                              MultilingualString?                   Name                                   = null,
                                              IEnumerable<MultilingualString>?      Alias                                  = null,
                                              String?                               ExternalIdentifier                     = null,
-                                             DateTime?                             LastUpdated                            = null,
+                                             DateTimeOffset?                       LastUpdated                            = null,
                                              MultilingualString?                   Description                            = null,
                                              IEnumerable<Accessibility>?           Accessibility                          = null,
                                              IEnumerable<MultilingualString>?      AdditionalInformation                  = null,
@@ -149,6 +149,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                    new XAttribute("version",                 Version),
 
                    ToXMLElements(),
+
+                   new XElement(DatexIINS.Facilities + "serviceFacilityType",            ServiceFacilityType.ToString()),
+
+                   NumberOfSubitems.HasValue
+                       ? new XElement(DatexIINS.Facilities + "numberOfSubitems",         NumberOfSubitems.          Value)
+                       : null,
+
+                   DistanceFromOriginFacility.HasValue
+                       ? new XElement(DatexIINS.Facilities + "distanceFromOriginFacility", DistanceFromOriginFacility.Value)
+                       : null,
 
                    SupplementalServiceFacilityExtension is not null
                        ? new XElement(DatexIINS.Facilities + "_supplementalServiceFacilityExtension", SupplementalServiceFacilityExtension)

@@ -180,28 +180,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse HeaderInformation             [optional]
 
-            if (XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "headerInformation",
-                                     "header information",
-                                     HeaderInformation.TryParseXML,
-                                     out HeaderInformation? headerInformation,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "headerInformation",
+                                      "header information",
+                                      HeaderInformation.TryParseXML,
+                                      out HeaderInformation? headerInformation,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse EnergyInfrastructureTables    [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureTable",
-                                             "header information",
-                                             EnergyInfrastructureTable.TryParseXML,
-                                             out IEnumerable<EnergyInfrastructureTable> energyInfrastructureTables,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureTable",
+                                              "header information",
+                                              EnergyInfrastructureTable.TryParseXML,
+                                              out IEnumerable<EnergyInfrastructureTable> energyInfrastructureTables,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -317,9 +315,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                           new XAttribute(DatexIINS.XSI + "schemaLocation",  "http://datex2.eu/schema/3/d2Payload DATEXII_3_D2Payload.xsd"),
                           new XAttribute(DatexIINS.XSI + "type",            "egi:EnergyInfrastructureTablePublication"),
                           new XAttribute("lang",                             Language.AsText()),
-                          new XAttribute("modelBaseVersion",                "3"),
-                          new XAttribute("profileName",                     "Level C profile Energy Infrastructure"),
-                          new XAttribute("profileVersion",                  "00-01-00"),
+                          new XAttribute("modelBaseVersion",                ModelBaseVersion),
+                          new XAttribute("profileName",                     ProfileName),
+                          new XAttribute("profileVersion",                  ProfileVersion),
 
                           new XElement(DatexIINS.Common + "publicationTime",   PublicationTime.ToISO8601()),
                           PublicationCreator.ToXML(),

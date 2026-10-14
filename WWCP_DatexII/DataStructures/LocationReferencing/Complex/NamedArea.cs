@@ -92,7 +92,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
             #region TryParse AreaName         [mandatory]
 
-            if (!XML.TryParseMandatory(DatexIINS.Common + "areaName",
+            if (!XML.TryParseMandatory(DatexIINS.LocationReferencing + "areaName",
                                        "area name",
                                        MultilingualString.TryParseXML,
                                        out MultilingualString? areaName,
@@ -105,28 +105,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
             #region TryParse NamedAreaType    [optional]
 
-            if (XML.TryParseOptional(DatexIINS.LocationReferencing + "namedAreaType",
-                                     "named area type",
-                                     LocationReferencing.NamedAreaType.TryParse,
-                                     out NamedAreaType? namedAreaType,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.LocationReferencing + "namedAreaType",
+                                           "named area type",
+                                           LocationReferencing.NamedAreaType.TryParse,
+                                           out NamedAreaType? namedAreaType,
+                                           out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse Country          [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "country",
-                                     "closure information",
-                                     Country.TryParse,
-                                     out Country? country,
-                                     out ErrorResponse))
+            Country? country = null;
+
+            if (XML.OptionalText(DatexIINS.LocationReferencing + "country") is String countryCode &&
+                !Country.TryParseAlpha2Code(countryCode.ToUpperInvariant(), out country))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                ErrorResponse = $"Invalid country '{countryCode}'!";
+                return false;
             }
 
             #endregion

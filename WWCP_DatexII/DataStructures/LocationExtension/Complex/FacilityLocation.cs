@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -60,6 +61,54 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         /// </summary>
         [XmlElement("_facilityLocationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?              FacilityLocationExtension    { get; } = FacilityLocationExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out FacilityLocation, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a facility location.
+        /// NUTS areas are not parsed yet.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="FacilityLocation">The parsed facility location.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                    XML,
+                                          [NotNullWhen(true)]  out FacilityLocation?  FacilityLocation,
+                                          [NotNullWhen(false)] out String?            ErrorResponse)
+        {
+
+            FacilityLocation = null;
+
+            if (!XML.TryParseOptionalValue(DatexIINS.LocationExtension + "timeZone",
+                                           "time zone",
+                                           Facilities.TimeZone.TryParse,
+                                           out Facilities.TimeZone? timeZone,
+                                           out ErrorResponse))
+            {
+                return false;
+            }
+
+            if (!XML.TryParseOptionalXML(DatexIINS.LocationExtension + "address",
+                                         "address",
+                                         LocationExtension.Address.TryParseXML,
+                                         out Address? address,
+                                         out ErrorResponse))
+            {
+                return false;
+            }
+
+            FacilityLocation = new FacilityLocation(
+                                   timeZone,
+                                   address,
+                                   null,
+                                   XML.Element(DatexIINS.LocationExtension + "_facilityLocationExtension")
+                               );
+
+            return true;
+
+        }
 
         #endregion
 

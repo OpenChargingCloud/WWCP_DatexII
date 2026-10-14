@@ -107,9 +107,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 return false;
             }
 
-            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.Facilities);
-
-            if (targetClass != $"{nsPrefix}:FacilityObject")
+            if (targetClass.Split(':').Last() != "FacilityObject")
             {
                 ErrorResponse = $"Invalid target class '{targetClass}'!";
                 return false;

@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -35,7 +36,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// </summary>
     [XmlType("EnergyRate", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
     public class EnergyRate(String                 Id,
-                            DateTime               LastUpdated,
+                            DateTimeOffset         LastUpdated,
                             RatePolicy             RatePolicy,
                             IEnumerable<Currency>  ApplicableCurrency,
                             MultilingualString?    RateName                    = null,
@@ -46,7 +47,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                             MultilingualString?    AdditionalInformation       = null,
                             PaymentMethod?         PaymentMethod               = null,
                             OverallPeriod?         OverallPeriod               = null,
-                            XElement?              EnergyRateExtension         = null)
+                            XElement?              EnergyRateExtension         = null,
+                            IEnumerable<EnergyPrice>? EnergyPrices             = null)
     {
 
         #region Properties
@@ -61,7 +63,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// The date/time at which this information was last updated.
         /// </summary>
         [XmlElement("lastUpdated",                Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime               LastUpdated                  { get; } = LastUpdated;
+        public DateTimeOffset         LastUpdated                  { get; } = LastUpdated;
 
         /// <summary>
         /// Indication if the price is contract based or ad hoc.
@@ -129,6 +131,112 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         [XmlElement("_energyRateExtension",       Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?              EnergyRateExtension          { get; } = EnergyRateExtension;
 
+        /// <summary>
+        /// The prices of this rate.
+        /// </summary>
+        [XmlElement("energyPrice",            Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
+        public IEnumerable<EnergyPrice>  EnergyPrices         { get; } = EnergyPrices?.Distinct() ?? [];
+
+        #endregion
+
+
+        #region TryParseXML(XML, out EnergyRate, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an energy rate.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="EnergyRate">The parsed energy rate.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                              XML,
+                                          [NotNullWhen(true)]  out EnergyRate?  EnergyRate,
+                                          [NotNullWhen(false)] out String?      ErrorResponse)
+        {
+
+            EnergyRate = null;
+
+            #region TryParse Id, RatePolicy, LastUpdated       [mandatory]
+
+            var id = XML.Attribute("id")?.Value.Trim();
+
+            if (id is null || id.Length == 0)
+            {
+                ErrorResponse = "The mandatory 'id' attribute of the energy rate is missing!";
+                return false;
+            }
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "ratePolicy",   "rate policy",   EnergyInfrastructure.RatePolicy.TryParse, out RatePolicy     ratePolicy,  out ErrorResponse) ||
+                !XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "lastUpdated",  "last updated",  DatexIIXMLExtensions.TryParseTimestamp,   out DateTimeOffset lastUpdated, out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse ApplicableCurrency                [mandatory]
+
+            var currencies = new List<Currency>();
+
+            foreach (var currencyXML in XML.Elements(DatexIINS.EnergyInfrastructure + "applicableCurrency"))
+            {
+
+                if (!Currency.TryParse(currencyXML.Value.Trim(), out var currency))
+                {
+                    ErrorResponse = $"Invalid applicable currency '{currencyXML.Value}'!";
+                    return false;
+                }
+
+                currencies.Add(currency);
+
+            }
+
+            if (currencies.Count == 0)
+            {
+                ErrorResponse = "The mandatory applicable currency of the energy rate is missing!";
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse optional values and elements
+
+            if (!XML.TryParseOptionalXML  (DatexIINS.EnergyInfrastructure + "rateName",                   "rate name",                     MultilingualString.TryParseXML,        out MultilingualString?       rateName,                  out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "combinationWithParkingFee",  "combination with parking fee",  DatexIIXMLExtensions.TryParseBoolean,  out Boolean?                  combinationWithParkingFee, out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "maximumDeliveryFee",         "maximum delivery fee",          AmountOfMoney.TryParse,                out AmountOfMoney?            maximumDeliveryFee,        out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "minimumDeliveryFee",         "minimum delivery fee",          AmountOfMoney.TryParse,                out AmountOfMoney?            minimumDeliveryFee,        out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "discount",                   "discount",                      Percentage.TryParse,                   out Percentage?               discount,                  out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.EnergyInfrastructure + "additionalInformation",      "additional information",        MultilingualString.TryParseXML,        out MultilingualString?       additionalInformation,     out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.EnergyInfrastructure + "paymentMethod",              "payment method",                Facilities.PaymentMethod.TryParseXML,  out PaymentMethod?            paymentMethod,             out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "energyPrice",                "energy price",                  EnergyPrice.TryParseXML,               out IEnumerable<EnergyPrice>  energyPrices,              out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.EnergyInfrastructure + "overallPeriod",              "overall period",                Common.OverallPeriod.TryParseXML,      out OverallPeriod?            overallPeriod,             out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+
+            EnergyRate = new EnergyRate(
+                             id,
+                             lastUpdated,
+                             ratePolicy,
+                             currencies,
+                             rateName,
+                             combinationWithParkingFee,
+                             minimumDeliveryFee,
+                             maximumDeliveryFee,
+                             discount,
+                             additionalInformation,
+                             paymentMethod,
+                             overallPeriod,
+                             XML.Element(DatexIINS.EnergyInfrastructure + "_energyRateExtension"),
+                             energyPrices
+                         );
+
+            return true;
+
+        }
+
         #endregion
 
 
@@ -177,9 +285,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                        ? PaymentMethod.ToXML(DatexIINS.EnergyInfrastructure + "paymentMethod")
                        : null,
 
-                   // The schema allows energyPrice 0..n here, but EnergyRate has no
-                   // property to hold them -- only EnergyRateUpdate does. Nothing to
-                   // write until the data model carries it.
+                   EnergyPrices.Select(energyPrice => energyPrice.ToXML(DatexIINS.EnergyInfrastructure + "energyPrice")),
 
                    OverallPeriod is not null
                        ? OverallPeriod.ToXML(DatexIINS.EnergyInfrastructure + "overallPeriod")

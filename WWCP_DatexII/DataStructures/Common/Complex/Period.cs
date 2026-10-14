@@ -107,82 +107,76 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse StartOfPeriod                  [optional]
 
-            if (XML.TryParseOptionalTimestamp(DatexIINS.Common + "startOfPeriod",
-                                              "start of period",
-                                              out DateTimeOffset? startOfPeriod,
-                                              out ErrorResponse))
+            if (!XML.TryParseOptionalTimestamp(DatexIINS.Common + "startOfPeriod",
+                                               "start of period",
+                                               out DateTimeOffset? startOfPeriod,
+                                               out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse EndOfPeriod                    [optional]
 
-            if (XML.TryParseOptionalTimestamp(DatexIINS.Common + "endOfPeriod",
-                                              "end of period",
-                                              out DateTimeOffset? endOfPeriod,
-                                              out ErrorResponse))
+            if (!XML.TryParseOptionalTimestamp(DatexIINS.Common + "endOfPeriod",
+                                               "end of period",
+                                               out DateTimeOffset? endOfPeriod,
+                                               out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse PeriodName                     [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "periodName",
-                                     "period name",
-                                     MultilingualString.TryParseXML,
-                                     out MultilingualString? periodName,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Common + "periodName",
+                                      "period name",
+                                      MultilingualString.TryParseXML,
+                                      out MultilingualString? periodName,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse RecurringTimePeriodOfDay       [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.Common + "recurringTimePeriodOfDay",
-                                             "recurring time period of day",
-                                             TimePeriodOfDay.TryParseXML,
-                                             out IEnumerable<TimePeriodOfDay>? recurringTimePeriodOfDay,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.Common + "recurringTimePeriodOfDay",
+                                              "recurring time period of day",
+                                              TimePeriodOfDay.TryParseXML,
+                                              out IEnumerable<TimePeriodOfDay>? recurringTimePeriodOfDay,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse RecurringDayWeekMonthPeriod    [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.Common + "recurringDayWeekMonthPeriod",
-                                             "recurring day week month period",
-                                             DayWeekMonth.TryParseXML,
-                                             out IEnumerable<DayWeekMonth>? recurringDayWeekMonthPeriod,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.Common + "recurringDayWeekMonthPeriod",
+                                              "recurring day week month period",
+                                              DayWeekMonth.TryParseXML,
+                                              out IEnumerable<DayWeekMonth>? recurringDayWeekMonthPeriod,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse RecurringSpecialDay            [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.Common + "recurringSpecialDay",
-                                             "recurring day week month period",
-                                             SpecialDay.TryParseXML,
-                                             out IEnumerable<SpecialDay>? recurringSpecialDay,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.Common + "recurringSpecialDay",
+                                              "recurring day week month period",
+                                              SpecialDay.TryParseXML,
+                                              out IEnumerable<SpecialDay>? recurringSpecialDay,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion

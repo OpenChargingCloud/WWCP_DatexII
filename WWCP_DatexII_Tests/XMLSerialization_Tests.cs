@@ -156,12 +156,10 @@ namespace cloud.charging.open.protocols.DatexII.Tests
     <endTimeOfPeriod>23:59:59</endTimeOfPeriod>
   </recurringTimePeriodOfDay>
   <recurringDayWeekMonthPeriod>
-    <DayWeekMonth>
-      <applicableDay>monday</applicableDay>
-      <applicableDay>friday</applicableDay>
-      <applicableMonth>may</applicableMonth>
-      <applicableMonth>september</applicableMonth>
-    </DayWeekMonth>
+    <applicableDay>monday</applicableDay>
+    <applicableDay>friday</applicableDay>
+    <applicableMonth>may</applicableMonth>
+    <applicableMonth>september</applicableMonth>
   </recurringDayWeekMonthPeriod>
   <recurringSpecialDay>
     <intersectWithApplicableDays>true</intersectWithApplicableDays>

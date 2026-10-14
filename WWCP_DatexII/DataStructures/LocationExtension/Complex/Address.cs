@@ -18,11 +18,12 @@
 #region Usings
 
 using System.Xml.Serialization;
+using System.Xml.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
-using System.Xml.Linq;
 
 #endregion
 
@@ -71,6 +72,63 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         /// </summary>
         [XmlElement("_addressExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                 AddressExtension    { get; } = AddressExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out Address, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an address.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Address">The parsed address.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                           XML,
+                                          [NotNullWhen(true)]  out Address?  Address,
+                                          [NotNullWhen(false)] out String?   ErrorResponse)
+        {
+
+            Address = null;
+
+            if (!XML.TryParseOptionalXML(DatexIINS.LocationExtension + "city",
+                                         "city",
+                                         MultilingualString.TryParseXML,
+                                         out MultilingualString? city,
+                                         out ErrorResponse))
+            {
+                return false;
+            }
+
+            Country? country = null;
+
+            if (XML.OptionalText(DatexIINS.LocationExtension + "countryCode") is String countryCode &&
+                !Country.TryParseAlpha2Code(countryCode.ToUpperInvariant(), out country))
+            {
+                ErrorResponse = $"Invalid country code '{countryCode}'!";
+                return false;
+            }
+
+            if (!XML.TryParseOptionalXMLs(DatexIINS.LocationExtension + "addressLine",
+                                          "address line",
+                                          AddressLine.TryParseXML,
+                                          out IEnumerable<AddressLine> addressLines,
+                                          out ErrorResponse))
+            {
+                return false;
+            }
+
+            Address = new Address(
+                          XML.OptionalText(DatexIINS.LocationExtension + "postcode"),
+                          city,
+                          country,
+                          addressLines,
+                          XML.Element(DatexIINS.LocationExtension + "_addressExtension")
+                      );
+
+            return true;
+
+        }
 
         #endregion
 

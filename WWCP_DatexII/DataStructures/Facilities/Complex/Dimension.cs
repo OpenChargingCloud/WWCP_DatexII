@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -70,6 +71,44 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_dimensionExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?     DimensionExtension    { get; } = DimensionExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out Dimension, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a dimension.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Dimension">The parsed dimension.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                             XML,
+                                          [NotNullWhen(true)]  out Dimension?  Dimension,
+                                          [NotNullWhen(false)] out String?     ErrorResponse)
+        {
+
+            Dimension = null;
+
+            if (!XML.TryParseOptionalValue(DatexIINS.Facilities + "length",      "length",       DatexIIXMLExtensions.TryParseMeter, out Meter? length,     out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "width",       "width",        DatexIIXMLExtensions.TryParseMeter, out Meter? width,      out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "height",      "height",       DatexIIXMLExtensions.TryParseMeter, out Meter? height,     out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "usableArea",  "usable area",  SquareMeter.TryParse,                out SquareMeter? usableArea, out ErrorResponse))
+            {
+                return false;
+            }
+
+            Dimension = new Dimension(
+                            length,
+                            width,
+                            height,
+                            usableArea,
+                            XML.Element(DatexIINS.Facilities + "_dimensionExtension")
+                        );
+
+            return true;
+
+        }
 
         #endregion
 

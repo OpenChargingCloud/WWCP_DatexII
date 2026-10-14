@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -55,6 +56,48 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// </summary>
         [XmlElement("_serviceTypeExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?       ServiceTypeExtension    { get; } = ServiceTypeExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out Service, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a service type.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Service">The parsed service type.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                           XML,
+                                          [NotNullWhen(true)]  out Service?  Service,
+                                          [NotNullWhen(false)] out String?   ErrorResponse)
+        {
+
+            Service = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "serviceType",
+                                            "service type",
+                                            ServiceType.TryParse,
+                                            out ServiceType serviceType,
+                                            out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "overallPeriod",
+                                            "overall period",
+                                            Common.OverallPeriod.TryParseXML,
+                                            out OverallPeriod? overallPeriod,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            Service = new Service(
+                          serviceType,
+                          overallPeriod,
+                          XML.Element(DatexIINS.EnergyInfrastructure + "_serviceTypeExtension")
+                      );
+
+            return true;
+
+        }
 
         #endregion
 

@@ -110,41 +110,38 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse OverallEndTime      [optional]
 
-            if (XML.TryParseOptionalTimestamp(DatexIINS.Common + "overallEndTime",
-                                              "end time",
-                                              out DateTimeOffset? overallEndTime,
-                                              out ErrorResponse))
+            if (!XML.TryParseOptionalTimestamp(DatexIINS.Common + "overallEndTime",
+                                               "end time",
+                                               out DateTimeOffset? overallEndTime,
+                                               out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse ValidPeriod         [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.Common + "validPeriod",
-                                             "valid period",
-                                             Period.TryParseXML,
-                                             out IEnumerable<Period> validPeriod,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.Common + "validPeriod",
+                                              "valid period",
+                                              Period.TryParseXML,
+                                              out IEnumerable<Period> validPeriod,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse ExceptionPeriod     [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.Common + "exceptionPeriod",
-                                             "exception period",
-                                             Period.TryParseXML,
-                                             out IEnumerable<Period> exceptionPeriod,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.Common + "exceptionPeriod",
+                                              "exception period",
+                                              Period.TryParseXML,
+                                              out IEnumerable<Period> exceptionPeriod,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -177,15 +174,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
                           OverallEndTime.HasValue
                               ? new XElement(DatexIINS.Common + "overallEndTime",     OverallEndTime.Value.ToISO8601WithOffset())
+                              : null,
+
+                          ValidPeriod.    Select(validPeriod     => validPeriod.    ToXML(DatexIINS.Common + "validPeriod")),
+                          ExceptionPeriod.Select(exceptionPeriod => exceptionPeriod.ToXML(DatexIINS.Common + "exceptionPeriod")),
+
+                          OverallPeriodExtension is not null
+                              ? new XElement(DatexIINS.Common + "_overallPeriodExtension", OverallPeriodExtension)
                               : null
-
-                          //ValidPeriod     is not null
-                          //    ? new XElement(DatexIINS.Common + "validPeriod",        ValidPeriod.         ToXML(DatexIINS.Common + "validPeriod"))
-                          //    : null,
-
-                          //ExceptionPeriod is not null
-                          //    ? new XElement(DatexIINS.Common + "exceptionPeriod",    ExceptionPeriod.     ToXML(DatexIINS.Common + "exceptionPeriod"))
-                          //    : null
 
                       );
 

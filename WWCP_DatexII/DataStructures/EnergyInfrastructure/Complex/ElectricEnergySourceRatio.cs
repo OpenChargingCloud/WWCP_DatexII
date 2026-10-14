@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -62,6 +63,58 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// </summary>
         [XmlElement(ElementName = "_electricEnergySourceRatioExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                 ElectricEnergySourceRatioExtension    { get; } = ElectricEnergySourceRatioExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out ElectricEnergySourceRatio, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an electric energy source ratio.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="ElectricEnergySourceRatio">The parsed electric energy source ratio.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                             XML,
+                                          [NotNullWhen(true)]  out ElectricEnergySourceRatio?  ElectricEnergySourceRatio,
+                                          [NotNullWhen(false)] out String?                     ErrorResponse)
+        {
+
+            ElectricEnergySourceRatio = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "energySource",
+                                            "energy source",
+                                            ElectricEnergySourceType.TryParse,
+                                            out ElectricEnergySourceType energySource,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            // A PercentageValue: the figure sits in a common percentage child.
+            var ratioXML = XML.Element(DatexIINS.EnergyInfrastructure + "sourceRatioValue");
+
+            if (ratioXML is null ||
+               !ratioXML.TryParseMandatoryValue(DatexIINS.Common + "percentage",
+                                                "source ratio value",
+                                                PercentageDouble.TryParse,
+                                                out PercentageDouble sourceRatioValue,
+                                                out ErrorResponse))
+            {
+                ErrorResponse ??= "The mandatory source ratio value is missing!";
+                return false;
+            }
+
+            ElectricEnergySourceRatio = new ElectricEnergySourceRatio(
+                                            energySource,
+                                            sourceRatioValue,
+                                            XML.OptionalText(DatexIINS.EnergyInfrastructure + "otherEnergySource"),
+                                            XML.Element(DatexIINS.EnergyInfrastructure + "_electricEnergySourceRatioExtension")
+                                        );
+
+            return true;
+
+        }
 
         #endregion
 

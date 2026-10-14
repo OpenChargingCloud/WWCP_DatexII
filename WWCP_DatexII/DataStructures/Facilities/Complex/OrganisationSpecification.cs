@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
@@ -41,7 +42,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                            String?                           OperatorId                           = null,
                                            String?                           ProviderId                           = null,
                                            String?                           OperatorIdBNetzA                     = null,
-                                           DateTime?                         LastUpdated                          = null,
+                                           DateTimeOffset?                   LastUpdated                          = null,
                                            String?                           ExternalCode                         = null,
                                            MultilingualString?               LegalName                            = null,
                                            MultilingualString?               Description                          = null,
@@ -104,7 +105,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// The date/time at which this information was last updated.
         /// </summary>
         [XmlElement("lastUpdated",                          Namespace = "http://datex2.eu/schema/3/common")]
-        public DateTime?                        LastUpdated                           { get; } = LastUpdated;
+        public DateTimeOffset?                  LastUpdated                           { get; } = LastUpdated;
 
         /// <summary>
         /// An external code to identify the organisation.
@@ -202,6 +203,148 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_organisationSpecificationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                        OrganisationSpecificationExtension    { get; } = OrganisationSpecificationExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out OrganisationSpecification, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an organisation specification.
+        /// Its general time validity is not parsed yet.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="OrganisationSpecification">The parsed organisation specification.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                             XML,
+                                          [NotNullWhen(true)]  out OrganisationSpecification?  OrganisationSpecification,
+                                          [NotNullWhen(false)] out String?                     ErrorResponse)
+        {
+
+            OrganisationSpecification = null;
+
+            #region TryParse Id, Version, Name                [mandatory]
+
+            var id       = XML.Attribute("id")?.     Value.Trim();
+            var version  = XML.Attribute("version")?.Value.Trim();
+
+            if (id is null || id.Length == 0 || version is null)
+            {
+                ErrorResponse = "The mandatory 'id' or 'version' attribute of the organisation is missing!";
+                return false;
+            }
+
+            if (!XML.TryParseMandatoryXML(DatexIINS.Facilities + "name",
+                                          "organisation name",
+                                          MultilingualString.TryParseXML,
+                                          out MultilingualString? name,
+                                          out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse LastUpdated, Available24hours, PublishingAgreement  [optional]
+
+            if (!XML.TryParseOptionalValue(DatexIINS.Facilities + "lastUpdated",          "last updated",          DatexIIXMLExtensions.TryParseTimestamp, out DateTimeOffset? lastUpdated,         out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "available24hours",     "available 24 hours",    DatexIIXMLExtensions.TryParseBoolean,   out Boolean?        available24hours,    out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "publishingAgreement",  "publishing agreement",  DatexIIXMLExtensions.TryParseBoolean,   out Boolean?        publishingAgreement, out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "type",                 "organisation type",     OrganisationType.TryParse,              out OrganisationType? type,              out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse LegalName, Description, Responsibility  [optional]
+
+            if (!XML.TryParseOptionalXML (DatexIINS.Facilities + "legalName",       "legal name",      MultilingualString.TryParseXML, out MultilingualString?              legalName,      out ErrorResponse) ||
+                !XML.TryParseOptionalXML (DatexIINS.Facilities + "description",     "description",     MultilingualString.TryParseXML, out MultilingualString?              description,    out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs(DatexIINS.Facilities + "responsibility",  "responsibility",  MultilingualString.TryParseXML, out IEnumerable<MultilingualString>  responsibility, out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse Links                             [optional]
+
+            if (!TryParseURL(XML, "linkToGeneralInformation", out var linkToGeneralInformation, out ErrorResponse) ||
+                !TryParseURL(XML, "linkToLogo",               out var linkToLogo,               out ErrorResponse) ||
+                !TryParseURL(XML, "linkToWebform",            out var linkToWebform,            out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse OrganisationUnits, SubOrganisations  [optional]
+
+            if (!XML.TryParseOptionalXMLs(DatexIINS.Facilities + "organisationUnit",  "organisation unit",  OrganisationUnit.TryParseXML, out IEnumerable<OrganisationUnit> organisationUnits, out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs(DatexIINS.Facilities + "subOrganisation",   "sub organisation",   AOrganisation.   TryParseXML, out IEnumerable<AOrganisation>    subOrganisations,  out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+
+            OrganisationSpecification = new OrganisationSpecification(
+                                            id,
+                                            version,
+                                            name,
+                                            XML.OptionalText(DatexIINS.Facilities + "operatorId"),
+                                            XML.OptionalText(DatexIINS.Facilities + "providerId"),
+                                            XML.OptionalText(DatexIINS.Facilities + "operatorIdBnetzA"),
+                                            lastUpdated,
+                                            XML.OptionalText(DatexIINS.Facilities + "externalCode"),
+                                            legalName,
+                                            description,
+                                            linkToGeneralInformation,
+                                            linkToLogo,
+                                            linkToWebform,
+                                            available24hours,
+                                            responsibility,
+                                            publishingAgreement,
+                                            type,
+                                            XML.OptionalText(DatexIINS.Facilities + "nationalOrganisationNumber"),
+                                            XML.OptionalText(DatexIINS.Facilities + "nationalRegister"),
+                                            XML.OptionalText(DatexIINS.Facilities + "vatIdentificationNumber"),
+                                            organisationUnits,
+                                            subOrganisations,
+                                            null,
+                                            XML.Element(DatexIINS.Facilities + "_organisationSpecificationExtension")
+                                        );
+
+            return true;
+
+        }
+
+        private static Boolean TryParseURL(XElement                          XML,
+                                           String                            Name,
+                                           out URL?                          URL,
+                                           [NotNullWhen(false)] out String?  ErrorResponse)
+        {
+
+            URL            = null;
+            ErrorResponse  = null;
+
+            var text = XML.OptionalText(DatexIINS.Facilities + Name);
+
+            if (text is null)
+                return true;
+
+            if (!org.GraphDefined.Vanaheimr.Hermod.HTTP.URL.TryParse(text, out var url))
+            {
+                ErrorResponse = $"Invalid {Name} '{text}'!";
+                return false;
+            }
+
+            URL = url;
+            return true;
+
+        }
 
         #endregion
 

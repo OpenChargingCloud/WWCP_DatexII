@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.LocationReferencing;
@@ -77,6 +78,46 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_organisationUnitExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                        OrganisationUnitExtension    { get; } = OrganisationUnitExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out OrganisationUnit, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an organisation unit.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="OrganisationUnit">The parsed organisation unit.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                    XML,
+                                          [NotNullWhen(true)]  out OrganisationUnit?  OrganisationUnit,
+                                          [NotNullWhen(false)] out String?            ErrorResponse)
+        {
+
+            OrganisationUnit = null;
+
+            if (!XML.TryParseOptionalXML (DatexIINS.Facilities + "name",                "name",                 MultilingualString.          TryParseXML, out MultilingualString?               name,               out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs(DatexIINS.Facilities + "function",            "function",             MultilingualString.          TryParseXML, out IEnumerable<MultilingualString>   function,           out ErrorResponse) ||
+                !XML.TryParseOptionalXML (DatexIINS.Facilities + "locationReference",   "location reference",   ALocationReference.          TryParseXML, out ALocationReference?               locationReference,  out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs(DatexIINS.Facilities + "contactInformation",  "contact information",  Facilities.ContactInformation.TryParseXML, out IEnumerable<ContactInformation> contactInformation, out ErrorResponse) ||
+                !XML.TryParseOptionalXML (DatexIINS.Facilities + "operatingHours",      "operating hours",      AOperatingHours.             TryParseXML, out AOperatingHours?                  operatingHours,     out ErrorResponse))
+            {
+                return false;
+            }
+
+            OrganisationUnit = new OrganisationUnit(
+                                   name,
+                                   function,
+                                   locationReference,
+                                   contactInformation,
+                                   operatingHours,
+                                   XML.Element(DatexIINS.Facilities + "_organisationUnitExtension")
+                               );
+
+            return true;
+
+        }
 
         #endregion
 

@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
@@ -43,7 +44,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                       MultilingualString?                   Name                      = null,
                                       IEnumerable<MultilingualString>?      Alias                     = null,
                                       String?                               ExternalIdentifier        = null,
-                                      DateTime?                             LastUpdated               = null,
+                                      DateTimeOffset?                       LastUpdated               = null,
                                       MultilingualString?                   Description               = null,
                                       IEnumerable<Accessibility>?           Accessibility             = null,
                                       IEnumerable<MultilingualString>?      AdditionalInformation     = null,
@@ -138,6 +139,40 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// </summary>
         [XmlElement("_refillPointExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?            RefillPointExtension     { get; } = RefillPointExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out RefillPoint, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a refill point, by its xsi:type.
+        /// Only electric charging points can be parsed so far.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="RefillPoint">The parsed refill point.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                               XML,
+                                          [NotNullWhen(true)]  out RefillPoint?  RefillPoint,
+                                          [NotNullWhen(false)] out String?       ErrorResponse)
+        {
+
+            RefillPoint = null;
+
+            switch (XML.XSIType())
+            {
+
+                case "ElectricChargingPoint":
+                    if (ElectricChargingPoint.TryParseXML(XML, out var electricChargingPoint, out ErrorResponse)) { RefillPoint = electricChargingPoint; return true; }
+                    return false;
+
+                default:
+                    ErrorResponse = $"Refill points of the type '{XML.XSIType()}' can not be parsed yet!";
+                    return false;
+
+            }
+
+        }
 
         #endregion
 

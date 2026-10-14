@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -49,6 +50,60 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_organisationExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?       OrganisationExtension    { get; } = OrganisationExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out Organisation, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an organisation, by its xsi:type.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Organisation">The parsed organisation.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                 XML,
+                                          [NotNullWhen(true)]  out AOrganisation?  Organisation,
+                                          [NotNullWhen(false)] out String?         ErrorResponse)
+        {
+
+            Organisation   = null;
+            ErrorResponse  = null;
+
+            switch (XML.XSIType())
+            {
+
+                case "OrganisationSpecification":
+                    if (OrganisationSpecification.TryParseXML(XML, out var specification, out ErrorResponse)) { Organisation = specification; return true; }
+                    return false;
+
+                case "OrganisationByReference":
+                    if (OrganisationByReference.  TryParseXML(XML, out var byReference,   out ErrorResponse)) { Organisation = byReference;   return true; }
+                    return false;
+
+                case "UnknownOrganisation":
+                    Organisation = new UnknownOrganisation(
+                                       XML.Element(DatexIINS.Facilities + "_unknownOrganisationExtension"),
+                                       null,
+                                       XML.Element(DatexIINS.Facilities + "_organisationExtension")
+                                   );
+                    return true;
+
+                case "UndefinedOrganisation":
+                    Organisation = new UndefinedOrganisation(
+                                       XML.Element(DatexIINS.Facilities + "_undefinedOrganisationExtension"),
+                                       null,
+                                       XML.Element(DatexIINS.Facilities + "_organisationExtension")
+                                   );
+                    return true;
+
+                default:
+                    ErrorResponse = $"Unknown organisation type '{XML.XSIType()}'!";
+                    return false;
+
+            }
+
+        }
 
         #endregion
 

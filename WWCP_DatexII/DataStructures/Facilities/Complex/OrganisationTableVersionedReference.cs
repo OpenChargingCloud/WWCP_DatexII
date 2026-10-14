@@ -102,9 +102,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 return false;
             }
 
-            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.Facilities);
-
-            if (targetClass != $"{nsPrefix}:OrganisationTable")
+            // Whatever prefix the document gave the namespace.
+            if (targetClass.Split(':').Last() != "OrganisationTable")
             {
                 ErrorResponse = $"Invalid target class '{targetClass}'!";
                 return false;

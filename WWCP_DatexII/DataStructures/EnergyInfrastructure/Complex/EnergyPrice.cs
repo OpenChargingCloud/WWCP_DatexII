@@ -141,55 +141,51 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse TaxIncluded              [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Facilities + "taxIncluded",
-                                     "tax included",
-                                     out Boolean? taxIncluded,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "taxIncluded",
+                                      "tax included",
+                                      out Boolean? taxIncluded,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse TaxRate                  [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "taxRate",
-                                     "tax rate",
-                                     Percentage.TryParse,
-                                     out Percentage? taxRate,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "taxRate",
+                                           "tax rate",
+                                           Percentage.TryParse,
+                                           out Percentage? taxRate,
+                                           out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse AdditionalInformation    [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "additionalInformation",
-                                     "overall period",
-                                     MultilingualString.TryParseXML,
-                                     out MultilingualString? additionalInformation,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "additionalInformation",
+                                      "overall period",
+                                      MultilingualString.TryParseXML,
+                                      out MultilingualString? additionalInformation,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse OverallPeriod            [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "overallPeriod",
-                                     "overall period",
-                                     OverallPeriod.TryParseXML,
-                                     out OverallPeriod? overallPeriod,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "overallPeriod",
+                                      "overall period",
+                                      OverallPeriod.TryParseXML,
+                                      out OverallPeriod? overallPeriod,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -204,7 +200,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                               additionalInformation,
                               overallPeriod,
 
-                              XML.Element(DatexIINS.Common + "_energyPriceExtension")
+                              XML.Element(DatexIINS.EnergyInfrastructure + "_energyPriceExtension")
 
                           );
 

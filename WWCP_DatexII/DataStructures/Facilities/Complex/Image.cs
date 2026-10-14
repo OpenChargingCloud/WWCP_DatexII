@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -53,6 +54,64 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_imageExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?    ImageExtension    { get; } = ImageExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out Image, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an image.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Image">The parsed image.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                          XML,
+                                          [NotNullWhen(true)]  out Image?   Image,
+                                          [NotNullWhen(false)] out String?  ErrorResponse)
+        {
+
+            Image          = null;
+            ErrorResponse  = null;
+
+            var data = XML.OptionalText(DatexIINS.Facilities + "imageData");
+
+            if (data is null)
+            {
+                ErrorResponse = "The mandatory image data is missing!";
+                return false;
+            }
+
+            Byte[] bytes;
+
+            try
+            {
+                bytes = Convert.FromBase64String(data);
+            }
+            catch (FormatException)
+            {
+                ErrorResponse = "The image data is no base64!";
+                return false;
+            }
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.Facilities + "imageFormat",
+                                            "image format",
+                                            ImageFormat.TryParse,
+                                            out ImageFormat format,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            Image = new Image(
+                        bytes,
+                        format,
+                        XML.Element(DatexIINS.Facilities + "_imageExtension")
+                    );
+
+            return true;
+
+        }
 
         #endregion
 

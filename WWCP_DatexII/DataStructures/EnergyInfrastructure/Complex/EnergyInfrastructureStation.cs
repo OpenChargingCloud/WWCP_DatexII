@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
@@ -49,7 +50,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                              MultilingualString?                               Name                                   = null,
                                              IEnumerable<MultilingualString>?                  Alias                                  = null,
                                              String?                                           ExternalIdentifier                     = null,
-                                             DateTime?                                         LastUpdated                            = null,
+                                             DateTimeOffset?                                   LastUpdated                            = null,
                                              MultilingualString?                               Description                            = null,
                                              IEnumerable<Accessibility>?                       Accessibility                          = null,
                                              IEnumerable<MultilingualString>?                  AdditionalInformation                  = null,
@@ -190,6 +191,108 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// </summary>
         [XmlElement("_energyInfrastructureStationExtension",   Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                                         EnergyInfrastructureStationExtension      { get; } = EnergyInfrastructureStationExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out EnergyInfrastructureStation, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an energy infrastructure station.
+        /// Refill points by reference are not parsed yet.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="EnergyInfrastructureStation">The parsed energy infrastructure station.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                               XML,
+                                          [NotNullWhen(true)]  out EnergyInfrastructureStation?  EnergyInfrastructureStation,
+                                          [NotNullWhen(false)] out String?                       ErrorResponse)
+        {
+
+            EnergyInfrastructureStation = null;
+
+            if (!FacilityParts.TryParseXML(XML, out var facility, out ErrorResponse))
+                return false;
+
+            #region TryParse StationIdBNetzA, TotalMaximumPower, NumberOfRefillPoints   [mandatory]
+
+            var stationIdBNetzA = XML.Element(DatexIINS.EnergyInfrastructure + "stationIdBNetzA")?.Value.Trim();
+
+            if (stationIdBNetzA is null)
+            {
+                ErrorResponse = "The mandatory station identification of the BNetzA is missing!";
+                return false;
+            }
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "totalMaximumPower",     "total maximum power",      DatexIIXMLExtensions.TryParseWatt,    out Watt    totalMaximumPower,    out ErrorResponse) ||
+                !XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "numberOfRefillPoints",  "number of refill points",  DatexIIXMLExtensions.TryParseUInt16,  out UInt16  numberOfRefillPoints, out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse the lists
+
+            if (!XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "authenticationAndIdentificationMethods",  "authentication and identification method",  AuthenticationAndIdentificationType.TryParse,  out IEnumerable<AuthenticationAndIdentificationType>  authenticationAndIdentificationMethods, out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "userInterfaceLanguage",                   "user interface language",                   DatexIIXMLExtensions.TryParseLanguage,         out IEnumerable<Languages>                            userInterfaceLanguages,                 out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "energyDistributor",                       "energy distributor",                        AOrganisation.TryParseXML,                     out AOrganisation?                                    energyDistributor,                      out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "mobilityServiceProvider",                 "mobility service provider",                 AOrganisation.TryParseXML,                     out IEnumerable<AOrganisation>                        mobilityServiceProviders,               out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "roamingPlatform",                         "roaming platform",                          AOrganisation.TryParseXML,                     out IEnumerable<AOrganisation>                        roamingPlatforms,                       out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "serviceType",                             "service type",                              Service.TryParseXML,                           out IEnumerable<Service>                              serviceTypes,                           out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "refillPoint",                             "refill point",                              RefillPoint.TryParseXML,                       out IEnumerable<RefillPoint>                          refillPoints,                           out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "electricEnergy",                          "electric energy",                           EnergyInfrastructure.ElectricEnergy.TryParseXML, out IEnumerable<ElectricEnergy>                    electricEnergy,                         out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            var parts = facility.Object;
+
+            EnergyInfrastructureStation = new EnergyInfrastructureStation(
+                                              parts.Id,
+                                              parts.Version,
+                                              stationIdBNetzA,
+                                              totalMaximumPower,
+                                              authenticationAndIdentificationMethods,
+                                              numberOfRefillPoints,
+                                              userInterfaceLanguages,
+                                              serviceTypes,
+                                              parts.Name,
+                                              parts.Alias,
+                                              parts.ExternalIdentifier,
+                                              parts.LastUpdated,
+                                              parts.Description,
+                                              parts.Accessibility,
+                                              parts.AdditionalInformation,
+                                              parts.InformationWebsites,
+                                              parts.PhotoURLs,
+                                              parts.Photos,
+                                              parts.OperatingHours,
+                                              parts.LocationReference,
+                                              parts.Owner,
+                                              parts.Operator,
+                                              parts.Helpdesk,
+                                              null,
+                                              parts.Dimension,
+                                              parts.Amenities,
+                                              facility.SupplementalFacilities,
+                                              facility.DedicatedParkingSpaces,
+                                              null,
+                                              energyDistributor,
+                                              mobilityServiceProviders,
+                                              roamingPlatforms,
+                                              refillPoints,
+                                              electricEnergy,
+                                              parts.FacilityObjectExtension,
+                                              facility.FacilityExtension,
+                                              XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationExtension")
+                                          );
+
+            return true;
+
+        }
 
         #endregion
 

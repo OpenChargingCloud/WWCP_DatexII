@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
@@ -42,7 +43,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                         MultilingualString?                   Name                              = null,
                                         IEnumerable<MultilingualString>?      Alias                             = null,
                                         String?                               ExternalIdentifier                = null,
-                                        DateTime?                             LastUpdated                       = null,
+                                        DateTimeOffset?                       LastUpdated                       = null,
                                         MultilingualString?                   Description                       = null,
                                         IEnumerable<Accessibility>?           Accessibility                     = null,
                                         IEnumerable<MultilingualString>?      AdditionalInformation             = null,
@@ -106,6 +107,63 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// </summary>
         [XmlElement("_dedicatedParkingSpacesExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?              DedicatedParkingSpacesExtension    { get; }
+
+        #endregion
+
+
+        #region TryParseXML(XML, out DedicatedParkingSpaces, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of dedicated parking spaces.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="DedicatedParkingSpaces">The parsed dedicated parking spaces.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                          XML,
+                                          [NotNullWhen(true)]  out DedicatedParkingSpaces?  DedicatedParkingSpaces,
+                                          [NotNullWhen(false)] out String?                  ErrorResponse)
+        {
+
+            DedicatedParkingSpaces = null;
+
+            if (!FacilityObjectParts.TryParseXML(XML, out var parts, out ErrorResponse))
+                return false;
+
+            if (!XML.TryParseMandatoryValue (DatexIINS.EnergyInfrastructure + "numberOfSpaces",  "number of spaces",  DatexIIXMLExtensions.TryParseUInt16, out UInt16                numberOfSpaces, out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "userSpecific",    "user specific",     UserType.TryParse,                   out IEnumerable<UserType> userSpecific,   out ErrorResponse))
+            {
+                return false;
+            }
+
+            DedicatedParkingSpaces = new DedicatedParkingSpaces(
+                                         parts.Id,
+                                         parts.Version,
+                                         numberOfSpaces,
+                                         parts.Name,
+                                         parts.Alias,
+                                         parts.ExternalIdentifier,
+                                         parts.LastUpdated,
+                                         parts.Description,
+                                         parts.Accessibility,
+                                         parts.AdditionalInformation,
+                                         parts.InformationWebsites,
+                                         parts.PhotoURLs,
+                                         parts.Photos,
+                                         parts.OperatingHours,
+                                         parts.LocationReference,
+                                         parts.Owner,
+                                         parts.Operator,
+                                         parts.Helpdesk,
+                                         null,
+                                         parts.Dimension,
+                                         parts.Amenities,
+                                         userSpecific,
+                                         XML.Element(DatexIINS.EnergyInfrastructure + "_dedicatedParkingSpacesExtension")
+                                     );
+
+            return true;
+
+        }
 
         #endregion
 

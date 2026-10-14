@@ -104,9 +104,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                 return false;
             }
 
-            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.LocationReferencing);
-
-            if (targetClass != $"{nsPrefix}:PredefinedLocationGroup")
+            // Whatever prefix the document gave the namespace.
+            if (targetClass.Split(':').Last() != "PredefinedLocationGroup")
             {
                 ErrorResponse = $"Invalid target class '{targetClass}'!";
                 return false;

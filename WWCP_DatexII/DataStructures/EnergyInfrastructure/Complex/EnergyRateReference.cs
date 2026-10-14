@@ -89,9 +89,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                 return false;
             }
 
-            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.EnergyInfrastructure);
-
-            if (targetClass != $"{nsPrefix}:EnergyRate")
+            // Whatever prefix the document gave the energy infrastructure namespace.
+            if (targetClass.Split(':').Last() != "EnergyRate")
             {
                 ErrorResponse = $"Invalid target class '{targetClass}'!";
                 return false;
@@ -110,23 +109,21 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
-        #region ToXML()
+        #region ToXML(XMLName = null)
 
-        public XElement ToXML()
-        {
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">The XML element name: energyRateByReference in an electric energy, energyRateReference in an update.</param>
+        public override XElement ToXML(XName? XMLName = null)
 
             // <energyRateReference xmlns       = "http://datex2.eu/schema/3/energyInfrastructure"
             //                      id          = "74034E3E-9D2F-4410-BE6F-CAA3176D69B4"
             //                      targetClass = "egi:EnergyRate" />
 
-            var xml = new XElement(DatexIINS.EnergyInfrastructure + "tableReference",
-                          new XAttribute("targetClass",   TargetClass),
-                          new XAttribute("id",            Id)
-                      );
-
-            return xml;
-
-        }
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyRateReference",
+                    new XAttribute("targetClass",   TargetClass),
+                    new XAttribute("id",            Id));
 
         #endregion
 

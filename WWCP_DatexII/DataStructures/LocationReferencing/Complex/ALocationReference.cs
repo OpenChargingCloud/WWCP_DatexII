@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -41,6 +42,44 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_locationReferenceExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?  LocationReferenceExtension    { get; } = LocationReferenceExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out LocationReference, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a location reference, by its xsi:type.
+        /// Only point and area locations can be parsed so far.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="LocationReference">The parsed location reference.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                      XML,
+                                          [NotNullWhen(true)]  out ALocationReference?  LocationReference,
+                                          [NotNullWhen(false)] out String?              ErrorResponse)
+        {
+
+            LocationReference = null;
+
+            switch (XML.XSIType())
+            {
+
+                case "PointLocation":
+                    if (PointLocation.TryParseXML(XML, out var pointLocation, out ErrorResponse)) { LocationReference = pointLocation; return true; }
+                    return false;
+
+                case "AreaLocation":
+                    if (AreaLocation. TryParseXML(XML, out var areaLocation,  out ErrorResponse)) { LocationReference = areaLocation;  return true; }
+                    return false;
+
+                default:
+                    ErrorResponse = $"Location references of the type '{XML.XSIType()}' can not be parsed yet!";
+                    return false;
+
+            }
+
+        }
 
         #endregion
 

@@ -21,6 +21,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
+using org.GraphDefined.Vanaheimr.Illias;
 
 #endregion
 
@@ -98,6 +99,45 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_facilityObjectStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                         FacilityObjectStatusExtension    { get; } = FacilityObjectStatusExtension;
+
+        #endregion
+
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The particles of a facility object status, in schema order.
+        /// </summary>
+        protected virtual IEnumerable<Object?> ToXMLElements()
+        {
+
+            yield return Reference.ToXML();
+
+            if (LastUpdated.HasValue)
+                yield return new XElement(DatexIINS.Facilities + "lastUpdated",                    LastUpdated.Value.ToISO8601WithOffset());
+
+            if (OpeningStatus.HasValue)
+                yield return new XElement(DatexIINS.Facilities + "openingStatus",                  OpeningStatus.  Value.ToString());
+
+            if (OperationStatus.HasValue)
+                yield return new XElement(DatexIINS.Facilities + "operationStatus",                OperationStatus.Value.ToString());
+
+            if (RegularOperatingHoursInForce.HasValue)
+                yield return new XElement(DatexIINS.Facilities + "regularOperatingHoursInForce",   RegularOperatingHoursInForce.Value ? "true" : "false");
+
+            if (StatusDescription is not null)
+                yield return StatusDescription.ToXML(DatexIINS.Facilities + "statusDescription");
+
+            if (NewOperatingHours is not null)
+                yield return NewOperatingHours.ToXML(DatexIINS.Facilities + "newOperatingHours");
+
+            if (Fault is not null)
+                yield return Fault.ToXML(DatexIINS.Facilities + "fault");
+
+            if (FacilityObjectStatusExtension is not null)
+                yield return new XElement(DatexIINS.Facilities + "_facilityObjectStatusExtension", FacilityObjectStatusExtension);
+
+        }
 
         #endregion
 

@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -77,6 +78,43 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_paymentMethodExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                            PaymentMethodExtension    { get; } = PaymentMethodExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out PaymentMethod, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a payment method.
+        /// The brands accepted are not parsed yet.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="PaymentMethod">The parsed payment method.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                 XML,
+                                          [NotNullWhen(true)]  out PaymentMethod?  PaymentMethod,
+                                          [NotNullWhen(false)] out String?         ErrorResponse)
+        {
+
+            PaymentMethod = null;
+
+            if (!XML.TryParseOptionalValues(DatexIINS.Facilities + "paymentMeans",       "payment means",        MeansOfPayment.TryParse,         out IEnumerable<MeansOfPayment>      paymentMeans,      out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.Facilities + "paymentMode",        "payment mode",         PaymentTiming.TryParse,          out IEnumerable<PaymentTiming>       paymentMode,       out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.Facilities + "otherPaymentMeans",  "other payment means",  MultilingualString.TryParseXML,  out IEnumerable<MultilingualString>  otherPaymentMeans, out ErrorResponse))
+            {
+                return false;
+            }
+
+            PaymentMethod = new PaymentMethod(
+                                paymentMeans,
+                                paymentMode,
+                                otherPaymentMeans,
+                                PaymentMethodExtension: XML.Element(DatexIINS.Facilities + "_paymentMethodExtension")
+                            );
+
+            return true;
+
+        }
 
         #endregion
 

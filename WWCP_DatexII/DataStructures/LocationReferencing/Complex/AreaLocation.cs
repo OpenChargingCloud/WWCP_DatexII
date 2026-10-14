@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.LocationExtension;
 
@@ -84,6 +85,51 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_areaLocationExtension",       Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                      AreaLocationExtension          { get; } = AreaLocationExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out AreaLocation, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an area location.
+        /// Its GML multi polygon and an OpenLR reference are not parsed yet.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="AreaLocation">The parsed area location.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                XML,
+                                          [NotNullWhen(true)]  out AreaLocation?  AreaLocation,
+                                          [NotNullWhen(false)] out String?        ErrorResponse)
+        {
+
+            AreaLocation = null;
+
+            if (!XML.TryParseOptionalXMLs (DatexIINS.LocationReferencing + "externalReferencing",     "external referencing",       LocationReferencing.ExternalReferencing.TryParseXML,  out IEnumerable<LocationReferencing.ExternalReferencing>  externalReferencing,    out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.LocationReferencing + "coordinatesForDisplay",   "coordinates for display",    PointCoordinates.TryParseXML,                         out PointCoordinates?                                     coordinatesForDisplay,  out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.LocationReferencing + "facilityLocation",        "facility location",          v3.LocationExtension.FacilityLocation.TryParseXML,    out v3.LocationExtension.FacilityLocation?                facilityLocation,       out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.LocationReferencing + "areasAtWhichApplicable",  "areas at which applicable",  LocationReferencing.AreaPlace.TryParse,               out AreaPlace?                                            areasAtWhichApplicable, out ErrorResponse) ||
+                !XML.TryParseOptionalXML  (DatexIINS.LocationReferencing + "namedArea",               "named area",                 LocationReferencing.NamedArea.TryParseXML,            out NamedArea?                                            namedArea,              out ErrorResponse))
+            {
+                return false;
+            }
+
+            AreaLocation = new AreaLocation(
+                               areasAtWhichApplicable,
+                               namedArea,
+                               null,
+                               null,
+                               XML.Element(DatexIINS.LocationReferencing + "_areaLocationExtension"),
+                               externalReferencing,
+                               coordinatesForDisplay,
+                               facilityLocation,
+                               XML.Element(DatexIINS.LocationReferencing + "_locationExtension"),
+                               XML.Element(DatexIINS.LocationReferencing + "_locationReferenceExtension")
+                           );
+
+            return true;
+
+        }
 
         #endregion
 

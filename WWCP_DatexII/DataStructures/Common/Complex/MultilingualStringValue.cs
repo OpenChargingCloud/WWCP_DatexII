@@ -70,14 +70,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
             ErrorResponse            = null;
 
 
-            #region TryParse Language    [mandatory]
+            #region TryParse Language    [optional]
 
-            if (!XML.TryParseMandatoryAttribute("lang",
-                                                "language",
-                                                LanguagesExtensions.TryParse,
-                                                out Languages language,
-                                                out ErrorResponse))
+            var language = Languages.unknown;
+
+            if (XML.Attribute("lang") is XAttribute lang &&
+                !LanguagesExtensions.TryParse(lang.Value, out language))
             {
+                ErrorResponse = $"Invalid language '{lang.Value}'!";
                 return false;
             }
 
@@ -102,7 +102,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             var xml = new XElement(XMLName ?? "value",
 
-                          new XAttribute("lang", Language.ToString()),
+                          Language != Languages.unknown
+                              ? new XAttribute("lang", Language.ToString())
+                              : null,
 
                           Text
 

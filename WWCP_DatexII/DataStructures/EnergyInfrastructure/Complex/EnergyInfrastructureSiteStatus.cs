@@ -36,7 +36,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// </summary>
     [XmlType("EnergyInfrastructureSiteStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
     public class EnergyInfrastructureSiteStatus(FacilityObjectVersionedReference                 Reference,
-                                                DateTime?                                        LastUpdated                               = null,
+                                                DateTimeOffset?                                  LastUpdated                               = null,
                                                 OpeningStatus?                                   OpeningStatus                             = null,
                                                 OperationStatus?                                 OperationStatus                           = null,
                                                 Boolean?                                         RegularOperatingHoursInForce              = null,
@@ -117,66 +117,75 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                           [NotNullWhen(false)] out String?                          ErrorResponse)
         {
 
-            EnergyInfrastructureSiteStatus  = null;
-            ErrorResponse                   = null;
+            EnergyInfrastructureSiteStatus = null;
 
-            #region TryParse Reference                    [mandatory]
+            if (!FacilityStatusParts.TryParseXML(XML, out var facilityStatus, out ErrorResponse))
+                return false;
 
-            if (!XML.TryParseMandatory(DatexIINS.Facilities + "reference",
-                                       "facility object versioned reference",
-                                       FacilityObjectVersionedReference.TryParseXML,
-                                       out FacilityObjectVersionedReference? reference,
-                                       out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "availableCarParkingPlaces",          "available car parking places",          DatexIIXMLExtensions.TryParseUInt16,                                 out UInt16?                                         availableCarParkingPlaces,   out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "availableTruckParkingPlaces",        "available truck parking places",        DatexIIXMLExtensions.TryParseUInt16,                                 out UInt16?                                         availableTruckParkingPlaces, out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "energyInfrastructureStationStatus",  "energy infrastructure station status",  EnergyInfrastructure.EnergyInfrastructureStationStatus.TryParseXML,  out IEnumerable<EnergyInfrastructureStationStatus>  stationStatus,               out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "serviceType",                        "service type",                          Service.TryParseXML,                                                 out IEnumerable<Service>                            services,                    out ErrorResponse))
             {
                 return false;
             }
 
-            #endregion
-
-
-
-
-            #region TryParse EnergyInfrastructureStationStatus    [optional]
-
-            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyInfrastructureStationStatus",
-                                             "energy infrastructure station status",
-                                             EnergyInfrastructure.EnergyInfrastructureStationStatus.TryParseXML,
-                                             out IEnumerable<EnergyInfrastructureStationStatus> energyInfrastructureStationStatuses,
-                                             out ErrorResponse))
-            {
-                if (ErrorResponse is not null)
-                    return false;
-            }
-
-            #endregion
-
+            var parts = facilityStatus.Object;
 
             EnergyInfrastructureSiteStatus = new EnergyInfrastructureSiteStatus(
-
-                                                 reference,
-                                                 null, //lastUpdated,
-                                                 null, //openingStatus,
-                                                 null, //operationStatus,
-                                                 null, //regularOperatingHoursInForce,
-                                                 null, //statusDescription,
-                                                 null, //newOperatingHours,
-                                                 null, //fault,
-                                                 null,
-
-                                                 null, //supplementalFacilityStatuses,
-                                                 null,
-
-                                                 null, //availableCarParkingPlaces,
-                                                 null, //availableTruckParkingPlaces,
-                                                 energyInfrastructureStationStatuses,
-                                                 null, //serviceTypes,
-                                                 null  //energyInfrastructureSiteStatusExtension
-
+                                                 parts.Reference,
+                                                 parts.LastUpdated,
+                                                 parts.OpeningStatus,
+                                                 parts.OperationStatus,
+                                                 parts.RegularOperatingHoursInForce,
+                                                 parts.StatusDescription,
+                                                 parts.NewOperatingHours,
+                                                 parts.Fault,
+                                                 parts.FacilityObjectStatusExtension,
+                                                 facilityStatus.SupplementalFacilityStatus,
+                                                 facilityStatus.FacilityStatusExtension,
+                                                 availableCarParkingPlaces,
+                                                 availableTruckParkingPlaces,
+                                                 stationStatus,
+                                                 services,
+                                                 XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureSiteStatusExtension")
                                              );
 
             return true;
 
         }
+
+        #endregion
+
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyInfrastructureSiteStatus",
+
+                   ToXMLElements(),
+
+                   AvailableCarParkingPlaces.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "availableCarParkingPlaces",     AvailableCarParkingPlaces.  Value)
+                       : null,
+
+                   AvailableTruckParkingPlaces.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "availableTruckParkingPlaces",   AvailableTruckParkingPlaces.Value)
+                       : null,
+
+                   EnergyInfrastructureStationStatus.Select(stationStatus => stationStatus.ToXML(DatexIINS.EnergyInfrastructure + "energyInfrastructureStationStatus")),
+                   Services.                         Select(service       => service.      ToXML(DatexIINS.EnergyInfrastructure + "serviceType")),
+
+                   EnergyInfrastructureSiteStatusExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureSiteStatusExtension", EnergyInfrastructureSiteStatusExtension)
+                       : null
+
+               );
 
         #endregion
 

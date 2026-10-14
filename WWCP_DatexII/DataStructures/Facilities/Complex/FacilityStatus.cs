@@ -72,6 +72,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The particles of a facility status, in schema order.
+        /// </summary>
+        protected override IEnumerable<Object?> ToXMLElements()
+        {
+
+            foreach (var element in base.ToXMLElements())
+                yield return element;
+
+            foreach (var supplementalFacilityStatus in SupplementalFacilityStatus)
+                yield return supplementalFacilityStatus.ToXML(DatexIINS.Facilities + "supplementalFacilityStatus");
+
+            if (FacilityStatusExtension is not null)
+                yield return new XElement(DatexIINS.Facilities + "_facilityStatusExtension", FacilityStatusExtension);
+
+        }
+
+        #endregion
+
     }
 
 }

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\WWCP_Core\WWCP_Core\WWCP_Core.csproj" />
+    <ProjectReference Include="..\..\WWCP_POI\WWCP_POI3\WWCP_POI3.csproj" />
     <ProjectReference Include="..\WWCP_DatexII\WWCP_DatexII.csproj" />
   </ItemGroup>
 

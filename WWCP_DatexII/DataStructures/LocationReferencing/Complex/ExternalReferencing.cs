@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -53,6 +54,44 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_externalReferencingExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?  ExternalReferencingExtension    { get; } = ExternalReferencingExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out ExternalReferencing, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an external referencing.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="ExternalReferencing">The parsed external referencing.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                       XML,
+                                          [NotNullWhen(true)]  out ExternalReferencing?  ExternalReferencing,
+                                          [NotNullWhen(false)] out String?               ErrorResponse)
+        {
+
+            ExternalReferencing  = null;
+            ErrorResponse        = null;
+
+            var code    = XML.OptionalText(DatexIINS.LocationReferencing + "externalLocationCode");
+            var system  = XML.OptionalText(DatexIINS.LocationReferencing + "externalReferencingSystem");
+
+            if (code is null || system is null)
+            {
+                ErrorResponse = "The mandatory external location code or referencing system is missing!";
+                return false;
+            }
+
+            ExternalReferencing = new ExternalReferencing(
+                                      code,
+                                      system,
+                                      XML.Element(DatexIINS.LocationReferencing + "_externalReferencingExtension")
+                                  );
+
+            return true;
+
+        }
 
         #endregion
 

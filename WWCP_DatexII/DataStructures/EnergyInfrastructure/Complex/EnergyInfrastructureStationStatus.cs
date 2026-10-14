@@ -36,7 +36,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// </summary>
     [XmlType("EnergyInfrastructureStationStatus", Namespace = "http://datex2.eu/schema/3/energyInfrastructure")]
     public class EnergyInfrastructureStationStatus(FacilityObjectVersionedReference          Reference,
-                                                   DateTime?                                 LastUpdated                                  = null,
+                                                   DateTimeOffset?                           LastUpdated                                  = null,
                                                    OpeningStatus?                            OpeningStatus                                = null,
                                                    OperationStatus?                          OperationStatus                              = null,
                                                    Boolean?                                  RegularOperatingHoursInForce                 = null,
@@ -120,64 +120,72 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                           [NotNullWhen(false)] out String?                             ErrorResponse)
         {
 
-            EnergyInfrastructureStationStatus  = null;
-            ErrorResponse                      = null;
+            EnergyInfrastructureStationStatus = null;
 
-            #region TryParse Reference            [mandatory]
+            if (!FacilityStatusParts.TryParseXML(XML, out var facilityStatus, out ErrorResponse))
+                return false;
 
-            if (!XML.TryParseMandatory(DatexIINS.Facilities + "reference",
-                                       "facility object versioned reference",
-                                       FacilityObjectVersionedReference.TryParseXML,
-                                       out FacilityObjectVersionedReference? reference,
-                                       out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "isAvailable",        "is available",         DatexIIXMLExtensions.TryParseBoolean,                 out Boolean?                        isAvailable,       out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "refillPointStatus",  "refill point status",  EnergyInfrastructure.RefillPointStatus.TryParseXML,   out IEnumerable<RefillPointStatus>  refillPointStatus, out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "serviceType",        "service type",         Service.TryParseXML,                                  out IEnumerable<Service>            services,          out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs (DatexIINS.EnergyInfrastructure + "energyRateUpdate",   "energy rate update",   EnergyRateUpdate.TryParseXML,                         out IEnumerable<EnergyRateUpdate>   energyRateUpdates, out ErrorResponse))
             {
                 return false;
             }
 
-            #endregion
-
-
-
-            #region TryParse RefillPointStatus    [optional]
-
-            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "refillPointStatus",
-                                             "energy infrastructure station status",
-                                             EnergyInfrastructure.RefillPointStatus.TryParseXML,
-                                             out IEnumerable<RefillPointStatus> refillPointStatus,
-                                             out ErrorResponse))
-            {
-                if (ErrorResponse is not null)
-                    return false;
-            }
-
-            #endregion
-
+            var parts = facilityStatus.Object;
 
             EnergyInfrastructureStationStatus = new EnergyInfrastructureStationStatus(
-
-                                                    reference,
-                                                    null, //lastUpdated,
-                                                    null, //openingStatus,
-                                                    null, //operationStatus,
-                                                    null, //regularOperatingHoursInForce,
-                                                    null, //statusDescription,
-                                                    null, //newOperatingHours,
-                                                    null, //fault,
-                                                    null,
-
-                                                    null, //supplementalFacilityStatuses,
-                                                    null,
-
-                                                    null, //isAvailable,
+                                                    parts.Reference,
+                                                    parts.LastUpdated,
+                                                    parts.OpeningStatus,
+                                                    parts.OperationStatus,
+                                                    parts.RegularOperatingHoursInForce,
+                                                    parts.StatusDescription,
+                                                    parts.NewOperatingHours,
+                                                    parts.Fault,
+                                                    parts.FacilityObjectStatusExtension,
+                                                    facilityStatus.SupplementalFacilityStatus,
+                                                    facilityStatus.FacilityStatusExtension,
+                                                    isAvailable,
                                                     refillPointStatus,
-                                                    null, //serviceTypes,
-                                                    null  //energyRateUpdates
-
+                                                    services,
+                                                    energyRateUpdates,
+                                                    XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationStatusExtension")
                                                 );
 
             return true;
 
         }
+
+        #endregion
+
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "energyInfrastructureStationStatus",
+
+                   ToXMLElements(),
+
+                   IsAvailable.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "isAvailable",   IsAvailable.Value ? "true" : "false")
+                       : null,
+
+                   RefillPointStatus.Select(refillPointStatus => refillPointStatus.ToXML(DatexIINS.EnergyInfrastructure + "refillPointStatus")),
+                   Services.         Select(service           => service.          ToXML(DatexIINS.EnergyInfrastructure + "serviceType")),
+                   EnergyRateUpdates.Select(energyRateUpdate  => energyRateUpdate. ToXML(DatexIINS.EnergyInfrastructure + "energyRateUpdate")),
+
+                   EnergyInfrastructureStationStatusExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationStatusExtension", EnergyInfrastructureStationStatusExtension)
+                       : null
+
+               );
 
         #endregion
 

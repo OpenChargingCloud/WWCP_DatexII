@@ -64,6 +64,59 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         #endregion
 
 
+        #region (static) TryParse(Text, out TimeZone)
+
+        /// <summary>
+        /// Try to parse the given text as a time zone: "Z" or a signed offset like "+02:00".
+        /// </summary>
+        /// <param name="Text">A text representation of a time zone.</param>
+        /// <param name="TimeZone">The parsed time zone.</param>
+        public static Boolean TryParse(String Text, out TimeZone TimeZone)
+        {
+
+            Text = Text.Trim();
+
+            if (Pattern.IsMatch(Text))
+            {
+                TimeZone = new TimeZone(Text);
+                return true;
+            }
+
+            TimeZone = default;
+            return false;
+
+        }
+
+        #endregion
+
+        #region (static) FromOffset(Offset)
+
+        /// <summary>
+        /// The time zone of the given offset to UTC.
+        /// </summary>
+        /// <param name="Offset">An offset to UTC.</param>
+        public static TimeZone FromOffset(TimeSpan Offset)
+
+            => Offset == TimeSpan.Zero
+                   ? new TimeZone("Z")
+                   : new TimeZone($"{(Offset < TimeSpan.Zero ? "-" : "+")}{Offset.Duration().Hours:D2}:{Offset.Duration().Minutes:D2}");
+
+        #endregion
+
+        #region Offset
+
+        /// <summary>
+        /// The offset of this time zone to UTC.
+        /// </summary>
+        public TimeSpan Offset
+
+            => Value == "Z"
+                   ? TimeSpan.Zero
+                   : (Value[0] == '-' ? -1 : 1) * new TimeSpan(Int32.Parse(Value[1..3]), Int32.Parse(Value[4..6]), 0);
+
+        #endregion
+
+
         //public static implicit operator string(TimeZone tz) => tz._value;
         //public static implicit operator TimeZone(string s) => new TimeZone(s);
 

@@ -109,9 +109,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                 return false;
             }
 
-            var nsPrefix = XML.GetPrefixOfNamespace(DatexIINS.EnergyInfrastructure);
-
-            if (targetClass != $"{nsPrefix}:EnergyInfrastructureTable")
+            // Whatever prefix the document gave the namespace.
+            if (targetClass.Split(':').Last() != "EnergyInfrastructureTable")
             {
                 ErrorResponse = $"Invalid target class '{targetClass}'!";
                 return false;

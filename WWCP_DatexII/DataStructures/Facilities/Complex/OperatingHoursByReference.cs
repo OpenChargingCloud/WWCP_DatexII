@@ -111,28 +111,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             #region TryParse OperatingHoursTableReference    [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Facilities + "operatingHoursTableReference",
-                                     "operating hours table reference",
-                                     OperatingHoursTableVersionedReference.TryParseXML,
-                                     out OperatingHoursTableVersionedReference? operatingHoursTableReference,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Facilities + "operatingHoursTableReference",
+                                      "operating hours table reference",
+                                      OperatingHoursTableVersionedReference.TryParseXML,
+                                      out OperatingHoursTableVersionedReference? operatingHoursTableReference,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse ClosureInformation              [optional]
 
-            if (XML.TryParseOptional("closureInformation",
-                                     "closure information",
-                                     ClosureInformation.TryParseXML,
-                                     out ClosureInformation? closureInformation,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Facilities + "closureInformation",
+                                      "closure information",
+                                      ClosureInformation.TryParseXML,
+                                      out ClosureInformation? closureInformation,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion

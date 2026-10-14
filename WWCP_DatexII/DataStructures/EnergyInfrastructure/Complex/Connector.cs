@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -107,6 +108,65 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// </summary>
         [XmlElement("_connectorExtension",                    Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?              ConnectorExtension         { get; } = ConnectorExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out Connector, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a connector.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Connector">The parsed connector.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                             XML,
+                                          [NotNullWhen(true)]  out Connector?  Connector,
+                                          [NotNullWhen(false)] out String?     ErrorResponse)
+        {
+
+            Connector = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "connectorType",     "connector type",       EnergyInfrastructure.ConnectorType.TryParse,    out ConnectorType     connectorType,    out ErrorResponse) ||
+                !XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "maxPowerAtSocket",  "max power at socket",  DatexIIXMLExtensions.TryParseWatt,               out Watt              maxPowerAtSocket, out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "chargingMode",      "charging mode",        EnergyInfrastructure.ChargingMode.TryParse,     out ChargingMode?     chargingMode,     out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "connectorFormat",   "connector format",     EnergyInfrastructure.ConnectorFormat.TryParse,  out ConnectorFormat?  connectorFormat,  out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "voltage",           "voltage",              DatexIIXMLExtensions.TryParseVolt,               out Volt?             voltage,          out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "maximumCurrent",    "maximum current",      DatexIIXMLExtensions.TryParseAmpere,             out Ampere?           maximumCurrent,   out ErrorResponse))
+            {
+                return false;
+            }
+
+            var countries = new List<Country>();
+
+            foreach (var countryXML in XML.Elements(DatexIINS.EnergyInfrastructure + "countryOfDomesticSocket"))
+            {
+
+                if (!Country.TryParseAlpha2Code(countryXML.Value.Trim().ToUpperInvariant(), out var country))
+                {
+                    ErrorResponse = $"Invalid country of domestic socket '{countryXML.Value}'!";
+                    return false;
+                }
+
+                countries.Add(country);
+
+            }
+
+            Connector = new Connector(
+                            connectorType,
+                            maxPowerAtSocket,
+                            XML.OptionalText(DatexIINS.EnergyInfrastructure + "otherConnector"),
+                            countries,
+                            chargingMode,
+                            connectorFormat,
+                            voltage,
+                            maximumCurrent,
+                            XML.Element(DatexIINS.EnergyInfrastructure + "_connectorExtension")
+                        );
+
+            return true;
+
+        }
 
         #endregion
 

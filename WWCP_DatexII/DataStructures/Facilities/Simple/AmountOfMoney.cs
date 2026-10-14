@@ -97,7 +97,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             if (Text.IsNotNullOrEmpty())
             {
-                if (Decimal.TryParse(Text, out var value))
+                if (Decimal.TryParse(Text, NumberStyles.Number, CultureInfo.InvariantCulture, out var value))
                 {
                     AmountOfMoney = new AmountOfMoney(value);
                     return true;

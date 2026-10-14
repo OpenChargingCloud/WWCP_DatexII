@@ -16,6 +16,7 @@
     <ProjectReference Include="..\WWCP_DatexII\WWCP_DatexII.csproj" />
     <ProjectReference Include="..\WWCP_DatexII_Adapter\WWCP_DatexII_Adapter.csproj" />
     <ProjectReference Include="..\WWCP_DatexII_WebAPI\WWCP_DatexII_WebAPI.csproj" />
+    <ProjectReference Include="..\..\WWCP_POI\WWCP_POI3_Tests\WWCP_POI3_Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>

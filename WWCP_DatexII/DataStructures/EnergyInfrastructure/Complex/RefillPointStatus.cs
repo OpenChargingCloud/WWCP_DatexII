@@ -154,6 +154,54 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The particles of a refill point status, in schema order.
+        /// </summary>
+        protected override IEnumerable<Object?> ToXMLElements()
+        {
+
+            foreach (var element in base.ToXMLElements())
+                yield return element;
+
+            yield return new XElement(DatexIINS.EnergyInfrastructure + "status",                          Status.ToString());
+
+            if (UnitsInStock.HasValue)
+                yield return new XElement(DatexIINS.EnergyInfrastructure + "unitsInStock",                UnitsInStock.Value);
+
+            foreach (var energyRateUpdate in EnergyRateUpdates)
+                yield return energyRateUpdate.ToXML(DatexIINS.EnergyInfrastructure + "energyRateUpdate");
+
+            // A DurationValue: the seconds sit in a facilities duration child.
+            if (WaitingTime.HasValue)
+                yield return new XElement(DatexIINS.EnergyInfrastructure + "waitingTime",
+                                 new XElement(DatexIINS.Facilities + "duration",                          (UInt64) Math.Round(WaitingTime.Value.TotalSeconds)));
+
+            foreach (var plannedRefillPointStatus in PlannedRefillPointStatus)
+                yield return plannedRefillPointStatus.ToXML(DatexIINS.EnergyInfrastructure + "plannedRefillPointStatus");
+
+            if (RefillPointStatusExtension is not null)
+                yield return new XElement(DatexIINS.EnergyInfrastructure + "_refillPointStatusExtension", RefillPointStatusExtension);
+
+        }
+
+        #endregion
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public virtual XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "refillPointStatus",
+                    ToXMLElements());
+
+        #endregion
+
     }
 
 }

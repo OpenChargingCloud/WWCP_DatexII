@@ -105,8 +105,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse SpecialDayType                 [mandatory]
 
-            if (!XML.TryParseMandatory(DatexIINS.Common + "intersectWithApplicableDays",
-                                       "intersect with applicable days",
+            if (!XML.TryParseMandatory(DatexIINS.Common + "specialDayType",
+                                       "special day type",
                                        SpecialDayType.TryParse,
                                        out SpecialDayType specialDayType,
                                        out ErrorResponse))
@@ -118,28 +118,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse PublicEvent                    [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "publicEvent",
-                                     "public event",
-                                     PublicEventType.TryParse,
-                                     out PublicEventType? publicEvent,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.Common + "publicEvent",
+                                           "public event",
+                                           PublicEventType.TryParse,
+                                           out PublicEventType? publicEvent,
+                                           out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse NamedAreas                     [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.Common + "namedArea",
-                                             "named area",
-                                             ANamedArea.TryParseXML,
-                                             out IEnumerable<ANamedArea> namedAreas,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.Common + "namedArea",
+                                              "named area",
+                                              ANamedArea.TryParseXML,
+                                              out IEnumerable<ANamedArea> namedAreas,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion

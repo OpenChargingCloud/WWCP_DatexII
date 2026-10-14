@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -62,6 +63,59 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         /// </summary>
         [XmlElement("_addressLineExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?           AddressLineExtension    { get; } = AddressLineExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out AddressLine, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an address line.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="AddressLine">The parsed address line.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                               XML,
+                                          [NotNullWhen(true)]  out AddressLine?  AddressLine,
+                                          [NotNullWhen(false)] out String?       ErrorResponse)
+        {
+
+            AddressLine = null;
+
+            if (!UInt32.TryParse(XML.Attribute("order")?.Value, out var order))
+            {
+                ErrorResponse = $"Invalid or missing address line order '{XML.Attribute("order")?.Value}'!";
+                return false;
+            }
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.LocationExtension + "type",
+                                            "address line type",
+                                            AddressLineType.TryParse,
+                                            out AddressLineType type,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            if (!XML.TryParseMandatoryXML(DatexIINS.LocationExtension + "text",
+                                          "address line text",
+                                          MultilingualString.TryParseXML,
+                                          out MultilingualString? text,
+                                          out ErrorResponse))
+            {
+                return false;
+            }
+
+            AddressLine = new AddressLine(
+                              order,
+                              text,
+                              type,
+                              XML.Element(DatexIINS.LocationExtension + "_addressLineExtension")
+                          );
+
+            return true;
+
+        }
 
         #endregion
 

@@ -18,6 +18,8 @@
 #region Usings
 
 using System.Xml.Serialization;
+using System.Xml.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
@@ -25,7 +27,6 @@ using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.Facilities;
 using cloud.charging.open.protocols.DatexII.v3.LocationReferencing;
-using System.Xml.Linq;
 
 #endregion
 
@@ -160,6 +161,79 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// </summary>
         [XmlElement("_energyInfrastructureSiteExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                                 EnergyInfrastructureSiteExtension    { get; } = EnergyInfrastructureSiteExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out EnergyInfrastructureSite, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an energy infrastructure site.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="EnergyInfrastructureSite">The parsed energy infrastructure site.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                            XML,
+                                          [NotNullWhen(true)]  out EnergyInfrastructureSite?  EnergyInfrastructureSite,
+                                          [NotNullWhen(false)] out String?                    ErrorResponse)
+        {
+
+            EnergyInfrastructureSite = null;
+
+            if (!FacilityParts.TryParseXML(XML, out var facility, out ErrorResponse))
+                return false;
+
+            if (!XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "typeOfSite",                   "type of site",                   EnergyInfrastructureSiteType.TryParse,  out EnergyInfrastructureSiteType?          typeOfSite,   out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "brand",                        "brand",                          MultilingualString.TryParseXML,         out MultilingualString?                    brand,        out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "exclusiveUsers",               "exclusive users",                UserType.TryParse,                      out IEnumerable<UserType>                  exclusiveUsers, out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "preferredUsers",               "preferred users",                UserType.TryParse,                      out IEnumerable<UserType>                  preferredUsers, out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "serviceType",                  "service type",                   Service.TryParseXML,                    out IEnumerable<Service>                   serviceTypes, out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "energyInfrastructureStation",  "energy infrastructure station",  EnergyInfrastructureStation.TryParseXML, out IEnumerable<EnergyInfrastructureStation> stations,  out ErrorResponse))
+            {
+                return false;
+            }
+
+            var parts = facility.Object;
+
+            EnergyInfrastructureSite = new EnergyInfrastructureSite(
+                                           parts.Id,
+                                           parts.Version,
+                                           parts.Name,
+                                           parts.Alias,
+                                           parts.ExternalIdentifier,
+                                           parts.LastUpdated,
+                                           parts.Description,
+                                           parts.Accessibility,
+                                           parts.AdditionalInformation,
+                                           parts.InformationWebsites,
+                                           parts.PhotoURLs,
+                                           parts.Photos,
+                                           parts.OperatingHours,
+                                           parts.LocationReference,
+                                           parts.Owner,
+                                           parts.Operator,
+                                           parts.Helpdesk,
+                                           null,
+                                           parts.Dimension,
+                                           parts.Amenities,
+                                           facility.SupplementalFacilities,
+                                           facility.DedicatedParkingSpaces,
+                                           typeOfSite,
+                                           brand,
+                                           exclusiveUsers,
+                                           preferredUsers,
+                                           serviceTypes,
+                                           null,
+                                           null,
+                                           stations,
+                                           parts.FacilityObjectExtension,
+                                           facility.FacilityExtension,
+                                           XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureSiteExtension")
+                                       );
+
+            return true;
+
+        }
 
         #endregion
 

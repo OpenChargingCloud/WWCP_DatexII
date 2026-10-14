@@ -48,7 +48,36 @@ namespace cloud.charging.open.protocols.DatexII
             this.Value = Value;
         }
 
+        private Units(Double Value)
+        {
+            this.Value = Value;
+        }
+
         #endregion
+
+        #region (static) TryParse(Text, out Units)
+
+        /// <summary>
+        /// Try to parse the given text as a non-negative number of units (an xs:float).
+        /// </summary>
+        /// <param name="Text">A text representation of units.</param>
+        /// <param name="Units">The parsed units.</param>
+        public static Boolean TryParse(String Text, out Units Units)
+        {
+
+            if (DatexII.v3.DatexIIXMLExtensions.TryParseDouble(Text, out var value) && value >= 0)
+            {
+                Units = new Units(value);
+                return true;
+            }
+
+            Units = default;
+            return false;
+
+        }
+
+        #endregion
+
 
         public override readonly String ToString()
             => Value.ToString();

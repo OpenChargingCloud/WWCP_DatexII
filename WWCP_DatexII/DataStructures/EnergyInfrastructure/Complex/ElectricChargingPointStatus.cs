@@ -159,27 +159,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse EnergyRateUpdates               [optional]
 
-            if (XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "unitsInStock",
-                                     "units in stock",
-                                     out Double? unitsInStock,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "unitsInStock",
+                                      "units in stock",
+                                      out Double? unitsInStock,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse EnergyRateUpdates               [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyRateUpdate",
-                                             "energy rate updates",
-                                             EnergyRateUpdate.TryParseXML,
-                                             out IEnumerable<EnergyRateUpdate> energyRateUpdates,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "energyRateUpdate",
+                                              "energy rate updates",
+                                              EnergyRateUpdate.TryParseXML,
+                                              out IEnumerable<EnergyRateUpdate> energyRateUpdates,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -208,14 +206,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse PlannedRefillPointStatus        [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "plannedRefillPointStatus",
-                                             "planned refill point status",
-                                             EnergyInfrastructure.PlannedRefillPointStatus.TryParseXML,
-                                             out IEnumerable<PlannedRefillPointStatus> plannedRefillPointStatus,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.EnergyInfrastructure + "plannedRefillPointStatus",
+                                              "planned refill point status",
+                                              EnergyInfrastructure.PlannedRefillPointStatus.TryParseXML,
+                                              out IEnumerable<PlannedRefillPointStatus> plannedRefillPointStatus,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -223,68 +220,63 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse LastUpdated                     [optional]
 
-            if (XML.TryParseOptionalTimestamp(DatexIINS.Facilities + "lastUpdated",
-                                              "last updated",
-                                              out DateTimeOffset? lastUpdated,
-                                              out ErrorResponse))
+            if (!XML.TryParseOptionalTimestamp(DatexIINS.Facilities + "lastUpdated",
+                                               "last updated",
+                                               out DateTimeOffset? lastUpdated,
+                                               out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse OpeningStatus                   [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Facilities + "openingStatus",
-                                     "opening status",
-                                     Facilities.OpeningStatus.TryParse,
-                                     out OpeningStatus? openingStatus,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.Facilities + "openingStatus",
+                                           "opening status",
+                                           Facilities.OpeningStatus.TryParse,
+                                           out OpeningStatus? openingStatus,
+                                           out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse OperationStatus                 [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Facilities + "operationStatus",
-                                     "operation status",
-                                     Facilities.OperationStatus.TryParse,
-                                     out OperationStatus? operationStatus,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.Facilities + "operationStatus",
+                                           "operation status",
+                                           Facilities.OperationStatus.TryParse,
+                                           out OperationStatus? operationStatus,
+                                           out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse RegularOperatingHoursInForce    [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "regularOperatingHoursInForce",
-                                     "regular operating hours in force",
-                                     out Boolean? regularOperatingHoursInForce,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Facilities + "regularOperatingHoursInForce",
+                                      "regular operating hours in force",
+                                      out Boolean? regularOperatingHoursInForce,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse StatusDescription               [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "statusDescription",
-                                     "status description",
-                                     MultilingualString.TryParseXML,
-                                     out MultilingualString? statusDescription,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptional(DatexIINS.Facilities + "statusDescription",
+                                      "status description",
+                                      MultilingualString.TryParseXML,
+                                      out MultilingualString? statusDescription,
+                                      out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -295,54 +287,69 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
             #region TryParse RemainingChargingTime           [optional]
 
-            if (XML.TryParseOptionalTimeSpan(DatexIINS.EnergyInfrastructure + "remainingChargingTime",
-                                             "remaining charging time",
-                                             out TimeSpan? remainingChargingTime,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalTimeSpan(DatexIINS.EnergyInfrastructure + "remainingChargingTime",
+                                              "remaining charging time",
+                                              out TimeSpan? remainingChargingTime,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse CurrentVoltage                  [optional]
 
-            if (XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "currentVoltage",
-                                     "current voltage",
-                                     Volt.TryParse,
-                                     out Volt? currentVoltage,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "currentVoltage",
+                                           "current voltage",
+                                           Volt.TryParse,
+                                           out Volt? currentVoltage,
+                                           out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse CurrentChargingPower            [optional]
 
-            if (XML.TryParseOptional(DatexIINS.EnergyInfrastructure + "currentChargingPower",
-                                     "current charging power",
-                                     Watt.TryParse,
-                                     out Watt? currentChargingPower,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.EnergyInfrastructure + "currentChargingPower",
+                                           "current charging power",
+                                           Watt.TryParse,
+                                           out Watt? currentChargingPower,
+                                           out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse NextAvailableChargingSlots      [optional]
 
-            if (XML.TryParseOptionalTimestamps(DatexIINS.Facilities + "lastUpdated",
-                                               "last updated",
-                                               out IEnumerable<DateTimeOffset> nextAvailableChargingSlots,
-                                               out ErrorResponse))
+            if (!XML.TryParseOptionalTimestamps(DatexIINS.EnergyInfrastructure + "nextAvailableChargingSlots",
+                                                "last updated",
+                                                out IEnumerable<DateTimeOffset> nextAvailableChargingSlots,
+                                                out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
+            }
+
+            #endregion
+
+
+            #region TryParse NewOperatingHours, Fault     [optional]
+
+            if (!XML.TryParseOptionalXML(DatexIINS.Facilities + "newOperatingHours",
+                                         "new operating hours",
+                                         AOperatingHours.TryParseXML,
+                                         out AOperatingHours? newOperatingHours,
+                                         out ErrorResponse) ||
+                !XML.TryParseOptionalXML(DatexIINS.Facilities + "fault",
+                                         "fault",
+                                         Common.Fault.TryParseXML,
+                                         out Fault? fault,
+                                         out ErrorResponse))
+            {
+                return false;
             }
 
             #endregion
@@ -357,28 +364,66 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                               energyRateUpdates,
                                               waitingTime,
                                               plannedRefillPointStatus,
-                                              XML.Element(DatexIINS.Common + "_refillPointStatusExtension"),
+                                              XML.Element(DatexIINS.EnergyInfrastructure + "_refillPointStatusExtension"),
 
                                               lastUpdated,
                                               openingStatus,
                                               operationStatus,
                                               regularOperatingHoursInForce,
                                               statusDescription,
-                                              null, //newOperatingHours,
-                                              null, //fault,
-                                              XML.Element(DatexIINS.Common + "_facilityObjectStatusExtension"),
+                                              newOperatingHours,
+                                              fault,
+                                              XML.Element(DatexIINS.Facilities + "_facilityObjectStatusExtension"),
 
                                               remainingChargingTime,
                                               currentVoltage,
                                               currentChargingPower,
                                               nextAvailableChargingSlots,
-                                              XML.Element(DatexIINS.Common + "_electricChargingPointStatusExtension")
+                                              XML.Element(DatexIINS.EnergyInfrastructure + "_electricChargingPointStatusExtension")
 
                                           );
 
             return true;
 
         }
+
+        #endregion
+
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "refillPointStatus",
+
+                   // The schema declares refillPointStatus with the abstract type.
+                   new XAttribute(DatexIINS.XSI + "type",   "egi:ElectricChargingPointStatus"),
+
+                   ToXMLElements(),
+
+                   RemainingChargingTime.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "remainingChargingTime",   (UInt64) Math.Round(RemainingChargingTime.Value.TotalSeconds))
+                       : null,
+
+                   CurrentVoltage.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "currentVoltage",          CurrentVoltage.      Value.Value)
+                       : null,
+
+                   CurrentChargingPower.HasValue
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "currentChargingPower",    CurrentChargingPower.Value.Value)
+                       : null,
+
+                   NextAvailableChargingSlots.Select(slot => new XElement(DatexIINS.EnergyInfrastructure + "nextAvailableChargingSlots", slot.ToISO8601WithOffset())),
+
+                   ElectricChargingPointStatusExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_electricChargingPointStatusExtension", ElectricChargingPointStatusExtension)
+                       : null
+
+               );
 
         #endregion
 

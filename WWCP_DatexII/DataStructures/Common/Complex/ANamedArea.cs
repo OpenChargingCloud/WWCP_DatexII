@@ -60,8 +60,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
             ANamedArea     = null;
             ErrorResponse  = null;
 
+            switch (XML.XSIType())
+            {
 
-            return true;
+                case "NamedArea":
+                    if (LocationReferencing.NamedArea.TryParseXML(XML, out var namedArea, out ErrorResponse)) { ANamedArea = namedArea; return true; }
+                    return false;
+
+                default:
+                    ErrorResponse = $"Named areas of the type '{XML.XSIType()}' can not be parsed yet!";
+                    return false;
+
+            }
 
         }
 

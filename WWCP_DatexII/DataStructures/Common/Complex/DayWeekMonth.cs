@@ -80,14 +80,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse ApplicableDays      [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.Common + "applicableDay",
-                                             "applicable days",
-                                             Day.TryParse,
-                                             out IEnumerable<Day> applicableDays,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.Common + "applicableDay",
+                                              "applicable days",
+                                              Day.TryParse,
+                                              out IEnumerable<Day> applicableDays,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
@@ -112,7 +111,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                   applicableDays,
                                   applicableMonths,
 
-                                  XML.Element(DatexIINS.Common + "_timePeriodOfDayExtension")
+                                  XML.Element(DatexIINS.Common + "_dayWeekMonthExtension")
 
                               );
 
@@ -124,32 +123,23 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
         #region ToXML(XMLName = null)
 
+        /// <summary>
+        /// Return an XML representation of this object: its days and months directly in the element, e.g. a
+        /// recurringDayWeekMonthPeriod, as com:DayWeekMonth declares them.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
         public virtual XElement ToXML(XName? XMLName = null)
-        {
 
-            // C# is very strict with XML namespaces!
-            var xmlElement    = XMLName ?? DatexIINS.Common + "DayWeekMonth";
-            var xmlNamespace  = xmlElement.Namespace;
+            => new (XMLName ?? DatexIINS.Common + "dayWeekMonth",
 
-            var xml = new XElement(XMLName ?? DatexIINS.Common + "period",
+                   ApplicableDays.  Select(day   => new XElement(DatexIINS.Common + "applicableDay",    day.  ToString())),
+                   ApplicableMonths.Select(month => new XElement(DatexIINS.Common + "applicableMonth",  month.ToString())),
 
-                          new XElement(xmlNamespace + "DayWeekMonth",
+                   DayWeekMonthExtension is not null
+                       ? new XElement(DatexIINS.Common + "_dayWeekMonthExtension", DayWeekMonthExtension)
+                       : null
 
-                              ApplicableDays.  Any()
-                                  ? ApplicableDays.  Select(day   => new XElement(xmlNamespace + "applicableDay",    day.  ToString()))
-                                  : null,
-
-                              ApplicableMonths.Any()
-                                  ? ApplicableMonths.Select(month => new XElement(xmlNamespace + "applicableMonth",  month.ToString()))
-                                  : null
-
-                          )
-
-                      );
-
-            return xml;
-
-        }
+               );
 
         #endregion
 

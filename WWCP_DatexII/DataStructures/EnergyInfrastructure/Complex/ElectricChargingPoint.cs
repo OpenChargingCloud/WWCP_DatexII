@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
@@ -43,7 +44,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                        MultilingualString?                       Name                             = null,
                                        IEnumerable<MultilingualString>?          Alias                            = null,
                                        String?                                   ExternalIdentifier               = null,
-                                       DateTime?                                 LastUpdated                      = null,
+                                       DateTimeOffset?                           LastUpdated                      = null,
                                        MultilingualString?                       Description                      = null,
                                        IEnumerable<Accessibility>?               Accessibility                    = null,
                                        IEnumerable<MultilingualString>?          AdditionalInformation            = null,
@@ -187,6 +188,107 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// </summary>
         [XmlElement("_electricChargingPointExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                                ElectricChargingPointExtension    { get; } = ElectricChargingPointExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out ElectricChargingPoint, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an electric charging point.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="ElectricChargingPoint">The parsed electric charging point.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                         XML,
+                                          [NotNullWhen(true)]  out ElectricChargingPoint?  ElectricChargingPoint,
+                                          [NotNullWhen(false)] out String?                 ErrorResponse)
+        {
+
+            ElectricChargingPoint = null;
+
+            if (!FacilityParts.TryParseXML(XML, out var facility, out ErrorResponse))
+                return false;
+
+            #region TryParse the refill point                   [deliveryUnit mandatory]
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.EnergyInfrastructure + "deliveryUnit",           "delivery unit",            EnergyInfrastructure.DeliveryUnit.TryParse,  out DeliveryUnit      deliveryUnit,          out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "maximumDeliveryAmount",  "maximum delivery amount",  Units.TryParse,                               out Units?            maximumDeliveryAmount, out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "minimumDeliveryAmount",  "minimum delivery amount",  Units.TryParse,                               out Units?            minimumDeliveryAmount, out ErrorResponse) ||
+                !XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "modelType",              "model type",               MultilingualString.TryParseXML,               out MultilingualString? modelType,           out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "reservation",            "reservation",              ReservationType.TryParse,                     out ReservationType?  reservation,           out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region TryParse the electric charging point
+
+            if (!XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "usageType",                       "usage type",                         ChargingPointUsage.TryParse,          out IEnumerable<ChargingPointUsage>          usageType,                      out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "vehicleToGridCommunicationType",  "vehicle to grid communication type", VehicleToGridCommunication.TryParse,  out IEnumerable<VehicleToGridCommunication>  vehicleToGridCommunicationType, out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "numberOfConnectors",              "number of connectors",               Byte.TryParse,                        out Byte?                                    numberOfConnectors,             out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "availableVoltage",                "available voltage",                  DatexIIXMLExtensions.TryParseVolt,    out IEnumerable<Volt>                        availableVoltage,               out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "availableChargingPower",          "available charging power",           DatexIIXMLExtensions.TryParseWatt,    out IEnumerable<Watt>                        availableChargingPower,         out ErrorResponse) ||
+                !XML.TryParseOptionalValues(DatexIINS.EnergyInfrastructure + "smartRechargingServices",         "smart recharging services",          SmartRechargingService.TryParse,      out IEnumerable<SmartRechargingService>      smartRechargingServices,        out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "otherSmartRechargingServices",    "other smart recharging services",    MultilingualString.TryParseXML,       out IEnumerable<MultilingualString>          otherSmartRechargingServices,   out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "connector",                       "connector",                          EnergyInfrastructure.Connector.TryParseXML, out IEnumerable<Connector>             connectors,                     out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "electricEnergy",                  "electric energy",                    EnergyInfrastructure.ElectricEnergy.TryParseXML, out IEnumerable<ElectricEnergy>  electricEnergy,                 out ErrorResponse))
+            {
+                return false;
+            }
+
+            #endregion
+
+            var parts = facility.Object;
+
+            ElectricChargingPoint = new ElectricChargingPoint(
+                                        parts.Id,
+                                        parts.Version,
+                                        deliveryUnit,
+                                        parts.Name,
+                                        parts.Alias,
+                                        parts.ExternalIdentifier,
+                                        parts.LastUpdated,
+                                        parts.Description,
+                                        parts.Accessibility,
+                                        parts.AdditionalInformation,
+                                        parts.InformationWebsites,
+                                        parts.PhotoURLs,
+                                        parts.Photos,
+                                        parts.OperatingHours,
+                                        parts.LocationReference,
+                                        parts.Owner,
+                                        parts.Operator,
+                                        parts.Helpdesk,
+                                        null,
+                                        parts.Dimension,
+                                        parts.Amenities,
+                                        facility.SupplementalFacilities,
+                                        facility.DedicatedParkingSpaces,
+                                        minimumDeliveryAmount,
+                                        maximumDeliveryAmount,
+                                        modelType,
+                                        reservation,
+                                        XML.OptionalText(DatexIINS.EnergyInfrastructure + "evseId"),
+                                        usageType,
+                                        vehicleToGridCommunicationType,
+                                        numberOfConnectors,
+                                        availableVoltage,
+                                        availableChargingPower,
+                                        smartRechargingServices,
+                                        otherSmartRechargingServices,
+                                        connectors,
+                                        electricEnergy,
+                                        parts.FacilityObjectExtension,
+                                        facility.FacilityExtension,
+                                        XML.Element(DatexIINS.EnergyInfrastructure + "_refillPointExtension"),
+                                        XML.Element(DatexIINS.EnergyInfrastructure + "_electricChargingPointExtension")
+                                    );
+
+            return true;
+
+        }
 
         #endregion
 

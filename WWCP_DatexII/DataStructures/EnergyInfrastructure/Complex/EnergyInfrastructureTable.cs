@@ -88,6 +88,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             EnergyInfrastructureTable  = null;
             ErrorResponse              = null;
 
+            var id       = XML.Attribute("id")?.     Value.Trim();
+            var version  = XML.Attribute("version")?.Value.Trim();
+
+            if (id is null || id.Length == 0 || version is null)
+            {
+                ErrorResponse = "The mandatory 'id' or 'version' attribute of the energy infrastructure table is missing!";
+                return false;
+            }
+
+            if (!XML.TryParseOptionalXMLs(DatexIINS.EnergyInfrastructure + "energyInfrastructureSite",
+                                          "energy infrastructure site",
+                                          EnergyInfrastructureSite.TryParseXML,
+                                          out IEnumerable<EnergyInfrastructureSite> sites,
+                                          out ErrorResponse))
+            {
+                return false;
+            }
+
+            EnergyInfrastructureTable = new EnergyInfrastructureTable(
+                                            id,
+                                            version,
+                                            sites,
+                                            XML.OptionalText(DatexIINS.EnergyInfrastructure + "tableName"),
+                                            XML.Element(DatexIINS.EnergyInfrastructure + "_energyInfrastructureTableExtension")
+                                        );
+
             return true;
 
         }

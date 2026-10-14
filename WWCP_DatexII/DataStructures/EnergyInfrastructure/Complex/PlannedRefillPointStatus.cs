@@ -117,7 +117,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             PlannedRefillPointStatus = new PlannedRefillPointStatus(
                                            status,
                                            overallPeriod,
-                                           XML.Element(DatexIINS.Common + "_plannedRefillPointStatusExtension")
+                                           XML.Element(DatexIINS.EnergyInfrastructure + "_plannedRefillPointStatusExtension")
                                        );
 
             return true;
@@ -126,6 +126,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.EnergyInfrastructure + "plannedRefillPointStatus",
+
+                   new XElement(DatexIINS.EnergyInfrastructure + "status",   Status.ToString()),
+
+                   OverallPeriod.ToXML(DatexIINS.EnergyInfrastructure + "overallPeriod"),
+
+                   PlannedRefillPointStatusExtension is not null
+                       ? new XElement(DatexIINS.EnergyInfrastructure + "_plannedRefillPointStatusExtension", PlannedRefillPointStatusExtension)
+                       : null
+
+               );
+
+        #endregion
 
     }
 

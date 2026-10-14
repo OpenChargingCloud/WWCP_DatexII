@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -46,6 +47,55 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_operatingHoursExtension", Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?            OperatingHoursExtension    { get; } = OperatingHoursExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out OperatingHours, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of operating hours, by its xsi:type.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="OperatingHours">The parsed operating hours.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                   XML,
+                                          [NotNullWhen(true)]  out AOperatingHours?  OperatingHours,
+                                          [NotNullWhen(false)] out String?           ErrorResponse)
+        {
+
+            OperatingHours = null;
+
+            switch (XML.XSIType())
+            {
+
+                case "OpenAllHours":
+                    if (OpenAllHours.               TryParseXML(XML, out var openAllHours,   out ErrorResponse)) { OperatingHours = openAllHours;   return true; }
+                    return false;
+
+                case "OperatingHoursSpecification":
+                    if (OperatingHoursSpecification.TryParseXML(XML, out var specification,  out ErrorResponse)) { OperatingHours = specification;  return true; }
+                    return false;
+
+                case "OperatingHoursByReference":
+                    if (OperatingHoursByReference.  TryParseXML(XML, out var byReference,    out ErrorResponse)) { OperatingHours = byReference;    return true; }
+                    return false;
+
+                case "UndefinedOperatingHours":
+                    if (UndefinedOperatingHours.    TryParseXML(XML, out var undefinedHours, out ErrorResponse)) { OperatingHours = undefinedHours; return true; }
+                    return false;
+
+                case "UnknownOperatingHours":
+                    if (UnknownOperatingHours.      TryParseXML(XML, out var unknownHours,   out ErrorResponse)) { OperatingHours = unknownHours;   return true; }
+                    return false;
+
+                default:
+                    ErrorResponse = $"Unknown operating hours type '{XML.XSIType()}'!";
+                    return false;
+
+            }
+
+        }
 
         #endregion
 

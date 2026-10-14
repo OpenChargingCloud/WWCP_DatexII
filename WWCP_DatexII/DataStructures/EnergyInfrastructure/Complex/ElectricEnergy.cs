@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.Facilities;
@@ -102,6 +103,52 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         #endregion
 
 
+        #region TryParseXML(XML, out ElectricEnergy, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of an electric energy product.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="ElectricEnergy">The parsed electric energy product.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                  XML,
+                                          [NotNullWhen(true)]  out ElectricEnergy?  ElectricEnergy,
+                                          [NotNullWhen(false)] out String?          ErrorResponse)
+        {
+
+            ElectricEnergy = null;
+
+            if (!XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "energyProductName",          "energy product name",           MultilingualString.         TryParseXML,  out MultilingualString?                     energyProductName,          out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "isGreenEnergy",              "is green energy",               DatexIIXMLExtensions.       TryParseBoolean, out Boolean?                         isGreenEnergy,              out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "carbonDioxideImpact",        "carbon dioxide impact",         DatexIIXMLExtensions.       TryParseDouble,  out Double?                          carbonDioxideImpact,        out ErrorResponse) ||
+                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "nuclearWasteImpact",         "nuclear waste impact",          DatexIIXMLExtensions.       TryParseDouble,  out Double?                          nuclearWasteImpact,         out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "energyRateByReference",      "energy rate by reference",      EnergyRateReference.        TryParseXML,  out IEnumerable<EnergyRateReference>        energyRateByReference,      out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "electricEnergySourceRatio",  "electric energy source ratio",  ElectricEnergySourceRatio.  TryParseXML,  out IEnumerable<ElectricEnergySourceRatio>  electricEnergySourceRatios, out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "mobilityServiceProvider",    "mobility service provider",     AOrganisation.              TryParseXML,  out IEnumerable<AOrganisation>              mobilityServiceProviders,   out ErrorResponse) ||
+                !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "energyRate",                 "energy rate",                   EnergyRate.                 TryParseXML,  out IEnumerable<EnergyRate>                 energyRates,                out ErrorResponse))
+            {
+                return false;
+            }
+
+            ElectricEnergy = new ElectricEnergy(
+                                 energyProductName,
+                                 isGreenEnergy,
+                                 carbonDioxideImpact,
+                                 nuclearWasteImpact,
+                                 energyRateByReference,
+                                 electricEnergySourceRatios,
+                                 mobilityServiceProviders,
+                                 energyRates,
+                                 XML.Element(DatexIINS.EnergyInfrastructure + "_electricEnergyExtension")
+                             );
+
+            return true;
+
+        }
+
+        #endregion
+
+
         #region ToXML(XMLName = null)
 
         /// <summary>
@@ -128,7 +175,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                        ? new XElement(DatexIINS.EnergyInfrastructure + "nuclearWasteImpact",    NuclearWasteImpact. Value)
                        : null,
 
-                   EnergyRateByReference.     Select(energyRateReference      => energyRateReference.ToXML()),
+                   EnergyRateByReference.     Select(energyRateReference      => energyRateReference.ToXML(DatexIINS.EnergyInfrastructure + "energyRateByReference")),
                    ElectricEnergySourceRatios.Select(electricEnergySourceRatio => electricEnergySourceRatio.ToXML(DatexIINS.EnergyInfrastructure + "electricEnergySourceRatio")),
                    MobilityServiceProviders.  Select(mobilityServiceProvider   => mobilityServiceProvider.  ToXML(DatexIINS.EnergyInfrastructure + "mobilityServiceProvider")),
                    EnergyRates.               Select(energyRate                => energyRate.               ToXML(DatexIINS.EnergyInfrastructure + "energyRate")),

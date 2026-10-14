@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -69,6 +70,45 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_contactInformationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?               ContactInformationExtension    { get; } = ContactInformationExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out ContactInformation, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of contact information.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="ContactInformation">The parsed contact information.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                      XML,
+                                          [NotNullWhen(true)]  out ContactInformation?  ContactInformation,
+                                          [NotNullWhen(false)] out String?              ErrorResponse)
+        {
+
+            ContactInformation = null;
+
+            if (!XML.TryParseOptionalValues(DatexIINS.Facilities + "language",
+                                            "language",
+                                            DatexIIXMLExtensions.TryParseLanguage,
+                                            out IEnumerable<Languages> languages,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            ContactInformation = new ContactInformation(
+                                     languages,
+                                     XML.OptionalText(DatexIINS.Facilities + "telephoneNumber"),
+                                     XML.OptionalText(DatexIINS.Facilities + "faxNumber"),
+                                     XML.OptionalText(DatexIINS.Facilities + "eMail"),
+                                     XML.Element(DatexIINS.Facilities + "_contactInformationExtension")
+                                 );
+
+            return true;
+
+        }
 
         #endregion
 

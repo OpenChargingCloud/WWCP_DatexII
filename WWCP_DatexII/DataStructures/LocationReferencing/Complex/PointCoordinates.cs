@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -75,6 +76,53 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_pointCoordinatesExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?                      PointCoordinatesExtension     { get; } = PointCoordinatesExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out PointCoordinates, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of point coordinates.
+        /// Height coordinates, the position confidence ellipse and the horizontal position accuracy are not parsed yet.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="PointCoordinates">The parsed point coordinates.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                    XML,
+                                          [NotNullWhen(true)]  out PointCoordinates?  PointCoordinates,
+                                          [NotNullWhen(false)] out String?            ErrorResponse)
+        {
+
+            PointCoordinates = null;
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.LocationReferencing + "latitude",
+                                            "latitude",
+                                            DatexIIXMLExtensions.TryParseDouble,
+                                            out Double latitude,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            if (!XML.TryParseMandatoryValue(DatexIINS.LocationReferencing + "longitude",
+                                            "longitude",
+                                            DatexIIXMLExtensions.TryParseDouble,
+                                            out Double longitude,
+                                            out ErrorResponse))
+            {
+                return false;
+            }
+
+            PointCoordinates = new PointCoordinates(
+                                   latitude,
+                                   longitude,
+                                   PointCoordinatesExtension: XML.Element(DatexIINS.LocationReferencing + "_pointCoordinatesExtension")
+                               );
+
+            return true;
+
+        }
 
         #endregion
 

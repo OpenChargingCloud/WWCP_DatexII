@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -67,6 +68,44 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// </summary>
         [XmlElement("_amenitiesExtension",                 Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?  AmenitiesExtension                    { get; } = AmenitiesExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out Amenities, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of amenities.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="Amenities">The parsed amenities.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                             XML,
+                                          [NotNullWhen(true)]  out Amenities?  Amenities,
+                                          [NotNullWhen(false)] out String?     ErrorResponse)
+        {
+
+            Amenities = null;
+
+            if (!XML.TryParseOptionalValue(DatexIINS.Facilities + "illuminated",                         "illuminated",                            DatexIIXMLExtensions.TryParseBoolean, out Boolean? illuminated,       out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "roofed",                              "roofed",                                 DatexIIXMLExtensions.TryParseBoolean, out Boolean? roofed,            out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "illuminatedRechargingParkingNearby",  "illuminated recharging parking nearby",  DatexIIXMLExtensions.TryParseBoolean, out Boolean? illuminatedNearby, out ErrorResponse) ||
+                !XML.TryParseOptionalValue(DatexIINS.Facilities + "roofedRechargingParkingNearby",       "roofed recharging parking nearby",       DatexIIXMLExtensions.TryParseBoolean, out Boolean? roofedNearby,      out ErrorResponse))
+            {
+                return false;
+            }
+
+            Amenities = new Amenities(
+                            illuminated,
+                            roofed,
+                            illuminatedNearby,
+                            roofedNearby,
+                            XML.Element(DatexIINS.Facilities + "_amenitiesExtension")
+                        );
+
+            return true;
+
+        }
 
         #endregion
 

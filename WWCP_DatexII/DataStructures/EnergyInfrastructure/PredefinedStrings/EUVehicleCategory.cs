@@ -358,7 +358,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// Light commercial vehicles with 1,305–1,760 kg reference mass.
         /// </summary>
         public static EUVehicleCategory  N1ClassII          { get; }
-            = Register("xxn1ClassIIx");
+            = Register("n1ClassII");
 
         /// <summary>
         /// N1 Class III.

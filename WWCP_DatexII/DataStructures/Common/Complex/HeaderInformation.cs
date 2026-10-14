@@ -98,28 +98,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
             #region TryParse Confidentiality            [optional]
 
-            if (XML.TryParseOptional(DatexIINS.Common + "confidentiality",
-                                     "confidentiality",
-                                     Common.Confidentiality.TryParse,
-                                     out Confidentiality? confidentiality,
-                                     out ErrorResponse))
+            if (!XML.TryParseOptionalValue(DatexIINS.Common + "confidentiality",
+                                           "confidentiality",
+                                           Common.Confidentiality.TryParse,
+                                           out Confidentiality? confidentiality,
+                                           out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion
 
             #region TryParse AllowedDeliveryChannels    [optional]
 
-            if (XML.TryParseOptionalElements(DatexIINS.Common + "allowedDeliveryChannel",
-                                             "allowed delivery channels",
-                                             InformationDeliveryService.TryParse,
-                                             out IEnumerable<InformationDeliveryService> allowedDeliveryChannels,
-                                             out ErrorResponse))
+            if (!XML.TryParseOptionalElements(DatexIINS.Common + "allowedDeliveryChannel",
+                                              "allowed delivery channels",
+                                              InformationDeliveryService.TryParse,
+                                              out IEnumerable<InformationDeliveryService> allowedDeliveryChannels,
+                                              out ErrorResponse))
             {
-                if (ErrorResponse is not null)
-                    return false;
+                return false;
             }
 
             #endregion

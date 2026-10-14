@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using cloud.charging.open.protocols.DatexII.v3.Common;
 
@@ -56,6 +57,52 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// </summary>
         [XmlElement("_pointByCoordinatesExtension",  Namespace = "http://datex2.eu/schema/3/common")]
         public XElement?         PointByCoordinatesExtension    { get; } = PointByCoordinatesExtension;
+
+        #endregion
+
+
+        #region TryParseXML(XML, out PointByCoordinates, out ErrorResponse)
+
+        /// <summary>
+        /// Try to parse the given XML representation of a point by coordinates.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="PointByCoordinates">The parsed point by coordinates.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                      XML,
+                                          [NotNullWhen(true)]  out PointByCoordinates?  PointByCoordinates,
+                                          [NotNullWhen(false)] out String?              ErrorResponse)
+        {
+
+            PointByCoordinates = null;
+
+            if (!XML.TryParseMandatoryXML(DatexIINS.LocationReferencing + "pointCoordinates",
+                                          "point coordinates",
+                                          LocationReferencing.PointCoordinates.TryParseXML,
+                                          out PointCoordinates? pointCoordinates,
+                                          out ErrorResponse))
+            {
+                return false;
+            }
+
+            if (!XML.TryParseOptionalValue(DatexIINS.LocationReferencing + "bearing",
+                                           "bearing",
+                                           DatexIIXMLExtensions.TryParseUInt16,
+                                           out UInt16? bearing,
+                                           out ErrorResponse))
+            {
+                return false;
+            }
+
+            PointByCoordinates = new PointByCoordinates(
+                                     pointCoordinates,
+                                     bearing.HasValue ? new AngleInDegrees(bearing.Value) : null,
+                                     XML.Element(DatexIINS.LocationReferencing + "_pointByCoordinatesExtension")
+                                 );
+
+            return true;
+
+        }
 
         #endregion
 
