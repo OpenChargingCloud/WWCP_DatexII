@@ -71,6 +71,8 @@ await importer.ImportAsync(table!);
 - **Status:** the status of a refill point goes into the runtime status of its EVSE, with `DataSource` "DATEX II". The
   refill points of the last imported table tell which EVSE a reference means; a reference that is itself an EVSE
   identification works without a table.
+- **Other refill points:** diesel, petrol and alternative fuels refill points have no POI3 counterpart. They are left out
+  with a warning ("imported partly"), and their statuses are skipped.
 - **Operators:** they must already be in the roaming network. Adding them is up to the roaming network operator.
 
 Both classes work one job after the other, in the order the jobs came. Do not use both on the same history and the
@@ -335,10 +337,14 @@ writes and reads these differences:
   - `LocationByReference` and location groups.
 - **Not modelled:** `associatedFacility`, `rates`/`newRates` (the generic rate tables of 3.7) and the 3.7 publications
   other than table and status. The profile uses none of them; the parsers skip them.
-- **Refill points:** only electric charging points, the only ones the profile knows. A table with another refill point
-  (`aegi:AlternativeFuelsRefillPoint`, `aegi:DieselRefillPoint`, `aegi:PetrolRefillPoint`) can not be read.
-- **URLs:** links the URL parser does not take, e.g. the placeholders of the profile's example (`https://---.com`), are
-  left out when read, and make an energy product unreadable.
+- **Refill points:** electric charging points are modelled in full, as they are the only ones the profile knows. The
+  other refill points of the AFIR namespace (`aegi:AlternativeFuelsRefillPoint`, `aegi:DieselRefillPoint`,
+  `aegi:PetrolRefillPoint`) are read as an `OtherRefillPoint`. It has everything every refill point has; the elements
+  its type adds (all simple values, e.g. `cetane` or `pressure`) are kept as they were read and written again as they
+  are. The status of such a refill point is a plain `RefillPointStatus`, which is also read without an `xsi:type`.
+- **URLs:** links are informative only. One that is no URL, e.g. a placeholder of the profile's example
+  (`https://---.com`), is left out when read, rather than making its energy product, organisation or operating hours
+  unreadable.
 - **`[XmlElement(Namespace = …)]` annotations:** they name the namespace of the element's type rather than of the
   element. Nothing uses `XmlSerializer`, so this is only misleading documentation.
 - **`Serialize_Period_Test1`:** it still pins a `NamedArea`/`IsoNamedArea` output that nests an extra

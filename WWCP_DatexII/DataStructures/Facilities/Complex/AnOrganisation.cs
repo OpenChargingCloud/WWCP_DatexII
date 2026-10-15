@@ -242,9 +242,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 !XML.TryParseOptionalValue(DatexIINS.Facilities + "lastUpdated",                   "last updated",               DatexIIXMLExtensions.TryParseTimestamp,  out DateTimeOffset?                   lastUpdated,           out ErrorResponse) ||
                 !XML.TryParseOptionalXML  (DatexIINS.Facilities + "legalName",                     "legal name",                 MultilingualString.TryParseXML,         out MultilingualString?               legalName,             out ErrorResponse) ||
                 !XML.TryParseOptionalXML  (DatexIINS.Facilities + "description",                   "description",                MultilingualString.TryParseXML,         out MultilingualString?               description,           out ErrorResponse) ||
-                !XML.TryParseOptionalValue(DatexIINS.Facilities + "linkToGeneralInformation",      "link to general information", URL.TryParse,                          out URL?                              linkToGeneralInformation, out ErrorResponse) ||
-                !XML.TryParseOptionalValue(DatexIINS.Facilities + "linkToLogo",                    "link to logo",               URL.TryParse,                           out URL?                              linkToLogo,            out ErrorResponse) ||
-                !XML.TryParseOptionalValue(DatexIINS.Facilities + "linkToWebform",                 "link to web form",           URL.TryParse,                           out URL?                              linkToWebform,         out ErrorResponse) ||
                 !XML.TryParseOptionalValue(DatexIINS.Facilities + "available24hours",              "available 24 hours",         DatexIIXMLExtensions.TryParseBoolean,   out Boolean?                          available24hours,      out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs (DatexIINS.Facilities + "responsibility",                "responsibility",             MultilingualString.TryParseXML,         out IEnumerable<MultilingualString>   responsibility,        out ErrorResponse) ||
                 !XML.TryParseOptionalValue(DatexIINS.Facilities + "publishingAgreement",           "publishing agreement",       DatexIIXMLExtensions.TryParseBoolean,   out Boolean?                          publishingAgreement,   out ErrorResponse) ||
@@ -262,9 +259,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                         lastUpdated,
                         legalName,
                         description,
-                        linkToGeneralInformation,
-                        linkToLogo,
-                        linkToWebform,
+                        XML.OptionalURL(DatexIINS.Facilities + "linkToGeneralInformation"),
+                        XML.OptionalURL(DatexIINS.Facilities + "linkToLogo"),
+                        XML.OptionalURL(DatexIINS.Facilities + "linkToWebform"),
                         available24hours,
                         responsibility,
                         publishingAgreement,

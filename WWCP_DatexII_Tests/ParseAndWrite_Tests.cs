@@ -234,6 +234,170 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
         #endregion
 
+        #region ARefillPointThatIsNoChargingPointIsReadAndWrittenAgain()
+
+        /// <summary>
+        /// A diesel refill point next to the charging points: read with what every refill point has and what its type
+        /// adds, and written again as the schemas want it, as XML and as JSON. It made the whole table unreadable before.
+        /// </summary>
+        [Test]
+        public void ARefillPointThatIsNoChargingPointIsReadAndWrittenAgain()
+        {
+
+            var aegi  = v3.DatexIINS.EnergyInfrastructure;
+            var xml   = Example("EnergyInfrastructureTablePublication.xml");
+
+            xml.Descendants(aegi + "refillPoint").Last().AddAfterSelf(
+                new XElement(aegi + "refillPoint",
+                    new XAttribute(v3.DatexIINS.XSI + "type",  "aegi:DieselRefillPoint"),
+                    new XAttribute("id",                        "D1"),
+                    new XAttribute("version",                   "1"),
+                    new XElement(aegi + "deliveryUnit",         "litre"),
+                    new XElement(aegi + "dieselVehicleType",    "truckDiesel"),
+                    new XElement(aegi + "cetane",               "51")
+                )
+            );
+
+            Assert.That(ValidateTableSchema(xml.ToString(), out _, out var inputErrors), Is.True, String.Join(Environment.NewLine, inputErrors));
+
+            static OtherRefillPoint TheDieselRefillPoint(APayloadPublication Payload)
+
+                => ((EnergyInfrastructureTablePublication) Payload).EnergyInfrastructureTables.Single().
+                                                                    EnergyInfrastructureSites.Single().
+                                                                    EnergyInfrastructureStations.
+                                                                    SelectMany(station => station.RefillPoints).
+                                                                    OfType<OtherRefillPoint>().
+                                                                    Single();
+
+            Assert.That(Payload.TryParseXML(xml, out var payload, out var errorResponse), Is.True, errorResponse);
+
+            var publication  = (EnergyInfrastructureTablePublication) payload!;
+            var diesel       = TheDieselRefillPoint(publication);
+
+            Assert.Multiple(() => {
+                Assert.That(diesel.Type,                                                   Is.EqualTo("DieselRefillPoint"));
+                Assert.That(diesel.Id,                                                     Is.EqualTo("D1"));
+                Assert.That(diesel.DeliveryUnit.ToString(),                                Is.EqualTo("litre"));
+                Assert.That(diesel.TypeElements.Select(element => element.Name.LocalName), Is.EqualTo(new[] { "dieselVehicleType", "cetane" }));
+                Assert.That(publication.EnergyInfrastructureTables.Single().EnergyInfrastructureSites.Single().EnergyInfrastructureStations.
+                                SelectMany(station => station.RefillPoints).OfType<ElectricChargingPoint>().Count(),
+                            Is.EqualTo(4));
+            });
+
+            // Written as XML, and read again.
+            var written = publication.ToXML();
+
+            Assert.That(ValidateTableSchema(written.ToString(), out _, out var errors), Is.True, String.Join(Environment.NewLine, errors));
+            Assert.That(Payload.TryParseXML(written, out var again, out errorResponse), Is.True, errorResponse);
+            Assert.That(TheDieselRefillPoint(again!).TypeElements.Last().Value, Is.EqualTo("51"));
+
+            // Written as DATEX II 3.7 JSON, and read again.
+            var json = publication.ToJSON();
+
+            Assert.That(JSONSchemas.Validate(JSONSchemas.DATEXII_3_7_Payload, json, out var jsonErrors), Is.True, String.Join(Environment.NewLine, jsonErrors) + Environment.NewLine + json);
+            Assert.That(EnergyInfrastructureTablePublication.TryParseJSON(json, out var fromJSON, out errorResponse), Is.True, errorResponse);
+            Assert.That(TheDieselRefillPoint(fromJSON!).Type, Is.EqualTo("DieselRefillPoint"));
+
+        }
+
+        #endregion
+
+        #region ARefillPointStatusWithoutItsOwnTypeIsRead(XSIType)
+
+        /// <summary>
+        /// refillPointStatus is declared with the concrete type aegi:RefillPointStatus, so it needs no xsi:type, and it
+        /// is the status of every refill point that is no electric charging point. It was not read before.
+        /// </summary>
+        [TestCase(null)]
+        [TestCase("aegi:RefillPointStatus")]
+        public void ARefillPointStatusWithoutItsOwnTypeIsRead(String? XSIType)
+        {
+
+            var aegi         = v3.DatexIINS.EnergyInfrastructure;
+            var xml          = Example("EnergyInfrastructureStatusPublication.xml");
+            var pointStatus  = xml.Descendants(aegi + "refillPointStatus").Single();
+
+            pointStatus.SetAttributeValue(v3.DatexIINS.XSI + "type", XSIType);
+
+            // What only an electric charging point status has.
+            foreach (var name in new[] { "remainingChargingTime", "currentVoltage", "currentChargingPower", "nextAvailableChargingSlots" })
+                pointStatus.Elements(aegi + name).Remove();
+
+            Assert.That(ValidateStatusSchema(xml.ToString(), out _, out var inputErrors), Is.True, String.Join(Environment.NewLine, inputErrors));
+
+            static RefillPointStatus TheRefillPointStatus(APayloadPublication Payload)
+
+                => ((EnergyInfrastructureStatusPublication) Payload).EnergyInfrastructureSiteStatus.Single().
+                                                                     EnergyInfrastructureStationStatus.Single().
+                                                                     RefillPointStatus.Single();
+
+            Assert.That(Payload.TryParseXML(xml, out var payload, out var errorResponse), Is.True, errorResponse);
+
+            var status = TheRefillPointStatus(payload!);
+
+            Assert.Multiple(() => {
+                Assert.That(status,                                                              Is.Not.InstanceOf<ElectricChargingPointStatus>());
+                Assert.That(status.Reference.Id,                                                 Is.EqualTo("73ABE928-707D-4A99-8043-4293EE685504"));
+                Assert.That(status.Status.ToString(),                                            Is.EqualTo("charging"));
+                Assert.That(status.LastUpdated,                                                  Is.EqualTo(DateTimeOffset.Parse("2025-02-02T12:50:00+01:00")));
+                Assert.That(status.NewOperatingHours,                                            Is.InstanceOf<OpenAllHours>());
+                Assert.That(status.WaitingTime,                                                  Is.EqualTo(TimeSpan.FromMinutes(30)));
+                Assert.That(status.PlannedRefillPointStatus.Single().Status.ToString(),          Is.EqualTo("reserved"));
+                Assert.That(status.EnergyRateUpdates.Single().EnergyPrices.Single().Value.Value, Is.EqualTo(0.37m));
+            });
+
+            var written = ((EnergyInfrastructureStatusPublication) payload!).ToXML();
+
+            Assert.That(ValidateStatusSchema(written.ToString(), out _, out var errors), Is.True, String.Join(Environment.NewLine, errors));
+            Assert.That(Payload.TryParseXML(written, out var again, out errorResponse), Is.True, errorResponse);
+            Assert.That(TheRefillPointStatus(again!).Status.ToString(), Is.EqualTo("charging"));
+
+        }
+
+        #endregion
+
+        #region ALinkThatIsNoURLIsLeftOut()
+
+        /// <summary>
+        /// Links are informative only: one that is no URL, e.g. the placeholder "https://---.com" of the example of the
+        /// profile, is left out, rather than making its energy product or organisation, and so the table, unreadable.
+        /// </summary>
+        [Test]
+        public void ALinkThatIsNoURLIsLeftOut()
+        {
+
+            var aegi           = v3.DatexIINS.EnergyInfrastructure;
+            var afac           = v3.DatexIINS.Facilities;
+            var xml            = Example("EnergyInfrastructureTablePublication.xml");
+            var energyProduct  = xml.Descendants(aegi + "energyProduct").First();
+
+            energyProduct.Element(aegi + "energyProductName")!.AddAfterSelf(
+                new XElement(aegi + "energyProductInformation",  "https://---.com"),
+                new XElement(aegi + "renewableEnergyEvidence",   "https://example.org/evidence")
+            );
+
+            xml.Descendants(afac + "operator").First().Element(afac + "name")!.AddAfterSelf(
+                new XElement(afac + "linkToLogo",                "https://---.com")
+            );
+
+            Assert.That(Payload.TryParseXML(xml, out var payload, out var errorResponse), Is.True, errorResponse);
+
+            var publication  = (EnergyInfrastructureTablePublication) payload!;
+            var site         = publication.EnergyInfrastructureTables.Single().EnergyInfrastructureSites.Single();
+            var product      = site.EnergyInfrastructureStations.SelectMany(station => station.RefillPoints).OfType<ElectricChargingPoint>().First().ElectricEnergy.First();
+
+            Assert.Multiple(() => {
+                Assert.That(product.EnergyProductInformation,              Is.Null);
+                Assert.That(product.RenewableEnergyEvidence?.ToString(),   Is.EqualTo("https://example.org/evidence"));
+                Assert.That(((AnOrganisation) site.Operator!).LinkToLogo,  Is.Null);
+            });
+
+            Assert.That(ValidateTableSchema(publication.ToXML().ToString(), out _, out var errors), Is.True, String.Join(Environment.NewLine, errors));
+
+        }
+
+        #endregion
+
     }
 
 }

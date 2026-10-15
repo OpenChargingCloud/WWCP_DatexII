@@ -151,7 +151,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
             if (!XML.TryParseOptionalValue(DatexIINS.Facilities + "lastUpdated",         "last updated",         DatexIIXMLExtensions.TryParseTimestamp,  out DateTimeOffset?      lastUpdated,        out ErrorResponse) ||
                 !XML.TryParseOptionalValue(DatexIINS.Facilities + "operatingAllYear",    "operating all year",   DatexIIXMLExtensions.TryParseBoolean,    out Boolean?             operatingAllYear,   out ErrorResponse) ||
-                !XML.TryParseOptionalValue(DatexIINS.Facilities + "urlLinkAddress",      "URL link address",     URL.TryParse,                            out URL?                 urlLinkAddress,     out ErrorResponse) ||
                 !XML.TryParseOptionalXML  (DatexIINS.Facilities + "closureInformation",  "closure information",  Facilities.ClosureInformation.TryParseXML, out ClosureInformation? closureInformation, out ErrorResponse))
             {
                 return false;
@@ -169,7 +168,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                                               lastUpdated,
                                               XML.OptionalText(DatexIINS.Facilities + "label"),
                                               operatingAllYear,
-                                              urlLinkAddress,
+                                              XML.OptionalURL(DatexIINS.Facilities + "urlLinkAddress"),
                                               XML.Element(DatexIINS.Facilities + "_operatingHoursSpecificationExtension"),
 
                                               closureInformation,

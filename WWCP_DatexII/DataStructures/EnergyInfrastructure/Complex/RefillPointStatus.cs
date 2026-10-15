@@ -117,38 +117,49 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                                           [NotNullWhen(false)] out String?             ErrorResponse)
         {
 
-            RefillPointStatus  = null;
-            ErrorResponse      = null;
+            RefillPointStatus = null;
 
-            var concreteTypeAttribute        = XML.Attribute(DatexIINS.XSI + "type");
-            var concreteTypeNamespace        = concreteTypeAttribute?.Name.NamespaceName;
-            var concreteTypeName             = concreteTypeAttribute?.Value.Split(':');
-
-            var concreteTypeNamespacePrefix  = concreteTypeName?.Length == 2 ? XML.GetNamespaceOfPrefix(concreteTypeName?[0] ?? "") : DatexIINS.EnergyInfrastructure.NamespaceName;
-            var concreteTypeNamespaceSuffix  = concreteTypeName?.Length == 2 ? concreteTypeName?[1] ?? "" : concreteTypeName?[0] ?? "";
-
-
-            if (concreteTypeNamespacePrefix?.NamespaceName == DatexIINS.EnergyInfrastructure.NamespaceName)
+            switch (XML.XSIType())
             {
 
-                switch (concreteTypeNamespaceSuffix)
-                {
+                case "ElectricChargingPointStatus":
+                    if (ElectricChargingPointStatus.TryParseXML(XML, out var electricChargingPointStatus, out ErrorResponse)) { RefillPointStatus = electricChargingPointStatus; return true; }
+                    return false;
 
-                    case "ElectricChargingPointStatus":
-                        if (ElectricChargingPointStatus.TryParseXML(XML,
-                                                                    out var electricChargingPointStatus,
-                                                                    out ErrorResponse))
-                        {
-                            RefillPointStatus = electricChargingPointStatus;
-                            return true;
-                        }
-                        break;
+                // The schema declares refillPointStatus with this concrete type, so it needs no xsi:type. It is the
+                // status of any refill point, e.g. of a diesel refill point, as no other has a status type of its own.
+                case null:
+                case "RefillPointStatus":
 
-                }
+                    // What an electric charging point status adds is not there, everything else is read the same way.
+                    if (!ElectricChargingPointStatus.TryParseXML(XML, out var status, out ErrorResponse))
+                        return false;
+
+                    RefillPointStatus = new RefillPointStatus(
+                                            status.Status,
+                                            status.Reference,
+                                            status.UnitsInStock,
+                                            status.EnergyRateUpdates,
+                                            status.WaitingTime,
+                                            status.PlannedRefillPointStatus,
+                                            status.RefillPointStatusExtension,
+                                            status.LastUpdated,
+                                            status.OpeningStatus,
+                                            status.OperationStatus,
+                                            status.RegularOperatingHoursInForce,
+                                            status.StatusDescription,
+                                            status.NewOperatingHours,
+                                            status.Fault,
+                                            status.FacilityObjectStatusExtension
+                                        );
+
+                    return true;
+
+                default:
+                    ErrorResponse = $"Refill point statuses of the type '{XML.XSIType()}' can not be parsed!";
+                    return false;
 
             }
-
-            return RefillPointStatus is not null;
 
         }
 

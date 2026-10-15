@@ -152,8 +152,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         #region TryParseXML(XML, out RefillPoint, out ErrorResponse)
 
         /// <summary>
-        /// Try to parse the given XML representation of a refill point, by its xsi:type.
-        /// Only electric charging points can be parsed so far.
+        /// Try to parse the given XML representation of a refill point, by its xsi:type: an electric charging point,
+        /// or another refill point of the AFIR namespace (see OtherRefillPoint).
         /// </summary>
         /// <param name="XML">The XML to be parsed.</param>
         /// <param name="RefillPoint">The parsed refill point.</param>
@@ -173,7 +173,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                     return false;
 
                 default:
-                    ErrorResponse = $"Refill points of the type '{XML.XSIType()}' can not be parsed yet!";
+                    if (OtherRefillPoint.TryParseXML(XML, out var otherRefillPoint, out ErrorResponse)) { RefillPoint = otherRefillPoint; return true; }
                     return false;
 
             }

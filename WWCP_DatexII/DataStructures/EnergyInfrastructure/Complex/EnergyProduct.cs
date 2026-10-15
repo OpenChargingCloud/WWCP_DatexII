@@ -161,8 +161,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
             if (!XML.TryParseOptionalXML   (DatexIINS.EnergyInfrastructure + "energyProductName",         "energy product name",          MultilingualString.  TryParseXML,     out MultilingualString?               energyProductName,        out ErrorResponse) ||
                 !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "isGreenEnergy",             "is green energy",              DatexIIXMLExtensions.TryParseBoolean, out Boolean?                          isGreenEnergy,            out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "energyRateByReference",     "energy rate by reference",     EnergyRateReference. TryParseXML,     out IEnumerable<EnergyRateReference>  energyRateByReference,    out ErrorResponse) ||
-                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "energyProductInformation",  "energy product information",   URL.TryParse,                         out URL?                              energyProductInformation, out ErrorResponse) ||
-                !XML.TryParseOptionalValue (DatexIINS.EnergyInfrastructure + "renewableEnergyEvidence",   "renewable energy evidence",    URL.TryParse,                         out URL?                              renewableEnergyEvidence,  out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "mobilityServiceProvider",   "mobility service provider",    AOrganisation.       TryParseXML,     out IEnumerable<AOrganisation>        mobilityServiceProviders, out ErrorResponse) ||
                 !XML.TryParseOptionalXMLs  (DatexIINS.EnergyInfrastructure + "energyRate",                "energy rate",                  EnergyRate.          TryParseXML,     out IEnumerable<EnergyRate>           energyRates,              out ErrorResponse))
             {
@@ -173,8 +171,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                         energyProductName,
                         isGreenEnergy,
                         energyRateByReference,
-                        energyProductInformation,
-                        renewableEnergyEvidence,
+                        XML.OptionalURL(DatexIINS.EnergyInfrastructure + "energyProductInformation"),
+                        XML.OptionalURL(DatexIINS.EnergyInfrastructure + "renewableEnergyEvidence"),
                         mobilityServiceProviders,
                         energyRates,
                         XML.Element(DatexIINS.EnergyInfrastructure + "_energyProductExtension")

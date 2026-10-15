@@ -612,6 +612,84 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         #endregion
 
+        #region TheImporterLeavesOutRefillPointsThatAreNoChargingPoints()
+
+        /// <summary>
+        /// A diesel refill point next to the EVSE: the table is imported with a warning about it, and its status is
+        /// skipped rather than taken for the status of an unknown EVSE.
+        /// </summary>
+        [Test]
+        public async Task TheImporterLeavesOutRefillPointsThatAreNoChargingPoints()
+        {
+
+            var history  = POI.RoamingNetworkHistory.Start(ANetwork(WithPools: false));
+            var errors   = new List<String>();
+
+            await using var importer = new DatexIIToPOI3Importer(history, changeSet => changeSet.SignedByAll(history.Head.RoamingNetwork));
+
+            importer.OnError += (sender, description, warnings) => { lock (errors) errors.Add(description + " " + String.Join(" ", warnings)); };
+
+            var aegi     = DatexIINS.EnergyInfrastructure;
+            var table    = POI3Mapper.ToTablePublication(ANetwork(), Creator, Languages.de, "rn1", "1", [], StationIdBNetzA: station => "BNetzA-4711").ToXML();
+
+            table.Descendants(aegi + "refillPoint").Last().AddAfterSelf(
+                new XElement(aegi + "refillPoint",
+                    new XAttribute(DatexIINS.XSI + "type",  "aegi:DieselRefillPoint"),
+                    new XAttribute("id",                     "D1"),
+                    new XAttribute("version",                "1"),
+                    new XElement(aegi + "deliveryUnit",      "litre")
+                )
+            );
+
+            Assert.That(ValidateTableSchema(table.ToString(), out _, out var tableErrors), Is.True, String.Join(Environment.NewLine, tableErrors));
+
+            await importer.ImportAsync(table);
+
+            Assert.That(history.Head.RoamingNetwork.GetChargingStationOperatorById(GEF)!.EVSEs.Single().Id, Is.EqualTo(E1));
+
+            lock (errors)
+                Assert.That(errors.Single(), Does.Contain("'D1'").And.Contain("no electric charging point"));
+
+            // The statuses of both.
+            var status   = new EnergyInfrastructureStatusPublication(
+                               T0.AddMinutes(5),
+                               Creator,
+                               Languages.de,
+                               EnergyInfrastructureSiteStatus: [
+                                   new EnergyInfrastructureSiteStatus(
+                                       new FacilityObjectVersionedReference(P1.ToString()),
+                                       EnergyInfrastructureStationStatus: [
+                                           new EnergyInfrastructureStationStatus(
+                                               new FacilityObjectVersionedReference(S1.ToString()),
+                                               RefillPointStatus: [
+                                                   new ElectricChargingPointStatus(RefillPointStatusEnum.Parse("charging"),
+                                                                                   new FacilityObjectVersionedReference(E1.ToString()),
+                                                                                   LastUpdated: T0.AddMinutes(5)),
+                                                   new RefillPointStatus          (RefillPointStatusEnum.Parse("outOfStock"),
+                                                                                   new FacilityObjectVersionedReference("D1"),
+                                                                                   LastUpdated: T0.AddMinutes(5))
+                                               ]
+                                           )
+                                       ]
+                                   )
+                               ]
+                           ).ToXML();
+
+            Assert.That(ValidateStatusSchema(status.ToString(), out _, out var statusErrors), Is.True, String.Join(Environment.NewLine, statusErrors));
+
+            await importer.ImportAsync(status);
+
+            Assert.That(history.RuntimeStatus.TryGet(POI.POIRuntimeStatusKind.Status, nameof(POI.EVSE), E1.ToString(), out var current) &&
+                        current.Value == "charging",
+                        Is.True);
+
+            lock (errors)
+                Assert.That(errors, Has.Count.EqualTo(1), String.Join(Environment.NewLine, errors));
+
+        }
+
+        #endregion
+
         #region TheOfficialExampleBecomesAChargingPool()
 
         [Test]

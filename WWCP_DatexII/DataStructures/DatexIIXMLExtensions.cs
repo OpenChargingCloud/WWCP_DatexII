@@ -22,6 +22,7 @@ using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
+using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
 #endregion
 
@@ -286,6 +287,22 @@ namespace cloud.charging.open.protocols.DatexII.v3
                        : null;
 
         }
+
+        #endregion
+
+        #region OptionalURL(XML, Name)
+
+        /// <summary>
+        /// The URL of the given optional child element, or null when it is missing, empty or no URL, e.g. a placeholder
+        /// like "https://---.com" in the published examples. A link is informative only, so one that can not be read is
+        /// left out rather than making what it belongs to unreadable.
+        /// </summary>
+        public static URL? OptionalURL(this XElement  XML,
+                                       XName          Name)
+
+            => XML.OptionalText(Name) is String text && URL.TryParse(text, out var url)
+                   ? url
+                   : null;
 
         #endregion
 

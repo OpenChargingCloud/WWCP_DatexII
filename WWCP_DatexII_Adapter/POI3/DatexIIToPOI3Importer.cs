@@ -61,9 +61,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         #region Data
 
-        private readonly Channel<Func<Task>>                     work      = Channel.CreateUnbounded<Func<Task>>(new UnboundedChannelOptions { SingleReader = true });
-        private readonly ConcurrentDictionary<String, POI.EVSE_Id>  evseIds   = new();
-        private readonly Task                                    worker;
+        private readonly Channel<Func<Task>>                        work                 = Channel.CreateUnbounded<Func<Task>>(new UnboundedChannelOptions { SingleReader = true });
+        private readonly ConcurrentDictionary<String, POI.EVSE_Id>  evseIds              = new();
+        private readonly ConcurrentDictionary<String, Byte>         otherRefillPointIds  = new();
+        private readonly Task                                       worker;
 
         #endregion
 
@@ -277,6 +278,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                         if (POI3Mapper.ToPOI3EVSEId(chargingPoint, operatorId.Value) is POI.EVSE_Id evseId)
                             evseIds[chargingPoint.Id] = evseId;
 
+                    // And which refill points are no EVSEs, e.g. diesel ones: their statuses are skipped.
+                    foreach (var otherRefillPoint in site.EnergyInfrastructureStations.SelectMany(station => station.RefillPoints).OfType<OtherRefillPoint>())
+                        otherRefillPointIds[otherRefillPoint.Id] = 0;
+
                 }
             }
 
@@ -364,6 +369,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 {
                     foreach (var refillPointStatus in stationStatus.RefillPointStatus)
                     {
+
+                        if (otherRefillPointIds.ContainsKey(refillPointStatus.Reference.Id))
+                            continue;
 
                         var evseId = evseIds.TryGetValue(refillPointStatus.Reference.Id, out var known)
                                          ? known
