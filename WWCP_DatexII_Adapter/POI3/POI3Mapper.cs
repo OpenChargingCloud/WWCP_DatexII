@@ -256,7 +256,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                    "available"    => "available",
                    "blocked"      => "blocked",
                    "charging"     => "charging",
-                   "faulted"      => "faulted",
+                   "faulted"      => "error",
                    "inoperative"  => "inoperative",
                    "occupied"     => "occupied",
                    "outOfOrder"   => "outOfOrder",
