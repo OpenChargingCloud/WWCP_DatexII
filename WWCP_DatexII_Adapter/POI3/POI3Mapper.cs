@@ -1005,14 +1005,43 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                       point.Reservation.Value.ToString() is "optional" or "mandatory" or "partly")
                                          ? [ POI.ChargingStationFeature.Reservable ]
                                          : null,
-                       // Only a total maximum power of its own: the sum of the charging points is what POI3 tells anyway.
+                       // Only a total maximum power of its own: the sum of the charging points is what POI3 tells anyway,
+                       // and more than that sum POI3 refuses.
                        MaxPower:     Station.TotalMaximumPower is Watt totalMaximumPower &&
                                      totalMaximumPower.Value > 0 &&
-                                     totalMaximumPower.Value != evses.Sum(evse => evse.MaxPower?.Value ?? 0)
+                                     totalMaximumPower.Value != evses.Sum(evse => evse.MaxPower?.Value ?? 0) &&
+                                     !ExceedsItsChargingPoints(totalMaximumPower, evses, Station.Id, Warnings)
                                          ? totalMaximumPower
                                          : null,
                        LastChange:   Station.LastUpdated
                    );
+
+        }
+
+        #endregion
+
+        #region (private static) ExceedsItsChargingPoints(TotalMaximumPower, EVSEs, StationId, Warnings)
+
+        /// <summary>
+        /// Whether the given total maximum power of a station exceeds the maximum power of all its charging points
+        /// together, where all of them tell theirs; POI3 refuses a charging station with that, so it is left out.
+        /// </summary>
+        private static Boolean ExceedsItsChargingPoints(Watt                 TotalMaximumPower,
+                                                        IList<POI.EVSE>      EVSEs,
+                                                        String               StationId,
+                                                        ICollection<String>  Warnings)
+        {
+
+            if (EVSEs.Count == 0 || EVSEs.Any(evse => !evse.MaxPower.HasValue))
+                return false;
+
+            var chargingPointsMaximumPower = EVSEs.Sum(evse => evse.MaxPower!.Value.Value);
+
+            if (TotalMaximumPower.Value <= chargingPointsMaximumPower)
+                return false;
+
+            Warnings.Add($"The total maximum power of the station '{StationId}', {TotalMaximumPower.Value} W, exceeds the {chargingPointsMaximumPower} W of its charging points together, and is left out!");
+            return true;
 
         }
 
