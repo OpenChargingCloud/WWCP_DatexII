@@ -333,7 +333,7 @@ writes and reads these differences:
 
 - **Not read:**
   - OpenLR (17 types without a class);
-  - calendar variants, ISO and NUTS named areas;
+  - calendar variants and NUTS named areas (named areas and ISO named areas are read);
   - `LocationByReference` and location groups.
 - **Not modelled:** `associatedFacility`, `rates`/`newRates` (the generic rate tables of 3.7) and the 3.7 publications
   other than table and status. The profile uses none of them; the parsers skip them.
@@ -347,7 +347,5 @@ writes and reads these differences:
   unreadable.
 - **`[XmlElement(Namespace = …)]` annotations:** they name the namespace of the element's type rather than of the
   element. Nothing uses `XmlSerializer`, so this is only misleading documentation.
-- **`Serialize_Period_Test1`:** it still pins a `NamedArea`/`IsoNamedArea` output that nests an extra
-  `NamedArea`/`MultilingualString` element.
-- **Extensions:** extension elements are written inside a wrapper of their name. A parsed extension (the element itself)
-  is therefore nested once more when it is written again.
+- **Extensions:** an extension read is the extension element itself, and it is written again as it was. An extension
+  given as an element of another name is written inside an extension element. Their content is kept as XML.

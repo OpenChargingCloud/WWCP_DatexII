@@ -221,7 +221,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                    OverallPeriod.ToXML(DatexIINS.Facilities + "overallPeriod"),
 
                    OperatingHoursSpecificationExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_operatingHoursSpecificationExtension", OperatingHoursSpecificationExtension)
+                       ? OperatingHoursSpecificationExtension.ToExtensionXML(DatexIINS.Facilities + "_operatingHoursSpecificationExtension")
                        : null
 
                );

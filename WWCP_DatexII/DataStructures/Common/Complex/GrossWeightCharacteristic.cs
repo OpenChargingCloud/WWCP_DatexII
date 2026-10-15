@@ -135,7 +135,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                    new XElement(DatexIINS.Common + "typeOfWeight",         TypeOfWeight.ToString()),
 
                    GrossWeightCharacteristicExtension is not null
-                       ? new XElement(DatexIINS.Common + "_grossWeightCharacteristicExtension", GrossWeightCharacteristicExtension)
+                       ? GrossWeightCharacteristicExtension.ToExtensionXML(DatexIINS.Common + "_grossWeightCharacteristicExtension")
                        : null
 
                );

@@ -119,7 +119,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                        : null,
 
                    ServiceTypeExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_serviceTypeExtension", ServiceTypeExtension)
+                       ? ServiceTypeExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_serviceTypeExtension")
                        : null
 
                );

@@ -398,6 +398,58 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
         #endregion
 
+        #region AnExtensionIsWrittenAgainAsItWasRead()
+
+        /// <summary>
+        /// An extension read is the extension element itself. It is written again as it was, not nested in an
+        /// element of its name once more: a plain extension, and a typed one with more than one foreign element.
+        /// </summary>
+        [Test]
+        public void AnExtensionIsWrittenAgainAsItWasRead()
+        {
+
+            var aegi   = v3.DatexIINS.EnergyInfrastructure;
+            var loc    = v3.DatexIINS.LocationReferencing;
+            XNamespace test = "urn:test";
+
+            var xml    = Example("EnergyInfrastructureTablePublication.xml");
+
+            xml.Descendants(aegi + "refillPoint").First().Element(aegi + "currentType")!.AddBeforeSelf(
+                new XElement(aegi + "_refillPointExtension",
+                    new XElement(test + "plug", "and charge")
+                )
+            );
+
+            xml.Descendants(loc + "_locationExtension").First().Add(
+                new XElement(test + "first",  "1"),
+                new XElement(test + "second", "2")
+            );
+
+            Assert.That(ValidateTableSchema(xml.ToString(), out _, out var inputErrors), Is.True, String.Join(Environment.NewLine, inputErrors));
+
+            Assert.That(Payload.TryParseXML(xml, out var payload, out var errorResponse), Is.True, errorResponse);
+
+            var written = ((EnergyInfrastructureTablePublication) payload!).ToXML();
+
+            Assert.That(ValidateTableSchema(written.ToString(), out _, out var errors), Is.True, String.Join(Environment.NewLine, errors));
+
+            var refillPointExtension  = written.Descendants(aegi + "refillPoint").First().Elements(aegi + "_refillPointExtension").Single();
+            var locationExtension     = written.Descendants(loc  + "_locationExtension").First();
+
+            Assert.Multiple(() => {
+                Assert.That(refillPointExtension.Elements().Select(element => element.Name),  Is.EqualTo(new[] { test + "plug" }));
+                Assert.That(refillPointExtension.Value,                                         Is.EqualTo("and charge"));
+                Assert.That(locationExtension.Elements().Select(element => element.Name),      Is.EqualTo(new[] { loc + "afirFacilityLocation", test + "first", test + "second" }));
+            });
+
+            // And the same once more.
+            Assert.That(Payload.TryParseXML(written, out var again, out errorResponse), Is.True, errorResponse);
+            Assert.That(XNode.DeepEquals(((EnergyInfrastructureTablePublication) again!).ToXML(), written), Is.True);
+
+        }
+
+        #endregion
+
     }
 
 }

@@ -59,7 +59,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                 yield return element;
 
             if (LocationGroupExtension is not null)
-                yield return new XElement(DatexIINS.LocationReferencing + "_locationGroupExtension", LocationGroupExtension);
+                yield return LocationGroupExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_locationGroupExtension");
 
         }
 

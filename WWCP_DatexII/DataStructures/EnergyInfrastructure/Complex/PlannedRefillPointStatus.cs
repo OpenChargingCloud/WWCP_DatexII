@@ -142,7 +142,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    OverallPeriod.ToXML(DatexIINS.EnergyInfrastructure + "overallPeriod"),
 
                    PlannedRefillPointStatusExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_plannedRefillPointStatusExtension", PlannedRefillPointStatusExtension)
+                       ? PlannedRefillPointStatusExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_plannedRefillPointStatusExtension")
                        : null
 
                );

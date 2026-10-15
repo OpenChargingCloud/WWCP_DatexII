@@ -261,7 +261,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 yield return Amenities.ToXML(DatexIINS.Facilities + "amenities");
 
             if (FacilityObjectExtension is not null)
-                yield return new XElement(DatexIINS.Facilities + "_facilityObjectExtension", FacilityObjectExtension);
+                yield return FacilityObjectExtension.ToExtensionXML(DatexIINS.Facilities + "_facilityObjectExtension");
 
         }
 

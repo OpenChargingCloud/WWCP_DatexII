@@ -67,6 +67,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                     if (LocationReferencing.NamedArea.TryParseXML(XML, out var namedArea, out ErrorResponse)) { ANamedArea = namedArea; return true; }
                     return false;
 
+                case "IsoNamedArea":
+                    if (LocationReferencing.ISONamedArea.TryParseXML(XML, out var isoNamedArea, out ErrorResponse)) { ANamedArea = isoNamedArea; return true; }
+                    return false;
+
                 default:
                     ErrorResponse = $"Named areas of the type '{XML.XSIType()}' can not be parsed yet!";
                     return false;

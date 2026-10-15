@@ -82,7 +82,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                 yield return SupplementaryPositionalDescription.ToXML(DatexIINS.LocationReferencing + "supplementaryPositionalDescription");
 
             if (NetworkLocationExtension is not null)
-                yield return new XElement(DatexIINS.LocationReferencing + "_networkLocationExtension", NetworkLocationExtension);
+                yield return NetworkLocationExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_networkLocationExtension");
 
         }
 

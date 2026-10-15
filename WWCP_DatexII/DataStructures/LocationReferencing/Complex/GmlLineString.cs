@@ -89,7 +89,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    new XElement(DatexIINS.LocationReferencing + "posList",      PosList.Value),
 
                    GMLLineStringExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_gmlLineStringExtension", GMLLineStringExtension)
+                       ? GMLLineStringExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_gmlLineStringExtension")
                        : null
 
                );

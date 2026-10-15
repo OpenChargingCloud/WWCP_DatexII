@@ -330,7 +330,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    Connector.Select(connector => connector.ToXML(DatexIINS.EnergyInfrastructure + "connector")),
 
                    ElectricChargingPointExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_electricChargingPointExtension", ElectricChargingPointExtension)
+                       ? ElectricChargingPointExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_electricChargingPointExtension")
                        : null
 
                );

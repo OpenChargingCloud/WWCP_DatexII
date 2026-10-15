@@ -84,7 +84,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                     FromMinute.HasValue ? new XElement(DatexIINS.EnergyInfrastructure + "fromMinute", FromMinute.Value) : null,
                     ToMinute.  HasValue ? new XElement(DatexIINS.EnergyInfrastructure + "toMinute",   ToMinute.  Value) : null,
                     TimeBasedApplicabilityExtension is not null
-                        ? new XElement(DatexIINS.EnergyInfrastructure + "_timeBasedApplicabilityExtension", TimeBasedApplicabilityExtension)
+                        ? TimeBasedApplicabilityExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_timeBasedApplicabilityExtension")
                         : null);
 
     }
@@ -148,7 +148,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                     FromKWh.HasValue ? new XElement(DatexIINS.EnergyInfrastructure + "fromKWh", FromKWh.Value) : null,
                     ToKWh.  HasValue ? new XElement(DatexIINS.EnergyInfrastructure + "toKWh",   ToKWh.  Value) : null,
                     EnergyBasedApplicabilityExtension is not null
-                        ? new XElement(DatexIINS.EnergyInfrastructure + "_energyBasedApplicabilityExtension", EnergyBasedApplicabilityExtension)
+                        ? EnergyBasedApplicabilityExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_energyBasedApplicabilityExtension")
                         : null);
 
     }

@@ -80,7 +80,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                        new XElement(DatexIINS.Common + "applicableCalenderWeekWithinMonth", applicableCalendarWeekWithinMonth.ToString())),
 
                    CalendarWeekWithinMonthExtension is not null
-                       ? new XElement(DatexIINS.Common + "_calendarWeekWithinMonthExtension", CalendarWeekWithinMonthExtension)
+                       ? CalendarWeekWithinMonthExtension.ToExtensionXML(DatexIINS.Common + "_calendarWeekWithinMonthExtension")
                        : null
 
                );

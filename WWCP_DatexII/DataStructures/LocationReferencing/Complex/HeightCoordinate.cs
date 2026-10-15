@@ -98,7 +98,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                        : null,
 
                    HeightCoordinateExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_heightCoordinateExtension", HeightCoordinateExtension)
+                       ? HeightCoordinateExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_heightCoordinateExtension")
                        : null
 
                );

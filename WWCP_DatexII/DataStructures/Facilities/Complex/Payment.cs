@@ -134,7 +134,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                    OtherBrandsAccepted.Select(brand             => new XElement(DatexIINS.Facilities + "otherBrandsAccepted",  brand)),
 
                    PaymentExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_paymentExtension", PaymentExtension)
+                       ? PaymentExtension.ToExtensionXML(DatexIINS.Facilities + "_paymentExtension")
                        : null
 
                );

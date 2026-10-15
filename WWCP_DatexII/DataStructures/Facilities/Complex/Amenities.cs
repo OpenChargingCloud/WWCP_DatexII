@@ -137,7 +137,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                        : null,
 
                    AmenitiesExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_amenitiesExtension", AmenitiesExtension)
+                       ? AmenitiesExtension.ToExtensionXML(DatexIINS.Facilities + "_amenitiesExtension")
                        : null
 
                );

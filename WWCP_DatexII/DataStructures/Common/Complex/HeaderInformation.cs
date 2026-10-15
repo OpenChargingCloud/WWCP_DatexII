@@ -156,7 +156,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                 new XElement(DatexIINS.Common + "informationStatus",             InformationStatus.     ToString()),
 
                           HeaderInformationExtension is not null
-                              ? new XElement(DatexIINS.Common + "_headerInformationExtension",   HeaderInformationExtension)
+                              ? HeaderInformationExtension.ToExtensionXML(DatexIINS.Common + "_headerInformationExtension")
                               : null
 
                       );

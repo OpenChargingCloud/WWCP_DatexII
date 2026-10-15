@@ -135,7 +135,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 yield return Fault.ToXML(DatexIINS.Facilities + "fault");
 
             if (FacilityObjectStatusExtension is not null)
-                yield return new XElement(DatexIINS.Facilities + "_facilityObjectStatusExtension", FacilityObjectStatusExtension);
+                yield return FacilityObjectStatusExtension.ToExtensionXML(DatexIINS.Facilities + "_facilityObjectStatusExtension");
 
         }
 

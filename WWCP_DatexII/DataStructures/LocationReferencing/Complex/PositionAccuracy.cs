@@ -87,7 +87,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                        : null,
 
                    PositionAccuracyExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_positionAccuracyExtension", PositionAccuracyExtension)
+                       ? PositionAccuracyExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_positionAccuracyExtension")
                        : null
 
                );

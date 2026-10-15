@@ -130,7 +130,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                    new XElement(DatexIINS.Facilities + "imageFormat",   Format.ToString()),
 
                    ImageExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_imageExtension",  ImageExtension)
+                       ? ImageExtension.ToExtensionXML(DatexIINS.Facilities + "_imageExtension")
                        : null
 
                );

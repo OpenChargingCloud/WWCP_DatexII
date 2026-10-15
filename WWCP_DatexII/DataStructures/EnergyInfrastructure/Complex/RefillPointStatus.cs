@@ -194,7 +194,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                 yield return plannedRefillPointStatus.ToXML(DatexIINS.EnergyInfrastructure + "plannedRefillPointStatus");
 
             if (RefillPointStatusExtension is not null)
-                yield return new XElement(DatexIINS.EnergyInfrastructure + "_refillPointStatusExtension", RefillPointStatusExtension);
+                yield return RefillPointStatusExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_refillPointStatusExtension");
 
         }
 

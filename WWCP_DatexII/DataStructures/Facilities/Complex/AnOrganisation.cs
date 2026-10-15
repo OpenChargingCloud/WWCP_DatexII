@@ -346,7 +346,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 yield return subOrganisation.ToXML(DatexIINS.Facilities + "subOrganisation");
 
             if (AnOrganisationExtension is not null)
-                yield return new XElement(DatexIINS.Facilities + "_anOrganisationExtension", AnOrganisationExtension);
+                yield return AnOrganisationExtension.ToExtensionXML(DatexIINS.Facilities + "_anOrganisationExtension");
 
         }
 

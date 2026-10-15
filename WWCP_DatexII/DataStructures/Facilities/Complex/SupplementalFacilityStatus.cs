@@ -177,7 +177,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                        : null,
 
                    SupplementalFacilityStatusExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_supplementalFacilityStatusExtension", SupplementalFacilityStatusExtension)
+                       ? SupplementalFacilityStatusExtension.ToExtensionXML(DatexIINS.Facilities + "_supplementalFacilityStatusExtension")
                        : null
 
                );

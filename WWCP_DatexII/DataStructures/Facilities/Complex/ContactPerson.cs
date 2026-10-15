@@ -167,7 +167,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                        : null,
 
                    ContactPersonExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_contactPersonExtension", ContactPersonExtension)
+                       ? ContactPersonExtension.ToExtensionXML(DatexIINS.Facilities + "_contactPersonExtension")
                        : null
 
                );

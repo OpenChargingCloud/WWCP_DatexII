@@ -76,7 +76,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    LocationContainedInGroup.Select(location => location.ToXML(DatexIINS.LocationReferencing + "locationContainedInGroup")),
 
                    LocationGroupByListExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_locationGroupByListExtension", LocationGroupByListExtension)
+                       ? LocationGroupByListExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_locationGroupByListExtension")
                        : null
 
                );

@@ -127,7 +127,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    base.ToXML().Elements(),
 
                    GMLLinearRingExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_gmlLinearRingExtension", GMLLinearRingExtension)
+                       ? GMLLinearRingExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_gmlLinearRingExtension")
                        : null
 
                );

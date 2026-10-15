@@ -121,7 +121,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                    NutsAreas.Select(nutsArea => nutsArea.ToXML(DatexIINS.Facilities + "nutsArea", DatexIINS.Facilities)),
 
                    AfirFacilityLocationExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_afirFacilityLocationExtension", AfirFacilityLocationExtension)
+                       ? AfirFacilityLocationExtension.ToExtensionXML(DatexIINS.Facilities + "_afirFacilityLocationExtension")
                        : null
 
                );

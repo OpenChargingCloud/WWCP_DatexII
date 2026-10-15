@@ -149,7 +149,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                        : null,
 
                    OrganisationUnitExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_organisationUnitExtension", OrganisationUnitExtension)
+                       ? OrganisationUnitExtension.ToExtensionXML(DatexIINS.Facilities + "_organisationUnitExtension")
                        : null
 
                );

@@ -116,7 +116,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                    new XElement(DatexIINS.Common + "heaviestAxleWeight",          HeaviestAxleWeight.Value),
 
                    HeaviestAxleWeightCharacteristicExtension is not null
-                       ? new XElement(DatexIINS.Common + "_heaviestAxleWeightCharacteristicExtension", HeaviestAxleWeightCharacteristicExtension)
+                       ? HeaviestAxleWeightCharacteristicExtension.ToExtensionXML(DatexIINS.Common + "_heaviestAxleWeightCharacteristicExtension")
                        : null
 
                );

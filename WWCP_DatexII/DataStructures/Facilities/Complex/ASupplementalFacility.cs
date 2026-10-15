@@ -298,7 +298,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 yield return new XElement(DatexIINS.Facilities + "nearby",              Nearby.Value);
 
             if (SupplementalFacilityExtension is not null)
-                yield return new XElement(DatexIINS.Facilities + "_supplementalFacilityExtension", SupplementalFacilityExtension);
+                yield return SupplementalFacilityExtension.ToExtensionXML(DatexIINS.Facilities + "_supplementalFacilityExtension");
 
         }
 

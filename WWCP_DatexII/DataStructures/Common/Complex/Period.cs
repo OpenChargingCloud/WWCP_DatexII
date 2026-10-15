@@ -224,7 +224,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
 
                           RecurringSpecialDay?.        Select(specialDay      => specialDay.     ToXML(DatexIINS.Common + "recurringSpecialDay")),
 
-                          PeriodExtension
+                          PeriodExtension.ToExtensionXML(DatexIINS.Common + "_periodExtension")
 
                       );
 

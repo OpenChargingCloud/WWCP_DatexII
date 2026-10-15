@@ -186,7 +186,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                        : null,
 
                    ClosureInformationExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_closureInformationExtension", ClosureInformationExtension)
+                       ? ClosureInformationExtension.ToExtensionXML(DatexIINS.Facilities + "_closureInformationExtension")
                        : null
 
                );

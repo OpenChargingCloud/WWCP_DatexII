@@ -126,7 +126,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                 new XElement(DatexIINS.Common + "nationalIdentifier",                  NationalIdentifier),
 
                           InternationalIdentifierExtension is not null
-                              ? new XElement(DatexIINS.Common + "_internationalIdentifierExtension",   InternationalIdentifierExtension)
+                              ? InternationalIdentifierExtension.ToExtensionXML(DatexIINS.Common + "_internationalIdentifierExtension")
                               : null
 
                       );

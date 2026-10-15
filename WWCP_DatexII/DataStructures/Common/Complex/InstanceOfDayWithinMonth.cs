@@ -76,7 +76,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                        new XElement(DatexIINS.Common + "applicableInstanceOfDayWithinMonth", applicableInstanceOfDayWithinMonth.ToString())),
 
                    InstanceOfDayWithinMonthExtension is not null
-                       ? new XElement(DatexIINS.Common + "_instanceOfDayWithinMonthExtension", InstanceOfDayWithinMonthExtension)
+                       ? InstanceOfDayWithinMonthExtension.ToExtensionXML(DatexIINS.Common + "_instanceOfDayWithinMonthExtension")
                        : null
 
                );

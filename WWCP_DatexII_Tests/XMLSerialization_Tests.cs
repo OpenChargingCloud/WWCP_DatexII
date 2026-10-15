@@ -17,11 +17,14 @@
 
 #region Usings
 
+using System.Xml.Linq;
+
 using NUnit.Framework;
 
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
+using cloud.charging.open.protocols.DatexII.v3;
 using cloud.charging.open.protocols.DatexII.v3.Common;
 using cloud.charging.open.protocols.DatexII.v3.Facilities;
 using cloud.charging.open.protocols.DatexII.v3.LocationExtension;
@@ -37,7 +40,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
     /// Unit tests for DatexII.
     /// </summary>
     [TestFixture]
-    public class XMLSerialization_Tests
+    public class XMLSerialization_Tests : AXMLSchemaValidation
     {
 
         // <Period xmlns="com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -74,7 +77,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
         #region Serialize_Period_Test1()
 
         /// <summary>
-        /// A test for the serialization of a Period.
+        /// A test for the serialization of a Period, with the named areas of a special day.
         /// </summary>
         [Test]
         public async Task Serialize_Period_Test1()
@@ -138,7 +141,14 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
                           );
 
-            Assert.That(period.ToXML().ToString(),  Is.EqualTo(@"<period xmlns=""http://datex2.eu/schema/3/common"">
+            var xml     = period.ToXML();
+
+            // The prefixes a payload declares, by which the xsi:types of the named areas are resolved.
+            xml.Add(new XAttribute(XNamespace.Xmlns + "loc", DatexIINS.LocationReferencing.NamespaceName),
+                    new XAttribute(XNamespace.Xmlns + "xsi", DatexIINS.XSI.NamespaceName));
+
+            // Every named area is a namedArea of its own, typed by xsi:type, and an area name holds its values.
+            Assert.That(xml.ToString(),  Is.EqualTo(@"<period xmlns:loc=""http://datex2.eu/schema/3/locationReferencing"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns=""http://datex2.eu/schema/3/common"">
   <startOfPeriod>2025-01-01T08:00:00.000+00:00</startOfPeriod>
   <endOfPeriod>2025-06-30T23:59:59.000+00:00</endOfPeriod>
   <periodName>
@@ -165,36 +175,53 @@ namespace cloud.charging.open.protocols.DatexII.Tests
     <intersectWithApplicableDays>true</intersectWithApplicableDays>
     <specialDayType>publicHoliday</specialDayType>
     <publicEvent>wineFestival</publicEvent>
-    <namedArea>
-      <NamedArea xmlns=""http://datex2.eu/schema/3/locationReferencing"">
-        <areaName>
-          <MultilingualString xmlns=""http://datex2.eu/schema/3/common"">
-            <values>
-              <value lang=""de"">Weinberg</value>
-              <value lang=""en"">Vineyard</value>
-            </values>
-          </MultilingualString>
-        </areaName>
-        <namedAreaType>ruralCounty</namedAreaType>
-        <country>DE</country>
-      </NamedArea>
-      <IsoNamedArea xmlns=""http://datex2.eu/schema/3/locationReferencing"">
-        <areaName>
-          <MultilingualString xmlns=""http://datex2.eu/schema/3/common"">
-            <values>
-              <value lang=""de"">ISO-Weinberg</value>
-              <value lang=""en"">ISO-Vineyard</value>
-            </values>
-          </MultilingualString>
-        </areaName>
-        <namedAreaType>touristArea</namedAreaType>
-        <country>DE</country>
-        <subdivisionType>county</subdivisionType>
-        <subdivisionCode>DE</subdivisionCode>
-      </IsoNamedArea>
+    <namedArea xsi:type=""loc:NamedArea"">
+      <loc:areaName>
+        <values>
+          <value lang=""de"">Weinberg</value>
+          <value lang=""en"">Vineyard</value>
+        </values>
+      </loc:areaName>
+      <loc:namedAreaType>ruralCounty</loc:namedAreaType>
+      <loc:country>DE</loc:country>
+    </namedArea>
+    <namedArea xsi:type=""loc:IsoNamedArea"">
+      <loc:areaName>
+        <values>
+          <value lang=""de"">ISO-Weinberg</value>
+          <value lang=""en"">ISO-Vineyard</value>
+        </values>
+      </loc:areaName>
+      <loc:namedAreaType>touristArea</loc:namedAreaType>
+      <loc:country>DE</loc:country>
+      <loc:subdivisionType>county</loc:subdivisionType>
+      <loc:subdivisionCode>DE</loc:subdivisionCode>
     </namedArea>
   </recurringSpecialDay>
 </period>"));
+
+            // And read again.
+            Assert.That(Period.TryParseXML(xml, out var again, out var errorResponse), Is.True, errorResponse);
+
+            var namedAreas = again!.RecurringSpecialDay.Single().NamedAreas.ToArray();
+
+            Assert.Multiple(() => {
+                Assert.That(namedAreas.Length,                                           Is.EqualTo(2));
+                Assert.That(((NamedArea)    namedAreas[0]).AreaName.Values.Select(value => value.Text), Is.EqualTo(new[] { "Weinberg", "Vineyard" }));
+                Assert.That(((NamedArea)    namedAreas[0]).NamedAreaType,                Is.EqualTo(NamedAreaType.RuralCounty));
+                Assert.That(((ISONamedArea) namedAreas[1]).SubdivisionType,              Is.EqualTo(SubdivisionType.County));
+                Assert.That(((ISONamedArea) namedAreas[1]).SubdivisionCode.Value,        Is.EqualTo("DE"));
+                Assert.That(((ISONamedArea) namedAreas[1]).Country,                      Is.EqualTo(Country.Germany));
+            });
+
+            // Valid where the schema has it: as a special day of an exception period of the example table.
+            var table   = XDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Examples", "EnergyInfrastructureTablePublication.xml"))).Root!;
+
+            table.Descendants(DatexIINS.Common + "recurringSpecialDay").First().AddAfterSelf(
+                period.RecurringSpecialDay.Single().ToXML(DatexIINS.Common + "recurringSpecialDay")
+            );
+
+            Assert.That(ValidateTableSchema(table.ToString(), out _, out var errors), Is.True, String.Join(Environment.NewLine, errors));
 
         }
 

@@ -165,7 +165,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                        : null,
 
                    OrganisationByReferenceExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_organisationByReferenceExtension", OrganisationByReferenceExtension)
+                       ? OrganisationByReferenceExtension.ToExtensionXML(DatexIINS.Facilities + "_organisationByReferenceExtension")
                        : null
 
                );

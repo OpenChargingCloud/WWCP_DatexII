@@ -79,7 +79,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                    PublicHolidayName.ToXML(DatexIINS.Common + "publicHolidayName"),
 
                    PublicHolidayExtension is not null
-                       ? new XElement(DatexIINS.Common + "_publicHolidayExtension", PublicHolidayExtension)
+                       ? PublicHolidayExtension.ToExtensionXML(DatexIINS.Common + "_publicHolidayExtension")
                        : null
 
                );

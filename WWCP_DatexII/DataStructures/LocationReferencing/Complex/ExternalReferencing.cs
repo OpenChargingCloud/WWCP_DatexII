@@ -110,7 +110,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    new XElement(DatexIINS.LocationReferencing + "externalReferencingSystem",   ExternalReferencingSystem),
 
                    ExternalReferencingExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_externalReferencingExtension", ExternalReferencingExtension)
+                       ? ExternalReferencingExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_externalReferencingExtension")
                        : null
 
                );

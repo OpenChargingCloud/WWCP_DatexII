@@ -128,7 +128,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                           new XElement(DatexIINS.Common + "startTimeOfPeriod",   StartTimeOfPeriod),
                           new XElement(DatexIINS.Common + "endTimeOfPeriod",     EndTimeOfPeriod),
 
-                          TimePeriodOfDayExtension
+                          TimePeriodOfDayExtension.ToExtensionXML(DatexIINS.Common + "_timePeriodOfDayExtension")
 
                       );
 

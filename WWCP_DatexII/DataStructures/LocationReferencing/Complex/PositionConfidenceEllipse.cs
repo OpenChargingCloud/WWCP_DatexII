@@ -125,7 +125,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                        : null,
 
                    PositionConfidenceEllipseExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_positionConfidenceEllipseExtension", PositionConfidenceEllipseExtension)
+                       ? PositionConfidenceEllipseExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_positionConfidenceEllipseExtension")
                        : null
 
                );

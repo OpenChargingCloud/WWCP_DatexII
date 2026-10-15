@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -69,51 +70,79 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional ISO named area information.
         /// </summary>
-        [XmlElement("_isoNamedAreaExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_isoNamedAreaExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?        ISONamedAreaExtension    { get; } = ISONamedAreaExtension;
 
         #endregion
 
 
-        #region ToXML(XMLName = null)
+        #region TryParseXML(XML, out ISONamedArea, out ErrorResponse)
 
-        public override XElement ToXML(XName? XMLName = null)
+        /// <summary>
+        /// Try to parse the given XML representation of an ISO named area.
+        /// </summary>
+        /// <param name="XML">The XML to be parsed.</param>
+        /// <param name="ISONamedArea">The parsed ISO named area.</param>
+        /// <param name="ErrorResponse">An optional error response.</param>
+        public static Boolean TryParseXML(XElement                                XML,
+                                          [NotNullWhen(true)]  out ISONamedArea?  ISONamedArea,
+                                          [NotNullWhen(false)] out String?        ErrorResponse)
         {
 
-            var xml = new XElement(XMLName ?? DatexIINS.LocationReferencing + "IsoNamedArea",
+            ISONamedArea = null;
 
-                                new XElement(DatexIINS.LocationReferencing + "areaName",
-                                    AreaName.ToXML()
-                                ),
+            if (!NamedArea.TryParseXML(XML, out var namedArea, out ErrorResponse))
+                return false;
 
-                          NamedAreaType.HasValue
-                              ? new XElement(DatexIINS.LocationReferencing + "namedAreaType",
-                                    NamedAreaType.ToString()
-                                )
-                              : null,
+            if (!XML.TryParseMandatoryValue(DatexIINS.LocationReferencing + "subdivisionType",  "subdivision type",  LocationReferencing.SubdivisionType.TryParse,  out SubdivisionType subdivisionType,  out ErrorResponse))
+                return false;
 
-                          Country is not null
-                              ? new XElement(DatexIINS.LocationReferencing + "country",
-                                    Country.Alpha2Code
-                                )
-                              : null,
+            var subdivisionCode = XML.OptionalText(DatexIINS.LocationReferencing + "subdivisionCode");
 
-                          NamedAreaExtension is not null
-                              ? new XElement(DatexIINS.Common + "_namedAreaExtension",   NamedAreaExtension)
-                              : null,
+            if (subdivisionCode is null || subdivisionCode.Length > 3)
+            {
+                ErrorResponse = subdivisionCode is null
+                                    ? "The subdivision code is missing!"
+                                    : $"Invalid subdivision code '{subdivisionCode}'!";
+                return false;
+            }
 
-                                new XElement(DatexIINS.LocationReferencing + "subdivisionType",   SubdivisionType.ToString()),
-                                new XElement(DatexIINS.LocationReferencing + "subdivisionCode",   SubdivisionCode.ToString()),
+            ISONamedArea = new ISONamedArea(
+                               namedArea.AreaName,
+                               subdivisionType,
+                               new SubdivisionCode(subdivisionCode),
+                               namedArea.NamedAreaType,
+                               namedArea.Country,
+                               namedArea.NamedAreaExtension,
+                               XML.Element(DatexIINS.LocationReferencing + "_isoNamedAreaExtension"),
+                               namedArea.ANamedAreaExtension
+                           );
 
-                          ISONamedAreaExtension is not null
-                              ? new XElement(DatexIINS.Common + "_isoNamedAreaExtension",   ISONamedAreaExtension)
-                              : null
-
-                      );
-
-            return xml;
+            return true;
 
         }
+
+        #endregion
+
+        #region ToXML(XMLName = null)
+
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
+        public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "namedArea",
+
+                    // The schema declares namedArea with the abstract type com:NamedArea.
+                    new XAttribute(DatexIINS.XSI + "type", "loc:IsoNamedArea"),
+
+                    ToXMLElements(),
+
+                    new XElement(DatexIINS.LocationReferencing + "subdivisionType",   SubdivisionType.ToString()),
+                    new XElement(DatexIINS.LocationReferencing + "subdivisionCode",   SubdivisionCode.ToString()),
+
+                    ISONamedAreaExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_isoNamedAreaExtension"));
 
         #endregion
 

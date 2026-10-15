@@ -181,7 +181,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                        : null,
 
                    PointLocationExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_pointLocationExtension", PointLocationExtension)
+                       ? PointLocationExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_pointLocationExtension")
                        : null
 
                );

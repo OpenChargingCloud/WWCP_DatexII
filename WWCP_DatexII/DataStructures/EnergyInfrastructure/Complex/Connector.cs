@@ -205,7 +205,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    ExternalIdentifier.Select(identifier => identifier.ToXML(DatexIINS.EnergyInfrastructure + "externalIdentifier")),
 
                    ConnectorExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_connectorExtension",  ConnectorExtension)
+                       ? ConnectorExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_connectorExtension")
                        : null
 
                );

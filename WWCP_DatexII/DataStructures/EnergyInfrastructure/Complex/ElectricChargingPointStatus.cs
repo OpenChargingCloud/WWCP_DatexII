@@ -420,7 +420,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    NextAvailableChargingSlots.Select(slot => new XElement(DatexIINS.EnergyInfrastructure + "nextAvailableChargingSlots", slot.ToISO8601WithOffset())),
 
                    ElectricChargingPointStatusExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_electricChargingPointStatusExtension", ElectricChargingPointStatusExtension)
+                       ? ElectricChargingPointStatusExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_electricChargingPointStatusExtension")
                        : null
 
                );

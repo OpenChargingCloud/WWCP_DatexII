@@ -84,7 +84,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    PredefinedLocationReference.ToXML(),
 
                    LocationByReferenceExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_locationByReferenceExtension", LocationByReferenceExtension)
+                       ? LocationByReferenceExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_locationByReferenceExtension")
                        : null
 
                );

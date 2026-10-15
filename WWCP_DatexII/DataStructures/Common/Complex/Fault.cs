@@ -173,7 +173,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                        : null,
 
                    FaultExtension is not null
-                       ? new XElement(DatexIINS.Common + "_faultExtension",         FaultExtension)
+                       ? FaultExtension.ToExtensionXML(DatexIINS.Common + "_faultExtension")
                        : null
 
                );

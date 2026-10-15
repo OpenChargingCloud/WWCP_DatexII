@@ -134,7 +134,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
                    NutsAreas.Select(nutsArea => nutsArea.ToXML(DatexIINS.LocationExtension + "nutsArea")),
 
                    FacilityLocationExtension is not null
-                       ? new XElement(DatexIINS.LocationExtension + "_facilityLocationExtension", FacilityLocationExtension)
+                       ? FacilityLocationExtension.ToExtensionXML(DatexIINS.LocationExtension + "_facilityLocationExtension")
                        : null
 
                );

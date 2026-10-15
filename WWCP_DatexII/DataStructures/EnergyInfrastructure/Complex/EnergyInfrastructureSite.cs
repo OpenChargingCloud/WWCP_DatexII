@@ -308,7 +308,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    RoamingPlatforms.        Select(roamingPlatform         => roamingPlatform.        ToXML(DatexIINS.EnergyInfrastructure + "roamingPlatform")),
 
                    EnergyInfrastructureSiteExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureSiteExtension", EnergyInfrastructureSiteExtension)
+                       ? EnergyInfrastructureSiteExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_energyInfrastructureSiteExtension")
                        : null
 
                );

@@ -117,7 +117,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    GMLPolygons.Select(gmlPolygon => gmlPolygon.ToXML(DatexIINS.LocationReferencing + "gmlPolygon")),
 
                    GMLMultiPolygonExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_gmlMultiPolygonExtension", GMLMultiPolygonExtension)
+                       ? GMLMultiPolygonExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_gmlMultiPolygonExtension")
                        : null
 
                );

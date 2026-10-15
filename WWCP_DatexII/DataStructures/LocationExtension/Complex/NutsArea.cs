@@ -124,7 +124,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
                         new XElement(ns + "nutsCodeType",   NutsCodeType.ToString()),
                         new XElement(ns + "nutsCode",       NutsCode.    ToString()),
                         NutsAreaExtension is not null
-                            ? new XElement(ns + "_nutsAreaExtension", NutsAreaExtension)
+                            ? NutsAreaExtension.ToExtensionXML(ns + "_nutsAreaExtension")
                             : null);
 
         }

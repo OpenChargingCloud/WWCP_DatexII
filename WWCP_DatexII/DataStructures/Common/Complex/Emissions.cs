@@ -87,7 +87,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                        : null,
 
                    EmissionsExtension is not null
-                       ? new XElement(DatexIINS.Common + "_emissionsExtension",          EmissionsExtension)
+                       ? EmissionsExtension.ToExtensionXML(DatexIINS.Common + "_emissionsExtension")
                        : null
 
                );

@@ -136,7 +136,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                    ApplicableMonths.Select(month => new XElement(DatexIINS.Common + "applicableMonth",  month.ToString())),
 
                    DayWeekMonthExtension is not null
-                       ? new XElement(DatexIINS.Common + "_dayWeekMonthExtension", DayWeekMonthExtension)
+                       ? DayWeekMonthExtension.ToExtensionXML(DatexIINS.Common + "_dayWeekMonthExtension")
                        : null
 
                );

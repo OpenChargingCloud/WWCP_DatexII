@@ -92,7 +92,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    new XElement(DatexIINS.LocationReferencing + "nutsCode",       NutsCode.    ToString()),
 
                    NutsNamedAreaExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_nutsNamedAreaExtension", NutsNamedAreaExtension)
+                       ? NutsNamedAreaExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_nutsNamedAreaExtension")
                        : null
 
                );

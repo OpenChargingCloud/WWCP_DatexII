@@ -131,7 +131,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 yield return dedicatedParkingSpaces.ToXML(DatexIINS.Facilities + "dedicatedParkingSpaces");
 
             if (FacilityExtension is not null)
-                yield return new XElement(DatexIINS.Facilities + "_facilityExtension", FacilityExtension);
+                yield return FacilityExtension.ToExtensionXML(DatexIINS.Facilities + "_facilityExtension");
 
         }
 

@@ -180,7 +180,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                           ExceptionPeriod.Select(exceptionPeriod => exceptionPeriod.ToXML(DatexIINS.Common + "exceptionPeriod")),
 
                           OverallPeriodExtension is not null
-                              ? new XElement(DatexIINS.Common + "_overallPeriodExtension", OverallPeriodExtension)
+                              ? OverallPeriodExtension.ToExtensionXML(DatexIINS.Common + "_overallPeriodExtension")
                               : null
 
                       );

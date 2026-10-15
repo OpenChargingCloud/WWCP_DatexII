@@ -111,7 +111,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    new XElement(DatexIINS.EnergyInfrastructure + "cumulativeCapacityperDay", CumulativeCapacityPerDay),
 
                    HydrogenExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_hydrogenExtension", HydrogenExtension)
+                       ? HydrogenExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_hydrogenExtension")
                        : null
 
                );

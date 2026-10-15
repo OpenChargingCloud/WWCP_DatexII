@@ -289,7 +289,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                                        new XElement(DatexIINS.CommonExtension + "regulatedCharacteristics",
                                            EUVehicleCategory.Select(euVehicleCategory => new XElement(DatexIINS.CommonExtension + "euVehicleCategory", euVehicleCategory.ToString()))))
                                  : null,
-                             VehicleCharacteristicsExtension)
+                             VehicleCharacteristicsExtension.ExtensionContent(DatexIINS.Common + "_vehicleCharacteristicsExtension"))
                        : null
 
                );

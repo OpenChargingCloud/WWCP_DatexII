@@ -215,7 +215,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                 yield return energyRate.ToXML(DatexIINS.EnergyInfrastructure + "energyRate");
 
             if (EnergyProductExtension is not null)
-                yield return new XElement(DatexIINS.EnergyInfrastructure + "_energyProductExtension", EnergyProductExtension);
+                yield return EnergyProductExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_energyProductExtension");
 
         }
 

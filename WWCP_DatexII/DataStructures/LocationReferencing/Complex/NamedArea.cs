@@ -50,7 +50,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// The name of the area.
         /// </summary>
-        [XmlElement("areaName",             Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("areaName",             Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public MultilingualString  AreaName              { get; } = AreaName;
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// EN ISO 3166-1 two-character country code.
         /// </summary>
-        [XmlElement("country",              Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("country",              Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public Country?            Country               { get; } = Country;
 
         /// <summary>
@@ -136,7 +136,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                             namedAreaType,
                             country,
 
-                            XML.Element(DatexIINS.Common + "_namedAreaExtension")
+                            // loc:NamedArea has an extension of its own, after that of com:NamedArea it extends.
+                            XML.Element(DatexIINS.LocationReferencing + "_namedAreaExtension"),
+                            XML.Element(DatexIINS.Common              + "_namedAreaExtension")
 
                         );
 
@@ -148,34 +150,40 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
 
         #region ToXML(XMLName = null)
 
+        /// <summary>
+        /// Return an XML representation of this object.
+        /// </summary>
+        /// <param name="XMLName">An alternative XML element name.</param>
         public override XElement ToXML(XName? XMLName = null)
+
+            => new (XMLName ?? DatexIINS.Common + "namedArea",
+
+                    // The schema declares namedArea with the abstract type com:NamedArea.
+                    new XAttribute(DatexIINS.XSI + "type", "loc:NamedArea"),
+
+                    ToXMLElements());
+
+        #endregion
+
+        #region (protected) ToXMLElements()
+
+        /// <summary>
+        /// The particles of a named area, in schema order: the extension of com:NamedArea comes first.
+        /// </summary>
+        protected IEnumerable<XElement?> ToXMLElements()
         {
 
-            var xml = new XElement(XMLName ?? DatexIINS.LocationReferencing + "NamedArea",
+            yield return ANamedAreaExtension.ToExtensionXML(DatexIINS.Common + "_namedAreaExtension");
 
-                                new XElement(DatexIINS.LocationReferencing + "areaName",
-                                    AreaName.ToXML()
-                                ),
+            yield return AreaName.ToXML(DatexIINS.LocationReferencing + "areaName");
 
-                          NamedAreaType.HasValue
-                              ? new XElement(DatexIINS.LocationReferencing + "namedAreaType",
-                                    NamedAreaType.ToString()
-                                )
-                              : null,
+            if (NamedAreaType.HasValue)
+                yield return new XElement(DatexIINS.LocationReferencing + "namedAreaType",   NamedAreaType.Value.ToString());
 
-                          Country is not null
-                              ? new XElement(DatexIINS.LocationReferencing + "country",
-                                    Country.Alpha2Code
-                                )
-                              : null,
+            if (Country is not null)
+                yield return new XElement(DatexIINS.LocationReferencing + "country",         Country.Alpha2Code);
 
-                          NamedAreaExtension is not null
-                              ? new XElement(DatexIINS.Common + "_namedAreaExtension",   NamedAreaExtension)
-                              : null
-
-                      );
-
-            return xml;
+            yield return NamedAreaExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_namedAreaExtension");
 
         }
 

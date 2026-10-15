@@ -114,7 +114,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                    new XElement(DatexIINS.Common + "numberOfAxles",          NumberOfAxles),
 
                    NumberOfAxlesCharacteristicExtension is not null
-                       ? new XElement(DatexIINS.Common + "_numberOfAxlesCharacteristicExtension", NumberOfAxlesCharacteristicExtension)
+                       ? NumberOfAxlesCharacteristicExtension.ToExtensionXML(DatexIINS.Common + "_numberOfAxlesCharacteristicExtension")
                        : null
 
                );

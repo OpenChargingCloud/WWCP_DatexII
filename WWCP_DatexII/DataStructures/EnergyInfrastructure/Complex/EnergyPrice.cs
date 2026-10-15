@@ -292,7 +292,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    EnergyBasedApplicability?.ToXML(DatexIINS.EnergyInfrastructure + "energyBasedApplicability"),
 
                    EnergyPriceExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyPriceExtension", EnergyPriceExtension)
+                       ? EnergyPriceExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_energyPriceExtension")
                        : null
 
                );

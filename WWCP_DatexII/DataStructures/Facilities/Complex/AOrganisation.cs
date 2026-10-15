@@ -124,7 +124,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                 yield return GeneralTimeValidity.ToXML(DatexIINS.Facilities + "generalTimeValidity");
 
             if (OrganisationExtension is not null)
-                yield return new XElement(DatexIINS.Facilities + "_organisationExtension", OrganisationExtension);
+                yield return OrganisationExtension.ToExtensionXML(DatexIINS.Facilities + "_organisationExtension");
 
         }
 

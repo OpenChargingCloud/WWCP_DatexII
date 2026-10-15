@@ -292,7 +292,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                        : null,
 
                    EnergyRateExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyRateExtension", EnergyRateExtension)
+                       ? EnergyRateExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_energyRateExtension")
                        : null
 
                );

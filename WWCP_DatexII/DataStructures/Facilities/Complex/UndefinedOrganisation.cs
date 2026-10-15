@@ -66,7 +66,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                    ToXMLElements(),
 
                    UndefinedOrganisationExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_undefinedOrganisationExtension", UndefinedOrganisationExtension)
+                       ? UndefinedOrganisationExtension.ToExtensionXML(DatexIINS.Facilities + "_undefinedOrganisationExtension")
                        : null
 
                );

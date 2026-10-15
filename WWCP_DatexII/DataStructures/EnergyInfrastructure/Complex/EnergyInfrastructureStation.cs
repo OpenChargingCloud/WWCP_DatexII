@@ -327,7 +327,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    EnergyProducts.Select(energyProduct => energyProduct.ToXML(DatexIINS.EnergyInfrastructure + "energyProduct")),
 
                    EnergyInfrastructureStationExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationExtension", EnergyInfrastructureStationExtension)
+                       ? EnergyInfrastructureStationExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_energyInfrastructureStationExtension")
                        : null
 
                );

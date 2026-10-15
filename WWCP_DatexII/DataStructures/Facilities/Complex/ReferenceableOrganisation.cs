@@ -173,7 +173,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                     new XAttribute("version", Version),
                     ToXMLElements(),
                     ReferenceableOrganisationExtension is not null
-                        ? new XElement(DatexIINS.Facilities + "_referenceableOrganisationExtension", ReferenceableOrganisationExtension)
+                        ? ReferenceableOrganisationExtension.ToExtensionXML(DatexIINS.Facilities + "_referenceableOrganisationExtension")
                         : null);
 
         #endregion

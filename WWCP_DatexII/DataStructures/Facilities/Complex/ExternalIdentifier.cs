@@ -161,7 +161,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                        : null,
 
                    ExternalIdentifierExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_externalIdentifierExtension", ExternalIdentifierExtension)
+                       ? ExternalIdentifierExtension.ToExtensionXML(DatexIINS.Facilities + "_externalIdentifierExtension")
                        : null
 
                );

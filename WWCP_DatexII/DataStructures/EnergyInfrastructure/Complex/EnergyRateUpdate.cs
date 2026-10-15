@@ -192,7 +192,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    EnergyPrices.Select(energyPrice => energyPrice.ToXML(DatexIINS.EnergyInfrastructure + "energyPrice")),
 
                    EnergyRateUpdateExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_energyRateUpdateExtension", EnergyRateUpdateExtension)
+                       ? EnergyRateUpdateExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_energyRateUpdateExtension")
                        : null
 
                );

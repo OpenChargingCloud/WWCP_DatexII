@@ -141,7 +141,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                        new XElement(DatexIINS.Common + "percentage",   SourceRatioValue.Value)),
 
                    ElectricEnergySourceRatioExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_electricEnergySourceRatioExtension", ElectricEnergySourceRatioExtension)
+                       ? ElectricEnergySourceRatioExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_electricEnergySourceRatioExtension")
                        : null
 
                );

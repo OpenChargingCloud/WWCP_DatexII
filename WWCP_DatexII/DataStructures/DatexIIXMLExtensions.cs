@@ -290,6 +290,34 @@ namespace cloud.charging.open.protocols.DatexII.v3
 
         #endregion
 
+        #region ExtensionContent(Extension, Name) / ToExtensionXML(Extension, Name)
+
+        /// <summary>
+        /// What is written inside the extension element of the given name, e.g. com:_faultExtension. An extension that
+        /// was read is that element itself, so its attributes and nodes are taken; any other element is taken as its
+        /// content. So an extension read is written again as it was, not nested once more.
+        /// </summary>
+        public static IEnumerable<XObject> ExtensionContent(this XElement?  Extension,
+                                                            XName           Name)
+
+            => Extension is null
+                   ? []
+                   : Extension.Name == Name
+                         ? [ .. Extension.Attributes(), .. Extension.Nodes() ]
+                         : [ Extension ];
+
+        /// <summary>
+        /// The extension element of the given name for the given extension, or null without one (see ExtensionContent).
+        /// </summary>
+        public static XElement? ToExtensionXML(this XElement?  Extension,
+                                               XName           Name)
+
+            => Extension is not null
+                   ? new XElement(Name, Extension.ExtensionContent(Name))
+                   : null;
+
+        #endregion
+
         #region OptionalURL(XML, Name)
 
         /// <summary>

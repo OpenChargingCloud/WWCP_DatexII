@@ -137,7 +137,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
                    Text.ToXML(DatexIINS.LocationExtension + "text"),
 
                    AddressLineExtension is not null
-                       ? new XElement(DatexIINS.LocationExtension + "_addressLineExtension", AddressLineExtension)
+                       ? AddressLineExtension.ToExtensionXML(DatexIINS.LocationExtension + "_addressLineExtension")
                        : null
 
                );

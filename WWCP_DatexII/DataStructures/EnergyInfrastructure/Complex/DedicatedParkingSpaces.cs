@@ -188,7 +188,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                    UserSpecific.Select(userSpecific => new XElement(DatexIINS.EnergyInfrastructure + "userSpecific", userSpecific.ToString())),
 
                    DedicatedParkingSpacesExtension is not null
-                       ? new XElement(DatexIINS.EnergyInfrastructure + "_dedicatedParkingSpacesExtension", DedicatedParkingSpacesExtension)
+                       ? DedicatedParkingSpacesExtension.ToExtensionXML(DatexIINS.EnergyInfrastructure + "_dedicatedParkingSpacesExtension")
                        : null
 
                );

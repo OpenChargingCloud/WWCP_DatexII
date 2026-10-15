@@ -165,7 +165,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         public virtual XElement ToXML(XName? XMLName = null)
         {
 
-            var xml = new XElement(XMLName ?? DatexIINS.Common + "period",
+            var xml = new XElement(XMLName ?? DatexIINS.Common + "recurringSpecialDay",
 
                                 new XElement(DatexIINS.Common + "intersectWithApplicableDays",   IntersectWithApplicableDays ? "true" : "false"),
                                 new XElement(DatexIINS.Common + "specialDayType",                SpecialDayType.   ToString()),
@@ -174,13 +174,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                               ? new XElement(DatexIINS.Common + "publicEvent",                   PublicEvent.Value.ToString())
                               : null,
 
-                          NamedAreas. Any()
-                              ? new XElement(DatexIINS.Common + "namedArea",
-                                    NamedAreas.Select(namedArea => namedArea.ToXML())
-                                )
-                              : null,
+                          // Every named area is a namedArea of its own.
+                          NamedAreas.Select(namedArea => namedArea.ToXML(DatexIINS.Common + "namedArea")),
 
-                          SpecialDayExtension
+                          SpecialDayExtension.ToExtensionXML(DatexIINS.Common + "_specialDayExtension")
 
                       );
 

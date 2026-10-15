@@ -116,7 +116,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
                    new XElement(DatexIINS.Common + "vehicleLength",          VehicleLength.m),
 
                    LengthCharacteristicExtension is not null
-                       ? new XElement(DatexIINS.Common + "_lengthCharacteristicExtension", LengthCharacteristicExtension)
+                       ? LengthCharacteristicExtension.ToExtensionXML(DatexIINS.Common + "_lengthCharacteristicExtension")
                        : null
 
                );

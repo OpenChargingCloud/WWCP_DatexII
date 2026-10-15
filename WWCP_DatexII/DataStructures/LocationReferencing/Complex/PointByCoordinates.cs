@@ -124,7 +124,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    PointCoordinates.ToXML(DatexIINS.LocationReferencing + "pointCoordinates"),
 
                    PointByCoordinatesExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_pointByCoordinatesExtension", PointByCoordinatesExtension)
+                       ? PointByCoordinatesExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_pointByCoordinatesExtension")
                        : null
 
                );

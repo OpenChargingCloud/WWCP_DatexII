@@ -76,7 +76,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                        : null,
 
                    AltitudeConfidenceExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_altitudeConfidenceExtension", AltitudeConfidenceExtension)
+                       ? AltitudeConfidenceExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_altitudeConfidenceExtension")
                        : null
 
                );

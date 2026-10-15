@@ -174,7 +174,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                        : null,
 
                    AreaLocationExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_areaLocationExtension", AreaLocationExtension)
+                       ? AreaLocationExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_areaLocationExtension")
                        : null
 
                );

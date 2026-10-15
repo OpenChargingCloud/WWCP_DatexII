@@ -108,7 +108,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
                    Interior.Select(interior => interior.ToXML(DatexIINS.LocationReferencing + "interior")),
 
                    GMLPolygonExtension is not null
-                       ? new XElement(DatexIINS.LocationReferencing + "_gmlPolygonExtension", GMLPolygonExtension)
+                       ? GMLPolygonExtension.ToExtensionXML(DatexIINS.LocationReferencing + "_gmlPolygonExtension")
                        : null
 
                );

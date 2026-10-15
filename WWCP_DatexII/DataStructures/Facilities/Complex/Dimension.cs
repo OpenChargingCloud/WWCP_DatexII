@@ -140,7 +140,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                        : null,
 
                    DimensionExtension is not null
-                       ? new XElement(DatexIINS.Facilities + "_dimensionExtension", DimensionExtension)
+                       ? DimensionExtension.ToExtensionXML(DatexIINS.Facilities + "_dimensionExtension")
                        : null
 
                );
