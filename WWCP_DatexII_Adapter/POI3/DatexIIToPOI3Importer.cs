@@ -341,6 +341,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                            foreach (var property in desired.Properties().Where(property => property.Name is not "created" and not "lastChange"))
                                                merged[property.Name] = property.Value.DeepClone();
                                            POI3Mapper.Overlay(merged, desired, [ "name", "description" ]);
+                                           // The payment only when the rate tells one.
+                                           if (rate.Payment is not null)
+                                               POI3Mapper.Overlay(merged, desired, [ "paymentMeans", "paymentBrands" ]);
                                            existing.Replace(merged);
                                        }
                                        else

@@ -132,6 +132,7 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | pool `LocationLanguages`, else the language of the publication | `userInterfaceLanguage` |
 | — | `serviceType` `unattended` |
 | feature `Reservable` | `reservation` `optional` of its charging points (import: `optional`, `mandatory`, `partly`) |
+| `EUVehicleCategories` | one `applicableForVehicles` with the `euVehicleCategory`s, in lower case (`M1` ↔ `m1`); categories DATEX II 3.7 does not know, e.g. `L`, as extended values. Import: the categories of all its `applicableForVehicles`, in upper case. |
 | EVSEs | `refillPoint`s, `xsi:type` `aegi:ElectricChargingPoint` |
 
 ### EVSE ↔ electric charging point (`ElectricChargingPoint`)
@@ -165,6 +166,8 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | — | `ratePolicy` `adHoc` (import of a `contract` rate: with a warning) |
 | `Currency` | `applicableCurrency` (import: the first) |
 | `Name`, `Description` | `rateName`, `additionalInformation` |
+| `PaymentMeans` | `payment` `paymentMeans`: CREDIT_CARD ↔ `paymentCreditCard`, DEBIT_CARD ↔ `paymentDebitCard`, VALUE_CARD ↔ `paymentValueCard`, CASH ↔ `cashCoinsAndBills`, CASH_COINS ↔ `cashCoinsOnly`, CASH_BILLS ↔ `cashBillsOnly`, MOBILE_ACCOUNT ↔ `mobileAccount`, TOLL_TAG ↔ `tollTag`, PREPAY ↔ `prepay`, NFC ↔ `nfc`, EMV ↔ `emv`, QR_CODE ↔ `qrCode`, WEBSITE ↔ `website`. Others: `otherPaymentMeans`. Import: also extended values as they are named, and `otherPaymentMeans` by their text; not `unknown`. |
+| `PaymentBrands` | `payment` `brandsAccepted`: AMERICAN_EXPRESS ↔ `americanExpress`, APPLE_PAY ↔ `applePay`, CIRRUS ↔ `cirrus`, DINERS_CLUB ↔ `dinersClub`, DISCOVER ↔ `discoverCard`, GIROCARD ↔ `giroCard`, MAESTRO ↔ `maestro`, MASTERCARD ↔ `masterCard`, VISA ↔ `visa`, VPAY ↔ `vpay`. Others, e.g. `Google Pay`: `otherBrandsAccepted`. Import: also extended values, and `otherBrandsAccepted`; not `other`. An existing tariff keeps its payment when the rate tells none. |
 | price component ENERGY | `energyPrice` `pricePerKWh` |
 | price component TIME (per hour) | `energyPrice` `pricePerMinute` (price / 60; import × 60) |
 | price component FLAT | `energyPrice` `basePrice` (import also `flatRate`, and `free` as 0) |
@@ -211,9 +214,10 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
 
 - **NUTS:** the NUTS 1 region of a site (`afirFacilityLocation/nutsArea`).
 - **Amenities and parking:** amenities of the site, and dedicated parking spaces, e.g. for persons with disabilities.
-- **Vehicles:** the EU vehicle categories a site or station is for (`applicableForVehicles`).
-- **Payment:** the payment means and brands of a rate (`payment`), e.g. a payment terminal. POI3 has payment options
-  only per charging pool; they go into the authentication methods.
+- **Vehicles:** the EU vehicle categories of a station are published when the charging station tells them
+  (`euVehicleCategories`); those of a site are not.
+- **Payment:** the payment means and brands of a rate are published when the charging tariff tells them
+  (`paymentMeans`, `paymentBrands`). The payment options of a charging pool still go into the authentication methods.
 - **Green energy:** `isGreenEnergy` is published only with an energy mix.
 - **Helpdesk and operating hours:** published only when POI3 has a hotline and opening times.
 - **Station identification:** POI3 has no BNetzA station identification; the `StationIdBNetzA` delegate has to provide
@@ -243,11 +247,11 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
 
 ### What DATEX II has and POI3 does not, or not here
 
-- **Facility objects:** the owner, dimension, amenities, vehicle restrictions (`applicableForVehicles`), dedicated
-  parking spaces, entrances and exits, exclusive and preferred users, service types, alias, other external identifiers
+- **Facility objects:** the owner, dimension, amenities, vehicle restrictions (`applicableForVehicles`; of a station
+  only its EU vehicle categories), dedicated parking spaces, entrances and exits, exclusive and preferred users, service types, alias, other external identifiers
   and further additional information are not imported. So are the energy distributor, mobility service providers and
   roaming platforms (of sites and stations), and the renewable sources of a station.
-- **Payment:** the payment of a rate (modes, means, brands), minimum and maximum delivery fees, discount and
+- **Payment:** the payment modes of a rate (only its means and brands are), minimum and maximum delivery fees, discount and
   combination with parking fee are not imported. Neither are the price cap, the time and energy based applicability of
   a price, and the `taxIncluded` of a price that includes tax.
 - **Charging points:** connector format (socket or cable), country of a domestic socket, smart recharging services,

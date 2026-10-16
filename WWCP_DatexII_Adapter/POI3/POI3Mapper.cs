@@ -491,6 +491,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                           CoordinatesForDisplay:  ToDatexII(ChargingStation.GeoLocation.Value)
                                                                       )
                                                                     : null,
+                       ApplicableForVehicles:                   ToDatexII(ChargingStation.EUVehicleCategories),
                        RefillPoints:                            chargingPoints
 
                    );
@@ -678,6 +679,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        ApplicableCurrency:     [ ChargingTariff.Currency ],
                        RateName:               ToMultilingualString(ChargingTariff.Name),
                        AdditionalInformation:  ToMultilingualString(ChargingTariff.Description),
+                       Payment:                ToDatexII(ChargingTariff.PaymentMeans, ChargingTariff.PaymentBrands, Language),
                        EnergyPrices:           prices
                    );
 
@@ -1005,6 +1007,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                       point.Reservation.Value.ToString() is "optional" or "mandatory" or "partly")
                                          ? [ POI.ChargingStationFeature.Reservable ]
                                          : null,
+                       EUVehicleCategories:  ToPOI3(Station.ApplicableForVehicles),
                        // Only a total maximum power of its own: the sum of the charging points is what POI3 tells anyway,
                        // and more than that sum POI3 refuses.
                        MaxPower:     Station.TotalMaximumPower is Watt totalMaximumPower &&
@@ -1204,12 +1207,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 Warnings.Add($"The energy rate '{EnergyRate.Id}' has more than one currency; only '{currency}' is taken!");
 
             return new POI.ChargingTariff(
-                       Id:          tariffId.Value,
-                       Currency:    currency,
-                       Elements:    elements,
-                       Name:        ToI18NString(EnergyRate.RateName,              Language),
-                       Description: ToI18NString(EnergyRate.AdditionalInformation, Language),
-                       LastChange:  EnergyRate.LastUpdated
+                       Id:             tariffId.Value,
+                       Currency:       currency,
+                       Elements:       elements,
+                       Name:           ToI18NString(EnergyRate.RateName,              Language),
+                       Description:    ToI18NString(EnergyRate.AdditionalInformation, Language),
+                       PaymentMeans:   PaymentMeansOf (EnergyRate.Payment, Language),
+                       PaymentBrands:  PaymentBrandsOf(EnergyRate.Payment),
+                       LastChange:     EnergyRate.LastUpdated
                    );
 
         }
@@ -1247,7 +1252,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// The properties of a charging station DATEX II tells: imported onto an existing charging station, the others are kept.
         /// </summary>
         internal static readonly String[] StationProperties = [
-            "name", "description", "geoLocation", "images", "features", "maxPower"
+            "name", "description", "geoLocation", "images", "features", "maxPower", "euVehicleCategories"
         ];
 
         /// <summary>
@@ -1289,6 +1294,167 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 else
                     Target.Remove(property);
             }
+        }
+
+        #endregion
+
+        #region (private) EU vehicle categories and payment
+
+        /// <summary>
+        /// The vehicles a station is for: one vehicle characteristics of the given EU vehicle categories, none without.
+        /// DATEX II writes them in lower case, e.g. m1.
+        /// </summary>
+        private static IEnumerable<VehicleCharacteristics>? ToDatexII(IEnumerable<POI.EUVehicleCategory> EUVehicleCategories)
+        {
+
+            var categories = EUVehicleCategories.
+                                 Select(category => EUVehicleCategory.Parse(category.ToString().ToLowerInvariant())).
+                                 ToArray();
+
+            return categories.Length > 0
+                       ? [ new VehicleCharacteristics(EUVehicleCategory: categories) ]
+                       : null;
+
+        }
+
+        /// <summary>
+        /// The EU vehicle categories of all the given vehicle characteristics, in upper case, e.g. M1.
+        /// </summary>
+        private static IEnumerable<POI.EUVehicleCategory> ToPOI3(IEnumerable<VehicleCharacteristics> VehicleCharacteristics)
+
+            => VehicleCharacteristics.
+                   SelectMany(characteristics => characteristics.EUVehicleCategory).
+                   Select    (category        => POI.EUVehicleCategory.Parse(category.ToString().ToUpperInvariant())).
+                   Distinct  ();
+
+        /// <summary>
+        /// The means of payment of POI3 and DATEX II.
+        /// </summary>
+        private static readonly (POI.PaymentMeans POI3, String DatexII)[] PaymentMeansMapping = [
+            (POI.PaymentMeans.CREDIT_CARD,     "paymentCreditCard"),
+            (POI.PaymentMeans.DEBIT_CARD,      "paymentDebitCard"),
+            (POI.PaymentMeans.VALUE_CARD,      "paymentValueCard"),
+            (POI.PaymentMeans.CASH,            "cashCoinsAndBills"),
+            (POI.PaymentMeans.CASH_COINS,      "cashCoinsOnly"),
+            (POI.PaymentMeans.CASH_BILLS,      "cashBillsOnly"),
+            (POI.PaymentMeans.MOBILE_ACCOUNT,  "mobileAccount"),
+            (POI.PaymentMeans.TOLL_TAG,        "tollTag"),
+            (POI.PaymentMeans.PREPAY,          "prepay"),
+            (POI.PaymentMeans.NFC,             "nfc"),
+            (POI.PaymentMeans.EMV,             "emv"),
+            (POI.PaymentMeans.QR_CODE,         "qrCode"),
+            (POI.PaymentMeans.WEBSITE,         "website")
+        ];
+
+        /// <summary>
+        /// The payment brands of POI3 and DATEX II.
+        /// </summary>
+        private static readonly (POI.PaymentBrand POI3, String DatexII)[] PaymentBrandMapping = [
+            (POI.PaymentBrand.AMERICAN_EXPRESS,  "americanExpress"),
+            (POI.PaymentBrand.APPLE_PAY,         "applePay"),
+            (POI.PaymentBrand.CIRRUS,            "cirrus"),
+            (POI.PaymentBrand.DINERS_CLUB,       "dinersClub"),
+            (POI.PaymentBrand.DISCOVER,          "discoverCard"),
+            (POI.PaymentBrand.GIROCARD,          "giroCard"),
+            (POI.PaymentBrand.MAESTRO,           "maestro"),
+            (POI.PaymentBrand.MASTERCARD,        "masterCard"),
+            (POI.PaymentBrand.VISA,              "visa"),
+            (POI.PaymentBrand.VPAY,              "vpay")
+        ];
+
+        /// <summary>
+        /// The payment of a rate: the means and brands DATEX II knows as such, the others as other means and brands;
+        /// none without any.
+        /// </summary>
+        private static Payment? ToDatexII(IEnumerable<POI.PaymentMeans>  PaymentMeans,
+                                          IEnumerable<POI.PaymentBrand>  PaymentBrands,
+                                          Languages                      Language)
+        {
+
+            var means        = new List<MeansOfPayment>();
+            var otherMeans   = new List<MultilingualString>();
+            var brands       = new List<PaymentBrand>();
+            var otherBrands  = new List<String>();
+
+            foreach (var paymentMeans in PaymentMeans)
+            {
+                if (PaymentMeansMapping.Any(mapping => mapping.POI3 == paymentMeans))
+                    means.Add(MeansOfPayment.Parse(PaymentMeansMapping.First(mapping => mapping.POI3 == paymentMeans).DatexII));
+                else
+                    otherMeans.Add(new MultilingualString([ new MultilingualStringValue(Language, paymentMeans.ToString()) ]));
+            }
+
+            foreach (var paymentBrand in PaymentBrands)
+            {
+                if (PaymentBrandMapping.Any(mapping => mapping.POI3 == paymentBrand))
+                    brands.Add(PaymentBrand.Parse(PaymentBrandMapping.First(mapping => mapping.POI3 == paymentBrand).DatexII));
+                else
+                    otherBrands.Add(paymentBrand.ToString());
+            }
+
+            return means.Count + otherMeans.Count + brands.Count + otherBrands.Count > 0
+                       ? new Payment(PaymentMeans:         means,
+                                     OtherPaymentMeans:    otherMeans,
+                                     BrandsAccepted:       brands,
+                                     OtherBrandsAccepted:  otherBrands)
+                       : null;
+
+        }
+
+        /// <summary>
+        /// The means of payment of the given payment: those POI3 knows as such, the others as DATEX II names them,
+        /// other means by their text; not unknown ones.
+        /// </summary>
+        private static IEnumerable<POI.PaymentMeans> PaymentMeansOf(Payment?   Payment,
+                                                                    Languages  Language)
+        {
+
+            if (Payment is null)
+                return [];
+
+            var means       = Payment.PaymentMeans.
+                                  Select(paymentMeans => paymentMeans.ToString()).
+                                  Where (paymentMeans => paymentMeans != "unknown").
+                                  Select(paymentMeans => PaymentMeansMapping.Any(mapping => mapping.DatexII == paymentMeans)
+                                                             ? PaymentMeansMapping.First(mapping => mapping.DatexII == paymentMeans).POI3
+                                                             : POI.PaymentMeans.Parse(paymentMeans));
+
+            var otherMeans  = Payment.OtherPaymentMeans.
+                                  Select(text => ToI18NString(text, Language)).
+                                  Where (text => text is not null).
+                                  Select(text => text![Language] is String inLanguage && inLanguage.IsNotNullOrEmpty()
+                                                     ? inLanguage
+                                                     : text.FirstText()).
+                                  Where (text => text.IsNotNullOrEmpty()).
+                                  Select(text => POI.PaymentMeans.Parse(text));
+
+            return means.Concat(otherMeans).Distinct();
+
+        }
+
+        /// <summary>
+        /// The payment brands of the given payment: those POI3 knows as such, the others as DATEX II names them, other
+        /// brands by their text; not the brand "other".
+        /// </summary>
+        private static IEnumerable<POI.PaymentBrand> PaymentBrandsOf(Payment? Payment)
+        {
+
+            if (Payment is null)
+                return [];
+
+            var brands       = Payment.BrandsAccepted.
+                                   Select(paymentBrand => paymentBrand.ToString()).
+                                   Where (paymentBrand => paymentBrand != "other").
+                                   Select(paymentBrand => PaymentBrandMapping.Any(mapping => mapping.DatexII == paymentBrand)
+                                                              ? PaymentBrandMapping.First(mapping => mapping.DatexII == paymentBrand).POI3
+                                                              : POI.PaymentBrand.Parse(paymentBrand));
+
+            var otherBrands  = Payment.OtherBrandsAccepted.
+                                   Where (text => text.IsNotNullOrEmpty()).
+                                   Select(text => POI.PaymentBrand.Parse(text));
+
+            return brands.Concat(otherBrands).Distinct();
+
         }
 
         #endregion

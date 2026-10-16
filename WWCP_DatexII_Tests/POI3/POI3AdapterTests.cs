@@ -84,7 +84,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                                                          DaysOfWeek:  [ DayOfWeek.Sunday ]))
                     ],
                     I18NString.Create(Languages.en, "Standard"),
-                    Created: Created);
+                    PaymentMeans:   [ POI.PaymentMeans.QR_CODE, POI.PaymentMeans.CREDIT_CARD, POI.PaymentMeans.Parse("SMS") ],
+                    PaymentBrands:  [ POI.PaymentBrand.VISA, POI.PaymentBrand.Parse("Google Pay") ],
+                    Created:        Created);
 
         private static POI.EVSE AnEVSE(Int32 MaxPower = 22000)
 
@@ -110,9 +112,10 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     LocationLanguages:    [ Languages.de ],
                     OpeningTimes:         new ImmutableOpeningTimes(OpeningTimes.Open24Hours),
                     ChargingStations:     [ new POI.ChargingStation(S1,
-                                                                    Features:  [ POI.ChargingStationFeature.Reservable ],
-                                                                    EVSEs:     [ AnEVSE(MaxPower) ],
-                                                                    Created:   Created) ],
+                                                                    Features:             [ POI.ChargingStationFeature.Reservable ],
+                                                                    EVSEs:                [ AnEVSE(MaxPower) ],
+                                                                    EUVehicleCategories:  [ POI.EUVehicleCategory.M1, POI.EUVehicleCategory.N1, POI.EUVehicleCategory.L ],
+                                                                    Created:              Created) ],
                     Created:              Created);
 
         private static POI.RoamingNetwork ANetwork(Boolean WithPools = true)
@@ -347,6 +350,14 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             var warnings     = new List<String>();
             var xml          = AssertValidTable(POI3Mapper.ToTablePublication(network, Creator, Languages.de, "rn1", "1", warnings, StationIdBNetzA: station => "BNetzA-4711"));
 
+            // The EU vehicle categories of the station, and the payment of the rate: what DATEX II knows as such, the rest as other.
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "euVehicleCategory").Select(element => element.Attribute("_extendedValue")?.Value ?? element.Value),
+                        Is.EquivalentTo(new[] { "m1", "n1", "l" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "paymentMeans").       Select(element => element.Value), Is.EquivalentTo(new[] { "paymentCreditCard", "qrCode" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "otherPaymentMeans").  Select(element => element.Value), Is.EquivalentTo(new[] { "SMS" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "brandsAccepted").     Select(element => element.Value), Is.EquivalentTo(new[] { "visa" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "otherBrandsAccepted").Select(element => element.Value), Is.EquivalentTo(new[] { "Google Pay" }));
+
             // Through the parsers: what a consumer reads.
             Assert.That(Payload.TryParseXML(xml, out var payload, out var errorResponse), Is.True, errorResponse);
 
@@ -392,6 +403,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
                 Assert.That(pool.ChargingStations.Single().Id,                 Is.EqualTo(S1));
                 Assert.That(pool.ChargingStations.Single().Features,           Is.EqualTo(new[] { POI.ChargingStationFeature.Reservable }));
+                Assert.That(pool.ChargingStations.Single().EUVehicleCategories, Is.EqualTo(new[] { POI.EUVehicleCategory.L, POI.EUVehicleCategory.M1, POI.EUVehicleCategory.N1 }));
 
                 Assert.That(evse.Id,                                           Is.EqualTo(E1));
                 Assert.That(evse.CurrentTypes,                                 Is.EqualTo(POI.CurrentTypes.AC_ThreePhases));
