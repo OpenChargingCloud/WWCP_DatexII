@@ -131,6 +131,11 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 
 ### Charging station ↔ station (`EnergyInfrastructureStation`)
 
+A charging station is published as it is at runtime, the effective charging station of its operator: with the
+properties its charging station groups give it, e.g. its features or its `MaxPower`, given once for all stations of a
+group. A change of a group changes the stations of its members, its `lastChange` being the last change of these
+charging stations and of their pools.
+
 | POI3 charging station | DATEX II station |
 |---|---|
 | `Name`, `Description`, `GeoLocation`, `Images` | `name`, `description`, `locationReference` (point), `photoUrl` |
@@ -265,7 +270,7 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
 - **Charging modes:** AC one phase in mode 3 has no DATEX II charging mode. An EVSE with connectors of different
   charging modes gets one, the first that applies.
 - **No counterpart at all:** EVSE, charging station and charging pool groups (their tariffs are resolved onto every
-  charging point), tariff groups, signing and identity keys, data licenses, energy meters, grid connection points,
+  charging point, the properties charging station groups give onto their stations), tariff groups, signing and identity keys, data licenses, energy meters, grid connection points,
   manufacturers and models, calibration and certification links, entrance and exit addresses, related locations,
   charging when closed, UI features and the further pool and station features.
 - **Brands:** only the first brand's name is published.

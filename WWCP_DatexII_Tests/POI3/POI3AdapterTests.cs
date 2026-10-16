@@ -103,7 +103,8 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     ChargingTariffIds:   [ T1 ],
                     Created:             Created);
 
-        private static POI.ChargingPool APool(Int32 MaxPower = 22000)
+        private static POI.ChargingPool APool(Int32    MaxPower         = 22000,
+                                              Boolean  FeaturesByGroup  = false)
 
             => new (P1,
                     I18NString.Create(Languages.en, "Biberweg"),
@@ -119,13 +120,14 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     NUTSCodes:            [ POI.NUTSCode.Parse("DE"), POI.NUTSCode.Parse("DEG"), POI.NUTSCode.Parse("DEG03") ],
                     Features:             [ POI.ChargingPoolFeature.Roofed, POI.ChargingPoolFeature.IlluminatedParkingNearby ],
                     ChargingStations:     [ new POI.ChargingStation(S1,
-                                                                    Features:             [ POI.ChargingStationFeature.Reservable, POI.ChargingStationFeature.Illuminated ],
+                                                                    Features:             FeaturesByGroup ? [ POI.ChargingStationFeature.Illuminated ] : [ POI.ChargingStationFeature.Reservable, POI.ChargingStationFeature.Illuminated ],
                                                                     EVSEs:                [ AnEVSE(MaxPower) ],
                                                                     EUVehicleCategories:  [ POI.EUVehicleCategory.M1, POI.EUVehicleCategory.N1, POI.EUVehicleCategory.L ],
                                                                     Created:              Created) ],
                     Created:              Created);
 
-        private static POI.RoamingNetwork ANetwork(Boolean WithPools = true)
+        private static POI.RoamingNetwork ANetwork(Boolean WithPools        = true,
+                                                   Boolean FeaturesByGroup  = false)
 
             => new POI.RoamingNetwork(POI.RoamingNetwork_Id.Parse("rn1"),
                                       Created:                   Created,
@@ -133,7 +135,12 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                                                                    Name:            I18NString.Create(Languages.en, "GraphDefined"),
                                                                                                    Homepage:        URL.Parse("https://graphdefined.com"),
                                                                                                    ChargingTariffs: WithPools ? [ ATariff() ] : null,
-                                                                                                   ChargingPools:   WithPools ? [ APool()   ] : null,
+                                                                                                   ChargingPools:   WithPools ? [ APool(FeaturesByGroup: FeaturesByGroup) ] : null,
+                                                                                                   ChargingStationGroups: WithPools && FeaturesByGroup ? [ new POI.ChargingStationGroup(POI.ChargingStationGroup_Id.Parse("DE*GEF*SG1"),
+                                                                                                                                                                                       ChargingStationIds:  [ S1 ],
+                                                                                                                                                                                       Features:            [ POI.ChargingStationFeature.Reservable ],
+                                                                                                                                                                                       MaxPower:            Watt.FromW(11000),
+                                                                                                                                                                                       Created:             Created) ] : null,
                                                                                                    Created:         Created) ],
                                       ParkingOperators:          WithPools
                                                                      ? [ new POI.ParkingOperator(POI.ParkingOperator_Id.Parse("DE*PAR"),
@@ -296,6 +303,35 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(rate.EnergyPrices.First().TaxRate?.Value,                    Is.EqualTo(19));
                 Assert.That(rate.EnergyPrices.ElementAt(1).Value.Value,                  Is.EqualTo(0.1m));
 
+            });
+
+        }
+
+        #endregion
+
+        #region WhatGroupsGiveIsPublished()
+
+        /// <summary>
+        /// A charging station is published with the properties its groups give it.
+        /// </summary>
+        [Test]
+        public void WhatGroupsGiveIsPublished()
+        {
+
+            // The charging station is reservable, and limited to 11 kW, by its group only.
+            var warnings     = new List<String>();
+            var publication  = POI3Mapper.ToTablePublication(ANetwork(FeaturesByGroup: true), Creator, Languages.de, "rn1", "1", warnings,
+                                                             StationIdBNetzA: station => "BNetzA-4711");
+
+            AssertValidTable(publication);
+
+            var station      = publication.EnergyInfrastructureTables.Single().EnergyInfrastructureSites.Single().EnergyInfrastructureStations.Single();
+            var point        = (ElectricChargingPoint) station.RefillPoints.Single();
+
+            Assert.Multiple(() => {
+                Assert.That(warnings,                                                    Is.Empty);
+                Assert.That(station.TotalMaximumPower?.Value,                            Is.EqualTo(11000));
+                Assert.That(point.Reservation?.ToString(),                               Is.EqualTo("optional"));
             });
 
         }

@@ -316,7 +316,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             foreach (var chargingStationOperator in RoamingNetwork.ChargingStationOperators.Where(op => operatorIds is null || operatorIds.Contains(op.Id)))
             {
-                foreach (var chargingPool in chargingStationOperator.ChargingPools)
+                // With the properties their groups give its charging stations.
+                foreach (var chargingPool in chargingStationOperator.EffectiveChargingPools)
                 {
 
                     var site = chargingPool.ToDatexII(RoamingNetwork, Language, Warnings, StationIdBNetzA);
@@ -748,7 +749,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             foreach (var chargingStationOperator in RoamingNetwork.ChargingStationOperators.Where(op => operatorIds is null || operatorIds.Contains(op.Id)))
             {
-                foreach (var chargingPool in chargingStationOperator.ChargingPools)
+                foreach (var chargingPool in chargingStationOperator.EffectiveChargingPools)
                 {
 
                     var status = chargingPool.ToSiteStatus(evseIds);
