@@ -64,6 +64,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         private readonly Channel<Func<Task>>                        work                 = Channel.CreateUnbounded<Func<Task>>(new UnboundedChannelOptions { SingleReader = true });
         private readonly ConcurrentDictionary<String, POI.EVSE_Id>  evseIds              = new();
         private readonly ConcurrentDictionary<String, Byte>         otherRefillPointIds  = new();
+        private readonly ConcurrentDictionary<String, POI.ChargingStation_Id>  stationIds  = new();
         private readonly Task                                       worker;
 
         #endregion
@@ -278,6 +279,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                         if (POI3Mapper.ToPOI3EVSEId(chargingPoint, operatorId.Value) is POI.EVSE_Id evseId)
                             evseIds[chargingPoint.Id] = evseId;
 
+                    // Which charging station a station status is about.
+                    foreach (var station in site.EnergyInfrastructureStations)
+                        if (POI3Mapper.ToPOI3StationId(station.Id, operatorId.Value) is POI.ChargingStation_Id stationId)
+                            stationIds[station.Id] = stationId;
+
                     // And which refill points are no EVSEs, e.g. diesel ones: their statuses are skipped.
                     foreach (var otherRefillPoint in site.EnergyInfrastructureStations.SelectMany(station => station.RefillPoints).OfType<OtherRefillPoint>())
                         otherRefillPointIds[otherRefillPoint.Id] = 0;
@@ -385,6 +391,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             {
                 foreach (var stationStatus in siteStatus.EnergyInfrastructureStationStatus)
                 {
+
+                    // The energy rate updates of the station: the price status of the charging station.
+                    if ((stationIds.TryGetValue(stationStatus.Reference.Id, out var knownStation)
+                             ? knownStation
+                             : POI.ChargingStation_Id.TryParse(stationStatus.Reference.Id)) is POI.ChargingStation_Id chargingStationId)
+                    {
+                        ImportPriceStatus(nameof(POI.ChargingStation),
+                                          chargingStationId.ToString(),
+                                          chargingStationId.OperatorId,
+                                          stationStatus.EnergyRateUpdates,
+                                          stationStatus.LastUpdated ?? StatusPublication.PublicationTime);
+                    }
+
                     foreach (var refillPointStatus in stationStatus.RefillPointStatus)
                     {
 
@@ -408,8 +427,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                         ImportPlannedStatus(evseId.Value,
                                             refillPointStatus);
 
-                        ImportPriceStatus(evseId.Value,
-                                          refillPointStatus,
+                        ImportPriceStatus(nameof(POI.EVSE),
+                                          evseId.Value.ToString(),
+                                          evseId.Value.OperatorId,
+                                          refillPointStatus.EnergyRateUpdates,
                                           refillPointStatus.LastUpdated ?? StatusPublication.PublicationTime);
 
                     }
@@ -480,21 +501,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         }
 
         /// <summary>
-        /// The energy rate updates of the given refill point status as the price status of the EVSE: for every rate, its
-        /// new prices as the new prices of that charging tariff. None, after there were some, are no new prices.
+        /// The given energy rate updates of a refill point or station as the price status of the EVSE or charging station:
+        /// for every rate, its new prices as the new prices of that charging tariff. None, after there were some, are no
+        /// new prices.
         /// </summary>
-        private void ImportPriceStatus(POI.EVSE_Id        EVSEId,
-                                       RefillPointStatus  RefillPointStatus,
-                                       DateTimeOffset     Timestamp)
+        private void ImportPriceStatus(String                         EntityType,
+                                       String                         EntityId,
+                                       POI.ChargingStationOperator_Id  OperatorId,
+                                       IEnumerable<EnergyRateUpdate>  EnergyRateUpdates,
+                                       DateTimeOffset                 Timestamp)
         {
+
+            var updates   = EnergyRateUpdates.ToArray();
 
             var warnings  = new List<String>();
             var prices    = new List<POI.ChargingTariffPrices>();
 
-            foreach (var update in RefillPointStatus.EnergyRateUpdates)
+            foreach (var update in updates)
             {
 
-                var tariffId = POI3Mapper.ToPOI3TariffId(update.EnergyRateReference.Id, EVSEId.OperatorId);
+                var tariffId = POI3Mapper.ToPOI3TariffId(update.EnergyRateReference.Id, OperatorId);
 
                 if (!tariffId.HasValue)
                 {
@@ -510,28 +536,28 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             }
 
             if (warnings.Count > 0)
-                RaiseError($"The new prices of the EVSE '{EVSEId}' are imported partly.", warnings);
+                RaiseError($"The new prices of the {EntityType} '{EntityId}' are imported partly.", warnings);
 
             // No new prices, and none before: nothing to tell.
             if (prices.Count == 0 &&
-                !History.RuntimeStatus.TryGet(POI.POIRuntimeStatusKind.PriceStatus, nameof(POI.EVSE), EVSEId.ToString(), out _))
+                !History.RuntimeStatus.TryGet(POI.POIRuntimeStatusKind.PriceStatus, EntityType, EntityId, out _))
             {
                 return;
             }
 
             var result = History.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.PriceStatus,
-                                                         nameof(POI.EVSE),
-                                                         EVSEId.ToString(),
+                                                         EntityType,
+                                                         EntityId,
                                                          new POI.ChargingPrices(prices).Text,
-                                                         RefillPointStatus.EnergyRateUpdates.Any()
-                                                             ? RefillPointStatus.EnergyRateUpdates.Max(update => update.LastUpdated)
+                                                         updates.Length > 0
+                                                             ? updates.Max(update => update.LastUpdated)
                                                              : Timestamp,
                                                          out _,
                                                          out var errorResponse,
                                                          DataSource: "DATEX II");
 
             if (result == POI.POIStatusUpdateResult.Refused)
-                RaiseError($"The new prices of the EVSE '{EVSEId}' can not be taken: {errorResponse}", []);
+                RaiseError($"The new prices of the {EntityType} '{EntityId}' can not be taken: {errorResponse}", []);
 
         }
 

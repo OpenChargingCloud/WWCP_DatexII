@@ -123,6 +123,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                                     Features:             FeaturesByGroup ? [ POI.ChargingStationFeature.Illuminated ] : [ POI.ChargingStationFeature.Reservable, POI.ChargingStationFeature.Illuminated ],
                                                                     EVSEs:                [ AnEVSE(MaxPower) ],
                                                                     EUVehicleCategories:  [ POI.EUVehicleCategory.M1, POI.EUVehicleCategory.N1, POI.EUVehicleCategory.L ],
+                                                                    VehicleTypes:         [ POI.VehicleType.VAN, POI.VehicleType.PERSONAL_VEHICLE ],
                                                                     Created:              Created) ],
                     Created:              Created);
 
@@ -150,6 +151,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                                                                                           ChargingStationIds:   [ S1 ],
                                                                                                                           ParkingRestrictions:  [ POI.ParkingRestrictionGroup.DISABLED, POI.ParkingRestrictionGroup.EV_ONLY ],
                                                                                                                           EUVehicleCategories:  [ POI.EUVehicleCategory.M1 ],
+                                                                                                                          VehicleTypes:         [ POI.VehicleType.PERSONAL_VEHICLE ],
                                                                                                                           GeoLocation:          GeoCoordinate.Parse(50.9201, 11.5801),
                                                                                                                           Length:               Meter.From_m(5),
                                                                                                                           Width:                Meter.From_m(3.5m),
@@ -455,6 +457,13 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "dedicatedParkingSpaces").
                             Descendants().Where(element => element.Name.LocalName == "fuelType").Select(element => element.Value),             Is.EqualTo(new[] { "battery" }));
 
+            // The vehicle types of the station, and of the parking space for persons with disabilities.
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "vehicleType" &&
+                                                           !element.Ancestors().Any(ancestor => ancestor.Name.LocalName == "dedicatedParkingSpaces")).
+                            Select(element => element.Value),                                                                                     Is.EquivalentTo(new[] { "car", "van" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "dedicatedParkingSpaces").First().
+                            Descendants().Where(element => element.Name.LocalName == "vehicleType").Select(element => element.Value),            Is.EqualTo(new[] { "car" }));
+
             // Through the parsers: what a consumer reads.
             Assert.That(Payload.TryParseXML(xml, out var payload, out var errorResponse), Is.True, errorResponse);
 
@@ -504,6 +513,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(pool.Features,                                     Is.EquivalentTo(new[] { POI.ChargingPoolFeature.Roofed, POI.ChargingPoolFeature.IlluminatedParkingNearby }));
                 Assert.That(pool.NUTSCodes,                                    Is.EqualTo(new[] { POI.NUTSCode.Parse("DEG"), POI.NUTSCode.Parse("DEG03") }));
                 Assert.That(pool.ChargingStations.Single().EUVehicleCategories, Is.EqualTo(new[] { POI.EUVehicleCategory.L, POI.EUVehicleCategory.M1, POI.EUVehicleCategory.N1 }));
+                Assert.That(pool.ChargingStations.Single().VehicleTypes,       Is.EqualTo(new[] { POI.VehicleType.PERSONAL_VEHICLE, POI.VehicleType.VAN }));
 
                 Assert.That(evse.Id,                                           Is.EqualTo(E1));
                 Assert.That(evse.CurrentTypes,                                 Is.EqualTo(POI.CurrentTypes.AC_ThreePhases));
@@ -1214,6 +1224,41 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(imported!.Value,      Is.EqualTo(Prices(0.29m)));
                 Assert.That(imported.Timestamp,   Is.EqualTo(T0.AddMinutes(2)));
             });
+
+            // Energy rate updates of a station: the price status of the charging station.
+            var stationStatus = new EnergyInfrastructureStatusPublication(
+                                    T0.AddMinutes(3),
+                                    Creator,
+                                    Languages.de,
+                                    EnergyInfrastructureSiteStatus: [
+                                        new EnergyInfrastructureSiteStatus(
+                                            new FacilityObjectVersionedReference(P1.ToString()),
+                                            EnergyInfrastructureStationStatus: [
+                                                new EnergyInfrastructureStationStatus(
+                                                    new FacilityObjectVersionedReference(S1.ToString()),
+                                                    EnergyRateUpdates: [
+                                                        new EnergyRateUpdate(T0.AddMinutes(3),
+                                                                             new EnergyRateReference(T1.ToString()),
+                                                                             EnergyPrices: [ new EnergyPrice(PriceType.Parse("pricePerKWh"), new AmountOfMoney(0.49m), TaxIncluded: false, TaxRate: Percentage.Parse(19)) ])
+                                                    ],
+                                                    RefillPointStatus: [
+                                                        new ElectricChargingPointStatus(RefillPointStatusEnum.Parse("available"),
+                                                                                        new FacilityObjectVersionedReference(E1.ToString()),
+                                                                                        LastUpdated: T0.AddMinutes(3))
+                                                    ]
+                                                )
+                                            ]
+                                        )
+                                    ]
+                                );
+
+            await importer.ImportAsync(AssertValidStatus(stationStatus));
+
+            lock (errors)
+                Assert.That(errors, Is.Empty);
+
+            Assert.That(other.RuntimeStatus.TryGet(POI.POIRuntimeStatusKind.PriceStatus, nameof(POI.ChargingStation), S1.ToString(), out var importedStation), Is.True);
+            Assert.That(importedStation!.Value, Is.EqualTo(Prices(0.49m)));
 
         }
 

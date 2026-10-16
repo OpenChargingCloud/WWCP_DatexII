@@ -500,7 +500,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                           CoordinatesForDisplay:  ToDatexII(ChargingStation.GeoLocation.Value)
                                                                       )
                                                                     : null,
-                       ApplicableForVehicles:                   ToDatexII(ChargingStation.EUVehicleCategories),
+                       ApplicableForVehicles:                   ToDatexII(ChargingStation.VehicleTypes, ChargingStation.EUVehicleCategories),
                        Amenities:                               AmenitiesOf(ChargingStation.Features.Contains(POI.ChargingStationFeature.Illuminated),
                                                                             ChargingStation.Features.Contains(POI.ChargingStationFeature.Roofed),
                                                                             ChargingStation.Features.Contains(POI.ChargingStationFeature.IlluminatedParkingNearby),
@@ -1133,10 +1133,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 var effectiveStation   = ChildOf(Effective, "chargingStations", stationId);
 
                 Overlay    (station, mappedStation, Changed(mappedStation, unchangedStation, StationProperties));
-                OverlayTold(station, mappedStation, "features", StationFeaturesDatexIITells, unchangedStation);
+                OverlayTold(station, mappedStation, "features",     StationFeaturesDatexIITells,  unchangedStation);
+                OverlayTold(station, mappedStation, "vehicleTypes", VehicleTypesDatexIITells,     unchangedStation);
 
                 if (effectiveStation is not null)
-                    KeepWhatGroupsGive(station, stored, effectiveStation, [ .. StationProperties, "features" ]);
+                    KeepWhatGroupsGive(station, stored, effectiveStation, [ .. StationProperties, "features", "vehicleTypes" ]);
 
                 #region The EVSEs of the charging station: matched by their identification
 
@@ -1242,6 +1243,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                      Concat(FeaturesOf<POI.ChargingStationFeature>(Station.Amenities, POI.ChargingStationFeature.Illuminated, POI.ChargingStationFeature.Roofed,
                                                                                    POI.ChargingStationFeature.IlluminatedParkingNearby, POI.ChargingStationFeature.RoofedParkingNearby)),
                        EUVehicleCategories:  ToPOI3(Station.ApplicableForVehicles),
+                       VehicleTypes:         VehicleTypesOf(Station.ApplicableForVehicles),
                        // Only a total maximum power of its own: the sum of the charging points is what POI3 tells anyway,
                        // and more than that sum POI3 refuses.
                        MaxPower:     Station.TotalMaximumPower is Watt totalMaximumPower &&
@@ -1716,6 +1718,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                              Where  (space => space.ChargingStationIds.Contains(ChargingStation.Id)).
                              GroupBy(space => String.Join(",", space.ParkingRestrictions.Select(restriction => restriction.ToString())) + "|" +
                                               String.Join(",", space.EUVehicleCategories.Select(category    => category.   ToString())) + "|" +
+                                              String.Join(",", space.VehicleTypes.       Select(vehicleType => vehicleType.ToString())) + "|" +
                                               $"{space.Length?.m}|{space.Width?.m}|{space.MaxVehicleHeight?.m}|{space.Illuminated}|{space.Roofed}").
                              OrderBy(group => group.Key, StringComparer.Ordinal).
                              ToArray();
@@ -1733,6 +1736,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 var restrictions  = spaces[0].ParkingRestrictions.Select(restriction => restriction.ToString()).ToArray();
                 var categories    = spaces[0].EUVehicleCategories.Select(category => EUVehicleCategory.Parse(category.ToString().ToLowerInvariant())).ToArray();
                 var evOnly        = restrictions.Contains("EV_ONLY", StringComparer.OrdinalIgnoreCase);
+                var vehicleTypes  = ToDatexII(spaces[0].VehicleTypes);
+
+                // The vehicle type DISABLED means persons with disabilities.
+                if (spaces[0].VehicleTypes.Any(vehicleType => String.Equals(vehicleType.ToString(), "DISABLED", StringComparison.OrdinalIgnoreCase)) &&
+                    !restrictions.Contains("DISABLED", StringComparer.OrdinalIgnoreCase))
+                {
+                    restrictions = [ .. restrictions, "DISABLED" ];
+                }
                 var first         = spaces[0];
                 var location      = spaces.Length == 1 ? first.GeoLocation : null;
 
@@ -1743,8 +1754,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                Accessibility:          restrictions.Contains("DISABLED", StringComparer.OrdinalIgnoreCase)
                                                                            ? [ Accessibility.BarrierFreeAccessible ]
                                                                            : null,
-                                               ApplicableForVehicles:  evOnly || categories.Length > 0
+                                               ApplicableForVehicles:  evOnly || categories.Length > 0 || vehicleTypes.Length > 0
                                                                            ? [ new VehicleCharacteristics(FuelType:           evOnly ? [ FuelType.Battery ] : null,
+                                                                                                          VehicleType:        vehicleTypes.Length > 0 ? vehicleTypes : null,
                                                                                                           EUVehicleCategory:  categories) ]
                                                                            : null,
                                                UserSpecific:           ParkingRestrictionUserTypes.
@@ -1901,18 +1913,68 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         #region (private) EU vehicle categories and payment
 
         /// <summary>
-        /// The vehicles a station is for: one vehicle characteristics of the given EU vehicle categories, none without.
-        /// DATEX II writes them in lower case, e.g. m1.
+        /// The vehicle types of POI3 and DATEX II. DISABLED is no vehicle type: it means persons with disabilities.
         /// </summary>
-        private static IEnumerable<VehicleCharacteristics>? ToDatexII(IEnumerable<POI.EUVehicleCategory> EUVehicleCategories)
+        private static readonly (String POI3, String DatexII)[] VehicleTypeMapping = [
+            ("MOTORCYCLE",                     "motorcycle"),
+            ("PERSONAL_VEHICLE",               "car"),
+            ("PERSONAL_VEHICLE_WITH_TRAILER",  "carWithTrailer"),
+            ("VAN",                            "van"),
+            ("SEMI_TRACTOR",                   "articulatedVehicle"),
+            ("RIGID",                          "lorry"),
+            ("TRUCK_WITH_TRAILER",             "heavyGoodsVehicleWithTrailer"),
+            ("BUS",                            "bus")
+        ];
+
+        /// <summary>
+        /// The vehicle types of a charging station DATEX II tells.
+        /// </summary>
+        internal static readonly String[] VehicleTypesDatexIITells = [ .. VehicleTypeMapping.Select(mapping => mapping.POI3) ];
+
+        /// <summary>
+        /// The DATEX II vehicle types of the given POI3 ones that have one.
+        /// </summary>
+        private static VehicleType[] ToDatexII(IEnumerable<POI.VehicleType> VehicleTypes)
+
+            => [ .. VehicleTypes.
+                        Select(vehicleType => VehicleTypeMapping.FirstOrDefault(mapping => String.Equals(mapping.POI3, vehicleType.ToString(), StringComparison.OrdinalIgnoreCase)).DatexII).
+                        OfType<String>().
+                        Select(VehicleType.Parse) ];
+
+        /// <summary>
+        /// The POI3 vehicle types of all the given vehicle characteristics that have one; a passenger car is a personal
+        /// vehicle, a heavy goods vehicle a rigid one.
+        /// </summary>
+        private static IEnumerable<POI.VehicleType> VehicleTypesOf(IEnumerable<VehicleCharacteristics> VehicleCharacteristics)
+
+            => VehicleCharacteristics.
+                   SelectMany(characteristics => characteristics.VehicleType).
+                   Select    (vehicleType     => vehicleType.ToString() switch {
+                                                     "passengerCar"       => "PERSONAL_VEHICLE",
+                                                     "heavyGoodsVehicle"  => "RIGID",
+                                                     var datexII          => VehicleTypeMapping.FirstOrDefault(mapping => mapping.DatexII == datexII).POI3
+                                                 }).
+                   OfType<String>().
+                   Select    (POI.VehicleType.Parse).
+                   Distinct  ();
+
+        /// <summary>
+        /// The vehicles a station is for: one vehicle characteristics of the given vehicle types and EU vehicle
+        /// categories, none without. DATEX II writes the categories in lower case, e.g. m1.
+        /// </summary>
+        private static IEnumerable<VehicleCharacteristics>? ToDatexII(IEnumerable<POI.VehicleType>        VehicleTypes,
+                                                                      IEnumerable<POI.EUVehicleCategory>  EUVehicleCategories)
         {
 
-            var categories = EUVehicleCategories.
-                                 Select(category => EUVehicleCategory.Parse(category.ToString().ToLowerInvariant())).
-                                 ToArray();
+            var types       = ToDatexII(VehicleTypes);
 
-            return categories.Length > 0
-                       ? [ new VehicleCharacteristics(EUVehicleCategory: categories) ]
+            var categories  = EUVehicleCategories.
+                                  Select(category => EUVehicleCategory.Parse(category.ToString().ToLowerInvariant())).
+                                  ToArray();
+
+            return types.Length > 0 || categories.Length > 0
+                       ? [ new VehicleCharacteristics(VehicleType:        types.     Length > 0 ? types      : null,
+                                                      EUVehicleCategory:  categories.Length > 0 ? categories : null) ]
                        : null;
 
         }

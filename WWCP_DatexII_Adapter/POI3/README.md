@@ -82,7 +82,8 @@ await importer.ImportAsync(table!);
   owns the data.
 - **Status:** the status of a refill point goes into the runtime status of its EVSE, with `DataSource` "DATEX II". The
   refill points of the last imported table tell which EVSE a reference means; a reference that is itself an EVSE
-  identification works without a table. Its energy rate updates become the price status of the EVSE (the new prices
+  identification works without a table. Its energy rate updates become the price status of the EVSE, those of a station status the price status of
+  the charging station (the new prices
   of each rate as the new prices of that charging tariff; none, after there were some, as no new prices). Its planned
   statuses that have not started yet are planned as statuses of the
   EVSE from their start; when one ends without another starting then, the EVSE is planned to have its current status
@@ -158,7 +159,8 @@ maximum current of an EVSE, given once for all members of a group. A change of a
 | — | `serviceType` `unattended` |
 | feature `Reservable` | `reservation` `optional` of its charging points (import: `optional`, `mandatory`, `partly`) |
 | `Features` Illuminated, Roofed, IlluminatedParkingNearby, RoofedParkingNearby | `amenities` of the station, as of the site. The import sets them and `Reservable`, and keeps the other features of an existing charging station. |
-| parking spaces of the network whose `ChargingStationIds` name it | `dedicatedParkingSpaces`: one per combination of `ParkingRestrictions`, `EUVehicleCategories`, `Length`, `Width`, `MaxVehicleHeight`, `Illuminated` and `Roofed`, with their `numberOfSpaces`, their `dimension` (`length`, `width`, `height` as the clear height) and `amenities`, and the `locationReference` of a single space with a `GeoLocation`; DISABLED → `userSpecific` `personsWithDisabilities` and `accessibility` `barrierFreeAccessible`, EMPLOYEES → `employees`, CUSTOMERS → `customers`, TENANTS → `residents`, EV_ONLY → `applicableForVehicles` `fuelType` `battery`, the EU vehicle categories → its `euVehicleCategory`s. Not imported: POI3 parking spaces belong to parking operators. |
+| parking spaces of the network whose `ChargingStationIds` name it | `dedicatedParkingSpaces`: one per combination of `ParkingRestrictions`, `EUVehicleCategories`, `Length`, `Width`, `MaxVehicleHeight`, `Illuminated` and `Roofed`, with their `numberOfSpaces`, their `dimension` (`length`, `width`, `height` as the clear height) and `amenities`, and the `locationReference` of a single space with a `GeoLocation`; DISABLED → `userSpecific` `personsWithDisabilities` and `accessibility` `barrierFreeAccessible`, EMPLOYEES → `employees`, CUSTOMERS → `customers`, TENANTS → `residents`, EV_ONLY → `applicableForVehicles` `fuelType` `battery`, the EU vehicle categories → its `euVehicleCategory`s, the vehicle types → its `vehicleType`s (the vehicle type DISABLED → `personsWithDisabilities`). Not imported: POI3 parking spaces belong to parking operators. |
+| `VehicleTypes` | `vehicleType`s of the same `applicableForVehicles`: MOTORCYCLE ↔ `motorcycle`, PERSONAL_VEHICLE ↔ `car` (import also `passengerCar`), PERSONAL_VEHICLE_WITH_TRAILER ↔ `carWithTrailer`, VAN ↔ `van`, SEMI_TRACTOR ↔ `articulatedVehicle`, RIGID ↔ `lorry` (import also `heavyGoodsVehicle`), TRUCK_WITH_TRAILER ↔ `heavyGoodsVehicleWithTrailer`, BUS ↔ `bus`; DISABLED is no vehicle type and is left out. The import sets these and keeps the others of an existing charging station. |
 | `EUVehicleCategories` | one `applicableForVehicles` with the `euVehicleCategory`s, in lower case (`M1` ↔ `m1`); categories DATEX II 3.7 does not know, e.g. `L`, as extended values. Import: the categories of all its `applicableForVehicles`, in upper case. |
 | EVSEs | `refillPoint`s, `xsi:type` `aegi:ElectricChargingPoint` |
 
@@ -316,8 +318,9 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
   products of a station (rather than of its charging points) are imported only as rates.
 - **Hydrogen:** the hydrogen of a station (refuelling modes, capacity) is read and written by the library, but has no
   POI3 counterpart.
-- **Status:** only the refill point `status` and its planned statuses are imported, the latter as planned EVSE
-  statuses, not admin statuses. Waiting time, remaining charging time, current voltage and power, next available slots, energy rate updates of a station (those of refill points are imported),
+- **Status:** only the refill point `status`, its planned statuses (as planned EVSE statuses, not admin statuses) and the
+  energy rate updates of refill points and stations are imported. Waiting time, remaining charging time, current
+  voltage and power, next available slots,
   opening and operation status, faults, limited hydrogen amount, and site and station statuses are not.
 - **Locations:** only point and area locations are used, and only their display coordinates and address. GML
   geometries, NUTS areas, heights and accuracies are read by the library, but not imported; OpenLR is not read.
