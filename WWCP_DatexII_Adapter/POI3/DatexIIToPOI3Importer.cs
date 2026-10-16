@@ -437,7 +437,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         {
 
             var head          = History.Head.RoamingNetwork;
-            var networkJSON   = head.ToJSON();
+            var networkJSON   = head.ToJSON(IncludeETags: false);   // changed, so without the ETags of the head
             var operatorJSON  = (networkJSON["chargingStationOperators"] as JArray ?? []).
                                     OfType<JObject>().
                                     FirstOrDefault(op => op["@id"]?.Value<String>() == OperatorId.ToString());
