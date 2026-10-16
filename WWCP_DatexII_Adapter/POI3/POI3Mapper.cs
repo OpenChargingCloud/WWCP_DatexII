@@ -637,61 +637,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                             ICollection<String>      Warnings)
         {
 
-            var prices      = new List<EnergyPrice>();
-            var priceGroup  = 0U;
-
-            foreach (var element in ChargingTariff.Elements)
-            {
-
-                priceGroup++;
-
-                // DATEX II prices charging only, not a reservation.
-                if (element.Restrictions?.Reservation is POI.ChargingReservationRestriction reservation)
-                {
-                    Warnings.Add($"The element {priceGroup} of the charging tariff '{ChargingTariff.Id}' prices a reservation ({reservation}), which has no counterpart, and is left out!");
-                    continue;
-                }
-
-                var overallPeriod  = element.Restrictions is not null
-                                         ? ToDatexII(element.Restrictions, ChargingTariff.Created, ChargingTariff.Id, Warnings)
-                                         : null;
-
-                var byTime         = TimeBasedApplicabilityOf  (element.Restrictions, ChargingTariff.Id, Warnings);
-                var byEnergy       = EnergyBasedApplicabilityOf(element.Restrictions, ChargingTariff.Id, Warnings);
-
-                foreach (var priceComponent in element.PriceComponents)
-                {
-
-                    (String Type, Decimal Price)? price = priceComponent.Type switch {
-                        POI.ChargingDimensionTypes.ENERGY  => ("pricePerKWh",    priceComponent.Price),
-                        POI.ChargingDimensionTypes.TIME    => ("pricePerMinute", priceComponent.Price / 60),
-                        POI.ChargingDimensionTypes.FLAT    => ("basePrice",      priceComponent.Price),
-                        _                                  => null
-                    };
-
-                    if (!price.HasValue)
-                    {
-                        Warnings.Add($"The price component '{priceComponent.Type}' of the charging tariff '{ChargingTariff.Id}' has no counterpart and is left out!");
-                        continue;
-                    }
-
-                    if (priceComponent.StepSize.HasValue && priceComponent.StepSize.Value > 1)
-                        Warnings.Add($"The step size of the price component '{priceComponent.Type}' of the charging tariff '{ChargingTariff.Id}' has no counterpart!");
-
-                    prices.Add(new EnergyPrice(
-                                   PriceType:      PriceType.Parse(price.Value.Type),
-                                   Value:          new AmountOfMoney(price.Value.Price),
-                                   TaxIncluded:    priceComponent.VAT.HasValue ? false : null,
-                                   TaxRate:        priceComponent.VAT.HasValue ? Percentage.Parse(priceComponent.VAT.Value) : null,
-                                   OverallPeriod:             overallPeriod,
-                                   PriceGroupIndex:           priceGroup,
-                                   TimeBasedApplicability:    byTime,
-                                   EnergyBasedApplicability:  byEnergy
-                               ));
-
-                }
-
-            }
+            var prices = EnergyPricesOf(ChargingTariff.Elements, ChargingTariff.Created, ChargingTariff.Id, Warnings);
 
             if (prices.Count == 0)
             {
@@ -792,7 +738,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             foreach (var chargingStation in ChargingPool.ChargingStations)
             {
 
-                var pointStatus = ChargingStation_RefillPointStatus(chargingStation, EVSEIds);
+                var pointStatus = ChargingStation_RefillPointStatus(ChargingPool, chargingStation, EVSEIds);
 
                 if (pointStatus.Length == 0)
                     continue;
@@ -819,7 +765,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         }
 
-        private static ElectricChargingPointStatus[] ChargingStation_RefillPointStatus(POI.ChargingStation         ChargingStation,
+        private static ElectricChargingPointStatus[] ChargingStation_RefillPointStatus(POI.ChargingPool            ChargingPool,
+                                                                                      POI.ChargingStation         ChargingStation,
                                                                                       IReadOnlySet<POI.EVSE_Id>?  EVSEIds)
 
             => ChargingStation.EVSEs.
@@ -835,12 +782,162 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                       CurrentVoltage:         evse.EnergyStatus?.Value.CurrentVoltage,
                                       RemainingChargingTime:  evse.EnergyStatus?.Value.RemainingChargingTime,
                                       // Reservations, announced maintenance and the like.
-                                      PlannedRefillPointStatus: PlannedStatusesOf(evse, Timestamp.Now)
+                                      PlannedRefillPointStatus: PlannedStatusesOf(evse, Timestamp.Now),
+                                      // New prices at runtime, e.g. ad hoc prices following the electricity market.
+                                      EnergyRateUpdates:        EnergyRateUpdatesOf(ChargingPool, ChargingStation, evse)
                                   )).
                    ToArray();
 
         #endregion
 
+
+        #region EnergyPricesOf(Elements, Created, TariffId, Warnings)
+
+        /// <summary>
+        /// The energy prices of the given elements of a charging tariff, or of new prices of it: a price per hour becomes a
+        /// price per minute; time of day, weekdays and dates of an element become the overall period of its prices (from
+        /// the given creation, unless they tell a start date), energy and duration restrictions their applicability, and
+        /// the number of the element their price group index. An element pricing a reservation is left out.
+        /// </summary>
+        public static List<EnergyPrice> EnergyPricesOf(IEnumerable<POI.ChargingTariffElement>  Elements,
+                                                       DateTimeOffset                          Created,
+                                                       POI.ChargingTariff_Id                   TariffId,
+                                                       ICollection<String>                     Warnings)
+        {
+
+            var prices      = new List<EnergyPrice>();
+            var priceGroup  = 0U;
+
+            foreach (var element in Elements)
+            {
+
+                priceGroup++;
+
+                // DATEX II prices charging only, not a reservation.
+                if (element.Restrictions?.Reservation is POI.ChargingReservationRestriction reservation)
+                {
+                    Warnings.Add($"The element {priceGroup} of the charging tariff '{TariffId}' prices a reservation ({reservation}), which has no counterpart, and is left out!");
+                    continue;
+                }
+
+                var overallPeriod  = element.Restrictions is not null
+                                         ? ToDatexII(element.Restrictions, Created, TariffId, Warnings)
+                                         : null;
+
+                var byTime         = TimeBasedApplicabilityOf  (element.Restrictions, TariffId, Warnings);
+                var byEnergy       = EnergyBasedApplicabilityOf(element.Restrictions, TariffId, Warnings);
+
+                foreach (var priceComponent in element.PriceComponents)
+                {
+
+                    (String Type, Decimal Price)? price = priceComponent.Type switch {
+                        POI.ChargingDimensionTypes.ENERGY  => ("pricePerKWh",    priceComponent.Price),
+                        POI.ChargingDimensionTypes.TIME    => ("pricePerMinute", priceComponent.Price / 60),
+                        POI.ChargingDimensionTypes.FLAT    => ("basePrice",      priceComponent.Price),
+                        _                                  => null
+                    };
+
+                    if (!price.HasValue)
+                    {
+                        Warnings.Add($"The price component '{priceComponent.Type}' of the charging tariff '{TariffId}' has no counterpart and is left out!");
+                        continue;
+                    }
+
+                    if (priceComponent.StepSize.HasValue && priceComponent.StepSize.Value > 1)
+                        Warnings.Add($"The step size of the price component '{priceComponent.Type}' of the charging tariff '{TariffId}' has no counterpart!");
+
+                    prices.Add(new EnergyPrice(
+                                   PriceType:      PriceType.Parse(price.Value.Type),
+                                   Value:          new AmountOfMoney(price.Value.Price),
+                                   TaxIncluded:    priceComponent.VAT.HasValue ? false : null,
+                                   TaxRate:        priceComponent.VAT.HasValue ? Percentage.Parse(priceComponent.VAT.Value) : null,
+                                   OverallPeriod:             overallPeriod,
+                                   PriceGroupIndex:           priceGroup,
+                                   TimeBasedApplicability:    byTime,
+                                   EnergyBasedApplicability:  byEnergy
+                               ));
+
+                }
+
+            }
+
+            return prices;
+
+        }
+
+        #endregion
+
+        #region ElementsOf(Prices, RateId, Warnings)
+
+        /// <summary>
+        /// The charging tariff elements of the given energy prices of a rate, or of an update of it: a price per minute
+        /// becomes a price per hour; the prices of the same price group make one element (of the same overall period and
+        /// applicability, when they all are of one group, as in the Mobilithek profile), whose restrictions are the dates,
+        /// times of day, weekdays and applicability of it.
+        /// </summary>
+        public static List<POI.ChargingTariffElement> ElementsOf(IEnumerable<EnergyPrice>  Prices,
+                                                                 String                    RateId,
+                                                                 ICollection<String>       Warnings)
+        {
+
+            var elements = new List<POI.ChargingTariffElement>();
+
+            foreach (var group in GroupPrices(Prices))
+            {
+
+                var components = new List<POI.ChargingPriceComponent>();
+
+                foreach (var price in group)
+                {
+
+                    var component = price.PriceType.ToString() switch {
+                        "pricePerKWh"     => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.ENERGY, price.Value.Value,      VATOf(price), 1),
+                        "pricePerMinute"  => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.TIME,   price.Value.Value * 60, VATOf(price), 1),
+                        "basePrice"       => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.FLAT,   price.Value.Value,      VATOf(price)),
+                        "flatRate"        => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.FLAT,   price.Value.Value,      VATOf(price)),
+                        "free"            => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.FLAT,   0),
+                        _                 => null
+                    };
+
+                    if (component is null)
+                        Warnings.Add($"The price type '{price.PriceType}' of the energy rate '{RateId}' has no counterpart and is left out!");
+
+                    else
+                        components.Add(component);
+
+                }
+
+                if (components.Count > 0)
+                    elements.Add(new POI.ChargingTariffElement(components, RestrictionsOf(group.First(), Warnings)));
+
+            }
+
+            return elements;
+
+        }
+
+        #endregion
+
+        #region EnergyRateUpdatesOf(ChargingPool, ChargingStation, EVSE)
+
+        /// <summary>
+        /// The energy rate updates of the given EVSE: for every charging tariff, the new prices in effect there, of its
+        /// own price status, else of its charging station's, else of its charging pool's; since when they apply.
+        /// </summary>
+        public static IEnumerable<EnergyRateUpdate> EnergyRateUpdatesOf(POI.ChargingPool?     ChargingPool,
+                                                                        POI.ChargingStation?  ChargingStation,
+                                                                        POI.EVSE              EVSE)
+
+            => POI.ChargingPrices.Effective(ChargingPool, ChargingStation, EVSE).
+                   Select(price => new EnergyRateUpdate(
+                                       LastUpdated:          price.Timestamp,
+                                       EnergyRateReference:  new EnergyRateReference(price.Value.ChargingTariffId.ToString()),
+                                       EnergyPrices:         EnergyPricesOf(price.Value.Elements, price.Timestamp, price.Value.ChargingTariffId, new List<String>())
+                                   )).
+                   Where (update => update.EnergyPrices.Any()).
+                   ToArray();
+
+        #endregion
 
         #region PlannedStatusesOf(EVSE, Now)
 
@@ -1296,37 +1393,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             if (EnergyRate.RatePolicy.ToString() != "adHoc")
                 Warnings.Add($"The energy rate '{EnergyRate.Id}' is a '{EnergyRate.RatePolicy}' rate; POI3 charging tariffs do not tell!");
 
-            var elements = new List<POI.ChargingTariffElement>();
-
-            foreach (var group in GroupPrices(EnergyRate.EnergyPrices))
-            {
-
-                var components = new List<POI.ChargingPriceComponent>();
-
-                foreach (var price in group)
-                {
-
-                    var component = price.PriceType.ToString() switch {
-                        "pricePerKWh"     => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.ENERGY, price.Value.Value,      VATOf(price), 1),
-                        "pricePerMinute"  => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.TIME,   price.Value.Value * 60, VATOf(price), 1),
-                        "basePrice"       => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.FLAT,   price.Value.Value,      VATOf(price)),
-                        "flatRate"        => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.FLAT,   price.Value.Value,      VATOf(price)),
-                        "free"            => new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.FLAT,   0),
-                        _                 => null
-                    };
-
-                    if (component is null)
-                        Warnings.Add($"The price type '{price.PriceType}' of the energy rate '{EnergyRate.Id}' has no counterpart and is left out!");
-
-                    else
-                        components.Add(component);
-
-                }
-
-                if (components.Count > 0)
-                    elements.Add(new POI.ChargingTariffElement(components, RestrictionsOf(group.First(), Warnings)));
-
-            }
+            var elements = ElementsOf(EnergyRate.EnergyPrices, EnergyRate.Id, Warnings);
 
             if (elements.Count == 0)
             {

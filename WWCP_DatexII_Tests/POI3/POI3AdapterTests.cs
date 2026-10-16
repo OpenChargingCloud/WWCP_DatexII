@@ -1133,6 +1133,92 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         #endregion
 
+        #region PriceStatusesAreEnergyRateUpdates()
+
+        /// <summary>
+        /// The price status of a charging pool, station or EVSE, new prices of its charging tariffs at runtime, is an energy
+        /// rate update of every charging point it applies to, the most specific one for each tariff; it publishes a delta
+        /// at once, and is imported as the price status of the EVSE.
+        /// </summary>
+        [Test]
+        public async Task PriceStatusesAreEnergyRateUpdates()
+        {
+
+            var history   = POI.RoamingNetworkHistory.Start(ANetwork());
+            var deltas    = new List<EnergyInfrastructureStatusPublication>();
+
+            await using var publisher = new POI3ToDatexIIPublisher(history, Creator, Languages.de, StationIdBNetzA: station => "BNetzA-4711");
+
+            publisher.OnStatusPublication += (sender, publication, isDelta) => { if (isDelta) lock (deltas) deltas.Add(publication); return Task.CompletedTask; };
+
+            await publisher.StartAsync();
+
+            static String Prices(Decimal PerKWh)
+
+                => new POI.ChargingPrices([ new POI.ChargingTariffPrices(T1, [ new POI.ChargingTariffElement([ new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.ENERGY, PerKWh, VAT: 19, StepSize: 1) ]) ]) ]).Text;
+
+            static ElectricChargingPointStatus PointOf(EnergyInfrastructureStatusPublication Publication)
+
+                => (ElectricChargingPointStatus) Publication.EnergyInfrastructureSiteStatus.Single().EnergyInfrastructureStationStatus.Single().RefillPointStatus.Single();
+
+            // New prices of the charging pool: a delta of its EVSE at once.
+            Assert.That(history.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.PriceStatus, nameof(POI.ChargingPool), P1.ToString(), Prices(0.59m), T0.AddMinutes(1), out _, out var poolError),
+                        Is.EqualTo(POI.POIStatusUpdateResult.Updated), poolError);
+
+            Assert.That(await Eventually(() => { lock (deltas) return deltas.Count == 1; }), Is.True, "The new prices of the pool were not published.");
+
+            // ...and of the EVSE itself, which come first.
+            Assert.That(history.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.PriceStatus, nameof(POI.EVSE), E1.ToString(), Prices(0.29m), T0.AddMinutes(2), out _, out _),
+                        Is.EqualTo(POI.POIStatusUpdateResult.Updated));
+
+            Assert.That(await Eventually(() => { lock (deltas) return deltas.Count == 2; }), Is.True, "The new prices of the EVSE were not published.");
+
+            EnergyInfrastructureStatusPublication poolDelta, evseDelta;
+            lock (deltas)
+            {
+                poolDelta = deltas[0];
+                evseDelta = deltas[1];
+            }
+
+            AssertValidStatus(poolDelta);
+            AssertValidStatus(evseDelta);
+
+            var poolUpdate = PointOf(poolDelta).EnergyRateUpdates.Single();
+            var evseUpdate = PointOf(evseDelta).EnergyRateUpdates.Single();
+
+            Assert.Multiple(() => {
+                Assert.That(poolUpdate.EnergyRateReference.Id,                                   Is.EqualTo(T1.ToString()));
+                Assert.That(poolUpdate.EnergyPrices.Single().PriceType.ToString(),              Is.EqualTo("pricePerKWh"));
+                Assert.That(poolUpdate.EnergyPrices.Single().Value.Value,                       Is.EqualTo(0.59m));
+                Assert.That(poolUpdate.LastUpdated,                                             Is.EqualTo(T0.AddMinutes(1)));
+                Assert.That(evseUpdate.EnergyPrices.Single().Value.Value,                       Is.EqualTo(0.29m), "The EVSE's own prices come first.");
+                Assert.That(evseUpdate.LastUpdated,                                             Is.EqualTo(T0.AddMinutes(2)));
+            });
+
+            // Imported elsewhere: the price status of the EVSE.
+            var other     = POI.RoamingNetworkHistory.Start(ANetwork());
+            var errors    = new List<String>();
+
+            await using var importer = new DatexIIToPOI3Importer(other, changeSet => changeSet.SignedByAll(other.Head.RoamingNetwork));
+
+            importer.OnError += (sender, description, warnings) => { lock (errors) errors.Add(description + " " + String.Join(" ", warnings)); };
+
+            await importer.ImportAsync(AssertValidStatus(publisher.CurrentStatusPublication!));
+
+            lock (errors)
+                Assert.That(errors, Is.Empty);
+
+            Assert.That(other.RuntimeStatus.TryGet(POI.POIRuntimeStatusKind.PriceStatus, nameof(POI.EVSE), E1.ToString(), out var imported), Is.True);
+
+            Assert.Multiple(() => {
+                Assert.That(imported!.Value,      Is.EqualTo(Prices(0.29m)));
+                Assert.That(imported.Timestamp,   Is.EqualTo(T0.AddMinutes(2)));
+            });
+
+        }
+
+        #endregion
+
         #region TheImporterLeavesOutRefillPointsThatAreNoChargingPoints()
 
         /// <summary>

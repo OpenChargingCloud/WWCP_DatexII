@@ -276,6 +276,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         private void StatusUpdated(POI.POIStatusUpdate StatusUpdate)
         {
 
+            // New prices of a charging pool, station or EVSE: a delta of its EVSEs at once.
+            if (StatusUpdate.Kind == POI.POIRuntimeStatusKind.PriceStatus)
+            {
+                work.Writer.TryWrite(() => PublishStatusAsync(EVSEIdsOf(StatusUpdate.EntityType, StatusUpdate.EntityId)));
+                return;
+            }
+
             if (StatusUpdate.EntityType != nameof(POI.EVSE) ||
                 POI.EVSE_Id.TryParse(StatusUpdate.EntityId) is not POI.EVSE_Id evseId ||
                 (OperatorIds is not null && !OperatorIds.Contains(evseId.OperatorId)))
@@ -400,15 +407,61 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         #endregion
 
+        #region (private) EVSEIdsOf(EntityType, EntityId)
+
+        /// <summary>
+        /// The published EVSEs of the given charging pool, charging station or EVSE in the head.
+        /// </summary>
+        private IReadOnlyList<POI.EVSE_Id> EVSEIdsOf(String  EntityType,
+                                                    String  EntityId)
+        {
+
+            var head = History.Head.RoamingNetwork;
+
+            IEnumerable<POI.EVSE_Id> evseIds = EntityType switch {
+
+                nameof(POI.EVSE)             => POI.EVSE_Id.TryParse(EntityId) is POI.EVSE_Id evseId
+                                                    ? [ evseId ]
+                                                    : [],
+
+                nameof(POI.ChargingStation)  => POI.ChargingStation_Id.TryParse(EntityId) is POI.ChargingStation_Id stationId &&
+                                                head.TryGetChargingStationOperatorById(stationId.OperatorId, out var stationOperator) &&
+                                                stationOperator.TryGetChargingStation(stationId, out var station)
+                                                    ? station.EVSEs.Select(evse => evse.Id)
+                                                    : [],
+
+                nameof(POI.ChargingPool)     => POI.ChargingPool_Id.TryParse(EntityId) is POI.ChargingPool_Id poolId &&
+                                                head.TryGetChargingStationOperatorById(poolId.OperatorId, out var poolOperator) &&
+                                                poolOperator.TryGetChargingPool(poolId, out var pool)
+                                                    ? pool.ChargingStations.SelectMany(chargingStation => chargingStation.EVSEs).Select(evse => evse.Id)
+                                                    : [],
+
+                _                            => []
+
+            };
+
+            return evseIds.Where(evseId => OperatorIds is null || OperatorIds.Contains(evseId.OperatorId)).ToArray();
+
+        }
+
+        #endregion
+
         #region (private) PublishStatusAsync(EVSEId)
 
         /// <summary>
         /// Renew the full status, and publish the status of the given EVSE as a delta.
         /// </summary>
-        private async Task PublishStatusAsync(POI.EVSE_Id EVSEId)
+        private Task PublishStatusAsync(POI.EVSE_Id EVSEId)
+
+            => PublishStatusAsync([ EVSEId ]);
+
+        /// <summary>
+        /// Renew the full status, and publish the status of the given EVSEs as one delta.
+        /// </summary>
+        private async Task PublishStatusAsync(IReadOnlyList<POI.EVSE_Id> EVSEIds)
         {
 
-            if (TableVersion is null)
+            if (TableVersion is null || EVSEIds.Count == 0)
                 return;
 
             var head  = History.Head.RoamingNetwork;
@@ -426,14 +479,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                        TableId,
                                                        TableVersion,
                                                        OperatorIds,
-                                                       [ EVSEId ]).
+                                                       EVSEIds).
                             // Its Mobilithek JSON is a deltaPush.
                             AsDelta();
 
             if (delta.EnergyInfrastructureSiteStatus.Any())
             {
-                lastDeltas[EVSEId] = Timestamp.Now;
+
+                var now = Timestamp.Now;
+
+                foreach (var evseId in EVSEIds)
+                    lastDeltas[evseId] = now;
+
                 await Raise(OnStatusPublication, handler => handler(this, delta, true));
+
             }
 
         }

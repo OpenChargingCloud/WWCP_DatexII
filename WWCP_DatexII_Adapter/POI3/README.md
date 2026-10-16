@@ -56,6 +56,8 @@ await importer.ImportAsync(table!);
 - **On every planned status or admin status of an EVSE,** e.g. a reservation or an announced maintenance: a delta at
   once, with its planned statuses (POI3 `OnStatusPlanned`). When the planned status is due, its change is published as
   any other.
+- **On every price status change of a charging pool, station or EVSE:** a delta of all its EVSEs at once, with their
+  energy rate updates.
 - **On every energy status change of an EVSE:** the same, but throttled: its charging power, voltage and remaining
   charging time change often while charging. A change is published at once when the last delta of the EVSE is at least
   `EnergyStatusDeltaInterval` ago (a constructor parameter, one minute by default, zero for every change); otherwise
@@ -78,7 +80,9 @@ await importer.ImportAsync(table!);
   owns the data.
 - **Status:** the status of a refill point goes into the runtime status of its EVSE, with `DataSource` "DATEX II". The
   refill points of the last imported table tell which EVSE a reference means; a reference that is itself an EVSE
-  identification works without a table. Its planned statuses that have not started yet are planned as statuses of the
+  identification works without a table. Its energy rate updates become the price status of the EVSE (the new prices
+  of each rate as the new prices of that charging tariff; none, after there were some, as no new prices). Its planned
+  statuses that have not started yet are planned as statuses of the
   EVSE from their start; when one ends without another starting then, the EVSE is planned to have its current status
   again.
 - **Other refill points:** diesel, petrol and alternative fuels refill points have no POI3 counterpart. They are left out
@@ -213,6 +217,7 @@ maximum current of an EVSE, given once for all members of a group. A change of a
 | admin status | `operationStatus`: operational → `inOperation`, planned/inDeployment/outOfService/blocked/deleted → `notInOperation` (also of the site, from the pool's admin status) |
 | — | station `isAvailable`: any of its charging points `available` (full publications only) |
 | entity versions | `reference` `id` and `version`, the same as in the table |
+| price status of the EVSE, its charging station and its charging pool | `energyRateUpdate`s of its `refillPointStatus`: for every charging tariff the most specific new prices (`ChargingPrices.Effective`), referring to the rate of the tariff, since the timestamp of the price status, the prices as those of the tariff in the table. Import: the price status of the EVSE. |
 | future entries of the EVSE status and admin status schedules | `plannedRefillPointStatus`: from every future entry that changes the refill point status (as the current one: admin status first), until the next such change; the last one without an end. Import: planned EVSE statuses, see the importer. |
 | EVSE energy status `used`, `currentVoltage`, `remainingChargingTime` | `currentChargingPower`, `currentVoltage`, `remainingChargingTime` of its `refillPointStatus`; its timestamp also counts for `lastUpdated`. `available` (the power a newly arriving vehicle would get) and `storedEnergy` have no counterpart. Not imported: POI3 is where these values come from. |
 | full status / one changed EVSE | `IsDelta` false / true: `snapshotPush` / `deltaPush` in the Mobilithek message container |
@@ -308,7 +313,7 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
 - **Hydrogen:** the hydrogen of a station (refuelling modes, capacity) is read and written by the library, but has no
   POI3 counterpart.
 - **Status:** only the refill point `status` and its planned statuses are imported, the latter as planned EVSE
-  statuses, not admin statuses. Waiting time, remaining charging time, current voltage and power, next available slots, energy rate updates (ad hoc price changes),
+  statuses, not admin statuses. Waiting time, remaining charging time, current voltage and power, next available slots, energy rate updates of a station (those of refill points are imported),
   opening and operation status, faults, limited hydrogen amount, and site and station statuses are not.
 - **Locations:** only point and area locations are used, and only their display coordinates and address. GML
   geometries, NUTS areas, heights and accuracies are read by the library, but not imported; OpenLR is not read.

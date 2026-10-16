@@ -408,6 +408,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                         ImportPlannedStatus(evseId.Value,
                                             refillPointStatus);
 
+                        ImportPriceStatus(evseId.Value,
+                                          refillPointStatus,
+                                          refillPointStatus.LastUpdated ?? StatusPublication.PublicationTime);
+
                     }
                 }
             }
@@ -472,6 +476,62 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 }
 
             }
+
+        }
+
+        /// <summary>
+        /// The energy rate updates of the given refill point status as the price status of the EVSE: for every rate, its
+        /// new prices as the new prices of that charging tariff. None, after there were some, are no new prices.
+        /// </summary>
+        private void ImportPriceStatus(POI.EVSE_Id        EVSEId,
+                                       RefillPointStatus  RefillPointStatus,
+                                       DateTimeOffset     Timestamp)
+        {
+
+            var warnings  = new List<String>();
+            var prices    = new List<POI.ChargingTariffPrices>();
+
+            foreach (var update in RefillPointStatus.EnergyRateUpdates)
+            {
+
+                var tariffId = POI3Mapper.ToPOI3TariffId(update.EnergyRateReference.Id, EVSEId.OperatorId);
+
+                if (!tariffId.HasValue)
+                {
+                    warnings.Add($"The energy rate '{update.EnergyRateReference.Id}' of an energy rate update is no charging tariff identification!");
+                    continue;
+                }
+
+                var elements = POI3Mapper.ElementsOf(update.EnergyPrices, update.EnergyRateReference.Id, warnings);
+
+                if (elements.Count > 0 && !prices.Any(price => price.ChargingTariffId == tariffId.Value))
+                    prices.Add(new POI.ChargingTariffPrices(tariffId.Value, elements));
+
+            }
+
+            if (warnings.Count > 0)
+                RaiseError($"The new prices of the EVSE '{EVSEId}' are imported partly.", warnings);
+
+            // No new prices, and none before: nothing to tell.
+            if (prices.Count == 0 &&
+                !History.RuntimeStatus.TryGet(POI.POIRuntimeStatusKind.PriceStatus, nameof(POI.EVSE), EVSEId.ToString(), out _))
+            {
+                return;
+            }
+
+            var result = History.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.PriceStatus,
+                                                         nameof(POI.EVSE),
+                                                         EVSEId.ToString(),
+                                                         new POI.ChargingPrices(prices).Text,
+                                                         RefillPointStatus.EnergyRateUpdates.Any()
+                                                             ? RefillPointStatus.EnergyRateUpdates.Max(update => update.LastUpdated)
+                                                             : Timestamp,
+                                                         out _,
+                                                         out var errorResponse,
+                                                         DataSource: "DATEX II");
+
+            if (result == POI.POIStatusUpdateResult.Refused)
+                RaiseError($"The new prices of the EVSE '{EVSEId}' can not be taken: {errorResponse}", []);
 
         }
 
