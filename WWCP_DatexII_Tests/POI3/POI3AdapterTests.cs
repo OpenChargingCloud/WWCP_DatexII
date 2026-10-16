@@ -114,8 +114,10 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     LocationLanguages:    [ Languages.de ],
                     OpeningTimes:         new ImmutableOpeningTimes(OpeningTimes.Open24Hours),
                     Services:             [ POI.LocationService.ACCESSIBLE_CHARGING, POI.LocationService.ACCESSIBLE_TOILETS ],
+                    NUTSCodes:            [ POI.NUTSCode.Parse("DE"), POI.NUTSCode.Parse("DEG"), POI.NUTSCode.Parse("DEG03") ],
+                    Features:             [ POI.ChargingPoolFeature.Roofed ],
                     ChargingStations:     [ new POI.ChargingStation(S1,
-                                                                    Features:             [ POI.ChargingStationFeature.Reservable ],
+                                                                    Features:             [ POI.ChargingStationFeature.Reservable, POI.ChargingStationFeature.Illuminated ],
                                                                     EVSEs:                [ AnEVSE(MaxPower) ],
                                                                     EUVehicleCategories:  [ POI.EUVehicleCategory.M1, POI.EUVehicleCategory.N1, POI.EUVehicleCategory.L ],
                                                                     Created:              Created) ],
@@ -130,7 +132,27 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                                                                    Homepage:        URL.Parse("https://graphdefined.com"),
                                                                                                    ChargingTariffs: WithPools ? [ ATariff() ] : null,
                                                                                                    ChargingPools:   WithPools ? [ APool()   ] : null,
-                                                                                                   Created:         Created) ]).WithKeys();
+                                                                                                   Created:         Created) ],
+                                      ParkingOperators:          WithPools
+                                                                     ? [ new POI.ParkingOperator(POI.ParkingOperator_Id.Parse("DE*PAR"),
+                                                                                                 I18NString.Create(Languages.en, "Parking"),
+                                                                                                 ParkingSpaces: [
+                                                                                                     new POI.ParkingSpace(POI.ParkingSpace_Id.Parse("space-1"),
+                                                                                                                          ChargingStationIds:   [ S1 ],
+                                                                                                                          ParkingRestrictions:  [ POI.ParkingRestrictionGroup.DISABLED, POI.ParkingRestrictionGroup.EV_ONLY ],
+                                                                                                                          EUVehicleCategories:  [ POI.EUVehicleCategory.M1 ],
+                                                                                                                          Created:              Created),
+                                                                                                     new POI.ParkingSpace(POI.ParkingSpace_Id.Parse("space-2"),
+                                                                                                                          ChargingStationIds:   [ S1 ],
+                                                                                                                          Created:              Created),
+                                                                                                     new POI.ParkingSpace(POI.ParkingSpace_Id.Parse("space-3"),
+                                                                                                                          ChargingStationIds:   [ S1 ],
+                                                                                                                          Created:              Created),
+                                                                                                     new POI.ParkingSpace(POI.ParkingSpace_Id.Parse("space-4"),
+                                                                                                                          Created:              Created)
+                                                                                                 ],
+                                                                                                 Created:       Created) ]
+                                                                     : null).WithKeys();
 
         #endregion
 
@@ -356,7 +378,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             var xml          = AssertValidTable(POI3Mapper.ToTablePublication(network, Creator, Languages.de, "rn1", "1", warnings, StationIdBNetzA: station => "BNetzA-4711"));
 
             // The EU vehicle categories of the station, and the payment of the rate: what DATEX II knows as such, the rest as other.
-            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "euVehicleCategory").Select(element => element.Attribute("_extendedValue")?.Value ?? element.Value),
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "euVehicleCategory" &&
+                                                           !element.Ancestors().Any(ancestor => ancestor.Name.LocalName == "dedicatedParkingSpaces")).
+                            Select(element => element.Attribute("_extendedValue")?.Value ?? element.Value),
                         Is.EquivalentTo(new[] { "m1", "n1", "l" }));
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "paymentMeans").       Select(element => element.Value), Is.EquivalentTo(new[] { "paymentCreditCard", "qrCode" }));
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "otherPaymentMeans").  Select(element => element.Value), Is.EquivalentTo(new[] { "SMS" }));
@@ -371,6 +395,16 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "energyRate").Elements().
                             Where(element => element.Name.LocalName == "overallPeriod").Elements().Select(element => DateTimeOffset.Parse(element.Value)),
                         Is.EqualTo(new[] { DateTimeOffset.Parse("2026-02-01T00:00:00Z"), DateTimeOffset.Parse("2027-01-01T00:00:00Z") }));
+
+            // NUTS 1 to 3 of the site, illuminated and roofed as amenities, and the parking spaces of the station by their restrictions.
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "nutsCode").Select(element => element.Value),            Is.EqualTo(new[] { "DEG", "DEG03" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "nutsCodeType").Select(element => element.Value),        Is.EqualTo(new[] { "nuts1Code", "nuts3Code" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "roofed").Select(element => element.Value),              Is.EqualTo(new[] { "true" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "illuminated").Select(element => element.Value),         Is.EqualTo(new[] { "true" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "numberOfSpaces").Select(element => element.Value),      Is.EqualTo(new[] { "1", "2" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "userSpecific").Select(element => element.Value),        Is.EqualTo(new[] { "personsWithDisabilities" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "dedicatedParkingSpaces").
+                            Descendants().Where(element => element.Name.LocalName == "fuelType").Select(element => element.Value),             Is.EqualTo(new[] { "battery" }));
 
             // Through the parsers: what a consumer reads.
             Assert.That(Payload.TryParseXML(xml, out var payload, out var errorResponse), Is.True, errorResponse);
@@ -417,7 +451,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(pool.Services,                                     Is.EqualTo(new[] { POI.LocationService.ACCESSIBLE_CHARGING, POI.LocationService.ACCESSIBLE_TOILETS }));
 
                 Assert.That(pool.ChargingStations.Single().Id,                 Is.EqualTo(S1));
-                Assert.That(pool.ChargingStations.Single().Features,           Is.EqualTo(new[] { POI.ChargingStationFeature.Reservable }));
+                Assert.That(pool.ChargingStations.Single().Features,           Is.EquivalentTo(new[] { POI.ChargingStationFeature.Reservable, POI.ChargingStationFeature.Illuminated }));
+                Assert.That(pool.Features,                                     Is.EqualTo(new[] { POI.ChargingPoolFeature.Roofed }));
+                Assert.That(pool.NUTSCodes,                                    Is.EqualTo(new[] { POI.NUTSCode.Parse("DEG"), POI.NUTSCode.Parse("DEG03") }));
                 Assert.That(pool.ChargingStations.Single().EUVehicleCategories, Is.EqualTo(new[] { POI.EUVehicleCategory.L, POI.EUVehicleCategory.M1, POI.EUVehicleCategory.N1 }));
 
                 Assert.That(evse.Id,                                           Is.EqualTo(E1));

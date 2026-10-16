@@ -407,8 +407,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                           PointByCoordinates:     new PointByCoordinates(ToDatexII(ChargingPool.GeoLocation.Value)),
                                                           CoordinatesForDisplay:  ToDatexII(ChargingPool.GeoLocation.Value),
                                                           FacilityLocation:       new AfirFacilityLocation(
-                                                                                      TimeZone:  ToDatexII(ChargingPool.TimeZone ?? ChargingPool.Address?.TimeZone, ChargingPool.Id.ToString(), Warnings),
-                                                                                      Address:   ChargingPool.Address?.ToDatexII()
+                                                                                      TimeZone:   ToDatexII(ChargingPool.TimeZone ?? ChargingPool.Address?.TimeZone, ChargingPool.Id.ToString(), Warnings),
+                                                                                      Address:    ChargingPool.Address?.ToDatexII(),
+                                                                                      NutsAreas:  ToDatexII(ChargingPool.NUTSCodes)
                                                                                   )
                                                       ),
                        Operator:                      chargingStationOperator.ToDatexII(Language),
@@ -422,6 +423,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                                     ]
                                                             )
                                                           : null,
+                       Amenities:                     AmenitiesOf(ChargingPool.Features.Contains(POI.ChargingPoolFeature.Illuminated),
+                                                                  ChargingPool.Features.Contains(POI.ChargingPoolFeature.Roofed)),
                        Accessibility:                 ChargingPool.Services.Contains(POI.LocationService.ACCESSIBLE_CHARGING)
                                                           ? [ Accessibility.BarrierFreeAccessible ]
                                                           : null,
@@ -496,6 +499,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                       )
                                                                     : null,
                        ApplicableForVehicles:                   ToDatexII(ChargingStation.EUVehicleCategories),
+                       Amenities:                               AmenitiesOf(ChargingStation.Features.Contains(POI.ChargingStationFeature.Illuminated),
+                                                                            ChargingStation.Features.Contains(POI.ChargingStationFeature.Roofed)),
+                       DedicatedParkingSpaces:                  DedicatedParkingSpacesOf(ChargingStation, RoamingNetwork),
                        RefillPoints:                            chargingPoints
 
                    );
@@ -887,6 +893,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                        PaymentOptions:       PaymentOptionsOf(authentication),
                                        AuthenticationModes:  AuthenticationModesOf(authentication),
                                        Services:             ServicesOf(Site),
+                                       NUTSCodes:            NUTSCodesOf(Site),
+                                       Features:             FeaturesOf<POI.ChargingPoolFeature>(Site.Amenities, POI.ChargingPoolFeature.Illuminated, POI.ChargingPoolFeature.Roofed),
                                        LocationLanguages:    Site.EnergyInfrastructureStations.
                                                                  SelectMany(station => station.UserInterfaceLanguages).
                                                                  Distinct(),
@@ -914,7 +922,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                               new JProperty("created",  mapped["created"]));
 
             Overlay(desired, mapped, PoolProperties);
-            OverlayServices(desired, mapped);
+            OverlayTold(desired, mapped, "services", ServicesDatexIITells);
+            OverlayTold(desired, mapped, "features", PoolFeaturesDatexIITells);
 
             #region The charging stations: matched by their identification
 
@@ -934,6 +943,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 }
 
                 Overlay(station, mappedStation, StationProperties);
+                OverlayTold(station, mappedStation, "features", StationFeaturesDatexIITells);
 
                 #region The EVSEs of the charging station: matched by their identification
 
@@ -1022,10 +1032,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                          : null,
                        EVSEs:        evses,
                        Images:       Station.PhotoURLs.Select(ToPOI3Image),
-                       Features:     Station.RefillPoints.Any(point => point.Reservation.HasValue &&
-                                                                      point.Reservation.Value.ToString() is "optional" or "mandatory" or "partly")
-                                         ? [ POI.ChargingStationFeature.Reservable ]
-                                         : null,
+                       Features:     (Station.RefillPoints.Any(point => point.Reservation.HasValue &&
+                                                                       point.Reservation.Value.ToString() is "optional" or "mandatory" or "partly")
+                                          ? new[] { POI.ChargingStationFeature.Reservable }
+                                          : []).
+                                     Concat(FeaturesOf<POI.ChargingStationFeature>(Station.Amenities, POI.ChargingStationFeature.Illuminated, POI.ChargingStationFeature.Roofed)),
                        EUVehicleCategories:  ToPOI3(Station.ApplicableForVehicles),
                        // Only a total maximum power of its own: the sum of the charging points is what POI3 tells anyway,
                        // and more than that sum POI3 refuses.
@@ -1277,14 +1288,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// </summary>
         internal static readonly String[] PoolProperties = [
             "name", "description", "address", "geoLocation", "parkingType", "hotline", "openingTimes", "energyMix", "images",
-            "facilities", "paymentOptions", "authenticationModes", "locationLanguages", "arrivalInstructions"
+            "facilities", "paymentOptions", "authenticationModes", "locationLanguages", "arrivalInstructions", "nutsCodes"
         ];
 
         /// <summary>
         /// The properties of a charging station DATEX II tells: imported onto an existing charging station, the others are kept.
         /// </summary>
         internal static readonly String[] StationProperties = [
-            "name", "description", "geoLocation", "images", "features", "maxPower", "euVehicleCategories"
+            "name", "description", "geoLocation", "images", "maxPower", "euVehicleCategories"
         ];
 
         /// <summary>
@@ -1326,6 +1337,151 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 else
                     Target.Remove(property);
             }
+        }
+
+        #endregion
+
+        #region (private) NUTS, amenities and dedicated parking spaces
+
+        /// <summary>
+        /// The features of a charging pool DATEX II tells: whether it is illuminated or roofed.
+        /// </summary>
+        internal static readonly String[] PoolFeaturesDatexIITells = [
+            "Illuminated",
+            "Roofed"
+        ];
+
+        /// <summary>
+        /// The features of a charging station DATEX II tells: whether it is reservable, illuminated or roofed.
+        /// </summary>
+        internal static readonly String[] StationFeaturesDatexIITells = [
+            "Reservable",
+            "Illuminated",
+            "Roofed"
+        ];
+
+        /// <summary>
+        /// The NUTS areas of the given NUTS codes of levels 1 to 3; a country (level 0) has none.
+        /// </summary>
+        private static IEnumerable<NutsArea> ToDatexII(IEnumerable<POI.NUTSCode> NUTSCodes)
+
+            => NUTSCodes.
+                   Where (code => code.Level is >= 1 and <= 3).
+                   Select(code => new NutsArea(new NutsCode(code.ToString()),
+                                               code.Level switch {
+                                                   1 => NutsCodeType.Nuts1Code,
+                                                   2 => NutsCodeType.Nuts2Code,
+                                                   _ => NutsCodeType.Nuts3Code
+                                               }));
+
+        /// <summary>
+        /// The NUTS codes of the given site: of its own location and of those of its stations, NUTS 1 to 3 only.
+        /// </summary>
+        private static IEnumerable<POI.NUTSCode> NUTSCodesOf(EnergyInfrastructureSite Site)
+
+            => new[] { Site.LocationReference }.
+                   Concat(Site.EnergyInfrastructureStations.Select(station => station.LocationReference)).
+                   OfType<ALocation>().
+                   SelectMany(location => location.FacilityLocation?.NutsAreas ?? []).
+                   Where (area => area.NutsCodeType.ToString() is "nuts1Code" or "nuts2Code" or "nuts3Code").
+                   Select(area => POI.NUTSCode.TryParse(area.NutsCode.Value)).
+                   Where (code => code.HasValue).
+                   Select(code => code!.Value).
+                   Distinct();
+
+        /// <summary>
+        /// The amenities of something illuminated or roofed; none, when it is neither.
+        /// </summary>
+        private static Amenities? AmenitiesOf(Boolean Illuminated,
+                                              Boolean Roofed)
+
+            => Illuminated || Roofed
+                   ? new Amenities(Illuminated: Illuminated ? true : null,
+                                   Roofed:      Roofed      ? true : null)
+                   : null;
+
+        /// <summary>
+        /// The given illuminated and roofed features, as the given amenities tell them.
+        /// </summary>
+        private static IEnumerable<TFeature> FeaturesOf<TFeature>(Amenities?  Amenities,
+                                                                  TFeature    Illuminated,
+                                                                  TFeature    Roofed)
+        {
+
+            var features = new List<TFeature>();
+
+            if (Amenities?.Illuminated == true)
+                features.Add(Illuminated);
+
+            if (Amenities?.Roofed == true)
+                features.Add(Roofed);
+
+            return features;
+
+        }
+
+        /// <summary>
+        /// The user types of the given parking restrictions: DISABLED → persons with disabilities, EMPLOYEES →
+        /// employees, CUSTOMERS → customers, TENANTS → residents; EV_ONLY becomes a battery fuel type, the others have no
+        /// counterpart.
+        /// </summary>
+        private static readonly (String Restriction, String UserType)[] ParkingRestrictionUserTypes = [
+            ("DISABLED",   "personsWithDisabilities"),
+            ("EMPLOYEES",  "employees"),
+            ("CUSTOMERS",  "customers"),
+            ("TENANTS",    "residents")
+        ];
+
+        /// <summary>
+        /// The dedicated parking spaces of the given charging station: the parking spaces of the roaming network naming
+        /// it, one entry for those of the same parking restrictions and EU vehicle categories, with their number.
+        /// Spaces for persons with disabilities are barrier free accessible.
+        /// </summary>
+        private static IEnumerable<DedicatedParkingSpaces>? DedicatedParkingSpacesOf(POI.ChargingStation  ChargingStation,
+                                                                                    POI.RoamingNetwork   RoamingNetwork)
+        {
+
+            var groups = RoamingNetwork.ParkingSpaces.
+                             Where  (space => space.ChargingStationIds.Contains(ChargingStation.Id)).
+                             GroupBy(space => String.Join(",", space.ParkingRestrictions.Select(restriction => restriction.ToString())) + "|" +
+                                              String.Join(",", space.EUVehicleCategories.Select(category    => category.   ToString()))).
+                             OrderBy(group => group.Key, StringComparer.Ordinal).
+                             ToArray();
+
+            if (groups.Length == 0)
+                return null;
+
+            var dedicatedParkingSpaces = new List<DedicatedParkingSpaces>();
+            var number                 = 0;
+
+            foreach (var group in groups)
+            {
+
+                var spaces        = group.ToArray();
+                var restrictions  = spaces[0].ParkingRestrictions.Select(restriction => restriction.ToString()).ToArray();
+                var categories    = spaces[0].EUVehicleCategories.Select(category => EUVehicleCategory.Parse(category.ToString().ToLowerInvariant())).ToArray();
+                var evOnly        = restrictions.Contains("EV_ONLY", StringComparer.OrdinalIgnoreCase);
+
+                dedicatedParkingSpaces.Add(new DedicatedParkingSpaces(
+                                               Id:                     $"{ChargingStation.Id}*PARKING*{++number}",
+                                               Version:                VersionOf(spaces.Max(space => space.LastChangeDate)),
+                                               NumberOfSpaces:         (UInt16) Math.Min(spaces.Length, UInt16.MaxValue),
+                                               Accessibility:          restrictions.Contains("DISABLED", StringComparer.OrdinalIgnoreCase)
+                                                                           ? [ Accessibility.BarrierFreeAccessible ]
+                                                                           : null,
+                                               ApplicableForVehicles:  evOnly || categories.Length > 0
+                                                                           ? [ new VehicleCharacteristics(FuelType:           evOnly ? [ FuelType.Battery ] : null,
+                                                                                                          EUVehicleCategory:  categories) ]
+                                                                           : null,
+                                               UserSpecific:           ParkingRestrictionUserTypes.
+                                                                           Where (mapping => restrictions.Contains(mapping.Restriction, StringComparer.OrdinalIgnoreCase)).
+                                                                           Select(mapping => UserType.Parse(mapping.UserType))
+                                           ));
+
+            }
+
+            return dedicatedParkingSpaces;
+
         }
 
         #endregion
@@ -1423,23 +1579,26 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         }
 
         /// <summary>
-        /// Set the services of the target to those DATEX II tells, keeping the others it can not tell.
+        /// Set the values of the given set property of the target that DATEX II can tell to those of the source,
+        /// keeping the others, e.g. the services or features DATEX II has no counterpart for.
         /// </summary>
-        internal static void OverlayServices(JObject  Target,
-                                             JObject  Source)
+        internal static void OverlayTold(JObject              Target,
+                                         JObject              Source,
+                                         String               Property,
+                                         IEnumerable<String>  Told)
         {
 
-            var kept      = (Target["services"] as JArray)?.Values<String>().OfType<String>().
-                                Where(service => !ServicesDatexIITells.Contains(service, StringComparer.OrdinalIgnoreCase)) ?? [];
+            var kept    = (Target[Property] as JArray)?.Values<String>().OfType<String>().
+                              Where(value => !Told.Contains(value, StringComparer.OrdinalIgnoreCase)) ?? [];
 
-            var told      = (Source["services"] as JArray)?.Values<String>().OfType<String>() ?? [];
+            var told    = (Source[Property] as JArray)?.Values<String>().OfType<String>() ?? [];
 
-            var services  = kept.Concat(told).ToArray();
+            var values  = kept.Concat(told).ToArray();
 
-            if (services.Length > 0)
-                Target["services"] = new JArray(services);
+            if (values.Length > 0)
+                Target[Property] = new JArray(values);
             else
-                Target.Remove("services");
+                Target.Remove(Property);
 
         }
 

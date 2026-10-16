@@ -106,6 +106,7 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | `ArrivalInstructions` | first `additionalInformation` |
 | `GeoLocation` | `locationReference` `loc:PointLocation`: `pointByCoordinates` and `coordinatesForDisplay`. Import: also `loc:AreaLocation` (its `coordinatesForDisplay`). A pool without a geo location is not published. |
 | `Address`: street, house number, region, postal code, city, country | `loc:_locationExtension/loc:afirFacilityLocation/afac:address`: address lines `street` (order 0), `houseNumber` (1) and `region` (2), `postcode`, `city`, `countryCode` |
+| `NUTSCodes` | `afirFacilityLocation/nutsArea`s of the site: level 1 → `nuts1Code`, 2 → `nuts2Code`, 3 → `nuts3Code`; a country (level 0) is left out. Import: the NUTS 1 to 3 areas of the site and of its stations. |
 | `TimeZone` (or that of the address) | `afirFacilityLocation/timeZone`, as an offset: the standard offset of the zone, e.g. Europe/Berlin → `+01:00` |
 | `ParkingType` | `typeOfSite`: ON_STREET ↔ `onstreet`; PARKING_GARAGE, UNDERGROUND_GARAGE → `inBuilding` → PARKING_GARAGE; PARKING_LOT, ALONG_MOTORWAY → `openSpace` → PARKING_LOT; ON_DRIVEWAY → `other` |
 | `OpeningTimes` | `operatingHours`: open 24/7 ↔ `afac:OpenAllHours`. Regular openings ↔ `afac:OperatingHoursSpecification` with one valid period per time of day (`recurringTimePeriodOfDay`) on its weekdays (`recurringDayWeekMonthPeriod`); the overall period starts with the creation of the pool. |
@@ -117,6 +118,7 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | `LocationLanguages` | the `userInterfaceLanguage`s of the stations (union on import) |
 | `AuthenticationModes`, `PaymentOptions` | the `authenticationAndIdentificationMethods` of the stations (see below; union on import) |
 | `EnergyMix` | the `ElectricEnergy` energy product of every charging point (import: the first one) |
+| `Features` Illuminated, Roofed | `amenities` `illuminated`, `roofed` of the site (only `true` is written). The import sets these two features and keeps the others of an existing charging pool. |
 | `Services` ACCESSIBLE_CHARGING | `accessibility` `barrierFreeAccessible` of the site. Import: also `disabilityAccessible` and `wheelChairAccessible`. |
 | `Services` ACCESSIBLE_TOILETS | a `supplementalFacility` `afac:SupplementalEquipment` `toilet` whose `accessibility` is `barrierFreeAccessible` (import: also `disabilityAccessible`, `wheelChairAccessible`). The import sets these two services and keeps the others of an existing charging pool. |
 | `LastChangeDate` | `lastUpdated` |
@@ -134,6 +136,8 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | pool `LocationLanguages`, else the language of the publication | `userInterfaceLanguage` |
 | — | `serviceType` `unattended` |
 | feature `Reservable` | `reservation` `optional` of its charging points (import: `optional`, `mandatory`, `partly`) |
+| `Features` Illuminated, Roofed | `amenities` `illuminated`, `roofed` of the station. The import sets them and `Reservable`, and keeps the other features of an existing charging station. |
+| parking spaces of the network whose `ChargingStationIds` name it | `dedicatedParkingSpaces`: one per combination of `ParkingRestrictions` and `EUVehicleCategories`, with their `numberOfSpaces`; DISABLED → `userSpecific` `personsWithDisabilities` and `accessibility` `barrierFreeAccessible`, EMPLOYEES → `employees`, CUSTOMERS → `customers`, TENANTS → `residents`, EV_ONLY → `applicableForVehicles` `fuelType` `battery`, the EU vehicle categories → its `euVehicleCategory`s. Not imported: POI3 parking spaces belong to parking operators. |
 | `EUVehicleCategories` | one `applicableForVehicles` with the `euVehicleCategory`s, in lower case (`M1` ↔ `m1`); categories DATEX II 3.7 does not know, e.g. `L`, as extended values. Import: the categories of all its `applicableForVehicles`, in upper case. |
 | EVSEs | `refillPoint`s, `xsi:type` `aegi:ElectricChargingPoint` |
 
@@ -217,8 +221,11 @@ DATEX II tells only part of a charging pool, so the import lays it onto the exis
 The publications are valid against the DATEX II 3.7 schemas and against the JSON schemas of the profile. Its
 documentation (revision 2) asks for more than its schemas require. POI3 has no data for:
 
-- **NUTS:** the NUTS 1 region of a site (`afirFacilityLocation/nutsArea`).
-- **Amenities and parking:** amenities of the site, and dedicated parking spaces, e.g. for persons with disabilities.
+- **NUTS:** the NUTS 1 region of a site is published when the charging pool tells it (`nutsCodes`).
+- **Amenities and parking:** whether a site or station is illuminated or roofed is published when its features tell it;
+  dedicated parking spaces, e.g. for persons with disabilities, when parking spaces of the network name the charging
+  station. Whether recharging parking nearby is illuminated or roofed, and the dimension, location and amenities of the
+  parking spaces, are not.
 - **Vehicles:** the EU vehicle categories of a station are published when the charging station tells them
   (`euVehicleCategories`); those of a site are not.
 - **Payment:** the payment means and brands of a rate are published when the charging tariff tells them
@@ -258,8 +265,8 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
 
 ### What DATEX II has and POI3 does not, or not here
 
-- **Facility objects:** the owner, dimension, amenities, vehicle restrictions (`applicableForVehicles`; of a station
-  only its EU vehicle categories), dedicated parking spaces, entrances and exits, exclusive and preferred users, service types, alias, other external identifiers
+- **Facility objects:** the owner, dimension, amenities (only illuminated and roofed of sites and stations are), vehicle
+  restrictions (`applicableForVehicles`; of a station only its EU vehicle categories), dedicated parking spaces, entrances and exits, exclusive and preferred users, service types, alias, other external identifiers
   and further additional information are not imported. So are the energy distributor, mobility service providers and
   roaming platforms (of sites and stations), and the renewable sources of a station.
 - **Payment:** the payment modes of a rate (only its means and brands are), minimum and maximum delivery fees, discount and
