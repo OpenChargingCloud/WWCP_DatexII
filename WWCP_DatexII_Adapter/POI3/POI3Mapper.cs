@@ -754,10 +754,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             }
 
+            // Exceptional closings and openings of its opening times.
+            var opening = OpeningOf(ChargingPool, Timestamp.Now);
+
             return stationStatus.Count > 0
                        ? new EnergyInfrastructureSiteStatus(
                              Reference:                          new FacilityObjectVersionedReference(ChargingPool.Id.ToString(), VersionOf(ChargingPool.LastChangeDate)),
                              LastUpdated:                        stationStatus.Max(status => status.LastUpdated),
+                             OpeningStatus:                      opening.OpeningStatus,
+                             RegularOperatingHoursInForce:       opening.RegularOperatingHoursInForce,
+                             NewOperatingHours:                  opening.NewOperatingHours,
                              OperationStatus:                    ToOperationStatus(ChargingPool.AdminStatus.Value.ToString()),
                              EnergyInfrastructureStationStatus:  stationStatus
                          )
@@ -2204,6 +2210,72 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                     ]
                                                   : null
                );
+
+        #endregion
+
+        #region OpeningOf(ChargingPool, Now) / NextOpeningChangeOf(ChargingPool, Now)
+
+        /// <summary>
+        /// The opening of the given charging pool now, as its site status tells it: during an exceptional closing
+        /// temporarily closed, during an exceptional opening open, with the regular operating hours not in force then;
+        /// and while there are current or future exceptional closings or openings, the new operating hours: the regular
+        /// ones, the exceptional openings as dated valid periods, the exceptional closings as exception periods.
+        /// </summary>
+        public static (OpeningStatus? OpeningStatus, Boolean? RegularOperatingHoursInForce, AOperatingHours? NewOperatingHours) OpeningOf(POI.ChargingPool  ChargingPool,
+                                                                                                                                              DateTimeOffset    Now)
+        {
+
+            var openingTimes  = ChargingPool.OpeningTimes;
+
+            if (openingTimes is null)
+                return (null, null, null);
+
+            var closings      = openingTimes.ExceptionalClosings.Where(period => period.End > Now).OrderBy(period => period.Begin).ToArray();
+            var openings      = openingTimes.ExceptionalOpenings.Where(period => period.End > Now).OrderBy(period => period.Begin).ToArray();
+
+            if (closings.Length == 0 && openings.Length == 0)
+                return (null, null, null);
+
+            var closed        = closings.Any(period => period.Begin <= Now);
+            var opened        = openings.Any(period => period.Begin <= Now);
+
+            var regular       = ToDatexII(openingTimes, ChargingPool.Id.ToString(), VersionOf(ChargingPool.LastChangeDate), ChargingPool.Created, new List<String>());
+
+            var validPeriods  = regular switch {
+                                    OperatingHoursSpecification specification  => specification.OverallPeriod.ValidPeriod.ToList(),
+                                    OpenAllHours                               => [ new Period(RecurringTimePeriodOfDay: [ new TimePeriodOfDay(Time.FromHourMinSec((Int16)  0, (Byte)  0, (Byte)  0)!.Value,
+                                                                                                                                              Time.FromHourMinSec((Int16) 23, (Byte) 59, (Byte) 59)!.Value) ]) ],
+                                    _                                          => new List<Period>()
+                                };
+
+            validPeriods.AddRange(openings.Select(period => new Period(StartOfPeriod: period.Begin, EndOfPeriod: period.End)));
+
+            return (closed ? OpeningStatus.TemporarilyClosed : opened ? OpeningStatus.Open : null,
+                    !closed && !opened,
+                    new OperatingHoursSpecification(
+                        Id:             $"{ChargingPool.Id}*NEWOPENINGTIMES",
+                        Version:        VersionOf(ChargingPool.LastChangeDate),
+                        OverallPeriod:  new OverallPeriod(ChargingPool.Created,
+                                                          ValidPeriod:      validPeriods,
+                                                          ExceptionPeriod:  closings.Select(period => new Period(StartOfPeriod: period.Begin, EndOfPeriod: period.End)))
+                    ));
+
+        }
+
+        /// <summary>
+        /// When the given charging pool begins or ends its next exceptional closing or opening after the given time.
+        /// </summary>
+        public static DateTimeOffset? NextOpeningChangeOf(POI.ChargingPool  ChargingPool,
+                                                          DateTimeOffset    Now)
+
+            => ChargingPool.OpeningTimes is ImmutableOpeningTimes openingTimes
+                   ? openingTimes.ExceptionalClosings.
+                         Concat(openingTimes.ExceptionalOpenings).
+                         SelectMany(period => new[] { period.Begin, period.End }).
+                         Where (timestamp => timestamp > Now).
+                         Select(timestamp => (DateTimeOffset?) timestamp).
+                         Min()
+                   : null;
 
         #endregion
 

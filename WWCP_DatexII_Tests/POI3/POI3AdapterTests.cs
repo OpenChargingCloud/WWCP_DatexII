@@ -1219,6 +1219,98 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         #endregion
 
+        #region ExceptionalClosingsAreTheOpeningStatusOfASite()
+
+        /// <summary>
+        /// An exceptional closing of a charging pool is the opening status of its site: the new operating hours tell it in
+        /// advance, during it the site is temporarily closed and the regular operating hours are not in force, and the
+        /// publisher publishes a delta when it begins and when it ends.
+        /// </summary>
+        [Test]
+        public async Task ExceptionalClosingsAreTheOpeningStatusOfASite()
+        {
+
+            var now       = Timestamp.Now;
+            var begin     = now.AddSeconds(1.5);
+            var end       = now.AddSeconds(3);
+
+            var network   = new POI.RoamingNetwork(POI.RoamingNetwork_Id.Parse("rn1"),
+                                                   Created:                   Created,
+                                                   ChargingStationOperators:  [ new POI.ChargingStationOperator(GEF,
+                                                                                                                Name:             I18NString.Create(Languages.en, "GraphDefined"),
+                                                                                                                ChargingTariffs:  [ ATariff() ],
+                                                                                                                ChargingPools:    [ new POI.ChargingPool(P1,
+                                                                                                                                                         I18NString.Create(Languages.en, "Biberweg"),
+                                                                                                                                                         GeoLocation:       GeoCoordinate.Parse(50.92, 11.58),
+                                                                                                                                                         OpeningTimes:      new ImmutableOpeningTimes(new OpeningTimes().AddExceptionalClosing(begin, end)),
+                                                                                                                                                         ChargingStations:  [ new POI.ChargingStation(S1, EVSEs: [ AnEVSE() ], Created: Created) ],
+                                                                                                                                                         Created:           Created) ],
+                                                                                                                Created:          Created) ]).WithKeys();
+
+            var pool      = network.GetChargingStationOperatorById(GEF)!.ChargingPools.Single();
+
+            var before    = POI3Mapper.OpeningOf(pool, now);
+            var during    = POI3Mapper.OpeningOf(pool, begin.AddMilliseconds(500));
+            var after     = POI3Mapper.OpeningOf(pool, end.AddSeconds(1));
+
+            Assert.Multiple(() => {
+
+                Assert.That(before.OpeningStatus,                  Is.Null);
+                Assert.That(before.RegularOperatingHoursInForce,   Is.True);
+                Assert.That(((OperatingHoursSpecification) before.NewOperatingHours!).OverallPeriod.ExceptionPeriod.Single().StartOfPeriod, Is.EqualTo(begin).Within(TimeSpan.FromMilliseconds(1)));
+
+                Assert.That(during.OpeningStatus?.ToString(),      Is.EqualTo("temporarilyClosed"));
+                Assert.That(during.RegularOperatingHoursInForce,   Is.False);
+
+                Assert.That(after.OpeningStatus,                   Is.Null);
+                Assert.That(after.RegularOperatingHoursInForce,    Is.Null);
+                Assert.That(after.NewOperatingHours,               Is.Null);
+
+            });
+
+            // The publisher: the full status tells it in advance, and a delta follows when it begins and when it ends.
+            var history   = POI.RoamingNetworkHistory.Start(network);
+            var deltas    = new List<EnergyInfrastructureStatusPublication>();
+
+            await using var publisher = new POI3ToDatexIIPublisher(history, Creator, Languages.de, StationIdBNetzA: station => "BNetzA-4711");
+
+            publisher.OnStatusPublication += (sender, publication, isDelta) => { if (isDelta) lock (deltas) deltas.Add(publication); return Task.CompletedTask; };
+
+            await publisher.StartAsync();
+
+            var full      = publisher.CurrentStatusPublication!;
+
+            AssertValidStatus(full);
+
+            Assert.That(full.EnergyInfrastructureSiteStatus.Single().RegularOperatingHoursInForce, Is.True);
+
+            Assert.That(await Eventually(() => { lock (deltas) return deltas.Count >= 1; }), Is.True, "The beginning closing was not published.");
+
+            EnergyInfrastructureStatusPublication closing;
+            lock (deltas)
+                closing = deltas[0];
+
+            AssertValidStatus(closing);
+
+            Assert.That(closing.EnergyInfrastructureSiteStatus.Single().OpeningStatus?.ToString(), Is.EqualTo("temporarilyClosed"));
+
+            Assert.That(await Eventually(() => { lock (deltas) return deltas.Count >= 2; }), Is.True, "The ending closing was not published.");
+
+            EnergyInfrastructureStatusPublication reopened;
+            lock (deltas)
+                reopened = deltas[1];
+
+            AssertValidStatus(reopened);
+
+            Assert.Multiple(() => {
+                Assert.That(reopened.EnergyInfrastructureSiteStatus.Single().OpeningStatus,      Is.Null);
+                Assert.That(reopened.EnergyInfrastructureSiteStatus.Single().NewOperatingHours,  Is.Null);
+            });
+
+        }
+
+        #endregion
+
         #region TheImporterLeavesOutRefillPointsThatAreNoChargingPoints()
 
         /// <summary>

@@ -56,6 +56,8 @@ await importer.ImportAsync(table!);
 - **On every planned status or admin status of an EVSE,** e.g. a reservation or an announced maintenance: a delta at
   once, with its planned statuses (POI3 `OnStatusPlanned`). When the planned status is due, its change is published as
   any other.
+- **When an exceptional closing or opening of a charging pool begins or ends:** a delta of its EVSEs, so that the opening
+  status of its site changes in time; the publisher waits for the next such change (at most twelve hours at once).
 - **On every price status change of a charging pool, station or EVSE:** a delta of all its EVSEs at once, with their
   energy rate updates.
 - **On every energy status change of an EVSE:** the same, but throttled: its charging power, voltage and remaining
@@ -217,6 +219,7 @@ maximum current of an EVSE, given once for all members of a group. A change of a
 | admin status | `operationStatus`: operational → `inOperation`, planned/inDeployment/outOfService/blocked/deleted → `notInOperation` (also of the site, from the pool's admin status) |
 | — | station `isAvailable`: any of its charging points `available` (full publications only) |
 | entity versions | `reference` `id` and `version`, the same as in the table |
+| exceptional closings and openings of the pool's `OpeningTimes` | site status: during a closing `openingStatus` `temporarilyClosed`, during an opening `open`, with `regularOperatingHoursInForce` false; while there are current or future ones, `regularOperatingHoursInForce` true otherwise, and `newOperatingHours`: the regular operating hours, the openings as dated valid periods, the closings as exception periods. The table keeps the regular operating hours. Not imported: POI3 opening times are content, changed by commits. |
 | price status of the EVSE, its charging station and its charging pool | `energyRateUpdate`s of its `refillPointStatus`: for every charging tariff the most specific new prices (`ChargingPrices.Effective`), referring to the rate of the tariff, since the timestamp of the price status, the prices as those of the tariff in the table. Import: the price status of the EVSE. |
 | future entries of the EVSE status and admin status schedules | `plannedRefillPointStatus`: from every future entry that changes the refill point status (as the current one: admin status first), until the next such change; the last one without an end. Import: planned EVSE statuses, see the importer. |
 | EVSE energy status `used`, `currentVoltage`, `remainingChargingTime` | `currentChargingPower`, `currentVoltage`, `remainingChargingTime` of its `refillPointStatus`; its timestamp also counts for `lastUpdated`. `available` (the power a newly arriving vehicle would get) and `storedEnergy` have no counterpart. Not imported: POI3 is where these values come from. |
@@ -279,7 +282,8 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
   `extendedOperationTimeout` and `standards` of an EVSE have no counterpart.
 - **Price components:** PARKING_TIME prices, step sizes and the prices of a reservation have no counterpart. Power and
   current restrictions have none either; energy and duration restrictions only in whole kWh and minutes.
-- **Opening times:** exceptional openings and closings are left out. So is the free text.
+- **Opening times:** exceptional openings and closings are not in the table, but in the site status (see above). The
+  free text is left out.
 - **Time zone:** DATEX II has a fixed UTC offset, not a named zone with daylight saving time. The standard offset is
   published; the import does not set the time zone.
 - **Connectors:** connector identifications are not published (3.7 has `externalIdentifier` on a connector). CHAOJI,

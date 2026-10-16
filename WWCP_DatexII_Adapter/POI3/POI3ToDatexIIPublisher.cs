@@ -87,6 +87,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// When a status delta of an EVSE was published last, and the EVSEs whose energy status delta is planned.
         /// </summary>
         private readonly ConcurrentDictionary<POI.EVSE_Id, DateTimeOffset>  lastDeltas            = new ();
+
+        /// <summary>
+        /// The schedule of the next change of an exceptional closing or opening: its generation, and until when changes
+        /// are published.
+        /// </summary>
+        private          Int32                                              openingGeneration;
+        private          DateTimeOffset                                     openingCheckedUntil   = Timestamp.Now;
+
+        /// <summary>
+        /// The longest the publisher waits for the next change of an exceptional closing or opening at once.
+        /// </summary>
+        private static readonly TimeSpan                                    maxOpeningWait        = TimeSpan.FromHours(12);
         private readonly ConcurrentDictionary<POI.EVSE_Id, Byte>            plannedEnergyDeltas   = new ();
 
         /// <summary>
@@ -256,6 +268,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             History.RuntimeStatus.OnStatusUpdate   -= StatusUpdated;
             History.RuntimeStatus.OnStatusPlanned  -= StatusPlanned;
 
+            Interlocked.Increment(ref openingGeneration);
+
             work.Writer.TryComplete();
 
             if (worker is not null)
@@ -402,6 +416,74 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                       OperatorIds);
 
             await Raise(OnStatusPublication, handler => handler(this, CurrentStatusPublication, false));
+
+            ScheduleOpeningChange();
+
+        }
+
+        #endregion
+
+        #region (private) ScheduleOpeningChange() / PublishOpeningChangesAsync()
+
+        /// <summary>
+        /// Wake up when the next exceptional closing or opening of a published charging pool begins or ends, so that the
+        /// opening status of its site changes in time.
+        /// </summary>
+        private void ScheduleOpeningChange()
+        {
+
+            var now         = Timestamp.Now;
+            var generation  = Interlocked.Increment(ref openingGeneration);
+
+            var next        = History.Head.RoamingNetwork.ChargingStationOperators.
+                                  Where     (chargingStationOperator => OperatorIds is null || OperatorIds.Contains(chargingStationOperator.Id)).
+                                  SelectMany(chargingStationOperator => chargingStationOperator.ChargingPools).
+                                  Select    (chargingPool            => POI3Mapper.NextOpeningChangeOf(chargingPool, now)).
+                                  Where     (timestamp               => timestamp.HasValue).
+                                  Min();
+
+            if (!next.HasValue)
+                return;
+
+            // A millisecond late rather than early.
+            var wait = next.Value - now + TimeSpan.FromMilliseconds(1);
+
+            if (wait > maxOpeningWait)
+                wait = maxOpeningWait;
+
+            _ = Task.Delay(wait).ContinueWith(_ => {
+                    if (generation == Volatile.Read(ref openingGeneration))
+                        work.Writer.TryWrite(PublishOpeningChangesAsync);
+                }, TaskScheduler.Default);
+
+        }
+
+        /// <summary>
+        /// Publish a delta of the EVSEs of the charging pools whose exceptional closing or opening began or ended since
+        /// the last time, and wait for the next change.
+        /// </summary>
+        private async Task PublishOpeningChangesAsync()
+        {
+
+            var since    = openingCheckedUntil;
+            var now      = Timestamp.Now;
+
+            openingCheckedUntil = now;
+
+            var evseIds  = History.Head.RoamingNetwork.ChargingStationOperators.
+                               Where     (chargingStationOperator => OperatorIds is null || OperatorIds.Contains(chargingStationOperator.Id)).
+                               SelectMany(chargingStationOperator => chargingStationOperator.ChargingPools).
+                               Where     (chargingPool            => chargingPool.OpeningTimes is not null &&
+                                                                     chargingPool.OpeningTimes.ExceptionalClosings.Concat(chargingPool.OpeningTimes.ExceptionalOpenings).
+                                                                         SelectMany(period => new[] { period.Begin, period.End }).
+                                                                         Any(timestamp => timestamp > since && timestamp <= now)).
+                               SelectMany(chargingPool            => chargingPool.ChargingStations.SelectMany(chargingStation => chargingStation.EVSEs)).
+                               Select    (evse                    => evse.Id).
+                               ToArray();
+
+            await PublishStatusAsync(evseIds);
+
+            ScheduleOpeningChange();
 
         }
 
