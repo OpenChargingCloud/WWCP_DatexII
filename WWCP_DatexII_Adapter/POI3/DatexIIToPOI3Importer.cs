@@ -297,16 +297,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
                                    var pools    = POI3Mapper.ArrayOf(operatorJSON, "chargingPools");
 
-                                   // What its groups give a charging station stays in its groups.
                                    head.TryGetChargingStationOperatorById(operatorId, out var chargingStationOperator);
-
-                                   JObject? EffectiveChargingStation(String ChargingStationId)
-
-                                       => chargingStationOperator is not null &&
-                                          POI.ChargingStation_Id.TryParse(ChargingStationId, out var chargingStationId) &&
-                                          chargingStationOperator.TryGetEffectiveChargingStation(chargingStationId, out var effectiveChargingStation)
-                                              ? effectiveChargingStation.ToJSON()
-                                              : null;
                                    var poolIds  = new HashSet<String>();
 
                                    foreach (var site in sites)
@@ -314,7 +305,17 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
                                        var poolId    = POI3Mapper.ToPOI3PoolId(site.Id, operatorId)?.ToString();
                                        var existing  = pools.OfType<JObject>().FirstOrDefault(pool => pool["@id"]?.Value<String>() == poolId);
-                                       var desired   = site.ToPOI3(operatorId, existing, Language, warnings, EffectiveChargingStation);
+                                       // The existing charging pool as it is at runtime, with what its groups give it, and as DATEX II
+                                       // tells it: what DATEX II tells alike is kept, what the groups give stays in the groups.
+                                       var effective  = chargingStationOperator is not null &&
+                                                        POI.ChargingPool_Id.TryParse(poolId ?? "", out var chargingPoolId) &&
+                                                        chargingStationOperator.TryGetEffectiveChargingPool(chargingPoolId, out var effectiveChargingPool)
+                                                            ? effectiveChargingPool
+                                                            : null;
+
+                                       var unchanged  = effective?.ToDatexII(head, Language, [])?.ToPOI3(operatorId, null, Language, []);
+
+                                       var desired    = site.ToPOI3(operatorId, existing, Language, warnings, unchanged, effective?.ToJSON());
 
                                        if (desired is null || poolId is null)
                                            continue;

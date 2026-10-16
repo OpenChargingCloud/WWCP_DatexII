@@ -136,10 +136,10 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 
 ### Charging station ↔ station (`EnergyInfrastructureStation`)
 
-A charging station is published as it is at runtime, the effective charging station of its operator: with the
-properties its charging station groups give it, e.g. its features or its `MaxPower`, given once for all stations of a
-group. A change of a group changes the stations of its members, its `lastChange` being the last change of these
-charging stations and of their pools.
+Charging pools, stations and EVSEs are published as they are at runtime, the effective ones of their operator: with
+the properties their groups give them, e.g. the facilities of a pool, the features or the `MaxPower` of a station, the
+maximum current of an EVSE, given once for all members of a group. A change of a group changes its members, its
+`lastChange` being the last change of these and of what embeds them.
 
 | POI3 charging station | DATEX II station |
 |---|---|
@@ -170,7 +170,7 @@ charging stations and of their pools.
 | `MaxCurrent` | `maximumCurrent` of its connectors (import: the highest) |
 | ISO 15118 authentication mode of the pool | `vehicleToGridCommunicationType` `iso15118` |
 | `ChargingConnectors` | `connector`s, `numberOfConnectors` |
-| pool `EnergyMix`, and `ChargingTariffIds` + tariffs of its EVSE, station and pool groups | one `energyProduct` of the type `aegi:ElectricEnergy` (`electricEnergy` in the Mobilithek JSON): `energyProductName`, `electricEnergySourceRatio`s, `isGreenEnergy` (all sources renewable), and its `energyRate`s, each with the full rate |
+| pool `EnergyMix`, and the `ChargingTariffIds` of the EVSE, else the tariff of its most specific EVSE, station or pool groups, as its effective EVSE has them | one `energyProduct` of the type `aegi:ElectricEnergy` (`electricEnergy` in the Mobilithek JSON): `energyProductName`, `electricEnergySourceRatio`s, `isGreenEnergy` (all sources renewable), and its `energyRate`s, each with the full rate |
 
 ### Charging connector ↔ connector (`Connector`)
 
@@ -230,10 +230,15 @@ DATEX II tells only part of a charging pool, so the import lays it onto the exis
 - **Charging tariff:** everything DATEX II tells; other properties of an existing tariff are kept.
 - **Identity:** stations and EVSEs are matched by their identification. New ones are added, ones that are gone are
   removed.
-- **What groups give:** what DATEX II tells of a charging station as its charging station groups give it stays in the
-  groups: where the station is to have what its effective charging station has, it keeps what it has of its own, also
-  nothing; of an array, e.g. its features, it takes as its own only what its groups do not give it. Another value, e.g.
-  another `maxPower`, becomes its own, as its own wins. What its groups give can not be taken away by DATEX II.
+- **Told alike:** what DATEX II tells as it would tell the existing charging pool, station or EVSE is kept as it is:
+  the existing charging pool, as it is at runtime, is mapped to DATEX II and back, and only where that differs from
+  what DATEX II tells does DATEX II's value win. So a pool keeps the NUTS code of its country, which DATEX II does not
+  tell, and an EVSE no charging modes of its own, where DATEX II tells those it derives. What a POI3 network publishes,
+  imported back into it, commits nothing.
+- **What groups give:** what DATEX II tells of a charging pool, station or EVSE as its groups give it stays in the
+  groups: where it is to have what its effective one has, it keeps what it has of its own, also nothing; of an array,
+  e.g. its features, it takes as its own only what its groups do not give it. Another value, e.g. another `maxPower`,
+  becomes its own, as its own wins. What its groups give can not be taken away by DATEX II.
 - **Kept untouched:** accessibility, data licenses, grid connection, energy meters, brands, UI features, features of the
   pool, entrances and exits, related locations, charging when closed, manufacturer and model, calibration, parking
   spaces, groups, keys and custom data.

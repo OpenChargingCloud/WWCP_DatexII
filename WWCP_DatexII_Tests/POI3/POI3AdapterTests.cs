@@ -856,22 +856,17 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
             importer.OnError += (sender, description, warnings) => { lock (errors) errors.Add(description + " " + String.Join(" ", warnings)); };
 
-            // What it publishes, imported back: the charging station is not changed. (The NUTS code of the country, which
-            // DATEX II does not tell, and the charging mode it derives are, as for every charging pool.)
+            // What it publishes, imported back: nothing changed, nothing is committed.
             await importer.ImportAsync(POI3Mapper.ToTablePublication(history.Head.RoamingNetwork, Creator, Languages.de, "rn1", "1", warnings, StationIdBNetzA: station => "BNetzA-4711"));
 
             var stored    = history.Head.RoamingNetwork.GetChargingStationOperatorById(GEF)!.ChargingStations.Single();
-            var changes   = history.Head.Commit.Revision > revision
-                                ? history.Head.Commit.ChangeSet!.Changes
-                                : [];
 
             Assert.Multiple(() => {
-                Assert.That(changes.Where(change => change.EntityType == nameof(POI.ChargingStation)).Select(change => change.ToJSON().ToString()),  Is.Empty);
+                Assert.That(history.Head.Commit.Revision,                              Is.EqualTo(revision),
+                            String.Join(", ", history.Head.Commit.ChangeSet?.Changes.Select(change => change.ToJSON().ToString(Newtonsoft.Json.Formatting.None)) ?? []));
                 Assert.That(stored.Features,                                           Is.EqualTo(new[] { POI.ChargingStationFeature.Illuminated }));
                 Assert.That(stored.MaxPower,                                           Is.Null);
             });
-
-            revision      = history.Head.Commit.Revision;
 
             // Another maximum power than its group gives it becomes its own; its features stay as they are.
             var json      = history.Head.RoamingNetwork.ToJSON(IncludeETags: false);
@@ -892,6 +887,77 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(history.Head.Commit.ChangeSet!.Changes.Select(change => change.PropertyName), Is.EquivalentTo(new[] { "maxPower" }));
                 Assert.That(stored.MaxPower?.Value,                                    Is.EqualTo(7400));
                 Assert.That(stored.Features,                                           Is.EqualTo(new[] { POI.ChargingStationFeature.Illuminated }));
+            });
+
+        }
+
+        #endregion
+
+        #region ARoundTripCommitsNothing()
+
+        /// <summary>
+        /// What a POI3 network publishes, imported back into it, commits nothing: also not what DATEX II can not tell,
+        /// e.g. the NUTS code of the country, or what it derives, e.g. the charging mode of an EVSE, nor what the groups
+        /// of a charging pool or of an EVSE give it.
+        /// </summary>
+        [Test]
+        public async Task ARoundTripCommitsNothing()
+        {
+
+            // The facility of the charging pool and the maximum current of the EVSE given by their groups only.
+            var json      = ANetwork().ToJSON(IncludeETags: false);
+            var gef       = (JObject) json["chargingStationOperators"]![0]!;
+            var pool      = (JObject) gef["chargingPools"]![0]!;
+            var evse      = (JObject) pool["chargingStations"]![0]!["EVSEs"]![0]!;
+
+            pool.Remove("facilities");
+            evse.Remove("maxCurrent");
+
+            gef["chargingPoolGroups"] = new JArray(new JObject(new JProperty("@id",              "DE*GEF*PG1"),
+                                                               new JProperty("chargingPoolIds",  new JArray(P1.ToString())),
+                                                               new JProperty("facilities",       new JArray("CAFE")),
+                                                               new JProperty("created",          "2026-01-01T00:00:00.000Z")));
+
+            gef["EVSEGroups"]         = new JArray(new JObject(new JProperty("@id",              "DE*GEF*EG1"),
+                                                               new JProperty("EVSEIds",          new JArray(E1.ToString())),
+                                                               new JProperty("maxCurrent",       32),
+                                                               new JProperty("created",          "2026-01-01T00:00:00.000Z")));
+
+            Assert.That(POI.RoamingNetwork.TryParse(json, out var network, out var errorResponse), Is.True, errorResponse);
+
+            var history   = POI.RoamingNetworkHistory.Start(network!);
+            var revision  = history.Head.Commit.Revision;
+            var errors    = new List<String>();
+            var warnings  = new List<String>();
+
+            await using var importer = new DatexIIToPOI3Importer(history, changeSet => changeSet.SignedByAll(history.Head.RoamingNetwork));
+
+            importer.OnError += (sender, description, warnings) => { lock (errors) errors.Add(description + " " + String.Join(" ", warnings)); };
+
+            var publication = POI3Mapper.ToTablePublication(history.Head.RoamingNetwork, Creator, Languages.de, "rn1", "1", warnings, StationIdBNetzA: station => "BNetzA-4711");
+
+            await importer.ImportAsync(publication);
+
+            var site      = publication.EnergyInfrastructureTables.Single().EnergyInfrastructureSites.Single();
+            var point     = (ElectricChargingPoint) site.EnergyInfrastructureStations.Single().RefillPoints.Single();
+            var op        = history.Head.RoamingNetwork.GetChargingStationOperatorById(GEF)!;
+
+            lock (errors)
+                Assert.That(errors, Is.Empty);
+
+            Assert.Multiple(() => {
+
+                // Published as they are at runtime...
+                Assert.That(site.SupplementalFacilities.OfType<SupplementalServiceFacility>().Single().ServiceFacilityType.ToString(), Is.EqualTo("cafe"));
+                Assert.That(point.Connector.Single().MaximumCurrent?.Value,            Is.EqualTo(32));
+
+                // ...and imported back as they are given.
+                Assert.That(history.Head.Commit.Revision,                              Is.EqualTo(revision),
+                            String.Join(", ", history.Head.Commit.ChangeSet?.Changes.Select(change => change.ToJSON().ToString(Newtonsoft.Json.Formatting.None)) ?? []));
+                Assert.That(op.ChargingPools.Single().Facilities,                      Is.Empty);
+                Assert.That(op.ChargingPools.Single().NUTSCodes.Select(code => code.ToString()), Does.Contain("DE"));
+                Assert.That(op.EVSEs.Single().MaxCurrent,                              Is.Null);
+
             });
 
         }

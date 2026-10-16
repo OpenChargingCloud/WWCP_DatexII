@@ -895,27 +895,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         #endregion
 
 
-        #region ToPOI3(Site, OperatorId, Existing, Language, Warnings, EffectiveChargingStation = null)
+        #region ToPOI3(Site, OperatorId, Existing, Language, Warnings, Unchanged = null, Effective = null)
 
         /// <summary>
         /// The charging pool of the given site, as JSON: the existing one, if any, with what DATEX II tells about it.
         /// What only POI3 knows is kept. Stations and charging points are matched by their identifications: new ones
-        /// are added, ones gone are removed. What DATEX II tells of a charging station as its groups give it stays in
-        /// its groups: see KeepWhatGroupsGive(…).
+        /// are added, ones gone are removed.
+        /// What DATEX II tells as it tells the existing charging pool, station or EVSE is kept as it is: e.g. the NUTS
+        /// code of the country, which DATEX II does not tell, or no charging modes, where DATEX II tells those it derives.
+        /// What it tells of them as their groups give it stays in their groups: see KeepWhatGroupsGive(…).
         /// </summary>
         /// <param name="Site">A site.</param>
         /// <param name="OperatorId">The operator of the site.</param>
         /// <param name="Existing">The JSON of the existing charging pool, if any.</param>
         /// <param name="Language">The language of texts DATEX II gives without one.</param>
         /// <param name="Warnings">Where to tell what could not be mapped.</param>
-        /// <param name="EffectiveChargingStation">The JSON of the existing charging station of the given identification
-        /// with the properties its groups give it, its effective charging station, if any.</param>
+        /// <param name="Unchanged">The existing charging pool, as DATEX II tells it: published and read back, if any.</param>
+        /// <param name="Effective">The JSON of the existing charging pool as it is at runtime, its effective one, with the
+        /// properties its groups and those of its charging stations and EVSEs give them, if any.</param>
         public static JObject? ToPOI3(this EnergyInfrastructureSite      Site,
                                       POI.ChargingStationOperator_Id     OperatorId,
                                       JObject?                           Existing,
                                       Languages                          Language,
                                       ICollection<String>                Warnings,
-                                      Func<String, JObject?>?            EffectiveChargingStation   = null)
+                                      JObject?                           Unchanged   = null,
+                                      JObject?                           Effective   = null)
         {
 
             var poolId = ToPOI3PoolId(Site.Id, OperatorId);
@@ -995,9 +999,14 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                 : new JObject(new JProperty("@id",      poolId.Value.ToString()),
                                               new JProperty("created",  mapped["created"]));
 
-            Overlay(desired, mapped, PoolProperties);
-            OverlayTold(desired, mapped, "services", ServicesDatexIITells);
-            OverlayTold(desired, mapped, "features", PoolFeaturesDatexIITells);
+            var storedPool = (JObject) desired.DeepClone();
+
+            Overlay    (desired, mapped, Changed(mapped, Unchanged, PoolProperties));
+            OverlayTold(desired, mapped, "services", ServicesDatexIITells,      Unchanged);
+            OverlayTold(desired, mapped, "features", PoolFeaturesDatexIITells,  Unchanged);
+
+            if (Effective is not null)
+                KeepWhatGroupsGive(desired, storedPool, Effective, [ .. PoolProperties, "services", "features" ]);
 
             #region The charging stations: matched by their identification
 
@@ -1016,13 +1025,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                     continue;
                 }
 
-                var stored = (JObject) station.DeepClone();
+                var stored             = (JObject) station.DeepClone();
+                var unchangedStation   = ChildOf(Unchanged, "chargingStations", stationId);
+                var effectiveStation   = ChildOf(Effective, "chargingStations", stationId);
 
-                Overlay(station, mappedStation, StationProperties);
-                OverlayTold(station, mappedStation, "features", StationFeaturesDatexIITells);
+                Overlay    (station, mappedStation, Changed(mappedStation, unchangedStation, StationProperties));
+                OverlayTold(station, mappedStation, "features", StationFeaturesDatexIITells, unchangedStation);
 
-                if (EffectiveChargingStation?.Invoke(stationId) is JObject effectiveChargingStation)
-                    KeepWhatGroupsGive(station, stored, effectiveChargingStation, [ .. StationProperties, "features" ]);
+                if (effectiveStation is not null)
+                    KeepWhatGroupsGive(station, stored, effectiveStation, [ .. StationProperties, "features" ]);
 
                 #region The EVSEs of the charging station: matched by their identification
 
@@ -1035,7 +1046,17 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                     var evseId = evse["@id"]?.Value<String>() ?? "";
 
                     if (wantedEVSEs.Remove(evseId, out var mappedEVSE))
-                        Overlay(evse, mappedEVSE, EVSEProperties);
+                    {
+
+                        var storedEVSE     = (JObject) evse.DeepClone();
+                        var effectiveEVSE  = ChildOf(effectiveStation, "EVSEs", evseId);
+
+                        Overlay(evse, mappedEVSE, Changed(mappedEVSE, ChildOf(unchangedStation, "EVSEs", evseId), EVSEProperties));
+
+                        if (effectiveEVSE is not null)
+                            KeepWhatGroupsGive(evse, storedEVSE, effectiveEVSE, EVSEProperties);
+
+                    }
 
                     // Gone at DATEX II.
                     else
@@ -1459,6 +1480,30 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         }
 
         /// <summary>
+        /// Of the given properties those the given source tells otherwise than it tells the existing one, unchanged: all,
+        /// without an unchanged one.
+        /// </summary>
+        /// <param name="Source">An entity as DATEX II tells it now.</param>
+        /// <param name="Unchanged">The existing entity as DATEX II tells it, if any.</param>
+        /// <param name="Properties">The properties DATEX II tells.</param>
+        internal static IEnumerable<String> Changed(JObject              Source,
+                                                    JObject?             Unchanged,
+                                                    IEnumerable<String>  Properties)
+
+            => Unchanged is null
+                   ? Properties
+                   : Properties.Where(property => !JToken.DeepEquals(Source[property], Unchanged[property]));
+
+        /// <summary>
+        /// The embedded object of the given identification in the given array of the given parent, if any.
+        /// </summary>
+        internal static JObject? ChildOf(JObject?  Parent,
+                                         String    Array,
+                                         String    Id)
+
+            => (Parent?[Array] as JArray)?.OfType<JObject>().FirstOrDefault(child => child["@id"]?.Value<String>() == Id);
+
+        /// <summary>
         /// Set the given properties of the target to those of the source; one the source does not have is removed.
         /// </summary>
         internal static void Overlay(JObject              Target,
@@ -1756,8 +1801,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         internal static void OverlayTold(JObject              Target,
                                          JObject              Source,
                                          String               Property,
-                                         IEnumerable<String>  Told)
+                                         IEnumerable<String>  Told,
+                                         JObject?             Unchanged   = null)
         {
+
+            // Told as it tells the existing one: kept as it is.
+            if (Unchanged is not null && JToken.DeepEquals(Source[Property], Unchanged[Property]))
+                return;
 
             var kept    = (Target[Property] as JArray)?.Values<String>().OfType<String>().
                               Where(value => !Told.Contains(value, StringComparer.OrdinalIgnoreCase)) ?? [];
@@ -2191,23 +2241,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         #region (private) Tariffs
 
         /// <summary>
-        /// The tariffs of an EVSE: its own, and those of the EVSE, charging station and charging pool groups it belongs to.
+        /// The tariffs of an EVSE as it is at runtime: its own, else the one of its most specific groups, of the EVSE,
+        /// charging station or charging pool groups it belongs to (ChargingStationOperator.EffectiveEVSE(…)).
         /// </summary>
         private static IEnumerable<POI.ChargingTariff_Id> TariffIdsOf(POI.EVSE                     EVSE,
                                                                       POI.ChargingStation          ChargingStation,
                                                                       POI.ChargingPool             ChargingPool,
                                                                       POI.ChargingStationOperator  Operator)
-        {
 
-            var tariffIds = new List<POI.ChargingTariff_Id>(EVSE.ChargingTariffIds);
-
-            tariffIds.AddRange(Operator.EVSEGroups.           Where(group => group.ChargingTariffId.HasValue && group.EVSEIds.           Contains(EVSE.Id)).           Select(group => group.ChargingTariffId!.Value));
-            tariffIds.AddRange(Operator.ChargingStationGroups.Where(group => group.ChargingTariffId.HasValue && group.ChargingStationIds.Contains(ChargingStation.Id)).Select(group => group.ChargingTariffId!.Value));
-            tariffIds.AddRange(Operator.ChargingPoolGroups.   Where(group => group.ChargingTariffId.HasValue && group.ChargingPoolIds.   Contains(ChargingPool.Id)).   Select(group => group.ChargingTariffId!.Value));
-
-            return tariffIds.Distinct();
-
-        }
+            => Operator.EffectiveEVSE(EVSE).ChargingTariffIds;
 
         /// <summary>
         /// The dates, times of day and weekdays of the given restrictions as an overall period: from the start date, else
