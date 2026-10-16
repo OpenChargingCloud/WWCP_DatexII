@@ -422,7 +422,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                                     ]
                                                             )
                                                           : null,
-                       SupplementalFacilities:        ToDatexII(ChargingPool.Facilities, ChargingPool.Id.ToString(), VersionOf(ChargingPool.LastChangeDate), Warnings),
+                       Accessibility:                 ChargingPool.Services.Contains(POI.LocationService.ACCESSIBLE_CHARGING)
+                                                          ? [ Accessibility.BarrierFreeAccessible ]
+                                                          : null,
+                       SupplementalFacilities:        ToDatexII(ChargingPool.Facilities, ChargingPool.Id.ToString(), VersionOf(ChargingPool.LastChangeDate), Warnings).
+                                                          Concat(ToDatexII(ChargingPool.Services, ChargingPool.Id.ToString(), VersionOf(ChargingPool.LastChangeDate), Warnings)),
                        TypeOfSite:                    ChargingPool.ParkingType.HasValue
                                                           ? ToTypeOfSite(ChargingPool.ParkingType.Value)
                                                           : null,
@@ -602,6 +606,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        ConnectorType:     connectorType ?? EnergyInfrastructure.ConnectorType.Parse("other"),
                        MaxPowerAtSocket:  EVSE.MaxPower ?? Watt.FromW(0),
                        OtherConnector:    connectorType.HasValue ? null : ChargingConnector.Type.ToString(),
+                       ConnectorFormat:   ToDatexII(ChargingConnector.Format, EVSE.ChargingModes),
                        Voltage:           EVSE.MaxVoltage,
                        MaximumCurrent:    EVSE.MaxCurrent
                    );
@@ -629,6 +634,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             {
 
                 priceGroup++;
+
+                // DATEX II prices charging only, not a reservation.
+                if (element.Restrictions?.Reservation is POI.ChargingReservationRestriction reservation)
+                {
+                    Warnings.Add($"The element {priceGroup} of the charging tariff '{ChargingTariff.Id}' prices a reservation ({reservation}), which has no counterpart, and is left out!");
+                    continue;
+                }
 
                 var overallPeriod = element.Restrictions is not null
                                         ? ToDatexII(element.Restrictions, ChargingTariff.Created, ChargingTariff.Id, Warnings)
@@ -680,7 +692,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        RateName:               ToMultilingualString(ChargingTariff.Name),
                        AdditionalInformation:  ToMultilingualString(ChargingTariff.Description),
                        Payment:                ToDatexII(ChargingTariff.PaymentMeans, ChargingTariff.PaymentBrands, Language),
-                       EnergyPrices:           prices
+                       EnergyPrices:           prices,
+                       // Its validity; from its creation, when it tells only an end.
+                       OverallPeriod:          ChargingTariff.ValidFrom.HasValue || ChargingTariff.ValidUntil.HasValue
+                                                   ? new OverallPeriod(ChargingTariff.ValidFrom ?? ChargingTariff.Created,
+                                                                       ChargingTariff.ValidUntil)
+                                                   : null
                    );
 
         }
@@ -869,6 +886,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                  Distinct(),
                                        PaymentOptions:       PaymentOptionsOf(authentication),
                                        AuthenticationModes:  AuthenticationModesOf(authentication),
+                                       Services:             ServicesOf(Site),
                                        LocationLanguages:    Site.EnergyInfrastructureStations.
                                                                  SelectMany(station => station.UserInterfaceLanguages).
                                                                  Distinct(),
@@ -896,6 +914,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                               new JProperty("created",  mapped["created"]));
 
             Overlay(desired, mapped, PoolProperties);
+            OverlayServices(desired, mapped);
 
             #region The charging stations: matched by their identification
 
@@ -1085,7 +1104,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                     Warnings.Add($"The connector type '{connector.ConnectorType}' of the charging point '{ChargingPoint.Id}' has no counterpart and is left out!");
 
                 else
-                    connectors.Add(new POI.ChargingConnector(POI.ChargingConnector_Id.Parse((number++).ToString()), type.Value));
+                    connectors.Add(new POI.ChargingConnector(POI.ChargingConnector_Id.Parse((number++).ToString()),
+                                                             type.Value,
+                                                             Format: ToPOI3(connector.ConnectorFormat)));
 
             }
 
@@ -1203,6 +1224,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             var currency = EnergyRate.ApplicableCurrency.First();
 
+            // POI3 wants the end of the validity after its start.
+            var validUntil = EnergyRate.OverallPeriod?.OverallEndTime;
+
+            if (validUntil.HasValue && validUntil.Value <= EnergyRate.OverallPeriod!.OverallStartTime)
+            {
+                Warnings.Add($"The overall period of the energy rate '{EnergyRate.Id}' ends before it starts; its end is left out!");
+                validUntil = null;
+            }
+
             if (EnergyRate.ApplicableCurrency.Count() > 1)
                 Warnings.Add($"The energy rate '{EnergyRate.Id}' has more than one currency; only '{currency}' is taken!");
 
@@ -1214,6 +1244,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        Description:    ToI18NString(EnergyRate.AdditionalInformation, Language),
                        PaymentMeans:   PaymentMeansOf (EnergyRate.Payment, Language),
                        PaymentBrands:  PaymentBrandsOf(EnergyRate.Payment),
+                       ValidFrom:      EnergyRate.OverallPeriod?.OverallStartTime,
+                       ValidUntil:     validUntil,
                        LastChange:     EnergyRate.LastUpdated
                    );
 
@@ -1294,6 +1326,121 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 else
                     Target.Remove(property);
             }
+        }
+
+        #endregion
+
+        #region (private) Connector formats and accessibility
+
+        /// <summary>
+        /// The connector format of the given POI3 one: a socket, or a cable of the charging mode of its EVSE.
+        /// </summary>
+        private static ConnectorFormat? ToDatexII(POI.ChargingConnectorFormat?  Format,
+                                                  POI.ChargingModes             ChargingModes)
+
+            => Format switch {
+                   POI.ChargingConnectorFormat.SOCKET                                            => ConnectorFormat.Parse("socket"),
+                   POI.ChargingConnectorFormat.CABLE when ChargingModes.HasFlag(POI.ChargingModes.Mode_3)  => ConnectorFormat.Parse("cableMode3"),
+                   POI.ChargingConnectorFormat.CABLE when ChargingModes.HasFlag(POI.ChargingModes.Mode_2)  => ConnectorFormat.Parse("cableMode2"),
+                   POI.ChargingConnectorFormat.CABLE                                             => ConnectorFormat.Parse("otherCable"),
+                   _                                                                             => null
+               };
+
+        /// <summary>
+        /// The POI3 connector format of the given one: every cable is a cable.
+        /// </summary>
+        private static POI.ChargingConnectorFormat? ToPOI3(ConnectorFormat? Format)
+
+            => Format?.ToString() switch {
+                   "socket"                                    => POI.ChargingConnectorFormat.SOCKET,
+                   "cableMode2" or "cableMode3" or "otherCable" => POI.ChargingConnectorFormat.CABLE,
+                   _                                           => null
+               };
+
+        /// <summary>
+        /// The services of a charging pool DATEX II tells: accessible charging and accessible toilets.
+        /// </summary>
+        internal static readonly String[] ServicesDatexIITells = [
+            "ACCESSIBLE_CHARGING",
+            "ACCESSIBLE_TOILETS"
+        ];
+
+        /// <summary>
+        /// The supplemental facilities of the given services: accessible toilets, a toilet that is barrier free.
+        /// Accessible charging is the accessibility of the site itself; the other services have no counterpart.
+        /// </summary>
+        private static IEnumerable<ASupplementalFacility> ToDatexII(IEnumerable<POI.LocationService>  Services,
+                                                                    String                            PoolId,
+                                                                    String                            Version,
+                                                                    ICollection<String>               Warnings)
+        {
+
+            var supplementalFacilities = new List<ASupplementalFacility>();
+
+            foreach (var service in Services)
+            {
+
+                if (service == POI.LocationService.ACCESSIBLE_TOILETS)
+                    supplementalFacilities.Add(new SupplementalEquipment($"{PoolId}*{service}",
+                                                                         Version,
+                                                                         EquipmentType.Parse("toilet"),
+                                                                         Accessibility: [ Accessibility.BarrierFreeAccessible ]));
+
+                else if (service != POI.LocationService.ACCESSIBLE_CHARGING)
+                    Warnings.Add($"The service '{service}' of the charging pool '{PoolId}' has no counterpart and is left out!");
+
+            }
+
+            return supplementalFacilities;
+
+        }
+
+        /// <summary>
+        /// Whether the given accessibility is one of persons with disabilities.
+        /// </summary>
+        private static Boolean IsAccessible(Accessibility Accessibility)
+
+            => Accessibility.ToString() is "barrierFreeAccessible" or "disabilityAccessible" or "wheelChairAccessible";
+
+        /// <summary>
+        /// The services of the given site: accessible charging when the site is accessible, accessible toilets when it
+        /// has an accessible toilet.
+        /// </summary>
+        private static IEnumerable<POI.LocationService> ServicesOf(EnergyInfrastructureSite Site)
+        {
+
+            var services = new List<POI.LocationService>();
+
+            if (Site.Accessibility.Any(IsAccessible))
+                services.Add(POI.LocationService.ACCESSIBLE_CHARGING);
+
+            if (Site.SupplementalFacilities.OfType<SupplementalEquipment>().Any(equipment => equipment.EquipmentType.ToString() == "toilet" &&
+                                                                                             equipment.Accessibility.Any(IsAccessible)))
+                services.Add(POI.LocationService.ACCESSIBLE_TOILETS);
+
+            return services;
+
+        }
+
+        /// <summary>
+        /// Set the services of the target to those DATEX II tells, keeping the others it can not tell.
+        /// </summary>
+        internal static void OverlayServices(JObject  Target,
+                                             JObject  Source)
+        {
+
+            var kept      = (Target["services"] as JArray)?.Values<String>().OfType<String>().
+                                Where(service => !ServicesDatexIITells.Contains(service, StringComparer.OrdinalIgnoreCase)) ?? [];
+
+            var told      = (Source["services"] as JArray)?.Values<String>().OfType<String>() ?? [];
+
+            var services  = kept.Concat(told).ToArray();
+
+            if (services.Length > 0)
+                Target["services"] = new JArray(services);
+            else
+                Target.Remove("services");
+
         }
 
         #endregion

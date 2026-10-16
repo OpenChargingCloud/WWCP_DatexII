@@ -117,6 +117,8 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | `LocationLanguages` | the `userInterfaceLanguage`s of the stations (union on import) |
 | `AuthenticationModes`, `PaymentOptions` | the `authenticationAndIdentificationMethods` of the stations (see below; union on import) |
 | `EnergyMix` | the `ElectricEnergy` energy product of every charging point (import: the first one) |
+| `Services` ACCESSIBLE_CHARGING | `accessibility` `barrierFreeAccessible` of the site. Import: also `disabilityAccessible` and `wheelChairAccessible`. |
+| `Services` ACCESSIBLE_TOILETS | a `supplementalFacility` `afac:SupplementalEquipment` `toilet` whose `accessibility` is `barrierFreeAccessible` (import: also `disabilityAccessible`, `wheelChairAccessible`). The import sets these two services and keeps the others of an existing charging pool. |
 | `LastChangeDate` | `lastUpdated` |
 | — | `serviceType` `unattended` (POI3 has nothing to tell) |
 
@@ -157,6 +159,7 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 |---|---|
 | `Type` | `connectorType`: CHAdeMO ↔ `chademo`, DOMESTIC_A…O ↔ `domesticAType`…`domesticOType` (`domesticA`…`domesticO` in the Mobilithek JSON), IEC_60309_2_single_16 ↔ `iec60309x2single16`, IEC_60309_2_three_16/32/64 ↔ `iec60309x2three16/32/64`, IEC_62196_T1/T1_COMBO/T2/T2_COMBO/T3A/T3C ↔ `iec62196T1`/`iec62196T1COMBO`/`iec62196T2`/`iec62196T2COMBO`/`iec62196T3A`/`iec62196T3C`, PANTOGRAPH_BOTTOM_UP/TOP_DOWN ↔ `pantographBottomUp`/`pantographTopDown`, TESLA_R/S ↔ `teslaR`/`teslaS`. Others: `other` with the POI3 type as `otherConnector`. |
 | EVSE `MaxPower`, `MaxVoltage`, `MaxCurrent` | `maxPowerAtSocket` (0 when unknown), `voltage`, `maximumCurrent` |
+| `Format` | `connectorFormat`: SOCKET ↔ `socket`; CABLE → `cableMode3` with charging mode 3, `cableMode2` with mode 2, else `otherCable`. Import: every cable → CABLE. |
 
 ### Charging tariff ↔ energy rate (`EnergyRate`)
 
@@ -173,6 +176,8 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | price component FLAT | `energyPrice` `basePrice` (import also `flatRate`, and `free` as 0) |
 | `VAT` | `taxRate`, with `taxIncluded` false |
 | tariff element | `priceGroupIndex` (mandatory in 3.7) of its prices: the number of the element, 1, 2, … The prices of a group apply together. Import: the prices of a group make one element; when all prices are of one group, as in the Mobilithek profile (which has no price groups, so its JSON is read as group 1), those with the same overall period do. |
+| `ValidFrom`, `ValidUntil` | `overallPeriod` of the rate: `overallStartTime` (`ValidFrom`, else the creation of the tariff when it tells only `ValidUntil`) and `overallEndTime`. Import: an end not after the start is left out; an existing tariff keeps its validity when the rate tells none. |
+| element with a `Reservation` restriction | — (DATEX II prices charging, not reservations): left out with a warning |
 | element restrictions `StartDate`, `EndDate`, `StartTime`/`EndTime`, `DaysOfWeek` | `overallPeriod` of each price of the element: `overallStartTime` (start date, else the creation of the tariff), `overallEndTime`, one valid period with `recurringTimePeriodOfDay` and `recurringDayWeekMonthPeriod` |
 
 ### Status
@@ -226,8 +231,12 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
 ### What POI3 has and DATEX II does not, or not here
 
 - **Accessibility:** POI3's `AccessibilityType` (free, paying or restricted public access, test station) has no
-  counterpart. DATEX II `accessibility` means barrier-free access. A warning tells.
-- **Price components:** PARKING_TIME prices and step sizes have no counterpart. Energy and duration restrictions could
+  counterpart. DATEX II `accessibility` means barrier-free access. A warning tells. Of the accessibility as the OCPI
+  Accessibility Extension, only the services ACCESSIBLE_CHARGING and ACCESSIBLE_TOILETS are published (see above); the
+  services ASSISTANCE, CAMERA_SURVEILLANCE, EMERGENCY_CALL, EMERGENCY_ASSISTANCE and PERIMETER_FENCE (a warning tells),
+  the `assistanceServiceDetails` and `standards` of a pool, and the `reachDistance`, `operationTimeout`,
+  `extendedOperationTimeout` and `standards` of an EVSE have no counterpart.
+- **Price components:** PARKING_TIME prices, step sizes and the prices of a reservation have no counterpart. Energy and duration restrictions could
   be `energyBasedApplicability` and `timeBasedApplicability` in 3.7, but are not mapped yet; power and current
   restrictions have no counterpart. Restricted prices keep only their dates, times of day and weekdays.
 - **Opening times:** exceptional openings and closings are left out. So is the free text.
@@ -235,7 +244,9 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
   published; the import does not set the time zone.
 - **Connectors:** connector identifications are not published (3.7 has `externalIdentifier` on a connector). CHAOJI,
   GB/T, NEMA and others become `other`. Per connector, DATEX II gives power, voltage and current, but POI3 has them only
-  per EVSE, so all connectors of an EVSE get the same values.
+  per EVSE, so all connectors of an EVSE get the same values. Whether a connector can be locked, its cable length,
+  weight and cable management system, its standards and images have no counterpart; as DATEX II tells the connectors
+  of a charging point as a whole, the import replaces them and these are lost.
 - **Charging modes:** AC one phase in mode 3 has no DATEX II charging mode. An EVSE with connectors of different
   charging modes gets one, the first that applies.
 - **No counterpart at all:** EVSE, charging station and charging pool groups (their tariffs are resolved onto every

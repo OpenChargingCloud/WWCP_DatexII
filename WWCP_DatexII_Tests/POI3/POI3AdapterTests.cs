@@ -86,6 +86,8 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     I18NString.Create(Languages.en, "Standard"),
                     PaymentMeans:   [ POI.PaymentMeans.QR_CODE, POI.PaymentMeans.CREDIT_CARD, POI.PaymentMeans.Parse("SMS") ],
                     PaymentBrands:  [ POI.PaymentBrand.VISA, POI.PaymentBrand.Parse("Google Pay") ],
+                    ValidFrom:      DateTimeOffset.Parse("2026-02-01T00:00:00Z"),
+                    ValidUntil:     DateTimeOffset.Parse("2027-01-01T00:00:00Z"),
                     Created:        Created);
 
         private static POI.EVSE AnEVSE(Int32 MaxPower = 22000)
@@ -95,7 +97,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     MaxVoltage:          Volt.  FromV(400),
                     MaxCurrent:          Ampere.FromA(32),
                     MaxPower:            Watt.  FromW(MaxPower),
-                    ChargingConnectors:  [ new POI.ChargingConnector(POI.ChargingConnector_Id.Parse("1"), POI.ChargingConnectorType.IEC_62196_T2) ],
+                    ChargingConnectors:  [ new POI.ChargingConnector(POI.ChargingConnector_Id.Parse("1"), POI.ChargingConnectorType.IEC_62196_T2, Format: POI.ChargingConnectorFormat.CABLE) ],
                     ChargingTariffIds:   [ T1 ],
                     Created:             Created);
 
@@ -111,6 +113,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     AuthenticationModes:  [ POI.AuthenticationMode.RFID(), POI.AuthenticationMode.REMOTE ],
                     LocationLanguages:    [ Languages.de ],
                     OpeningTimes:         new ImmutableOpeningTimes(OpeningTimes.Open24Hours),
+                    Services:             [ POI.LocationService.ACCESSIBLE_CHARGING, POI.LocationService.ACCESSIBLE_TOILETS ],
                     ChargingStations:     [ new POI.ChargingStation(S1,
                                                                     Features:             [ POI.ChargingStationFeature.Reservable ],
                                                                     EVSEs:                [ AnEVSE(MaxPower) ],
@@ -232,7 +235,9 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(site.TypeOfSite?.ToString(),                                 Is.EqualTo("openSpace"));
                 Assert.That(site.OperatingHours,                                         Is.InstanceOf<OpenAllHours>());
                 Assert.That(POI3Mapper.OperatorIdOf(site.Operator),                     Is.EqualTo("DE*GEF"));
-                Assert.That(((SupplementalServiceFacility) site.SupplementalFacilities.Single()).ServiceFacilityType.ToString(), Is.EqualTo("cafe"));
+                Assert.That(site.SupplementalFacilities.OfType<SupplementalServiceFacility>().Single().ServiceFacilityType.ToString(), Is.EqualTo("cafe"));
+                Assert.That(site.SupplementalFacilities.OfType<SupplementalEquipment>().Single().EquipmentType.ToString(),             Is.EqualTo("toilet"));
+                Assert.That(site.Accessibility.Select(accessibility => accessibility.ToString()),                                       Is.EqualTo(new[] { "barrierFreeAccessible" }));
                 Assert.That(location.CoordinatesForDisplay?.Latitude,                    Is.EqualTo(50.92));
                 Assert.That(location.FacilityLocation?.TimeZone?.ToString(),             Is.EqualTo("+01:00"));
                 Assert.That(location.FacilityLocation?.Address?.Postcode,                Is.EqualTo("07749"));
@@ -358,6 +363,15 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "brandsAccepted").     Select(element => element.Value), Is.EquivalentTo(new[] { "visa" }));
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "otherBrandsAccepted").Select(element => element.Value), Is.EquivalentTo(new[] { "Google Pay" }));
 
+            // Accessible charging is the accessibility of the site, accessible toilets a barrier free toilet; a cable without a charging mode is an other cable.
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "energyInfrastructureSite").
+                            Elements().Where(element => element.Name.LocalName == "accessibility").Select(element => element.Value),            Is.EqualTo(new[] { "barrierFreeAccessible" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "equipmentType").Select(element => element.Value),        Is.EqualTo(new[] { "toilet" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "connectorFormat").Select(element => element.Value),      Is.EqualTo(new[] { "otherCable" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "energyRate").Elements().
+                            Where(element => element.Name.LocalName == "overallPeriod").Elements().Select(element => DateTimeOffset.Parse(element.Value)),
+                        Is.EqualTo(new[] { DateTimeOffset.Parse("2026-02-01T00:00:00Z"), DateTimeOffset.Parse("2027-01-01T00:00:00Z") }));
+
             // Through the parsers: what a consumer reads.
             Assert.That(Payload.TryParseXML(xml, out var payload, out var errorResponse), Is.True, errorResponse);
 
@@ -400,6 +414,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(pool.OpeningTimes?.IsOpen24Hours,                  Is.True);
                 Assert.That(pool.AuthenticationModes.Select(mode => mode.Type), Is.EquivalentTo(new[] { POI.AuthenticationMode.RFIDType, POI.AuthenticationMode.REMOTEType }));
                 Assert.That(pool.LocationLanguages,                            Is.EqualTo(new[] { Languages.de }));
+                Assert.That(pool.Services,                                     Is.EqualTo(new[] { POI.LocationService.ACCESSIBLE_CHARGING, POI.LocationService.ACCESSIBLE_TOILETS }));
 
                 Assert.That(pool.ChargingStations.Single().Id,                 Is.EqualTo(S1));
                 Assert.That(pool.ChargingStations.Single().Features,           Is.EqualTo(new[] { POI.ChargingStationFeature.Reservable }));
@@ -411,11 +426,80 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(evse.MaxVoltage?.Value,                            Is.EqualTo(400));
                 Assert.That(evse.MaxCurrent?.Value,                            Is.EqualTo(32));
                 Assert.That(evse.ChargingConnectors.Single().Type,             Is.EqualTo(POI.ChargingConnectorType.IEC_62196_T2));
+                Assert.That(evse.ChargingConnectors.Single().Format,           Is.EqualTo(POI.ChargingConnectorFormat.CABLE));
                 Assert.That(evse.ChargingTariffIds,                            Is.EqualTo(new[] { T1 }));
 
                 Assert.That(JToken.DeepEquals(expected, actual),               Is.True, $"{expected}\n{actual}");
 
             });
+
+        }
+
+        #endregion
+
+        #region AReservationIsNoPriceOfCharging()
+
+        /// <summary>
+        /// DATEX II prices charging, not a reservation: an element pricing a reservation is left out.
+        /// </summary>
+        [Test]
+        public void AReservationIsNoPriceOfCharging()
+        {
+
+            var warnings  = new List<String>();
+
+            var tariff    = new POI.ChargingTariff(T1,
+                                                   Currency.EUR,
+                                                   [
+                                                       new POI.ChargingTariffElement([ new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.ENERGY, 0.39m, StepSize: 1) ]),
+                                                       new POI.ChargingTariffElement([ new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.FLAT,   2) ],
+                                                                                     new POI.ChargingTariffRestrictions(Reservation: POI.ChargingReservationRestriction.RESERVATION))
+                                                   ],
+                                                   Created: Created);
+
+            var rate      = tariff.ToDatexII(Languages.de, warnings)!;
+
+            Assert.Multiple(() => {
+                Assert.That(rate.EnergyPrices.Select(price => price.PriceType.ToString()),  Is.EqualTo(new[] { "pricePerKWh" }));
+                Assert.That(rate.OverallPeriod,                                              Is.Null, "Without a validity, the rate has no overall period.");
+                Assert.That(warnings.Single(),                                               Does.Contain("prices a reservation (RESERVATION)"));
+            });
+
+        }
+
+        #endregion
+
+        #region TheServicesDatexIICanNotTellAreKept()
+
+        /// <summary>
+        /// DATEX II tells only accessible charging and accessible toilets: the other services of an existing charging
+        /// pool are kept, those two are set as DATEX II tells them.
+        /// </summary>
+        [Test]
+        public void TheServicesDatexIICanNotTellAreKept()
+        {
+
+            var network   = ANetwork();
+            var warnings  = new List<String>();
+            var original  = network.GetChargingStationOperatorById(GEF)!.ChargingPools.Single();
+            var site      = original.ToDatexII(network, Languages.de, warnings)!;
+
+            var existing  = original.ToJSON();
+            existing["services"] = new JArray("ACCESSIBLE_TOILETS", "CAMERA_SURVEILLANCE");
+
+            var withoutToilets = new EnergyInfrastructureSite(site.Id,
+                                                              site.Version,
+                                                              Name:                    site.Name,
+                                                              LastUpdated:             site.LastUpdated,
+                                                              Accessibility:           site.Accessibility,
+                                                              LocationReference:       site.LocationReference,
+                                                              Operator:                site.Operator,
+                                                              EnergyInfrastructureStations:  site.EnergyInfrastructureStations);
+
+            var poolJSON  = withoutToilets.ToPOI3(GEF, existing, Languages.en, warnings);
+
+            Assert.That(poolJSON, Is.Not.Null, String.Join(" ", warnings));
+            Assert.That(poolJSON!["services"]!.Values<String>(), Is.EquivalentTo(new[] { "ACCESSIBLE_CHARGING", "CAMERA_SURVEILLANCE" }));
 
         }
 

@@ -344,6 +344,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                            // The payment only when the rate tells one.
                                            if (rate.Payment is not null)
                                                POI3Mapper.Overlay(merged, desired, [ "paymentMeans", "paymentBrands" ]);
+                                           // The validity only when the rate tells one.
+                                           if (rate.OverallPeriod is not null)
+                                               POI3Mapper.Overlay(merged, desired, [ "validFrom", "validUntil" ]);
                                            existing.Replace(merged);
                                        }
                                        else
