@@ -224,6 +224,10 @@ DATEX II tells only part of a charging pool, so the import lays it onto the exis
 - **Charging tariff:** everything DATEX II tells; other properties of an existing tariff are kept.
 - **Identity:** stations and EVSEs are matched by their identification. New ones are added, ones that are gone are
   removed.
+- **What groups give:** what DATEX II tells of a charging station as its charging station groups give it stays in the
+  groups: where the station is to have what its effective charging station has, it keeps what it has of its own, also
+  nothing; of an array, e.g. its features, it takes as its own only what its groups do not give it. Another value, e.g.
+  another `maxPower`, becomes its own, as its own wins. What its groups give can not be taken away by DATEX II.
 - **Kept untouched:** accessibility, data licenses, grid connection, energy meters, brands, UI features, features of the
   pool, entrances and exits, related locations, charging when closed, manufacturer and model, calibration, parking
   spaces, groups, keys and custom data.

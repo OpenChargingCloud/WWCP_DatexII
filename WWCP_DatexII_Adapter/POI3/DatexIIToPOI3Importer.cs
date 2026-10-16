@@ -293,9 +293,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 ChangeOperator(operatorId,
                                $"DATEX II table {tableIds}",
                                TablePublication.PublicationTime,
-                               (operatorJSON, warnings) => {
+                               (head, operatorJSON, warnings) => {
 
                                    var pools    = POI3Mapper.ArrayOf(operatorJSON, "chargingPools");
+
+                                   // What its groups give a charging station stays in its groups.
+                                   head.TryGetChargingStationOperatorById(operatorId, out var chargingStationOperator);
+
+                                   JObject? EffectiveChargingStation(String ChargingStationId)
+
+                                       => chargingStationOperator is not null &&
+                                          POI.ChargingStation_Id.TryParse(ChargingStationId, out var chargingStationId) &&
+                                          chargingStationOperator.TryGetEffectiveChargingStation(chargingStationId, out var effectiveChargingStation)
+                                              ? effectiveChargingStation.ToJSON()
+                                              : null;
                                    var poolIds  = new HashSet<String>();
 
                                    foreach (var site in sites)
@@ -303,7 +314,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
                                        var poolId    = POI3Mapper.ToPOI3PoolId(site.Id, operatorId)?.ToString();
                                        var existing  = pools.OfType<JObject>().FirstOrDefault(pool => pool["@id"]?.Value<String>() == poolId);
-                                       var desired   = site.ToPOI3(operatorId, existing, Language, warnings);
+                                       var desired   = site.ToPOI3(operatorId, existing, Language, warnings, EffectiveChargingStation);
 
                                        if (desired is null || poolId is null)
                                            continue;
@@ -434,12 +445,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         #region (private) ChangeOperator(OperatorId, Description, CreatedAt, Change)
 
         /// <summary>
-        /// Change the JSON of the given operator in the head, and commit the difference, signed.
+        /// Change the JSON of the given operator in the head, which the change is given as well, and commit the difference, signed.
         /// </summary>
-        private void ChangeOperator(POI.ChargingStationOperator_Id                OperatorId,
-                                    String                                        Description,
-                                    DateTimeOffset                                CreatedAt,
-                                    Func<JObject, ICollection<String>, Boolean>   Change)
+        private void ChangeOperator(POI.ChargingStationOperator_Id                                     OperatorId,
+                                    String                                                             Description,
+                                    DateTimeOffset                                                     CreatedAt,
+                                    Func<POI.RoamingNetwork, JObject, ICollection<String>, Boolean>    Change)
         {
 
             var head          = History.Head.RoamingNetwork;
@@ -456,7 +467,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             var warnings = new List<String>();
 
-            if (!Change(operatorJSON, warnings))
+            if (!Change(head, operatorJSON, warnings))
             {
                 if (warnings.Count > 0)
                     RaiseError($"{Description} can not be imported!", warnings);

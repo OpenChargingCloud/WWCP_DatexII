@@ -840,6 +840,64 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         #endregion
 
+        #region TheImporterKeepsWhatGroupsGiveInTheGroups()
+
+        [Test]
+        public async Task TheImporterKeepsWhatGroupsGiveInTheGroups()
+        {
+
+            // The charging station is reservable, and limited to 11 kW, by its group only.
+            var history   = POI.RoamingNetworkHistory.Start(ANetwork(FeaturesByGroup: true));
+            var revision  = history.Head.Commit.Revision;
+            var errors    = new List<String>();
+            var warnings  = new List<String>();
+
+            await using var importer = new DatexIIToPOI3Importer(history, changeSet => changeSet.SignedByAll(history.Head.RoamingNetwork));
+
+            importer.OnError += (sender, description, warnings) => { lock (errors) errors.Add(description + " " + String.Join(" ", warnings)); };
+
+            // What it publishes, imported back: the charging station is not changed. (The NUTS code of the country, which
+            // DATEX II does not tell, and the charging mode it derives are, as for every charging pool.)
+            await importer.ImportAsync(POI3Mapper.ToTablePublication(history.Head.RoamingNetwork, Creator, Languages.de, "rn1", "1", warnings, StationIdBNetzA: station => "BNetzA-4711"));
+
+            var stored    = history.Head.RoamingNetwork.GetChargingStationOperatorById(GEF)!.ChargingStations.Single();
+            var changes   = history.Head.Commit.Revision > revision
+                                ? history.Head.Commit.ChangeSet!.Changes
+                                : [];
+
+            Assert.Multiple(() => {
+                Assert.That(changes.Where(change => change.EntityType == nameof(POI.ChargingStation)).Select(change => change.ToJSON().ToString()),  Is.Empty);
+                Assert.That(stored.Features,                                           Is.EqualTo(new[] { POI.ChargingStationFeature.Illuminated }));
+                Assert.That(stored.MaxPower,                                           Is.Null);
+            });
+
+            revision      = history.Head.Commit.Revision;
+
+            // Another maximum power than its group gives it becomes its own; its features stay as they are.
+            var json      = history.Head.RoamingNetwork.ToJSON(IncludeETags: false);
+            json["chargingStationOperators"]![0]!["chargingPools"]![0]!["chargingStations"]![0]!["maxPower"] = 7400;
+
+            Assert.That(POI.RoamingNetwork.TryParse(json, out var changed, out var errorResponse), Is.True, errorResponse);
+
+            await importer.ImportAsync(POI3Mapper.ToTablePublication(changed!, Creator, Languages.de, "rn1", "2", warnings, StationIdBNetzA: station => "BNetzA-4711"));
+
+            stored        = history.Head.RoamingNetwork.GetChargingStationOperatorById(GEF)!.ChargingStations.Single();
+
+            lock (errors)
+                Assert.That(errors, Is.Empty);
+
+            Assert.Multiple(() => {
+                Assert.That(warnings,                                                  Is.Empty);
+                Assert.That(history.Head.Commit.Revision,                              Is.EqualTo(revision + 1));
+                Assert.That(history.Head.Commit.ChangeSet!.Changes.Select(change => change.PropertyName), Is.EquivalentTo(new[] { "maxPower" }));
+                Assert.That(stored.MaxPower?.Value,                                    Is.EqualTo(7400));
+                Assert.That(stored.Features,                                           Is.EqualTo(new[] { POI.ChargingStationFeature.Illuminated }));
+            });
+
+        }
+
+        #endregion
+
         #region TheImporterCommitsWhatItReads()
 
         [Test]
