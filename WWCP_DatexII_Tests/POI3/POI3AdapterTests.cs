@@ -81,6 +81,8 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                       new POI.ChargingTariffRestrictions(StartTime:   new TimeOnly(22, 0),
                                                                                          EndTime:     new TimeOnly(6, 30),
                                                                                          StartDate:   new DateOnly(2026, 1, 1),
+                                                                                         MinEnergy:   2000,
+                                                                                         MaxDuration: 3600,
                                                                                          DaysOfWeek:  [ DayOfWeek.Sunday ]))
                     ],
                     I18NString.Create(Languages.en, "Standard"),
@@ -115,7 +117,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     OpeningTimes:         new ImmutableOpeningTimes(OpeningTimes.Open24Hours),
                     Services:             [ POI.LocationService.ACCESSIBLE_CHARGING, POI.LocationService.ACCESSIBLE_TOILETS ],
                     NUTSCodes:            [ POI.NUTSCode.Parse("DE"), POI.NUTSCode.Parse("DEG"), POI.NUTSCode.Parse("DEG03") ],
-                    Features:             [ POI.ChargingPoolFeature.Roofed ],
+                    Features:             [ POI.ChargingPoolFeature.Roofed, POI.ChargingPoolFeature.IlluminatedParkingNearby ],
                     ChargingStations:     [ new POI.ChargingStation(S1,
                                                                     Features:             [ POI.ChargingStationFeature.Reservable, POI.ChargingStationFeature.Illuminated ],
                                                                     EVSEs:                [ AnEVSE(MaxPower) ],
@@ -141,6 +143,11 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                                                                                           ChargingStationIds:   [ S1 ],
                                                                                                                           ParkingRestrictions:  [ POI.ParkingRestrictionGroup.DISABLED, POI.ParkingRestrictionGroup.EV_ONLY ],
                                                                                                                           EUVehicleCategories:  [ POI.EUVehicleCategory.M1 ],
+                                                                                                                          GeoLocation:          GeoCoordinate.Parse(50.9201, 11.5801),
+                                                                                                                          Length:               Meter.From_m(5),
+                                                                                                                          Width:                Meter.From_m(3.5m),
+                                                                                                                          MaxVehicleHeight:     Meter.From_m(2.1m),
+                                                                                                                          Roofed:               true,
                                                                                                                           Created:              Created),
                                                                                                      new POI.ParkingSpace(POI.ParkingSpace_Id.Parse("space-2"),
                                                                                                                           ChargingStationIds:   [ S1 ],
@@ -399,7 +406,13 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             // NUTS 1 to 3 of the site, illuminated and roofed as amenities, and the parking spaces of the station by their restrictions.
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "nutsCode").Select(element => element.Value),            Is.EqualTo(new[] { "DEG", "DEG03" }));
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "nutsCodeType").Select(element => element.Value),        Is.EqualTo(new[] { "nuts1Code", "nuts3Code" }));
-            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "roofed").Select(element => element.Value),              Is.EqualTo(new[] { "true" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "roofed").Select(element => element.Value),              Is.EqualTo(new[] { "true", "true" }), "The site, and the parking space for persons with disabilities.");
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "illuminatedRechargingParkingNearby").Select(element => element.Value), Is.EqualTo(new[] { "true" }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "dedicatedParkingSpaces").First().
+                            Elements().Where(element => element.Name.LocalName == "dimension").Elements().Select(element => Decimal.Parse(element.Value, System.Globalization.CultureInfo.InvariantCulture)),
+                        Is.EqualTo(new[] { 5m, 3.5m, 2.1m }));
+            Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "dedicatedParkingSpaces").
+                            Select(spaces => spaces.Elements().Any(element => element.Name.LocalName == "locationReference")),                 Is.EqualTo(new[] { true, false }), "Only a single space tells its location.");
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "illuminated").Select(element => element.Value),         Is.EqualTo(new[] { "true" }));
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "numberOfSpaces").Select(element => element.Value),      Is.EqualTo(new[] { "1", "2" }));
             Assert.That(xml.Descendants().Where(element => element.Name.LocalName == "userSpecific").Select(element => element.Value),        Is.EqualTo(new[] { "personsWithDisabilities" }));
@@ -452,7 +465,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
                 Assert.That(pool.ChargingStations.Single().Id,                 Is.EqualTo(S1));
                 Assert.That(pool.ChargingStations.Single().Features,           Is.EquivalentTo(new[] { POI.ChargingStationFeature.Reservable, POI.ChargingStationFeature.Illuminated }));
-                Assert.That(pool.Features,                                     Is.EqualTo(new[] { POI.ChargingPoolFeature.Roofed }));
+                Assert.That(pool.Features,                                     Is.EquivalentTo(new[] { POI.ChargingPoolFeature.Roofed, POI.ChargingPoolFeature.IlluminatedParkingNearby }));
                 Assert.That(pool.NUTSCodes,                                    Is.EqualTo(new[] { POI.NUTSCode.Parse("DEG"), POI.NUTSCode.Parse("DEG03") }));
                 Assert.That(pool.ChargingStations.Single().EUVehicleCategories, Is.EqualTo(new[] { POI.EUVehicleCategory.L, POI.EUVehicleCategory.M1, POI.EUVehicleCategory.N1 }));
 
@@ -466,6 +479,65 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(evse.ChargingTariffIds,                            Is.EqualTo(new[] { T1 }));
 
                 Assert.That(JToken.DeepEquals(expected, actual),               Is.True, $"{expected}\n{actual}");
+
+            });
+
+        }
+
+        #endregion
+
+        #region EnergyAndDurationRestrictionsAreApplicabilities()
+
+        /// <summary>
+        /// The energy and duration restrictions of a tariff element are the energy and time based applicability of its
+        /// prices, in whole kWh and minutes: one of no whole unit is rounded, with a warning. Without price groups, as in
+        /// the Mobilithek profile, prices of different applicability are different elements.
+        /// </summary>
+        [Test]
+        public void EnergyAndDurationRestrictionsAreApplicabilities()
+        {
+
+            var warnings  = new List<String>();
+
+            var tariff    = new POI.ChargingTariff(T1,
+                                                   Currency.EUR,
+                                                   [
+                                                       new POI.ChargingTariffElement([ new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.ENERGY, 0.39m, StepSize: 1) ],
+                                                                                     new POI.ChargingTariffRestrictions(MaxEnergy: 20000, MaxDuration: 1800)),
+                                                       new POI.ChargingTariffElement([ new POI.ChargingPriceComponent(POI.ChargingDimensionTypes.ENERGY, 0.29m, StepSize: 1) ],
+                                                                                     new POI.ChargingTariffRestrictions(MinEnergy: 20500))
+                                                   ],
+                                                   Created: Created);
+
+            var rate      = tariff.ToDatexII(Languages.de, warnings)!;
+
+            var first     = rate.EnergyPrices.First();
+            var second    = rate.EnergyPrices.Last();
+
+            // As the Mobilithek profile reads it: without price groups.
+            var ungrouped = new EnergyRate(rate.Id,
+                                           rate.LastUpdated,
+                                           rate.RatePolicy,
+                                           rate.ApplicableCurrency,
+                                           EnergyPrices: rate.EnergyPrices.Select(price => new EnergyPrice(price.PriceType,
+                                                                                                           price.Value,
+                                                                                                           EnergyBasedApplicability:  price.EnergyBasedApplicability,
+                                                                                                           TimeBasedApplicability:    price.TimeBasedApplicability)));
+
+            var again     = ungrouped.ToPOI3(GEF, Languages.de, new List<String>())!;
+
+            Assert.Multiple(() => {
+
+                Assert.That(first. EnergyBasedApplicability?.ToKWh,     Is.EqualTo(20));
+                Assert.That(first. TimeBasedApplicability?.  ToMinute,  Is.EqualTo(30));
+                Assert.That(first. EnergyBasedApplicability?.FromKWh,   Is.Null);
+                Assert.That(second.EnergyBasedApplicability?.FromKWh,   Is.EqualTo(21), "20.5 kWh are rounded.");
+                Assert.That(second.TimeBasedApplicability,              Is.Null);
+                Assert.That(warnings.Single(),                          Does.Contain("minimum energy of a restriction of the charging tariff 'DE*GEF*T1' is no whole kWh"));
+
+                Assert.That(again.Elements.Select(element => element.Restrictions?.MaxEnergy),    Is.EqualTo(new Decimal?[] { 20000, null }));
+                Assert.That(again.Elements.Select(element => element.Restrictions?.MinEnergy),    Is.EqualTo(new Decimal?[] { null, 21000 }));
+                Assert.That(again.Elements.Select(element => element.Restrictions?.MaxDuration),  Is.EqualTo(new Decimal?[] { 1800, null }));
 
             });
 

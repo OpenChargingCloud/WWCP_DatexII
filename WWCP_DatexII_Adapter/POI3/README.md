@@ -118,7 +118,7 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | `LocationLanguages` | the `userInterfaceLanguage`s of the stations (union on import) |
 | `AuthenticationModes`, `PaymentOptions` | the `authenticationAndIdentificationMethods` of the stations (see below; union on import) |
 | `EnergyMix` | the `ElectricEnergy` energy product of every charging point (import: the first one) |
-| `Features` Illuminated, Roofed | `amenities` `illuminated`, `roofed` of the site (only `true` is written). The import sets these two features and keeps the others of an existing charging pool. |
+| `Features` Illuminated, Roofed, IlluminatedParkingNearby, RoofedParkingNearby | `amenities` `illuminated`, `roofed`, `illuminatedRechargingParkingNearby`, `roofedRechargingParkingNearby` of the site (only `true` is written). The import sets these four features and keeps the others of an existing charging pool. |
 | `Services` ACCESSIBLE_CHARGING | `accessibility` `barrierFreeAccessible` of the site. Import: also `disabilityAccessible` and `wheelChairAccessible`. |
 | `Services` ACCESSIBLE_TOILETS | a `supplementalFacility` `afac:SupplementalEquipment` `toilet` whose `accessibility` is `barrierFreeAccessible` (import: also `disabilityAccessible`, `wheelChairAccessible`). The import sets these two services and keeps the others of an existing charging pool. |
 | `LastChangeDate` | `lastUpdated` |
@@ -136,8 +136,8 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | pool `LocationLanguages`, else the language of the publication | `userInterfaceLanguage` |
 | — | `serviceType` `unattended` |
 | feature `Reservable` | `reservation` `optional` of its charging points (import: `optional`, `mandatory`, `partly`) |
-| `Features` Illuminated, Roofed | `amenities` `illuminated`, `roofed` of the station. The import sets them and `Reservable`, and keeps the other features of an existing charging station. |
-| parking spaces of the network whose `ChargingStationIds` name it | `dedicatedParkingSpaces`: one per combination of `ParkingRestrictions` and `EUVehicleCategories`, with their `numberOfSpaces`; DISABLED → `userSpecific` `personsWithDisabilities` and `accessibility` `barrierFreeAccessible`, EMPLOYEES → `employees`, CUSTOMERS → `customers`, TENANTS → `residents`, EV_ONLY → `applicableForVehicles` `fuelType` `battery`, the EU vehicle categories → its `euVehicleCategory`s. Not imported: POI3 parking spaces belong to parking operators. |
+| `Features` Illuminated, Roofed, IlluminatedParkingNearby, RoofedParkingNearby | `amenities` of the station, as of the site. The import sets them and `Reservable`, and keeps the other features of an existing charging station. |
+| parking spaces of the network whose `ChargingStationIds` name it | `dedicatedParkingSpaces`: one per combination of `ParkingRestrictions`, `EUVehicleCategories`, `Length`, `Width`, `MaxVehicleHeight`, `Illuminated` and `Roofed`, with their `numberOfSpaces`, their `dimension` (`length`, `width`, `height` as the clear height) and `amenities`, and the `locationReference` of a single space with a `GeoLocation`; DISABLED → `userSpecific` `personsWithDisabilities` and `accessibility` `barrierFreeAccessible`, EMPLOYEES → `employees`, CUSTOMERS → `customers`, TENANTS → `residents`, EV_ONLY → `applicableForVehicles` `fuelType` `battery`, the EU vehicle categories → its `euVehicleCategory`s. Not imported: POI3 parking spaces belong to parking operators. |
 | `EUVehicleCategories` | one `applicableForVehicles` with the `euVehicleCategory`s, in lower case (`M1` ↔ `m1`); categories DATEX II 3.7 does not know, e.g. `L`, as extended values. Import: the categories of all its `applicableForVehicles`, in upper case. |
 | EVSEs | `refillPoint`s, `xsi:type` `aegi:ElectricChargingPoint` |
 
@@ -183,6 +183,9 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | `ValidFrom`, `ValidUntil` | `overallPeriod` of the rate: `overallStartTime` (`ValidFrom`, else the creation of the tariff when it tells only `ValidUntil`) and `overallEndTime`. Import: an end not after the start is left out; an existing tariff keeps its validity when the rate tells none. |
 | element with a `Reservation` restriction | — (DATEX II prices charging, not reservations): left out with a warning |
 | element restrictions `StartDate`, `EndDate`, `StartTime`/`EndTime`, `DaysOfWeek` | `overallPeriod` of each price of the element: `overallStartTime` (start date, else the creation of the tariff), `overallEndTime`, one valid period with `recurringTimePeriodOfDay` and `recurringDayWeekMonthPeriod` |
+| element restrictions `MinEnergy`, `MaxEnergy` (Wh) | `energyBasedApplicability` `fromKWh`, `toKWh` of each price of the element, in whole kWh (rounded, with a warning) |
+| element restrictions `MinDuration`, `MaxDuration` (s) | `timeBasedApplicability` `fromMinute`, `toMinute` of each price of the element, in whole minutes (rounded, with a warning). Import: without price groups, as in the Mobilithek profile, prices of the same overall period and applicability make one element. |
+| element restrictions `MinPower`, `MaxPower`, `MinCurrent`, `MaxCurrent` | — (left out with a warning) |
 
 ### Status
 
@@ -224,8 +227,8 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
 - **NUTS:** the NUTS 1 region of a site is published when the charging pool tells it (`nutsCodes`).
 - **Amenities and parking:** whether a site or station is illuminated or roofed is published when its features tell it;
   dedicated parking spaces, e.g. for persons with disabilities, when parking spaces of the network name the charging
-  station. Whether recharging parking nearby is illuminated or roofed, and the dimension, location and amenities of the
-  parking spaces, are not.
+  station. Dedicated parking spaces of a site are not published: POI3 parking spaces name charging stations, and the
+  `parkingRestrictions` of a charging pool tell no number of spaces, which DATEX II requires.
 - **Vehicles:** the EU vehicle categories of a station are published when the charging station tells them
   (`euVehicleCategories`); those of a site are not.
 - **Payment:** the payment means and brands of a rate are published when the charging tariff tells them
@@ -243,9 +246,8 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
   services ASSISTANCE, CAMERA_SURVEILLANCE, EMERGENCY_CALL, EMERGENCY_ASSISTANCE and PERIMETER_FENCE (a warning tells),
   the `assistanceServiceDetails` and `standards` of a pool, and the `reachDistance`, `operationTimeout`,
   `extendedOperationTimeout` and `standards` of an EVSE have no counterpart.
-- **Price components:** PARKING_TIME prices, step sizes and the prices of a reservation have no counterpart. Energy and duration restrictions could
-  be `energyBasedApplicability` and `timeBasedApplicability` in 3.7, but are not mapped yet; power and current
-  restrictions have no counterpart. Restricted prices keep only their dates, times of day and weekdays.
+- **Price components:** PARKING_TIME prices, step sizes and the prices of a reservation have no counterpart. Power and
+  current restrictions have none either; energy and duration restrictions only in whole kWh and minutes.
 - **Opening times:** exceptional openings and closings are left out. So is the free text.
 - **Time zone:** DATEX II has a fixed UTC offset, not a named zone with daylight saving time. The standard offset is
   published; the import does not set the time zone.
@@ -270,9 +272,9 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
   and further additional information are not imported. So are the energy distributor, mobility service providers and
   roaming platforms (of sites and stations), and the renewable sources of a station.
 - **Payment:** the payment modes of a rate (only its means and brands are), minimum and maximum delivery fees, discount and
-  combination with parking fee are not imported. Neither are the price cap, the time and energy based applicability of
-  a price, and the `taxIncluded` of a price that includes tax.
-- **Charging points:** connector format (socket or cable), country of a domestic socket, smart recharging services,
+  combination with parking fee are not imported. Neither are the price cap and the `taxIncluded` of a price that
+  includes tax.
+- **Charging points:** the kind of cable of a connector (only that it is one), country of a domestic socket, smart recharging services,
   model type, and minimum and maximum delivery amounts are not imported.
 - **Energy:** carbon dioxide and nuclear waste impact, the product information and renewable energy evidence, and the
   `isGreenEnergy` flag itself are not imported. Water becomes OtherGreen, as POI3 has no water category. Energy

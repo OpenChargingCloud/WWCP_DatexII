@@ -382,9 +382,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                  Select(chargingStation => chargingStation.ToDatexII(ChargingPool, chargingStationOperator, RoamingNetwork, Language, Warnings, StationIdBNetzA)).
                                  ToArray();
 
-            var brand      = ChargingPool.BrandIds.
-                                 Select(brandId => RoamingNetwork.TryGetBrandById(brandId, out var found) ? found : null).
-                                 FirstOrDefault(found => found is not null);
+            // The pool's own brands; those of its operator are white labels and are not mixed in.
+            var brand      = ChargingPool.Brands.FirstOrDefault();
 
             var helpdesk   = ChargingPool.HotlinePhoneNumber ?? chargingStationOperator.HotlinePhoneNumber;
 
@@ -424,7 +423,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                             )
                                                           : null,
                        Amenities:                     AmenitiesOf(ChargingPool.Features.Contains(POI.ChargingPoolFeature.Illuminated),
-                                                                  ChargingPool.Features.Contains(POI.ChargingPoolFeature.Roofed)),
+                                                                  ChargingPool.Features.Contains(POI.ChargingPoolFeature.Roofed),
+                                                                  ChargingPool.Features.Contains(POI.ChargingPoolFeature.IlluminatedParkingNearby),
+                                                                  ChargingPool.Features.Contains(POI.ChargingPoolFeature.RoofedParkingNearby)),
                        Accessibility:                 ChargingPool.Services.Contains(POI.LocationService.ACCESSIBLE_CHARGING)
                                                           ? [ Accessibility.BarrierFreeAccessible ]
                                                           : null,
@@ -500,7 +501,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                     : null,
                        ApplicableForVehicles:                   ToDatexII(ChargingStation.EUVehicleCategories),
                        Amenities:                               AmenitiesOf(ChargingStation.Features.Contains(POI.ChargingStationFeature.Illuminated),
-                                                                            ChargingStation.Features.Contains(POI.ChargingStationFeature.Roofed)),
+                                                                            ChargingStation.Features.Contains(POI.ChargingStationFeature.Roofed),
+                                                                            ChargingStation.Features.Contains(POI.ChargingStationFeature.IlluminatedParkingNearby),
+                                                                            ChargingStation.Features.Contains(POI.ChargingStationFeature.RoofedParkingNearby)),
                        DedicatedParkingSpaces:                  DedicatedParkingSpacesOf(ChargingStation, RoamingNetwork),
                        RefillPoints:                            chargingPoints
 
@@ -648,9 +651,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                     continue;
                 }
 
-                var overallPeriod = element.Restrictions is not null
-                                        ? ToDatexII(element.Restrictions, ChargingTariff.Created, ChargingTariff.Id, Warnings)
-                                        : null;
+                var overallPeriod  = element.Restrictions is not null
+                                         ? ToDatexII(element.Restrictions, ChargingTariff.Created, ChargingTariff.Id, Warnings)
+                                         : null;
+
+                var byTime         = TimeBasedApplicabilityOf  (element.Restrictions, ChargingTariff.Id, Warnings);
+                var byEnergy       = EnergyBasedApplicabilityOf(element.Restrictions, ChargingTariff.Id, Warnings);
 
                 foreach (var priceComponent in element.PriceComponents)
                 {
@@ -676,8 +682,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                    Value:          new AmountOfMoney(price.Value.Price),
                                    TaxIncluded:    priceComponent.VAT.HasValue ? false : null,
                                    TaxRate:        priceComponent.VAT.HasValue ? Percentage.Parse(priceComponent.VAT.Value) : null,
-                                   OverallPeriod:    overallPeriod,
-                                   PriceGroupIndex:  priceGroup
+                                   OverallPeriod:             overallPeriod,
+                                   PriceGroupIndex:           priceGroup,
+                                   TimeBasedApplicability:    byTime,
+                                   EnergyBasedApplicability:  byEnergy
                                ));
 
                 }
@@ -894,7 +902,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                        AuthenticationModes:  AuthenticationModesOf(authentication),
                                        Services:             ServicesOf(Site),
                                        NUTSCodes:            NUTSCodesOf(Site),
-                                       Features:             FeaturesOf<POI.ChargingPoolFeature>(Site.Amenities, POI.ChargingPoolFeature.Illuminated, POI.ChargingPoolFeature.Roofed),
+                                       Features:             FeaturesOf<POI.ChargingPoolFeature>(Site.Amenities, POI.ChargingPoolFeature.Illuminated, POI.ChargingPoolFeature.Roofed,
+                                                                                                  POI.ChargingPoolFeature.IlluminatedParkingNearby, POI.ChargingPoolFeature.RoofedParkingNearby),
                                        LocationLanguages:    Site.EnergyInfrastructureStations.
                                                                  SelectMany(station => station.UserInterfaceLanguages).
                                                                  Distinct(),
@@ -1036,7 +1045,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                        point.Reservation.Value.ToString() is "optional" or "mandatory" or "partly")
                                           ? new[] { POI.ChargingStationFeature.Reservable }
                                           : []).
-                                     Concat(FeaturesOf<POI.ChargingStationFeature>(Station.Amenities, POI.ChargingStationFeature.Illuminated, POI.ChargingStationFeature.Roofed)),
+                                     Concat(FeaturesOf<POI.ChargingStationFeature>(Station.Amenities, POI.ChargingStationFeature.Illuminated, POI.ChargingStationFeature.Roofed,
+                                                                                   POI.ChargingStationFeature.IlluminatedParkingNearby, POI.ChargingStationFeature.RoofedParkingNearby)),
                        EUVehicleCategories:  ToPOI3(Station.ApplicableForVehicles),
                        // Only a total maximum power of its own: the sum of the charging points is what POI3 tells anyway,
                        // and more than that sum POI3 refuses.
@@ -1223,7 +1233,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 }
 
                 if (components.Count > 0)
-                    elements.Add(new POI.ChargingTariffElement(components, ToPOI3(group.First().OverallPeriod, Warnings)));
+                    elements.Add(new POI.ChargingTariffElement(components, RestrictionsOf(group.First(), Warnings)));
 
             }
 
@@ -1348,7 +1358,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// </summary>
         internal static readonly String[] PoolFeaturesDatexIITells = [
             "Illuminated",
-            "Roofed"
+            "Roofed",
+            "IlluminatedParkingNearby",
+            "RoofedParkingNearby"
         ];
 
         /// <summary>
@@ -1357,7 +1369,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         internal static readonly String[] StationFeaturesDatexIITells = [
             "Reservable",
             "Illuminated",
-            "Roofed"
+            "Roofed",
+            "IlluminatedParkingNearby",
+            "RoofedParkingNearby"
         ];
 
         /// <summary>
@@ -1390,22 +1404,29 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                    Distinct();
 
         /// <summary>
-        /// The amenities of something illuminated or roofed; none, when it is neither.
+        /// The amenities of something illuminated or roofed, or with illuminated or roofed parking for charging nearby;
+        /// none, when it is none of them. Only what is true is told.
         /// </summary>
         private static Amenities? AmenitiesOf(Boolean Illuminated,
-                                              Boolean Roofed)
+                                              Boolean Roofed,
+                                              Boolean IlluminatedParkingNearby,
+                                              Boolean RoofedParkingNearby)
 
-            => Illuminated || Roofed
-                   ? new Amenities(Illuminated: Illuminated ? true : null,
-                                   Roofed:      Roofed      ? true : null)
+            => Illuminated || Roofed || IlluminatedParkingNearby || RoofedParkingNearby
+                   ? new Amenities(Illuminated:                         Illuminated              ? true : null,
+                                   Roofed:                              Roofed                   ? true : null,
+                                   IlluminatedRechargingParkingNearby:  IlluminatedParkingNearby ? true : null,
+                                   RoofedRechargingParkingNearby:       RoofedParkingNearby      ? true : null)
                    : null;
 
         /// <summary>
-        /// The given illuminated and roofed features, as the given amenities tell them.
+        /// The given illuminated and roofed features, also of parking nearby, as the given amenities tell them.
         /// </summary>
         private static IEnumerable<TFeature> FeaturesOf<TFeature>(Amenities?  Amenities,
                                                                   TFeature    Illuminated,
-                                                                  TFeature    Roofed)
+                                                                  TFeature    Roofed,
+                                                                  TFeature    IlluminatedParkingNearby,
+                                                                  TFeature    RoofedParkingNearby)
         {
 
             var features = new List<TFeature>();
@@ -1415,6 +1436,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             if (Amenities?.Roofed == true)
                 features.Add(Roofed);
+
+            if (Amenities?.IlluminatedRechargingParkingNearby == true)
+                features.Add(IlluminatedParkingNearby);
+
+            if (Amenities?.RoofedRechargingParkingNearby == true)
+                features.Add(RoofedParkingNearby);
 
             return features;
 
@@ -1434,8 +1461,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         /// <summary>
         /// The dedicated parking spaces of the given charging station: the parking spaces of the roaming network naming
-        /// it, one entry for those of the same parking restrictions and EU vehicle categories, with their number.
-        /// Spaces for persons with disabilities are barrier free accessible.
+        /// it, one entry for those of the same parking restrictions, EU vehicle categories, length, width, clear height,
+        /// illumination and roof, with their number. Spaces for persons with disabilities are barrier free accessible;
+        /// a single space tells its location.
         /// </summary>
         private static IEnumerable<DedicatedParkingSpaces>? DedicatedParkingSpacesOf(POI.ChargingStation  ChargingStation,
                                                                                     POI.RoamingNetwork   RoamingNetwork)
@@ -1444,7 +1472,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             var groups = RoamingNetwork.ParkingSpaces.
                              Where  (space => space.ChargingStationIds.Contains(ChargingStation.Id)).
                              GroupBy(space => String.Join(",", space.ParkingRestrictions.Select(restriction => restriction.ToString())) + "|" +
-                                              String.Join(",", space.EUVehicleCategories.Select(category    => category.   ToString()))).
+                                              String.Join(",", space.EUVehicleCategories.Select(category    => category.   ToString())) + "|" +
+                                              $"{space.Length?.m}|{space.Width?.m}|{space.MaxVehicleHeight?.m}|{space.Illuminated}|{space.Roofed}").
                              OrderBy(group => group.Key, StringComparer.Ordinal).
                              ToArray();
 
@@ -1461,6 +1490,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 var restrictions  = spaces[0].ParkingRestrictions.Select(restriction => restriction.ToString()).ToArray();
                 var categories    = spaces[0].EUVehicleCategories.Select(category => EUVehicleCategory.Parse(category.ToString().ToLowerInvariant())).ToArray();
                 var evOnly        = restrictions.Contains("EV_ONLY", StringComparer.OrdinalIgnoreCase);
+                var first         = spaces[0];
+                var location      = spaces.Length == 1 ? first.GeoLocation : null;
 
                 dedicatedParkingSpaces.Add(new DedicatedParkingSpaces(
                                                Id:                     $"{ChargingStation.Id}*PARKING*{++number}",
@@ -1475,7 +1506,22 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                            : null,
                                                UserSpecific:           ParkingRestrictionUserTypes.
                                                                            Where (mapping => restrictions.Contains(mapping.Restriction, StringComparer.OrdinalIgnoreCase)).
-                                                                           Select(mapping => UserType.Parse(mapping.UserType))
+                                                                           Select(mapping => UserType.Parse(mapping.UserType)),
+                                               Dimension:              first.Length.HasValue || first.Width.HasValue || first.MaxVehicleHeight.HasValue
+                                                                           ? new Dimension(Length:  first.Length,
+                                                                                           Width:   first.Width,
+                                                                                           Height:  first.MaxVehicleHeight)
+                                                                           : null,
+                                               Amenities:              first.Illuminated.HasValue || first.Roofed.HasValue
+                                                                           ? new Amenities(Illuminated:  first.Illuminated,
+                                                                                           Roofed:       first.Roofed)
+                                                                           : null,
+                                               LocationReference:      location.HasValue
+                                                                           ? new PointLocation(
+                                                                                 PointByCoordinates:     new PointByCoordinates(ToDatexII(location.Value)),
+                                                                                 CoordinatesForDisplay:  ToDatexII(location.Value)
+                                                                             )
+                                                                           : null
                                            ));
 
             }
@@ -2040,7 +2086,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         /// <summary>
         /// The dates, times of day and weekdays of the given restrictions as an overall period: from the start date, else
-        /// from the creation of the tariff. Energy, power, current and duration restrictions have no counterpart.
+        /// from the creation of the tariff. Power and current restrictions have no counterpart; energy and duration
+        /// restrictions are the energy and time based applicability of the prices.
         /// </summary>
         private static OverallPeriod? ToDatexII(POI.ChargingTariffRestrictions  Restrictions,
                                                 DateTimeOffset                  Created,
@@ -2048,12 +2095,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                 ICollection<String>             Warnings)
         {
 
-            if (Restrictions.MinEnergy.  HasValue || Restrictions.MaxEnergy.  HasValue ||
-                Restrictions.MinPower.   HasValue || Restrictions.MaxPower.   HasValue ||
-                Restrictions.MinCurrent. HasValue || Restrictions.MaxCurrent. HasValue ||
-                Restrictions.MinDuration.HasValue || Restrictions.MaxDuration.HasValue)
+            if (Restrictions.MinPower.   HasValue || Restrictions.MaxPower.   HasValue ||
+                Restrictions.MinCurrent. HasValue || Restrictions.MaxCurrent. HasValue)
             {
-                Warnings.Add($"The energy, power, current and duration restrictions of the charging tariff '{TariffId}' have no counterpart and are left out!");
+                Warnings.Add($"The power and current restrictions of the charging tariff '{TariffId}' have no counterpart and are left out!");
             }
 
             var timeOfDay  = Restrictions.StartTime.HasValue || Restrictions.EndTime.HasValue
@@ -2088,31 +2133,91 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         }
 
         /// <summary>
-        /// The restrictions of the given overall period of a price: its start as the start date, its end as the end
-        /// date, and the times of day and weekdays of its first valid period.
+        /// The restrictions of the given price: the start of its overall period as the start date, its end as the end
+        /// date, the times of day and weekdays of its first valid period, and its time and energy based applicability as
+        /// the minimum and maximum duration (minutes → s) and energy (kWh → Wh).
         /// </summary>
-        private static POI.ChargingTariffRestrictions? ToPOI3(OverallPeriod?       OverallPeriod,
-                                                              ICollection<String>  Warnings)
+        private static POI.ChargingTariffRestrictions? RestrictionsOf(EnergyPrice          Price,
+                                                                      ICollection<String>  Warnings)
         {
 
-            if (OverallPeriod is null)
+            var overallPeriod  = Price.OverallPeriod;
+            var byTime         = Price.TimeBasedApplicability;
+            var byEnergy       = Price.EnergyBasedApplicability;
+
+            if (overallPeriod is null && byTime is null && byEnergy is null)
                 return null;
 
-            var period     = OverallPeriod.ValidPeriod.FirstOrDefault();
+            var period     = overallPeriod?.ValidPeriod.FirstOrDefault();
             var timeOfDay  = period?.RecurringTimePeriodOfDay.FirstOrDefault();
 
-            if (OverallPeriod.ValidPeriod.Count() > 1 || OverallPeriod.ExceptionPeriod.Any() || period?.RecurringTimePeriodOfDay.Count() > 1)
+            if (overallPeriod?.ValidPeriod.Count() > 1 || overallPeriod?.ExceptionPeriod.Any() == true || period?.RecurringTimePeriodOfDay.Count() > 1)
                 Warnings.Add("Only the first valid period and time of day of a price are taken!");
 
             return new POI.ChargingTariffRestrictions(
-                       StartTime:   timeOfDay is not null ? new TimeOnly(timeOfDay.StartTimeOfPeriod.Hour, timeOfDay.StartTimeOfPeriod.Minute) : null,
-                       EndTime:     timeOfDay is not null ? new TimeOnly(timeOfDay.EndTimeOfPeriod.  Hour, timeOfDay.EndTimeOfPeriod.  Minute) : null,
-                       StartDate:   DateOnly.FromDateTime(OverallPeriod.OverallStartTime.UtcDateTime),
-                       EndDate:     OverallPeriod.OverallEndTime.HasValue
-                                        ? DateOnly.FromDateTime(OverallPeriod.OverallEndTime.Value.UtcDateTime)
-                                        : null,
-                       DaysOfWeek:  period?.RecurringDayWeekMonthPeriod.SelectMany(dayWeekMonth => dayWeekMonth.ApplicableDays).Select(ToDayOfWeek)
+                       StartTime:    timeOfDay is not null ? new TimeOnly(timeOfDay.StartTimeOfPeriod.Hour, timeOfDay.StartTimeOfPeriod.Minute) : null,
+                       EndTime:      timeOfDay is not null ? new TimeOnly(timeOfDay.EndTimeOfPeriod.  Hour, timeOfDay.EndTimeOfPeriod.  Minute) : null,
+                       StartDate:    overallPeriod is not null
+                                         ? DateOnly.FromDateTime(overallPeriod.OverallStartTime.UtcDateTime)
+                                         : null,
+                       EndDate:      overallPeriod?.OverallEndTime.HasValue == true
+                                         ? DateOnly.FromDateTime(overallPeriod.OverallEndTime.Value.UtcDateTime)
+                                         : null,
+                       MinEnergy:    byEnergy?.FromKWh  * 1000m,
+                       MaxEnergy:    byEnergy?.ToKWh    * 1000m,
+                       MinDuration:  byTime?.  FromMinute * 60m,
+                       MaxDuration:  byTime?.  ToMinute   * 60m,
+                       DaysOfWeek:   period?.RecurringDayWeekMonthPeriod.SelectMany(dayWeekMonth => dayWeekMonth.ApplicableDays).Select(ToDayOfWeek)
                    );
+
+        }
+
+        /// <summary>
+        /// The time based applicability of prices with the given restrictions: their minimum and maximum duration, in
+        /// whole minutes; one of no whole minutes is rounded, and a warning tells.
+        /// </summary>
+        private static TimeBasedApplicability? TimeBasedApplicabilityOf(POI.ChargingTariffRestrictions?  Restrictions,
+                                                                        POI.ChargingTariff_Id             TariffId,
+                                                                        ICollection<String>               Warnings)
+
+            => Restrictions?.MinDuration.HasValue == true || Restrictions?.MaxDuration.HasValue == true
+                   ? new TimeBasedApplicability(FromMinute:  WholeUnits(Restrictions.MinDuration, 60,   "minimum duration", "minute", TariffId, Warnings),
+                                                ToMinute:    WholeUnits(Restrictions.MaxDuration, 60,   "maximum duration", "minute", TariffId, Warnings))
+                   : null;
+
+        /// <summary>
+        /// The energy based applicability of prices with the given restrictions: their minimum and maximum energy, in
+        /// whole kWh; one of no whole kWh is rounded, and a warning tells.
+        /// </summary>
+        private static EnergyBasedApplicability? EnergyBasedApplicabilityOf(POI.ChargingTariffRestrictions?  Restrictions,
+                                                                            POI.ChargingTariff_Id             TariffId,
+                                                                            ICollection<String>               Warnings)
+
+            => Restrictions?.MinEnergy.HasValue == true || Restrictions?.MaxEnergy.HasValue == true
+                   ? new EnergyBasedApplicability(FromKWh:  WholeUnits(Restrictions.MinEnergy, 1000, "minimum energy", "kWh", TariffId, Warnings),
+                                                  ToKWh:    WholeUnits(Restrictions.MaxEnergy, 1000, "maximum energy", "kWh", TariffId, Warnings))
+                   : null;
+
+        /// <summary>
+        /// The given value in whole units of the given size, rounded; a warning tells when it had to be rounded.
+        /// </summary>
+        private static UInt32? WholeUnits(Decimal?               Value,
+                                          Decimal                UnitSize,
+                                          String                 What,
+                                          String                 Unit,
+                                          POI.ChargingTariff_Id  TariffId,
+                                          ICollection<String>    Warnings)
+        {
+
+            if (!Value.HasValue)
+                return null;
+
+            var units = Value.Value / UnitSize;
+
+            if (units != Decimal.Truncate(units))
+                Warnings.Add($"The {What} of a restriction of the charging tariff '{TariffId}' is no whole {Unit}, and is rounded!");
+
+            return (UInt32) Math.Min(Math.Round(units, MidpointRounding.AwayFromZero), UInt32.MaxValue);
 
         }
 
@@ -2141,7 +2246,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             foreach (var price in Prices)
             {
 
-                var group = groups.FirstOrDefault(group => SamePeriod(group[0].OverallPeriod, price.OverallPeriod));
+                var group = groups.FirstOrDefault(group => SamePeriod(group[0].OverallPeriod, price.OverallPeriod) &&
+                                                           group[0].TimeBasedApplicability?.  FromMinute == price.TimeBasedApplicability?.  FromMinute &&
+                                                           group[0].TimeBasedApplicability?.  ToMinute   == price.TimeBasedApplicability?.  ToMinute   &&
+                                                           group[0].EnergyBasedApplicability?.FromKWh    == price.EnergyBasedApplicability?.FromKWh    &&
+                                                           group[0].EnergyBasedApplicability?.ToKWh      == price.EnergyBasedApplicability?.ToKWh);
 
                 if (group is null)
                     groups.Add([ price ]);
