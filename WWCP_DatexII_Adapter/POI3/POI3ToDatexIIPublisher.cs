@@ -19,6 +19,7 @@
 
 using System.Xml.Linq;
 using System.Threading.Channels;
+using System.Collections.Concurrent;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
@@ -82,6 +83,17 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         private          XElement?            publishedSites;
         private          Task?                worker;
 
+        /// <summary>
+        /// When a status delta of an EVSE was published last, and the EVSEs whose energy status delta is planned.
+        /// </summary>
+        private readonly ConcurrentDictionary<POI.EVSE_Id, DateTimeOffset>  lastDeltas            = new ();
+        private readonly ConcurrentDictionary<POI.EVSE_Id, Byte>            plannedEnergyDeltas   = new ();
+
+        /// <summary>
+        /// The default least time between two status deltas of an EVSE for a changed energy status: one minute.
+        /// </summary>
+        public static readonly TimeSpan DefaultEnergyStatusDeltaInterval = TimeSpan.FromMinutes(1);
+
         #endregion
 
         #region Properties
@@ -115,6 +127,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// Tells the station identification of the Bundesnetzagentur of a charging station.
         /// </summary>
         public StationIdBNetzADelegate?                        StationIdBNetzA             { get; }
+
+        /// <summary>
+        /// The least time between two status deltas of an EVSE for a changed energy status: its charging power,
+        /// voltage and remaining charging time change often, e.g. every few seconds while charging. A change of its
+        /// status is published at once, and with it the energy status as it is then. Zero publishes every change.
+        /// </summary>
+        public TimeSpan                                        EnergyStatusDeltaInterval   { get; }
 
         /// <summary>
         /// The current table publication, once started.
@@ -163,13 +182,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// <param name="TableId">The identification of the table; the roaming network identification by default.</param>
         /// <param name="OperatorIds">The operators to publish; all, unless given.</param>
         /// <param name="StationIdBNetzA">Tells the station identification of the Bundesnetzagentur of a charging station.</param>
+        /// <param name="EnergyStatusDeltaInterval">The least time between two status deltas of an EVSE for a changed energy status; one minute by default, zero for every change.</param>
         public POI3ToDatexIIPublisher(POI.RoamingNetworkHistory                      History,
                                       InternationalIdentifier                        PublicationCreator,
-                                      Languages?                                     Language          = null,
-                                      String?                                        TableId           = null,
-                                      IEnumerable<POI.ChargingStationOperator_Id>?   OperatorIds       = null,
-                                      StationIdBNetzADelegate?                       StationIdBNetzA   = null)
+                                      Languages?                                     Language                    = null,
+                                      String?                                        TableId                     = null,
+                                      IEnumerable<POI.ChargingStationOperator_Id>?   OperatorIds                 = null,
+                                      StationIdBNetzADelegate?                       StationIdBNetzA             = null,
+                                      TimeSpan?                                      EnergyStatusDeltaInterval   = null)
         {
+
+            if (EnergyStatusDeltaInterval < TimeSpan.Zero)
+                throw new ArgumentException("The energy status delta interval must not be negative!", nameof(EnergyStatusDeltaInterval));
 
             this.History             = History;
             this.PublicationCreator  = PublicationCreator;
@@ -177,6 +201,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             this.TableId             = TableId  ?? History.RoamingNetworkId.ToString();
             this.OperatorIds         = OperatorIds?.ToHashSet();
             this.StationIdBNetzA     = StationIdBNetzA;
+            this.EnergyStatusDeltaInterval = EnergyStatusDeltaInterval ?? DefaultEnergyStatusDeltaInterval;
 
         }
 
@@ -248,13 +273,48 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         // Raised while the status schedule of the EVSE is locked: only queued here.
         private void StatusUpdated(POI.POIStatusUpdate StatusUpdate)
         {
-            if (StatusUpdate.EntityType == nameof(POI.EVSE) &&
-                StatusUpdate.Kind is POI.POIRuntimeStatusKind.Status or POI.POIRuntimeStatusKind.AdminStatus &&
-                POI.EVSE_Id.TryParse(StatusUpdate.EntityId) is POI.EVSE_Id evseId &&
-                (OperatorIds is null || OperatorIds.Contains(evseId.OperatorId)))
+
+            if (StatusUpdate.EntityType != nameof(POI.EVSE) ||
+                POI.EVSE_Id.TryParse(StatusUpdate.EntityId) is not POI.EVSE_Id evseId ||
+                (OperatorIds is not null && !OperatorIds.Contains(evseId.OperatorId)))
             {
-                work.Writer.TryWrite(() => PublishStatusAsync(evseId));
+                return;
             }
+
+            if (StatusUpdate.Kind is POI.POIRuntimeStatusKind.Status or POI.POIRuntimeStatusKind.AdminStatus)
+                work.Writer.TryWrite(() => PublishStatusAsync(evseId));
+
+            else if (StatusUpdate.Kind == POI.POIRuntimeStatusKind.EnergyStatus)
+                PlanEnergyStatusDelta(evseId);
+
+        }
+
+        /// <summary>
+        /// Plan a status delta of the given EVSE for its changed energy status: at once, when its last delta is at least
+        /// the energy status delta interval ago, else when it will be. One planned delta publishes the energy status as
+        /// it is then, so further changes until then need none of their own.
+        /// </summary>
+        private void PlanEnergyStatusDelta(POI.EVSE_Id EVSEId)
+        {
+
+            if (!plannedEnergyDeltas.TryAdd(EVSEId, 0))
+                return;
+
+            var wait = lastDeltas.TryGetValue(EVSEId, out var lastDelta)
+                           ? lastDelta + EnergyStatusDeltaInterval - Timestamp.Now
+                           : TimeSpan.Zero;
+
+            void Publish()
+                => work.Writer.TryWrite(() => {
+                       plannedEnergyDeltas.TryRemove(EVSEId, out _);
+                       return PublishStatusAsync(EVSEId);
+                   });
+
+            if (wait <= TimeSpan.Zero)
+                Publish();
+            else
+                _ = Task.Delay(wait).ContinueWith(_ => Publish(), TaskScheduler.Default);
+
         }
 
         #endregion
@@ -357,7 +417,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                             AsDelta();
 
             if (delta.EnergyInfrastructureSiteStatus.Any())
+            {
+                lastDeltas[EVSEId] = Timestamp.Now;
                 await Raise(OnStatusPublication, handler => handler(this, delta, true));
+            }
 
         }
 

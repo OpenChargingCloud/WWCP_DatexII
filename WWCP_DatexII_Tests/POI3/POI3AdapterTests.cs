@@ -728,6 +728,82 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         #endregion
 
+        #region TheEnergyStatusIsPublishedThrottled()
+
+        /// <summary>
+        /// The energy status of an EVSE is the current charging power, voltage and remaining charging time of its
+        /// charging point. A change publishes a status delta at once; further changes within the energy status delta
+        /// interval one more when it is over, with the energy status as it is then.
+        /// </summary>
+        [Test]
+        public async Task TheEnergyStatusIsPublishedThrottled()
+        {
+
+            var history   = POI.RoamingNetworkHistory.Start(ANetwork());
+            var deltas    = new List<EnergyInfrastructureStatusPublication>();
+
+            await using var publisher = new POI3ToDatexIIPublisher(history, Creator, Languages.de,
+                                                                   StationIdBNetzA:            station => "BNetzA-4711",
+                                                                   EnergyStatusDeltaInterval:  TimeSpan.FromSeconds(1));
+
+            publisher.OnStatusPublication += (sender, publication, isDelta) => { if (isDelta) lock (deltas) deltas.Add(publication); return Task.CompletedTask; };
+
+            await publisher.StartAsync();
+
+            static String Energy(Int32 Used, Int32 Volt, Int32 Minutes)
+
+                => POI.POIEnergyStatus.ToText(new POI.EnergyInfo(Watt.FromW(Used),
+                                                                 Watt.FromW(22000),
+                                                                 CurrentVoltage:         org.GraphDefined.Vanaheimr.Illias.Volt.FromV(Volt),
+                                                                 RemainingChargingTime:  TimeSpan.FromMinutes(Minutes)));
+
+            ElectricChargingPointStatus PointOf(EnergyInfrastructureStatusPublication Delta)
+
+                => (ElectricChargingPointStatus) Delta.EnergyInfrastructureSiteStatus.Single().EnergyInfrastructureStationStatus.Single().RefillPointStatus.Single();
+
+            history.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.EnergyStatus, nameof(POI.EVSE), E1.ToString(), Energy(11000, 400, 30), T0.AddMinutes(1), out _, out _);
+
+            Assert.That(await Eventually(() => { lock (deltas) return deltas.Count == 1; }), Is.True, "The first energy status was not published at once.");
+
+            history.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.EnergyStatus, nameof(POI.EVSE), E1.ToString(), Energy(7400,  400, 40), T0.AddMinutes(2), out _, out _);
+            history.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.EnergyStatus, nameof(POI.EVSE), E1.ToString(), Energy(3700,  230, 50), T0.AddMinutes(3), out _, out _);
+
+            lock (deltas)
+                Assert.That(deltas, Has.Count.EqualTo(1), "Within the interval, a changed energy status must wait.");
+
+            Assert.That(await Eventually(() => { lock (deltas) return deltas.Count == 2; }), Is.True, "The changed energy status was not published after the interval.");
+
+            await Task.Delay(1500);
+
+            lock (deltas)
+            {
+
+                Assert.That(deltas, Has.Count.EqualTo(2), "Two changes within the interval need one delta, not two.");
+
+                foreach (var delta in deltas)
+                    AssertValidStatus(delta);
+
+                Assert.Multiple(() => {
+                    Assert.That(PointOf(deltas[0]).CurrentChargingPower?.Value,    Is.EqualTo(11000));
+                    Assert.That(PointOf(deltas[0]).CurrentVoltage?.Value,          Is.EqualTo(400));
+                    Assert.That(PointOf(deltas[0]).RemainingChargingTime,          Is.EqualTo(TimeSpan.FromMinutes(30)));
+                    Assert.That(PointOf(deltas[1]).CurrentChargingPower?.Value,    Is.EqualTo(3700), "The delta after the interval has the energy status as it is then.");
+                    Assert.That(PointOf(deltas[1]).CurrentVoltage?.Value,          Is.EqualTo(230));
+                    Assert.That(PointOf(deltas[1]).RemainingChargingTime,          Is.EqualTo(TimeSpan.FromMinutes(50)));
+                    Assert.That(PointOf(publisher.CurrentStatusPublication!).CurrentChargingPower?.Value, Is.EqualTo(3700));
+                });
+
+            }
+
+            // A change of the status is published at once, also within the interval.
+            history.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.Status, nameof(POI.EVSE), E1.ToString(), "charging", T0.AddMinutes(4), out _, out _);
+
+            Assert.That(await Eventually(() => { lock (deltas) return deltas.Count == 3; }), Is.True, "The changed status was not published at once.");
+
+        }
+
+        #endregion
+
         #region TheImporterCommitsWhatItReads()
 
         [Test]

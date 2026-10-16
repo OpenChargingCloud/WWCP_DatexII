@@ -824,10 +824,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             => ChargingStation.EVSEs.
                    Where (evse => EVSEIds is null || EVSEIds.Contains(evse.Id)).
                    Select(evse => new ElectricChargingPointStatus(
-                                      Status:           ToRefillPointStatus(evse.Status.Value, evse.AdminStatus.Value),
-                                      Reference:        new FacilityObjectVersionedReference(evse.Id.ToString(), VersionOf(evse.LastChangeDate)),
-                                      LastUpdated:      new[] { evse.Status.Timestamp, evse.AdminStatus.Timestamp }.Max(),
-                                      OperationStatus:  ToOperationStatus(evse.AdminStatus.Value.ToString())
+                                      Status:                 ToRefillPointStatus(evse.Status.Value, evse.AdminStatus.Value),
+                                      Reference:              new FacilityObjectVersionedReference(evse.Id.ToString(), VersionOf(evse.LastChangeDate)),
+                                      LastUpdated:            new[] { evse.Status.Timestamp, evse.AdminStatus.Timestamp, evse.EnergyStatus?.Timestamp ?? DateTimeOffset.MinValue }.Max(),
+                                      OperationStatus:        ToOperationStatus(evse.AdminStatus.Value.ToString()),
+                                      // The energy status: the power used now, the voltage and the remaining charging time;
+                                      // the power available to a newly arriving vehicle has no counterpart.
+                                      CurrentChargingPower:   evse.EnergyStatus?.Value.Used,
+                                      CurrentVoltage:         evse.EnergyStatus?.Value.CurrentVoltage,
+                                      RemainingChargingTime:  evse.EnergyStatus?.Value.RemainingChargingTime
                                   )).
                    ToArray();
 

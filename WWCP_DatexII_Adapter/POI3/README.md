@@ -53,6 +53,11 @@ await importer.ImportAsync(table!);
 - **On every status or admin status change of an EVSE:** the current status publication is renewed, and a delta with
   only that EVSE is published. The delta is marked as one (`IsDelta`), so its Mobilithek JSON is a `deltaPush`, and full
   status publications are a `snapshotPush`.
+- **On every energy status change of an EVSE:** the same, but throttled: its charging power, voltage and remaining
+  charging time change often while charging. A change is published at once when the last delta of the EVSE is at least
+  `EnergyStatusDeltaInterval` ago (a constructor parameter, one minute by default, zero for every change); otherwise
+  one delta follows when the interval is over, with the energy status as it is then. A status change is published at
+  once anyway, with the energy status as it is.
 - **Serving and pushing:** the publisher keeps the current publications and raises events. Serving them, e.g. over
   HTTP for a pull by the national access point, and pushing them is up to the subscribers.
 
@@ -198,6 +203,7 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | admin status | `operationStatus`: operational → `inOperation`, planned/inDeployment/outOfService/blocked/deleted → `notInOperation` (also of the site, from the pool's admin status) |
 | — | station `isAvailable`: any of its charging points `available` (full publications only) |
 | entity versions | `reference` `id` and `version`, the same as in the table |
+| EVSE energy status `used`, `currentVoltage`, `remainingChargingTime` | `currentChargingPower`, `currentVoltage`, `remainingChargingTime` of its `refillPointStatus`; its timestamp also counts for `lastUpdated`. `available` (the power a newly arriving vehicle would get) and `storedEnergy` have no counterpart. Not imported: POI3 is where these values come from. |
 | full status / one changed EVSE | `IsDelta` false / true: `snapshotPush` / `deltaPush` in the Mobilithek message container |
 
 ### What the import keeps
