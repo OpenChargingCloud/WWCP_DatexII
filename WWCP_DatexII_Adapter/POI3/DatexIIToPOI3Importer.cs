@@ -404,6 +404,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                      refillPointStatus.Status.ToPOI3Status(),
                                      refillPointStatus.LastUpdated ?? StatusPublication.PublicationTime);
 
+                        ImportPlannedStatus(evseId.Value,
+                                            refillPointStatus);
+
                     }
                 }
             }
@@ -437,6 +440,56 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             if (result == POI.POIStatusUpdateResult.Refused)
                 RaiseError($"The status of the EVSE '{EVSEId}' can not be taken: {errorResponse}", []);
+
+        }
+
+        /// <summary>
+        /// Plan the planned statuses of the given refill point status, e.g. reservations, as statuses of the EVSE from
+        /// their start. When one ends without another starting then, the EVSE is planned to have its current status
+        /// again. Planned statuses already started are not taken: the current status tells.
+        /// </summary>
+        private void ImportPlannedStatus(POI.EVSE_Id        EVSEId,
+                                         RefillPointStatus   RefillPointStatus)
+        {
+
+            var now      = Timestamp.Now;
+            var planned  = RefillPointStatus.PlannedRefillPointStatus.
+                               Where  (status => status.OverallPeriod.OverallStartTime > now).
+                               OrderBy(status => status.OverallPeriod.OverallStartTime).
+                               ToArray();
+
+            foreach (var status in planned)
+            {
+
+                Plan(EVSEId, status.Status.ToPOI3Status(), status.OverallPeriod.OverallStartTime);
+
+                if (status.OverallPeriod.OverallEndTime is DateTimeOffset end &&
+                    end > status.OverallPeriod.OverallStartTime &&
+                    !planned.Any(next => next.OverallPeriod.OverallStartTime == end))
+                {
+                    Plan(EVSEId, RefillPointStatus.Status.ToPOI3Status(), end);
+                }
+
+            }
+
+        }
+
+        private void Plan(POI.EVSE_Id         EVSEId,
+                          POI.EVSEStatusType  Status,
+                          DateTimeOffset      At)
+        {
+
+            var result = History.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.Status,
+                                                         nameof(POI.EVSE),
+                                                         EVSEId.ToString(),
+                                                         Status.ToString(),
+                                                         At,
+                                                         out _,
+                                                         out var errorResponse,
+                                                         DataSource: "DATEX II");
+
+            if (result == POI.POIStatusUpdateResult.Refused)
+                RaiseError($"The planned status of the EVSE '{EVSEId}' can not be taken: {errorResponse}", []);
 
         }
 

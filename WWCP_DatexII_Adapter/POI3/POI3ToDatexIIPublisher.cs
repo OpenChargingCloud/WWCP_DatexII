@@ -219,8 +219,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             if (worker is not null)
                 throw new InvalidOperationException("The publisher has been started already!");
 
-            History.OnCommitAnnouncement          += Announced;
-            History.RuntimeStatus.OnStatusUpdate  += StatusUpdated;
+            History.OnCommitAnnouncement           += Announced;
+            History.RuntimeStatus.OnStatusUpdate   += StatusUpdated;
+            History.RuntimeStatus.OnStatusPlanned  += StatusPlanned;
 
             worker = Task.Run(WorkAsync);
 
@@ -251,8 +252,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         public async ValueTask DisposeAsync()
         {
 
-            History.OnCommitAnnouncement          -= Announced;
-            History.RuntimeStatus.OnStatusUpdate  -= StatusUpdated;
+            History.OnCommitAnnouncement           -= Announced;
+            History.RuntimeStatus.OnStatusUpdate   -= StatusUpdated;
+            History.RuntimeStatus.OnStatusPlanned  -= StatusPlanned;
 
             work.Writer.TryComplete();
 
@@ -287,6 +289,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             else if (StatusUpdate.Kind == POI.POIRuntimeStatusKind.EnergyStatus)
                 PlanEnergyStatusDelta(evseId);
 
+        }
+
+        // A planned status or admin status of an EVSE, e.g. a reservation: its planned statuses changed.
+        private void StatusPlanned(POI.POIStatusUpdate StatusUpdate)
+        {
+            if (StatusUpdate.EntityType == nameof(POI.EVSE) &&
+                StatusUpdate.Kind is POI.POIRuntimeStatusKind.Status or POI.POIRuntimeStatusKind.AdminStatus &&
+                POI.EVSE_Id.TryParse(StatusUpdate.EntityId) is POI.EVSE_Id evseId &&
+                (OperatorIds is null || OperatorIds.Contains(evseId.OperatorId)))
+            {
+                work.Writer.TryWrite(() => PublishStatusAsync(evseId));
+            }
         }
 
         /// <summary>

@@ -986,6 +986,87 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         #endregion
 
+        #region PlannedStatusesMapBothWays()
+
+        /// <summary>
+        /// The future entries of the status and admin status schedules of an EVSE, e.g. a reservation and an announced
+        /// maintenance, are its planned refill point statuses, each until the next one. Planning one publishes a delta at
+        /// once; importing them plans them again, as statuses of the EVSE.
+        /// </summary>
+        [Test]
+        public async Task PlannedStatusesMapBothWays()
+        {
+
+            var history   = POI.RoamingNetworkHistory.Start(ANetwork());
+            var deltas    = new List<EnergyInfrastructureStatusPublication>();
+
+            await using var publisher = new POI3ToDatexIIPublisher(history, Creator, Languages.de, StationIdBNetzA: station => "BNetzA-4711");
+
+            publisher.OnStatusPublication += (sender, publication, isDelta) => { if (isDelta) lock (deltas) deltas.Add(publication); return Task.CompletedTask; };
+
+            await publisher.StartAsync();
+
+            var now        = Timestamp.Now;
+            var reserved   = now.AddHours(1);
+            var free       = now.AddHours(2);
+            var service    = now.AddHours(3);
+
+            Assert.Multiple(() => {
+                Assert.That(history.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.Status,      nameof(POI.EVSE), E1.ToString(), "reserved",     reserved, out _, out _), Is.EqualTo(POI.POIStatusUpdateResult.Scheduled));
+                Assert.That(history.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.Status,      nameof(POI.EVSE), E1.ToString(), "available",    free,     out _, out _), Is.EqualTo(POI.POIStatusUpdateResult.Scheduled));
+                Assert.That(history.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.AdminStatus, nameof(POI.EVSE), E1.ToString(), "outOfService", service,  out _, out _), Is.EqualTo(POI.POIStatusUpdateResult.Scheduled));
+            });
+
+            // Planning publishes a delta at once.
+            Assert.That(await Eventually(() => { lock (deltas) return deltas.Count == 3; }), Is.True, "The planned statuses were not published.");
+
+            var evse       = history.Head.RoamingNetwork.GetChargingStationOperatorById(GEF)!.EVSEs.Single();
+            var planned    = POI3Mapper.PlannedStatusesOf(evse, Timestamp.Now).ToArray();
+
+            static Int64 Seconds(DateTimeOffset? Timestamp)
+                => Timestamp?.ToUnixTimeSeconds() ?? 0;
+
+            Assert.Multiple(() => {
+                Assert.That(planned.Select(status => status.Status.ToString()),                          Is.EqualTo(new[] { "reserved", "available", "inoperative" }));
+                Assert.That(planned.Select(status => Seconds(status.OverallPeriod.OverallStartTime)),    Is.EqualTo(new[] { Seconds(reserved), Seconds(free),    Seconds(service) }));
+                Assert.That(planned.Select(status => Seconds(status.OverallPeriod.OverallEndTime)),      Is.EqualTo(new[] { Seconds(free),     Seconds(service), 0L }));
+                Assert.That(evse.Status.Value,                                                           Is.EqualTo(POI.EVSEStatusType.Available), "Planned is not current.");
+            });
+
+            EnergyInfrastructureStatusPublication delta;
+            lock (deltas)
+                delta = deltas.Last();
+
+            var point      = (ElectricChargingPointStatus) delta.EnergyInfrastructureSiteStatus.Single().EnergyInfrastructureStationStatus.Single().RefillPointStatus.Single();
+
+            Assert.That(point.PlannedRefillPointStatus.Select(status => status.Status.ToString()),       Is.EqualTo(new[] { "reserved", "available", "inoperative" }));
+
+            // Imported elsewhere: planned again, as statuses of the EVSE.
+            var other      = POI.RoamingNetworkHistory.Start(ANetwork());
+
+            await using var importer = new DatexIIToPOI3Importer(other, changeSet => changeSet.SignedByAll(other.Head.RoamingNetwork));
+
+            var errors     = new List<String>();
+            importer.OnError += (sender, description, warnings) => { lock (errors) errors.Add(description + " " + String.Join(" ", warnings)); };
+
+            await importer.ImportAsync(AssertValidStatus(publisher.CurrentStatusPublication!));
+
+            var otherEVSE  = other.Head.RoamingNetwork.GetChargingStationOperatorById(GEF)!.EVSEs.Single();
+            var schedule   = otherEVSE.StatusSchedule(timestamp => timestamp > Timestamp.Now).OrderBy(status => status.Timestamp).ToArray();
+
+            lock (errors)
+                Assert.That(errors, Is.Empty);
+
+            Assert.Multiple(() => {
+                Assert.That(schedule.Select(status => status.Value.ToString()),   Is.EqualTo(new[] { "reserved", "available", "inoperative" }).IgnoreCase);
+                Assert.That(schedule.Select(status => Seconds(status.Timestamp)), Is.EqualTo(new[] { Seconds(reserved), Seconds(free), Seconds(service) }));
+                Assert.That(otherEVSE.Status.Value,                              Is.EqualTo(POI.EVSEStatusType.Available));
+            });
+
+        }
+
+        #endregion
+
         #region TheImporterLeavesOutRefillPointsThatAreNoChargingPoints()
 
         /// <summary>

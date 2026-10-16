@@ -833,9 +833,64 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                       // the power available to a newly arriving vehicle has no counterpart.
                                       CurrentChargingPower:   evse.EnergyStatus?.Value.Used,
                                       CurrentVoltage:         evse.EnergyStatus?.Value.CurrentVoltage,
-                                      RemainingChargingTime:  evse.EnergyStatus?.Value.RemainingChargingTime
+                                      RemainingChargingTime:  evse.EnergyStatus?.Value.RemainingChargingTime,
+                                      // Reservations, announced maintenance and the like.
+                                      PlannedRefillPointStatus: PlannedStatusesOf(evse, Timestamp.Now)
                                   )).
                    ToArray();
+
+        #endregion
+
+
+        #region PlannedStatusesOf(EVSE, Now)
+
+        /// <summary>
+        /// The planned statuses of the given EVSE: from every future entry of its status and admin status schedules that
+        /// changes its refill point status, until the next such change, the last one without an end.
+        /// </summary>
+        public static IEnumerable<PlannedRefillPointStatus> PlannedStatusesOf(POI.EVSE        EVSE,
+                                                                              DateTimeOffset  Now)
+        {
+
+            var statuses       = EVSE.StatusSchedule().     OrderBy(status => status.Timestamp).ToArray();
+            var adminStatuses  = EVSE.AdminStatusSchedule().OrderBy(status => status.Timestamp).ToArray();
+
+            RefillPointStatusEnum StatusAt(DateTimeOffset Timestamp)
+
+                => ToRefillPointStatus(statuses.     LastOrDefault(status => status.Timestamp <= Timestamp, EVSE.Status).     Value,
+                                       adminStatuses.LastOrDefault(status => status.Timestamp <= Timestamp, EVSE.AdminStatus).Value);
+
+            var changes        = statuses.     Select(status => status.Timestamp).
+                                     Concat(adminStatuses.Select(status => status.Timestamp)).
+                                     Where (timestamp => timestamp > Now).
+                                     Distinct().
+                                     Order().
+                                     Select(timestamp => (Timestamp: timestamp, Status: StatusAt(timestamp))).
+                                     ToList();
+
+            // Only what changes the refill point status, starting from the current one.
+            var planned        = new List<(DateTimeOffset Start, RefillPointStatusEnum Status)>();
+            var previous       = StatusAt(Now);
+
+            foreach (var change in changes)
+            {
+                if (change.Status != previous)
+                {
+                    planned.Add((change.Timestamp, change.Status));
+                    previous = change.Status;
+                }
+            }
+
+            return planned.Select((status, index) => new PlannedRefillPointStatus(
+                                                         status.Status,
+                                                         new OverallPeriod(status.Start,
+                                                                           index + 1 < planned.Count
+                                                                               ? planned[index + 1].Start
+                                                                               : null)
+                                                     )).
+                           ToArray();
+
+        }
 
         #endregion
 

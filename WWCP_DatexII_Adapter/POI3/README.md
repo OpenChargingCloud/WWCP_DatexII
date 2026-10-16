@@ -53,6 +53,9 @@ await importer.ImportAsync(table!);
 - **On every status or admin status change of an EVSE:** the current status publication is renewed, and a delta with
   only that EVSE is published. The delta is marked as one (`IsDelta`), so its Mobilithek JSON is a `deltaPush`, and full
   status publications are a `snapshotPush`.
+- **On every planned status or admin status of an EVSE,** e.g. a reservation or an announced maintenance: a delta at
+  once, with its planned statuses (POI3 `OnStatusPlanned`). When the planned status is due, its change is published as
+  any other.
 - **On every energy status change of an EVSE:** the same, but throttled: its charging power, voltage and remaining
   charging time change often while charging. A change is published at once when the last delta of the EVSE is at least
   `EnergyStatusDeltaInterval` ago (a constructor parameter, one minute by default, zero for every change); otherwise
@@ -75,7 +78,9 @@ await importer.ImportAsync(table!);
   owns the data.
 - **Status:** the status of a refill point goes into the runtime status of its EVSE, with `DataSource` "DATEX II". The
   refill points of the last imported table tell which EVSE a reference means; a reference that is itself an EVSE
-  identification works without a table.
+  identification works without a table. Its planned statuses that have not started yet are planned as statuses of the
+  EVSE from their start; when one ends without another starting then, the EVSE is planned to have its current status
+  again.
 - **Other refill points:** diesel, petrol and alternative fuels refill points have no POI3 counterpart. They are left out
   with a warning ("imported partly"), and their statuses are skipped.
 - **Operators:** they must already be in the roaming network. Adding them is up to the roaming network operator.
@@ -208,6 +213,7 @@ charging stations and of their pools.
 | admin status | `operationStatus`: operational → `inOperation`, planned/inDeployment/outOfService/blocked/deleted → `notInOperation` (also of the site, from the pool's admin status) |
 | — | station `isAvailable`: any of its charging points `available` (full publications only) |
 | entity versions | `reference` `id` and `version`, the same as in the table |
+| future entries of the EVSE status and admin status schedules | `plannedRefillPointStatus`: from every future entry that changes the refill point status (as the current one: admin status first), until the next such change; the last one without an end. Import: planned EVSE statuses, see the importer. |
 | EVSE energy status `used`, `currentVoltage`, `remainingChargingTime` | `currentChargingPower`, `currentVoltage`, `remainingChargingTime` of its `refillPointStatus`; its timestamp also counts for `lastUpdated`. `available` (the power a newly arriving vehicle would get) and `storedEnergy` have no counterpart. Not imported: POI3 is where these values come from. |
 | full status / one changed EVSE | `IsDelta` false / true: `snapshotPush` / `deltaPush` in the Mobilithek message container |
 
@@ -296,8 +302,8 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
   products of a station (rather than of its charging points) are imported only as rates.
 - **Hydrogen:** the hydrogen of a station (refuelling modes, capacity) is read and written by the library, but has no
   POI3 counterpart.
-- **Status:** only the refill point `status` is imported. Waiting time, planned statuses (e.g. reservations), remaining
-  charging time, current voltage and power, next available slots, energy rate updates (ad hoc price changes),
+- **Status:** only the refill point `status` and its planned statuses are imported, the latter as planned EVSE
+  statuses, not admin statuses. Waiting time, remaining charging time, current voltage and power, next available slots, energy rate updates (ad hoc price changes),
   opening and operation status, faults, limited hydrogen amount, and site and station statuses are not.
 - **Locations:** only point and area locations are used, and only their display coordinates and address. GML
   geometries, NUTS areas, heights and accuracies are read by the library, but not imported; OpenLR is not read.
