@@ -66,7 +66,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// A named area defining boundaries or region.
         /// </summary>
-        [XmlElement("namedArea",                    Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        [XmlElement("namedArea",                    Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public NamedArea?                     NamedArea                      { get; } = NamedArea;
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional area location information.
         /// </summary>
-        [XmlElement("_areaLocationExtension",       Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_areaLocationExtension",       Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?                      AreaLocationExtension          { get; } = AreaLocationExtension;
 
         #endregion

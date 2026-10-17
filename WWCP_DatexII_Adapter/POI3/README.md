@@ -465,7 +465,5 @@ writes and reads these differences:
 - **URLs:** links are informative only. One that is no URL, e.g. a placeholder of the profile's example
   (`https://---.com`), is left out when read, rather than making its energy product, organisation or operating hours
   unreadable.
-- **`[XmlElement(Namespace = …)]` annotations:** they name the namespace of the element's type rather than of the
-  element. Nothing uses `XmlSerializer`, so this is only misleading documentation.
 - **Extensions:** an extension read is the extension element itself, and it is written again as it was. An extension
   given as an element of another name is written inside an extension element. Their content is kept as XML.

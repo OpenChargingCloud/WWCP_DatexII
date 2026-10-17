@@ -62,7 +62,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The date/time at which this information was last updated.
         /// </summary>
-        [XmlElement("lastUpdated",                Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("lastUpdated",                Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public DateTimeOffset         LastUpdated                  { get; } = LastUpdated;
 
         /// <summary>
@@ -74,61 +74,61 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// A general information on the applicable monetary currency.
         /// </summary>
-        [XmlElement("applicableCurrency",         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement("applicableCurrency",         Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<Currency>  ApplicableCurrency           { get; } = ApplicableCurrency.Distinct() ?? [];
 
         /// <summary>
         /// A name for this rate, for example the name of the specific energy contract.
         /// </summary>
-        [XmlElement("rateName",                   Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("rateName",                   Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public MultilingualString?    RateName                     { get; } = RateName;
 
         /// <summary>
         /// [TRUE] indicates that tax is included; [FALSE] indicates that tax is added additionally.
         /// </summary>
-        [XmlElement("combinationWithParkingFee",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("combinationWithParkingFee",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Boolean?               CombinationWithParkingFee    { get; } = CombinationWithParkingFee;
 
         /// <summary>
         /// A minimum delivery fee.
         /// </summary>
-        [XmlElement("minimumDeliveryFee",         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement("minimumDeliveryFee",         Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public AmountOfMoney?         MinimumDeliveryFee           { get; } = MinimumDeliveryFee;
 
         /// <summary>
         /// A maximum delivery fee.
         /// </summary>
-        [XmlElement("maximumDeliveryFee",         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement("maximumDeliveryFee",         Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public AmountOfMoney?         MaximumDeliveryFee           { get; } = MaximumDeliveryFee;
 
         /// <summary>
         /// Discount indicated in %.
         /// </summary>
-        [XmlElement("discount",                   Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("discount",                   Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Percentage?            Discount                     { get; } = Discount;
 
         /// <summary>
         /// Free text field for additional information regarding the energy rates.
         /// </summary>
-        [XmlElement("additionalInformation",      Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("additionalInformation",      Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public MultilingualString?    AdditionalInformation        { get; } = AdditionalInformation;
 
         /// <summary>
         /// Payment method information.
         /// </summary>
-        [XmlElement("paymentMethod",              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement("payment",                    Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Payment?               Payment                      { get; } = Payment;
 
         /// <summary>
         /// The specification of the period during which the energy rate is valid.
         /// </summary>
-        [XmlElement("overallPeriod",              Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("overallPeriod",              Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public OverallPeriod?         OverallPeriod                { get; } = OverallPeriod;
 
         /// <summary>
         /// Optional extension element for additional energy rate information.
         /// </summary>
-        [XmlElement("_energyRateExtension",       Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyRateExtension",       Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?              EnergyRateExtension          { get; } = EnergyRateExtension;
 
         /// <summary>

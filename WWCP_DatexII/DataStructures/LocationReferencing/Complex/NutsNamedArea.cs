@@ -56,19 +56,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// The NUTS code type for the named area.
         /// </summary>
-        [XmlElement("nutsCodeType",             Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        [XmlElement("nutsCodeType",             Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public NutsCodeType  NutsCodeType              { get; } = NutsCodeType;
 
         /// <summary>
         /// The NUTS code for the named area.
         /// </summary>
-        [XmlElement("nutsCode",                 Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        [XmlElement("nutsCode",                 Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public NutsCode      NutsCode                  { get; } = NutsCode;
 
         /// <summary>
         /// Optional extension element for additional NutsNamedArea information.
         /// </summary>
-        [XmlElement("_nutsNamedAreaExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_nutsNamedAreaExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?     NutsNamedAreaExtension    { get; } = NutsNamedAreaExtension;
 
         #endregion

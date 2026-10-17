@@ -80,37 +80,37 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The price for the energy according to the price type.
         /// </summary>
-        [XmlElement("value",                  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement("value",                  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public AmountOfMoney        Value                    { get; } = Value;
 
         /// <summary>
         /// [TRUE] indicates that tax is included; [FALSE] indicates that tax is added additionally.
         /// </summary>
-        [XmlElement("taxIncluded",            Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("taxIncluded",            Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Boolean?             TaxIncluded              { get; } = TaxIncluded;
 
         /// <summary>
         /// The percentage rate of tax to be applied.
         /// </summary>
-        [XmlElement("taxRate",                Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("taxRate",                Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Percentage?          TaxRate                  { get; } = TaxRate;
 
         /// <summary>
         /// Free text field for additional information regarding the price.
         /// </summary>
-        [XmlElement("additionalInformation",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("additionalInformation",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public MultilingualString?  AdditionalInformation    { get; } = AdditionalInformation;
 
         /// <summary>
         /// The overall period during which the price is applicable.
         /// </summary>
-        [XmlElement("overallPeriod",          Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("overallPeriod",          Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public OverallPeriod?       OverallPeriod            { get; } = OverallPeriod;
 
         /// <summary>
         /// Optional extension element for additional energy price information.
         /// </summary>
-        [XmlElement("_energyPriceExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyPriceExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?            EnergyPriceExtension     { get; } = EnergyPriceExtension;
 
         #endregion

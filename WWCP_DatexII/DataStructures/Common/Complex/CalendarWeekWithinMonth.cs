@@ -51,7 +51,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// Note: Calendar weeks start with Monday. The first week is the week containing the first day of the month.
         /// Must have at least one and no more than six values.
         /// </summary>
-        [XmlElement("applicableCalendarWeekWithinMonth",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("applicableCalenderWeekWithinMonth",   Namespace = "http://datex2.eu/schema/3/common")]
         public IEnumerable<CalendarWeekWithinMonthEnum>  ApplicableCalendarWeekWithinMonth    { get; } = ApplicableCalendarWeekWithinMonth?.Distinct() ?? [];
 
         /// <summary>

@@ -40,7 +40,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Encoded image data.
         /// </summary>
-        [XmlElement("imageData",        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("imageData",        Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Byte[]       Data              { get; } = Data;
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Optional extension element for additional content.
         /// </summary>
-        [XmlElement("_imageExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_imageExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?    ImageExtension    { get; } = ImageExtension;
 
         #endregion

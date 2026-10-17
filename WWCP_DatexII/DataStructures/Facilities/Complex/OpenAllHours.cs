@@ -46,7 +46,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Optional extension element for additional open-all-hours information.
         /// </summary>
-        [XmlElement("_openAllHoursExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_openAllHoursExtension", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?  OpenAllHoursExtension    { get; } = OpenAllHoursExtension;
 
         #endregion

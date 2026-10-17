@@ -49,19 +49,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Some other energy source.
         /// </summary>
-        [XmlElement(ElementName = "otherEnergySource",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement(ElementName = "otherEnergySource",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public String?                   OtherEnergySource                     { get; } = OtherEnergySource;
 
         /// <summary>
         /// The percentage ratio value of this energy source.
         /// </summary>
-        [XmlElement(ElementName = "sourceRatioValue",   Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement(ElementName = "sourceRatioValue",   Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public PercentageDouble          SourceRatioValue                      { get; } = SourceRatioValue;
 
         /// <summary>
         /// Optional extension element for additional content.
         /// </summary>
-        [XmlElement(ElementName = "_electricEnergySourceRatioExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement(ElementName = "_electricEnergySourceRatioExtension", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                 ElectricEnergySourceRatioExtension    { get; } = ElectricEnergySourceRatioExtension;
 
         #endregion

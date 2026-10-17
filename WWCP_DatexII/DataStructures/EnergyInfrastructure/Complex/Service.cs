@@ -48,13 +48,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The overall period during which the service is available.
         /// </summary>
-        [XmlElement("overallPeriod",          Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("overallPeriod",          Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public OverallPeriod?  OverallPeriod           { get; } = OverallPeriod;
 
         /// <summary>
         /// Optional extension element for additional service type information.
         /// </summary>
-        [XmlElement("_serviceTypeExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_serviceTypeExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?       ServiceTypeExtension    { get; } = ServiceTypeExtension;
 
         #endregion

@@ -45,7 +45,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The date/time at which this information was last updated.
         /// </summary>
-        [XmlElement("lastUpdated",                 Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("lastUpdated",                 Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public DateTimeOffset            LastUpdated                  { get; } = LastUpdated;
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Free text field for additional information regarding the energy rates.
         /// </summary>
-        [XmlElement("additionalInformation",       Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("additionalInformation",       Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public MultilingualString?       AdditionalInformation        { get; } = AdditionalInformation;
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional energy rate update information.
         /// </summary>
-        [XmlElement("_energyRateUpdateExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyRateUpdateExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                 EnergyRateUpdateExtension    { get; } = EnergyRateUpdateExtension;
 
         #endregion

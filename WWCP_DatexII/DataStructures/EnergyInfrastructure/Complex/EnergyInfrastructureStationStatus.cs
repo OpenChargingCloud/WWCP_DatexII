@@ -77,7 +77,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// It might be unavailable, for example, because of a fault, damage, or maintenance.
         /// It does not inform if the corresponding refill points are currently occupied or not.
         /// </summary>
-        [XmlElement("isAvailable",                                  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("isAvailable",                                  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public Boolean?                        IsAvailable                                   { get; } = IsAvailable;
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional station status information.
         /// </summary>
-        [XmlElement("_energyInfrastructureStationStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyInfrastructureStationStatusExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                       EnergyInfrastructureStationStatusExtension    { get; } = EnergyInfrastructureStationStatusExtension;
 
         #endregion

@@ -112,7 +112,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional electric charging equipment information.
         /// </summary>
-        [XmlElement("_electricChargingEquipmentExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_electricChargingEquipmentExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?              ElectricChargingEquipmentExtension    { get; } = ElectricChargingEquipmentExtension;
 
         #endregion

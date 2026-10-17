@@ -45,19 +45,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Length.
         /// </summary>
-        [XmlElement("length",               Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("length",               Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Meter?        Length                { get; } = Length;
 
         /// <summary>
         /// Width.
         /// </summary>
-        [XmlElement("width",                Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("width",                Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Meter?        Width                 { get; } = Width;
 
         /// <summary>
         /// Height.
         /// </summary>
-        [XmlElement("height",               Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("height",               Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Meter?        Height                { get; } = Height;
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Optional extension element for additional dimension information.
         /// </summary>
-        [XmlElement("_dimensionExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_dimensionExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?     DimensionExtension    { get; } = DimensionExtension;
 
         #endregion

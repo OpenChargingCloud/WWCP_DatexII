@@ -79,7 +79,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Common
         /// <summary>
         /// Vehicle categories as defined in EU Directive 2007/46/EG and Regulation (EU) No 168/2013.
         /// </summary>
-        [XmlElement("euVehicleCategory",                 Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
+        [XmlElement("euVehicleCategory",                 Namespace = "http://datex2.eu/schema/3/commonExtension")]
         public IEnumerable<EUVehicleCategory>                 EUVehicleCategory                   { get; } = EUVehicleCategory?.               Distinct() ?? [];
 
         /// <summary>

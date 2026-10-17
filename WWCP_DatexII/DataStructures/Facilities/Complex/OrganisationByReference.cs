@@ -64,7 +64,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Optional extension element for additional organisation-by-reference information.
         /// </summary>
-        [XmlElement("_organisationByReferenceExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_organisationByReferenceExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?                                    OrganisationByReferenceExtension    { get; } = OrganisationByReferenceExtension;
 
         #endregion

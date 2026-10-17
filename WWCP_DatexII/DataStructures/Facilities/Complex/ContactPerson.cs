@@ -58,31 +58,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// The (last) name of the contact person.
         /// </summary>
-        [XmlElement("name",                     Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("name",                     Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public String               Name                      { get; } = Name;
 
         /// <summary>
         /// The first name of the contact person.
         /// </summary>
-        [XmlElement("firstName",                Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("firstName",                Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public String?              FirstName                 { get; } = FirstName;
 
         /// <summary>
         /// Title information of the contact person.
         /// </summary>
-        [XmlElement("title",                    Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("title",                    Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public MultilingualString?  Title                     { get; } = Title;
 
         /// <summary>
         /// The position of the contact person.
         /// </summary>
-        [XmlElement("position",                 Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("position",                 Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public MultilingualString?  Position                  { get; } = Position;
 
         /// <summary>
         /// Optional extension element for additional contact person information.
         /// </summary>
-        [XmlElement("_contactPersonExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_contactPersonExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?            ContactPersonExtension    { get; } = ContactPersonExtension;
 
         #endregion

@@ -70,7 +70,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         /// <summary>
         /// Optional extension element for additional address information.
         /// </summary>
-        [XmlElement("_addressExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_addressExtension",  Namespace = "http://datex2.eu/schema/3/locationExtension")]
         public XElement?                 AddressExtension    { get; } = AddressExtension;
 
         #endregion

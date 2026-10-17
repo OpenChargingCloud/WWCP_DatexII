@@ -450,6 +450,47 @@ namespace cloud.charging.open.protocols.DatexII.Tests
 
         #endregion
 
+        #region OperatingHoursByReferenceKeepTheirExtensions()
+
+        /// <summary>
+        /// Operating hours by reference read their extensions in the afirFacilities namespace, where the schema declares
+        /// them, and write them again in schema order. They were read in the common namespace and never written before.
+        /// </summary>
+        [Test]
+        public void OperatingHoursByReferenceKeepTheirExtensions()
+        {
+
+            var afac        = v3.DatexIINS.Facilities;
+            var xsi         = v3.DatexIINS.XSI;
+            XNamespace test = "urn:test";
+
+            var xml = new XElement(afac + "operatingHours",
+                          new XAttribute(XNamespace.Xmlns + "afac",  afac.NamespaceName),
+                          new XAttribute(XNamespace.Xmlns + "xsi",   xsi. NamespaceName),
+                          new XAttribute(xsi + "type",               "afac:OperatingHoursByReference"),
+                          new XElement(afac + "_operatingHoursExtension",             new XElement(test + "first",  "1")),
+                          new XElement(afac + "operatingHoursReference",
+                              new XAttribute("targetClass",  "afac:OperatingHoursSpecification"),
+                              new XAttribute("id",           "OH1"),
+                              new XAttribute("version",      "1")),
+                          new XElement(afac + "_operatingHoursByReferenceExtension",  new XElement(test + "second", "2")));
+
+            Assert.That(AOperatingHours.TryParseXML(xml, out var operatingHours, out var errorResponse), Is.True, errorResponse);
+            Assert.That(operatingHours, Is.InstanceOf<OperatingHoursByReference>());
+
+            var written = operatingHours!.ToXML(afac + "operatingHours");
+
+            Assert.Multiple(() => {
+                Assert.That(written.Elements().Select(element => element.Name),
+                            Is.EqualTo(new[] { afac + "_operatingHoursExtension", afac + "operatingHoursReference", afac + "_operatingHoursByReferenceExtension" }));
+                Assert.That(written.Element(afac + "_operatingHoursExtension")!.           Element(test + "first")?. Value, Is.EqualTo("1"));
+                Assert.That(written.Element(afac + "_operatingHoursByReferenceExtension")!.Element(test + "second")?.Value, Is.EqualTo("2"));
+            });
+
+        }
+
+        #endregion
+
     }
 
 }

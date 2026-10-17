@@ -55,7 +55,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Information on the time when the information was last updated.
         /// </summary>
-        [XmlElement("lastUpdated",                     Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("lastUpdated",                     Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public DateTimeOffset?                   LastUpdated                      { get; } = LastUpdated;
 
         /// <summary>
@@ -73,13 +73,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// If true, regular operating hours are in force (can be open or closed).
         /// </summary>
-        [XmlElement("regularOperatingHoursInForce",    Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("regularOperatingHoursInForce",    Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?                          RegularOperatingHoursInForce     { get; } = RegularOperatingHoursInForce;
 
         /// <summary>
         /// A description for the status of this facility.
         /// </summary>
-        [XmlElement("statusDescription",               Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("statusDescription",               Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public MultilingualString?               StatusDescription                { get; } = StatusDescription;
 
         /// <summary>
@@ -91,13 +91,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Fault information, if applicable.
         /// </summary>
-        [XmlElement("fault",                           Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("fault",                           Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Fault?                            Fault                            { get; } = Fault;
 
         /// <summary>
         /// Optional extension element for additional dynamic status information.
         /// </summary>
-        [XmlElement("_facilityObjectStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_facilityObjectStatusExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?                         FacilityObjectStatusExtension    { get; } = FacilityObjectStatusExtension;
 
         #endregion

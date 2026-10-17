@@ -60,13 +60,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The name of the Energy Infrastructure Table.
         /// </summary>
-        [XmlElement("tableName",                            Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("tableName",                            Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public String?                                TableName                             { get; } = TableName;
 
         /// <summary>
         /// Optional extension element for additional EnergyInfrastructureTable information.
         /// </summary>
-        [XmlElement("_energyInfrastructureTableExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyInfrastructureTableExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                              EnergyInfrastructureTableExtension    { get; } = EnergyInfrastructureTableExtension;
 
         #endregion

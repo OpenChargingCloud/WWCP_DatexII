@@ -42,13 +42,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Specification of a time validity, for which this organisation information is valid in general.
         /// This is not a specification of the operating hours as such.
         /// </summary>
-        [XmlElement("generalTimeValidity", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("generalTimeValidity", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public OverallPeriod?  GeneralTimeValidity      { get; } = GeneralTimeValidity;
 
         /// <summary>
         /// Optional extension element for additional organisation information.
         /// </summary>
-        [XmlElement("_organisationExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_organisationExtension", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?       OrganisationExtension    { get; } = OrganisationExtension;
 
         #endregion

@@ -84,7 +84,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// If known, the approximate remaining charging time (in seconds) for the current vehicle on this refill point.
         /// </summary>
-        [XmlElement("remainingChargingTime",                  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("remainingChargingTime",                  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public TimeSpan?                    RemainingChargingTime                   { get; } = RemainingChargingTime;
 
         /// <summary>
@@ -102,13 +102,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// One or more points of time in the future at which the charging point will be available (not occupied and not reserved).
         /// </summary>
-        [XmlElement("nextAvailableChargingSlots",             Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("nextAvailableChargingSlots",             Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<DateTimeOffset>  NextAvailableChargingSlots              { get; } = NextAvailableChargingSlots?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional electric charging point status information.
         /// </summary>
-        [XmlElement("_electricChargingPointStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_electricChargingPointStatusExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                    ElectricChargingPointStatusExtension    { get; } = ElectricChargingPointStatusExtension;
 
         #endregion

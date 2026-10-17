@@ -51,7 +51,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional altitude confidence information.
         /// </summary>
-        [XmlElement("_altitudeConfidenceExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_altitudeConfidenceExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?                      AltitudeConfidenceExtension    { get; } = AltitudeConfidenceExtension;
 
         #endregion

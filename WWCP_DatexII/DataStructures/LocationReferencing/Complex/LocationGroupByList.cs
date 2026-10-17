@@ -53,7 +53,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional LocationGroupByList information.
         /// </summary>
-        [XmlElement("_locationGroupByListExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_locationGroupByListExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?               LocationGroupByListExtension    { get; } = LocationGroupByListExtension;
 
         #endregion

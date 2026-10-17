@@ -48,7 +48,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Half of length of the major axis, i.e. the distance between the centre point and the major axis point of the position accuracy ellipse.
         /// </summary>
-        [XmlElement("semiMajorAxisLength",                  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("semiMajorAxisLength",                  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public Meter?                         SemiMajorAxisLength                   { get; } = SemiMajorAxisLength;
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Half of length of the minor axis, i.e. the distance between the centre point and the minor axis point of the position accuracy ellipse.
         /// </summary>
-        [XmlElement("semiMinorAxisLength",                  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("semiMinorAxisLength",                  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public Meter?                         SemiMinorAxisLength                   { get; } = SemiMinorAxisLength;
 
         /// <summary>
@@ -72,19 +72,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Orientation direction of the ellipse's major axis with respect to geographic north, in degrees.
         /// </summary>
-        [XmlElement("semiMajorAxisOrientation",             Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("semiMajorAxisOrientation",             Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public AngleInDegrees?                SemiMajorAxisOrientation              { get; } = SemiMajorAxisOrientation;
 
         /// <summary>
         /// Indicates whether the ellipse orientation is unavailable (True) or not (False).
         /// </summary>
-        [XmlElement("semiMajorAxisOrientationError",        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("semiMajorAxisOrientationError",        Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public Boolean?                       SemiMajorAxisOrientationError         { get; } = SemiMajorAxisOrientationError;
 
         /// <summary>
         /// Optional extension element for additional position confidence ellipse information.
         /// </summary>
-        [XmlElement("_positionConfidenceEllipseExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_positionConfidenceEllipseExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?                      PositionConfidenceEllipseExtension    { get; } = PositionConfidenceEllipseExtension;
 
         #endregion

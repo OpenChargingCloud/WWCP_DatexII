@@ -61,7 +61,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional network location information.
         /// </summary>
-        [XmlElement("_networkLocationExtension",           Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_networkLocationExtension",           Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?                            NetworkLocationExtension              { get; } = NetworkLocationExtension;
 
         #endregion

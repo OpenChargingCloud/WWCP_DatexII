@@ -42,31 +42,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// The facility is illuminated during darkness.
         /// </summary>
-        [XmlElement("illuminated",                         Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("illuminated",                         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?   Illuminated                           { get; } = Illuminated;
 
         /// <summary>
         /// The facility has got a roof.
         /// </summary>
-        [XmlElement("roofed",                              Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("roofed",                              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?   Roofed                                { get; } = Roofed;
 
         /// <summary>
         /// There is an illuminated recharging or refuelling parking location in the immediate surrounding of the facility.
         /// </summary>
-        [XmlElement("illuminatedRechargingParkingNearby",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("illuminatedRechargingParkingNearby",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?   IlluminatedRechargingParkingNearby    { get; } = IlluminatedRechargingParkingNearby;
 
         /// <summary>
         /// There is a roofed recharging or refuelling parking location in the immediate surrounding of the facility.
         /// </summary>
-        [XmlElement("roofedRechargingParkingNearby",       Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("roofedRechargingParkingNearby",       Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?   RoofedRechargingParkingNearby         { get; } = RoofedRechargingParkingNearby;
 
         /// <summary>
         /// Optional extension element for additional amenities information.
         /// </summary>
-        [XmlElement("_amenitiesExtension",                 Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_amenitiesExtension",                 Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?  AmenitiesExtension                    { get; } = AmenitiesExtension;
 
         #endregion

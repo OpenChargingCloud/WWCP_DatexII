@@ -126,19 +126,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// A description of the refill point model type.
         /// </summary>
-        [XmlElement("modelType",              Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("modelType",              Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public MultilingualString?  ModelType                { get; } = ModelType;
 
         /// <summary>
         /// Information regarding options for reservation of a time frame.
         /// </summary>
-        [XmlElement("reservation",            Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement("reservation",            Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public ReservationType?     Reservation              { get; } = Reservation;
 
         /// <summary>
         /// Optional extension element for additional refill point information.
         /// </summary>
-        [XmlElement("_refillPointExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_refillPointExtension", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?            RefillPointExtension     { get; } = RefillPointExtension;
 
         /// <summary>

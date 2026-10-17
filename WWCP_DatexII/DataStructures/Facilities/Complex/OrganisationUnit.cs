@@ -46,19 +46,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// A name for this organisation unit.
         /// </summary>
-        [XmlElement("name",                        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("name",                        Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public MultilingualString?              Name                         { get; } = Name;
 
         /// <summary>
         /// Functions this unit is responsible for or a specific type, e.g. headquarter or sales.
         /// </summary>
-        [XmlElement("function",                    Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("function",                    Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<MultilingualString>  Function                     { get; } = Function?.          Distinct() ?? [];
 
         /// <summary>
         /// Location reference for this organisation unit.
         /// </summary>
-        [XmlElement("locationReference",           Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        [XmlElement("locationReference",           Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public ALocationReference?              LocationReference            { get; } = LocationReference;
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Optional extension element for additional organisation unit information.
         /// </summary>
-        [XmlElement("_organisationUnitExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_organisationUnitExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?                        OrganisationUnitExtension    { get; } = OrganisationUnitExtension;
 
         #endregion

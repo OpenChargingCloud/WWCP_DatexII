@@ -42,19 +42,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Name of the multi-polygon area.
         /// </summary>
-        [XmlElement("gmlAreaName",                Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("gmlAreaName",                Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public MultilingualString?      GMLAreaName                 { get; } = GMLAreaName;
 
         /// <summary>
         /// A collection of GML polygons that define the area.
         /// </summary>
-        [XmlElement("gmlPolygon",                 Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        [XmlElement("gmlPolygon",                 Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public IEnumerable<GMLPolygon>  GMLPolygons                 { get; } = GMLPolygons?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional multi-polygon information.
         /// </summary>
-        [XmlElement("_gmlMultiPolygonExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_gmlMultiPolygonExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?                GMLMultiPolygonExtension    { get; } = GMLMultiPolygonExtension;
 
         #endregion

@@ -30,7 +30,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// Unlike standard GML, this implementation may allow self-intersecting geometries.
     /// If the srsName attribute is not present, posList is assumed to use the "ETRS89-LatLonh" reference system.
     /// </summary>
-    [XmlType("GmlLineString", Namespace = "http://datex2.eu/schema/3/locationExtension")]
+    [XmlType("GmlLineString", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
     public class GMLLineString(GMLPosList  PosList,
                                UInt32?     SrsDimension             = null,
                                String?     SrsName                  = null,
@@ -43,7 +43,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// List of coordinate tuples defining the geometry of this GmlLineString.
         /// There must be at least 2 tuples of coordinates. The typical form is a space-separated list of latitude and longitude pairs.
         /// </summary>
-        [XmlElement("posList",                  Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        [XmlElement("posList",                  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public GMLPosList  PosList                   { get; } = PosList;
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional line string information.
         /// </summary>
-        [XmlElement("_gmlLineStringExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_gmlLineStringExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?   GMLLineStringExtension    { get; } = GMLLineStringExtension;
 
         #endregion

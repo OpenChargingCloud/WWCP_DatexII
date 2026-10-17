@@ -32,7 +32,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
     /// The NUTS-Code representation for the area (Nomenclature of territorial units for statistics)
     /// or its LAU code representation (Local Administrative Unit).
     /// </summary>
-    [XmlType("NutsArea", Namespace = "http://datex2.eu/schema/3/locationExtension")]
+    [XmlType("NutsArea", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
     public class NutsArea(NutsCode      NutsCode,
                           NutsCodeType  NutsCodeType,
                           XElement?     NutsAreaExtension   = null)
@@ -43,19 +43,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         /// <summary>
         /// The NUTS code for the named area.
         /// </summary>
-        [XmlElement("nutsCode",            Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        [XmlElement("nutsCode",            Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public NutsCode      NutsCode             { get; } = NutsCode;
 
         /// <summary>
         /// The NUTS code type for the named area.
         /// </summary>
-        [XmlElement("nutsCodeType",        Namespace = "http://datex2.eu/schema/3/locationExtension")]
+        [XmlElement("nutsCodeType",        Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public NutsCodeType  NutsCodeType         { get; } = NutsCodeType;
 
         /// <summary>
         /// Optional extension element for additional NutsArea information.
         /// </summary>
-        [XmlElement("_nutsAreaExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_nutsAreaExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?     NutsAreaExtension    { get; } = NutsAreaExtension;
 
         #endregion

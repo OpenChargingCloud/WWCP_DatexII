@@ -44,31 +44,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Language(s) that are supported via telephone or mail.
         /// </summary>
-        [XmlElement("language",                      Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("language",                      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<Languages>  Languages                      { get; } = Languages?.Distinct() ?? [];
 
         /// <summary>
         /// Telephone number, which can be a general number or the number of a specific contact person.
         /// </summary>
-        [XmlElement("telephoneNumber",               Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("telephoneNumber",               Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public String?                 TelephoneNumber                { get; } = TelephoneNumber;
 
         /// <summary>
         /// Fax number, which can be a general number or the number of a specific contact person.
         /// </summary>
-        [XmlElement("faxNumber",                     Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("faxNumber",                     Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public String?                 FaxNumber                      { get; } = FaxNumber;
 
         /// <summary>
         /// E-Mail address, which can be a general mail address or the mail address of a specific contact person.
         /// </summary>
-        [XmlElement("eMail",                         Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("eMail",                         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public String?                 EMail                          { get; } = EMail;
 
         /// <summary>
         /// Optional extension element for additional contact information.
         /// </summary>
-        [XmlElement("_contactInformationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_contactInformationExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?               ContactInformationExtension    { get; } = ContactInformationExtension;
 
         #endregion

@@ -40,25 +40,25 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Accuracy defined by the 50th percentile of the cumulative distribution of position errors.
         /// </summary>
-        [XmlElement("accuracyPercentile50",        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("accuracyPercentile50",        Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public Double?    AccuracyPercentile50         { get; } = AccuracyPercentile50;
 
         /// <summary>
         /// Accuracy defined by the 75th percentile of the cumulative distribution of position errors.
         /// </summary>
-        [XmlElement("accuracyPercentile75",        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("accuracyPercentile75",        Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public Double?    AccuracyPercentile75         { get; } = AccuracyPercentile75;
 
         /// <summary>
         /// Accuracy defined by the 95th percentile of the cumulative distribution of position errors.
         /// </summary>
-        [XmlElement("accuracyPercentile95",        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("accuracyPercentile95",        Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public Double?    AccuracyPercentile95         { get; } = AccuracyPercentile95;
 
         /// <summary>
         /// Optional extension element for additional position accuracy information.
         /// </summary>
-        [XmlElement("_positionAccuracyExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_positionAccuracyExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?  PositionAccuracyExtension    { get; } = PositionAccuracyExtension;
 
         #endregion

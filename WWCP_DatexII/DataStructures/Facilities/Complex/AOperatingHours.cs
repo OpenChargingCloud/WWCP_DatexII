@@ -45,7 +45,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Optional extension element for additional operating hours information.
         /// </summary>
-        [XmlElement("_operatingHoursExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_operatingHoursExtension", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?            OperatingHoursExtension    { get; } = OperatingHoursExtension;
 
         #endregion

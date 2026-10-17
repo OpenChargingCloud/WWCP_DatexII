@@ -120,19 +120,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The brand of the site.
         /// </summary>
-        [XmlElement("brand",                               Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("brand",                               Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public MultilingualString?                       Brand                                { get; } = Brand;
 
         /// <summary>
         /// Limitation to a set of users (exclusive).
         /// </summary>
-        [XmlElement("exclusiveUsers",                      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement("exclusiveUsers",                      Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<UserType>                     ExclusiveUsers                       { get; } = ExclusiveUsers?.              Distinct() ?? [];
 
         /// <summary>
         /// Users that are preferred at this site (but not exclusive).
         /// </summary>
-        [XmlElement("preferredUsers",                      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement("preferredUsers",                      Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<UserType>                     PreferredUsers                       { get; } = PreferredUsers?.              Distinct() ?? [];
 
         /// <summary>
@@ -144,13 +144,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Possibility to specify the location of the site's entrance.
         /// </summary>
-        [XmlElement("entrance",                            Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        [XmlElement("entrance",                            Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<ALocation>                    Entrances                            { get; } = Entrances?.                   Distinct() ?? [];
 
         /// <summary>
         /// Possibility to specify the location of the site's exit.
         /// </summary>
-        [XmlElement("exit",                                Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        [XmlElement("exit",                                Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<ALocation>                    Exits                                { get; } = Exits?.                       Distinct() ?? [];
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional EnergyInfrastructureSite information.
         /// </summary>
-        [XmlElement("_energyInfrastructureSiteExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyInfrastructureSiteExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                                 EnergyInfrastructureSiteExtension    { get; } = EnergyInfrastructureSiteExtension;
 
         #endregion

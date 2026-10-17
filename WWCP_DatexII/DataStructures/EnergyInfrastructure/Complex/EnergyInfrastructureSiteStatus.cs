@@ -74,13 +74,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Parking places available for cars.
         /// </summary>
-        [XmlElement("availableCarParkingPlaces",                 Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("availableCarParkingPlaces",                 Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public UInt16?                                         AvailableCarParkingPlaces                  { get; } = AvailableCarParkingPlaces;
 
         /// <summary>
         /// Parking places available for trucks.
         /// </summary>
-        [XmlElement("availableTruckParkingPlaces",               Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("availableTruckParkingPlaces",               Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public UInt16?                                         AvailableTruckParkingPlaces                { get; } = AvailableTruckParkingPlaces;
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional site status information.
         /// </summary>
-        [XmlElement("_energyInfrastructureSiteStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyInfrastructureSiteStatusExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                                       EnergyInfrastructureSiteStatusExtension    { get; } = EnergyInfrastructureSiteStatusExtension;
 
         #endregion

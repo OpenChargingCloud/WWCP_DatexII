@@ -80,7 +80,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional publication information.
         /// </summary>
-        [XmlElement("_energyInfrastructureTablePublicationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyInfrastructureTablePublicationExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                               EnergyInfrastructureTablePublicationExtension    { get; } = EnergyInfrastructureTablePublicationExtension;
 
         #endregion

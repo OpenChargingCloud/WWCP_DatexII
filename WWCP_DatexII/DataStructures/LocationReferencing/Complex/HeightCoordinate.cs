@@ -43,7 +43,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Value in metres for the height measured vertically at the planar coordinates the point corresponds to.
         /// </summary>
-        [XmlElement("heightValue",                 Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("heightValue",                 Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public Meter                HeightValue                  { get; } = HeightValue;
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional height coordinate information.
         /// </summary>
-        [XmlElement("_heightCoordinateExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_heightCoordinateExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?            HeightCoordinateExtension    { get; } = HeightCoordinateExtension;
 
         #endregion

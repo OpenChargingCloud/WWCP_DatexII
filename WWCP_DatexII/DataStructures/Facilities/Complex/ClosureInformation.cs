@@ -44,31 +44,31 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Permanently closed, i.e. it is not intended to open again.
         /// </summary>
-        [XmlElement("permanentlyClosed",             Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("permananentlyClosed",           Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?         PermanentlyClosed              { get; } = PermanentlyClosed;
 
         /// <summary>
         /// Temporarily closed for an unspecified period.
         /// </summary>
-        [XmlElement("temporarilyClosed",             Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("temporarilyClosed",             Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?         TemporarilyClosed              { get; } = TemporarilyClosed;
 
         /// <summary>
         /// Permanently or temporarily closed from the given date on. May lie in the future - in this case the scene is not closed now.
         /// </summary>
-        [XmlElement("closedFrom",                    Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("closedFrom",                    Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public DateTimeOffset?  ClosedFrom                     { get; } = ClosedFrom;
 
         /// <summary>
         /// Temporarily closed until the given date (i.e. closure still includes this date).
         /// </summary>
-        [XmlElement("temporarilyClosedUntil",        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("temporarilyClosedUntil",        Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public DateTimeOffset?  TemporarilyClosedUntil         { get; } = TemporarilyClosedUntil;
 
         /// <summary>
         /// Optional extension element for additional closure information.
         /// </summary>
-        [XmlElement("_closureInformationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_closureInformationExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?        ClosureInformationExtension    { get; } = ClosureInformationExtension;
 
         #endregion

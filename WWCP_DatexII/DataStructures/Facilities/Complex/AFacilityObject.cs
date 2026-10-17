@@ -78,13 +78,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// The name of this facility.
         /// </summary>
-        [XmlElement("name",                   Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("name",                   Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public MultilingualString?                  Name                       { get; } = Name;
 
         /// <summary>
         /// An alternative name for this facility.
         /// </summary>
-        [XmlElement("alias",                  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("alias",                  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<MultilingualString>      Alias                      { get; } = Alias?.                Distinct() ?? [];
 
         /// <summary>
@@ -96,13 +96,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Information on the time when the information has been updated the last time.
         /// </summary>
-        [XmlElement("lastUpdated",            Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("lastUpdated",            Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public DateTimeOffset?                      LastUpdated                { get; } = LastUpdated;
 
         /// <summary>
         /// A description for this facility.
         /// </summary>
-        [XmlElement("description",            Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("description",            Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public MultilingualString?                  Description                { get; } = Description;
 
         /// <summary>
@@ -114,19 +114,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Some additional information.
         /// </summary>
-        [XmlElement("additionalInformation",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("additionalInformation",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<MultilingualString>      AdditionalInformation      { get; } = AdditionalInformation?.Distinct() ?? [];
 
         /// <summary>
         /// URL of some internet site with additional information.
         /// </summary>
-        [XmlElement("informationWebsite",     Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("informationWebsite",     Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<URL>                     InformationWebsites        { get; } = InformationWebsites?.  Distinct() ?? [];
 
         /// <summary>
         /// Specifies a URL at which a photo of the facility or its surrounding can be found.
         /// </summary>
-        [XmlElement("photoUrl",               Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("photoUrl",               Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<URL>                     PhotoURLs                  { get; } = PhotoURLs?.            Distinct() ?? [];
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Location reference of the facility.
         /// </summary>
-        [XmlElement("locationReference",      Namespace = "http://datex2.eu/schema/3/locationReferencing")]
+        [XmlElement("locationReference",      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public ALocationReference?                  LocationReference          { get; } = LocationReference;
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// A set of vehicles, for which this facility is appropriate, specified by its characteristics.
         /// </summary>
-        [XmlElement("applicableForVehicles",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("applicableForVehicles",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<VehicleCharacteristics>  ApplicableForVehicles      { get; } = ApplicableForVehicles?.Distinct() ?? [];
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Extension element for additional content.
         /// </summary>
-        [XmlElement("_facilityObjectExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_facilityObjectExtension", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?                            FacilityObjectExtension    { get; } = FacilityObjectExtension;
 
         #endregion

@@ -61,7 +61,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Optional extension element for additional operating hours by reference information.
         /// </summary>
-        [XmlElement("_operatingHoursByReferenceExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_operatingHoursByReferenceExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?                                      OperatingHoursByReferenceExtension    { get; } = OperatingHoursByReferenceExtension;
 
         #endregion
@@ -140,10 +140,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
 
                                             operatingHoursReference,
                                             operatingHoursTableReference,
-                                            XML.Element(DatexIINS.Common + "_operatingHoursByReferenceExtension"),
+                                            XML.Element(DatexIINS.Facilities + "_operatingHoursByReferenceExtension"),
 
                                             closureInformation,
-                                            XML.Element(DatexIINS.Common + "_operatingHoursExtension")
+                                            XML.Element(DatexIINS.Facilities + "_operatingHoursExtension")
 
                                         );
 
@@ -171,11 +171,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
                        ? ClosureInformation.ToXML(DatexIINS.Facilities + "closureInformation")
                        : null,
 
+                   OperatingHoursExtension.ToExtensionXML(DatexIINS.Facilities + "_operatingHoursExtension"),
+
                    OperatingHoursReference.ToXML(),
 
                    OperatingHoursTableReference is not null
                        ? OperatingHoursTableReference.ToXML()
-                       : null
+                       : null,
+
+                   OperatingHoursByReferenceExtension.ToExtensionXML(DatexIINS.Facilities + "_operatingHoursByReferenceExtension")
 
                );
 

@@ -101,13 +101,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Dedicated parking spaces associated with the facility.
         /// </summary>
-        [XmlElement("dedicatedParkingSpaces",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
+        [XmlElement("dedicatedParkingSpaces",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public IEnumerable<DedicatedParkingSpaces>  DedicatedParkingSpaces    { get; } = DedicatedParkingSpaces?.Distinct() ?? [];
 
         /// <summary>
         /// Optional extension element for additional facility information.
         /// </summary>
-        [XmlElement("_facilityExtension",      Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_facilityExtension",      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?                            FacilityExtension         { get; } = FacilityExtension;
 
         #endregion

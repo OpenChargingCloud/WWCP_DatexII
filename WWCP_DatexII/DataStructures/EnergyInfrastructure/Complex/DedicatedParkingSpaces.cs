@@ -93,19 +93,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// The number of parking spaces.
         /// </summary>
-        [XmlElement(ElementName = "numberOfSpaces",      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement(ElementName = "numberOfSpaces",      Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public UInt16                 NumberOfSpaces                     { get; } = NumberOfSpaces;
 
         /// <summary>
         /// The indicated parking spaces are specifically for the given set of users.
         /// </summary>
-        [XmlElement(ElementName = "userSpecific",        Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement(ElementName = "userSpecific",        Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<UserType>  UserSpecific                       { get; } = UserSpecific ?? [];
 
         /// <summary>
         /// Optional extension element for additional dedicated parking spaces information.
         /// </summary>
-        [XmlElement("_dedicatedParkingSpacesExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_dedicatedParkingSpacesExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?              DedicatedParkingSpacesExtension    { get; }
 
         #endregion

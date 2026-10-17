@@ -94,7 +94,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional publication information.
         /// </summary>
-        [XmlElement("_energyInfrastructureStatusPublicationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_energyInfrastructureStatusPublicationExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                                                 EnergyInfrastructureStatusPublicationExtension    { get; } = EnergyInfrastructureStatusPublicationExtension;
 
         #endregion

@@ -49,7 +49,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         /// <summary>
         /// Free-text description for the address line element.
         /// </summary>
-        [XmlElement("text",                   Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("text",                   Namespace = "http://datex2.eu/schema/3/locationExtension")]
         public MultilingualString  Text                    { get; } = Text;
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationExtension
         /// <summary>
         /// Optional extension element for additional address line information.
         /// </summary>
-        [XmlElement("_addressLineExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_addressLineExtension",  Namespace = "http://datex2.eu/schema/3/locationExtension")]
         public XElement?           AddressLineExtension    { get; } = AddressLineExtension;
 
         #endregion

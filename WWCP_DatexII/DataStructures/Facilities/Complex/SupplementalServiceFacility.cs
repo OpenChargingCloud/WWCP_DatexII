@@ -115,20 +115,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// The quantity of subitems to this service facility type, e.g. the total number of restaurant places or fuel dispensers etc.
         /// </summary>
-        [XmlElement("numberOfSubitems",                       Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("numberOfSubitems",                       Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public UInt64?              NumberOfSubitems                        { get; } = NumberOfSubitems;
 
         /// <summary>
         /// Approximate distance (in metres) between this supplemental facility and some origin facility to which it is clearly related 
         /// (typically a larger facility, e.g. a parking site).
         /// </summary>
-        [XmlElement("distanceFromOriginFacility",             Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("distanceFromOriginFacility",             Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public UInt64?              DistanceFromOriginFacility              { get; } = DistanceFromOriginFacility;
 
         /// <summary>
         /// Optional extension element for additional supplemental service facility information.
         /// </summary>
-        [XmlElement("_supplementalServiceFacilityExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_supplementalServiceFacilityExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?            SupplementalServiceFacilityExtension    { get; } = SupplementalServiceFacilityExtension;
 
         #endregion

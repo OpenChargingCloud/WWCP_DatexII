@@ -76,7 +76,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// Countries for which the domestic socket is applicable.
         /// Only needed if explicit type of a domestic socket is not specified.
         /// </summary>
-        [XmlElement(ElementName = "countryOfDomesticSocket",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement(ElementName = "countryOfDomesticSocket",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public IEnumerable<Country>?  CountryOfDomesticSocket    { get; } = CountryOfDomesticSocket ?? [];  // 2-Letter-Code
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional content.
         /// </summary>
-        [XmlElement("_connectorExtension",                    Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_connectorExtension",                    Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?              ConnectorExtension         { get; } = ConnectorExtension;
 
         #endregion

@@ -67,20 +67,20 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Overrides the static quantity information (for example because of long- or midterm closures, such as renovation).
         /// </summary>
-        [XmlElement("quantityOverride",                      Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("quantityOverride",                      Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public UInt16?           QuantityOverride                       { get; } = QuantityOverride;
 
         /// <summary>
         /// Overrides the static value 'numberOfSubitems' (for example because of long- or midterm closures, such as renovation).
         /// </summary>
-        [XmlElement("numberOfSubitemsOverride",              Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("numberOfSubitemsOverride",              Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public UInt16?           NumberOfSubitemsOverride               { get; } = NumberOfSubitemsOverride;
 
         /// <summary>
         /// Sets the number of currently vacant elements of either equipment (e.g. free toilets) 
         /// or service facility subitems (e.g. free restaurant places).
         /// </summary>
-        [XmlElement("vacantSubitems",                        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("vacantSubitems",                        Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public UInt16?           VacantSubitems                         { get; } = VacantSubitems;
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Optional extension element for additional supplemental facility status information.
         /// </summary>
-        [XmlElement("_supplementalFacilityStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_supplementalFacilityStatusExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?         SupplementalFacilityStatusExtension    { get; } = SupplementalFacilityStatusExtension;
 
         #endregion

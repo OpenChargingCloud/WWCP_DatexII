@@ -37,7 +37,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional OpenLR point location reference information.
         /// </summary>
-        [XmlElement("_openlrPointLocationReferenceExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_openlrPointLocationReferenceExtension", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?  OpenLRPointLocationReferenceExtension    { get; } = OpenLRPointLocationReferenceExtension;
 
         #endregion

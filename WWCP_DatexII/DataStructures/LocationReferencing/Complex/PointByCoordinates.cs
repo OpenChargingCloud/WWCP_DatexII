@@ -49,13 +49,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// A bearing at the point measured in degrees (0 - 359). Unless otherwise specified the reference 
         /// direction corresponding to 0 degrees is North. Values increase in the clockwise direction.
         /// </summary>
-        [XmlElement("bearing",                       Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("bearing",                       Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public AngleInDegrees?   Bearing                        { get; } = Bearing;
 
         /// <summary>
         /// Optional extension element for additional point by coordinates information.
         /// </summary>
-        [XmlElement("_pointByCoordinatesExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_pointByCoordinatesExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?         PointByCoordinatesExtension    { get; } = PointByCoordinatesExtension;
 
         #endregion

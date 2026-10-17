@@ -29,7 +29,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
     /// <summary>
     /// Closed line string not self-intersecting (i.e. having as last point the first point)
     /// </summary>
-    [XmlType("GmlLinearRing", Namespace = "http://datex2.eu/schema/3/locationExtension")]
+    [XmlType("GmlLinearRing", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
     public class GMLLinearRing(GMLPosList  PosList,
                                UInt32?     SrsDimension             = null,
                                String?     SrsName                  = null,
@@ -48,7 +48,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional linear ring information.
         /// </summary>
-        [XmlElement("_gmlLinearRingExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_gmlLinearRingExtension", Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?  GMLLinearRingExtension    { get; } = GMLLinearRingExtension;
 
         #endregion

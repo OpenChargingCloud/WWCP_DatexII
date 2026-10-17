@@ -70,37 +70,37 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// The specification of operating hours by an overall period combined with valid or exceptional periods.
         /// </summary>
-        [XmlElement("overallPeriod",                          Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("overallPeriod",                          Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public OverallPeriod    OverallPeriod                           { get; } = OverallPeriod;
 
         /// <summary>
         /// The date/time at which this information was last updated.
         /// </summary>
-        [XmlElement("lastUpdated",                            Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("lastUpdated",                            Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public DateTimeOffset?  LastUpdated                             { get; } = LastUpdated;
 
         /// <summary>
         /// A label, name or identifier for this operating hours specification.
         /// </summary>
-        [XmlElement("label",                                  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("label",                                  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public String?          Label                                   { get; } = Label;
 
         /// <summary>
         /// Indicates that the facility or organisation is not closed on a seasonal basis.
         /// </summary>
-        [XmlElement("operatingAllYear",                       Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("operatingAllYear",                       Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?         OperatingAllYear                        { get; } = OperatingAllYear;
 
         /// <summary>
         /// A Uniform Resource Locator (URL) address pointing to a resource available on the Internet from where further relevant information may be obtained.
         /// </summary>
-        [XmlElement("urlLinkAddress",                         Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("urlLinkAddress",                         Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public URL?             URLLinkAddress                          { get; } = URLLinkAddress;
 
         /// <summary>
         /// Optional extension element for additional operating hours specification information.
         /// </summary>
-        [XmlElement("_operatingHoursSpecificationExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_operatingHoursSpecificationExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?        OperatingHoursSpecificationExtension    { get; } = OperatingHoursSpecificationExtension;
 
         #endregion

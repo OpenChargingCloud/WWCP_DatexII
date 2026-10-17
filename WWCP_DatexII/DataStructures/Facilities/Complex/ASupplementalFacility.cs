@@ -105,13 +105,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// Number of the supplemental facility (e.g. number of toilets, restaurants, park &amp; ride places, etc.)
         /// with respect to given restrictions. Dynamic overridable.
         /// </summary>
-        [XmlElement("quantity",                        Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("quantity",                        Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public UInt64?                Quantity                         { get; } = Quantity;
 
         /// <summary>
         /// Indicates whether the supplemental facility is cleaned on a regular basis.
         /// </summary>
-        [XmlElement("regularlyCleaned",                Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("regularlyCleaned",                Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?               RegularlyCleaned                 { get; } = RegularlyCleaned;
 
         /// <summary>
@@ -124,13 +124,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// If true, the Supplemental Facility is not located on the site of the original facility but nearby.
         /// They do not necessarily belong together.
         /// </summary>
-        [XmlElement("nearby",                          Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("nearby",                          Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public Boolean?               Nearby                           { get; } = Nearby;
 
         /// <summary>
         /// Optional extension element for additional information.
         /// </summary>
-        [XmlElement("_supplementalFacilityExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_supplementalFacilityExtension",  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?              SupplementalFacilityExtension    { get; } = SupplementalFacilityExtension;
 
         #endregion

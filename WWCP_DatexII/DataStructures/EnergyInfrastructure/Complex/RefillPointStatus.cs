@@ -86,7 +86,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Estimated waiting time for customers without reservation.
         /// </summary>
-        [XmlElement("waitingTime",                  Namespace = "http://datex2.eu/schema/3/afirFacilities")]
+        [XmlElement("waitingTime",                  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public TimeSpan?                              WaitingTime                   { get; } = WaitingTime;
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
         /// <summary>
         /// Optional extension element for additional refill point status information.
         /// </summary>
-        [XmlElement("_refillPointStatusExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_refillPointStatusExtension",  Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
         public XElement?                              RefillPointStatusExtension    { get; } = RefillPointStatusExtension;
 
         #endregion

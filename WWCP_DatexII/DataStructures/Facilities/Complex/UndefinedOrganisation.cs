@@ -45,7 +45,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         /// <summary>
         /// Optional extension element for additional undefined organisation information.
         /// </summary>
-        [XmlElement("_undefinedOrganisationExtension", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_undefinedOrganisationExtension", Namespace = "http://datex2.eu/schema/3/afirFacilities")]
         public XElement?  UndefinedOrganisationExtension    { get; } = UndefinedOrganisationExtension;
 
         #endregion

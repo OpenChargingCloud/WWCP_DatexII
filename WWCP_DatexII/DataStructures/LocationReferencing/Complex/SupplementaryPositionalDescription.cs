@@ -42,7 +42,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Supplementary human-readable description of the location.
         /// </summary>
-        [XmlElement("locationDescription",                           Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("locationDescription",                           Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public MultilingualString?  LocationDescription                            { get; } = LocationDescription;
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.LocationReferencing
         /// <summary>
         /// Optional extension element for additional supplementary positional information.
         /// </summary>
-        [XmlElement("_supplementaryPositionalDescriptionExtension",  Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("_supplementaryPositionalDescriptionExtension",  Namespace = "http://datex2.eu/schema/3/locationReferencing")]
         public XElement?            SupplementaryPositionalDescriptionExtension    { get; } = SupplementaryPositionalDescriptionExtension;
 
         #endregion

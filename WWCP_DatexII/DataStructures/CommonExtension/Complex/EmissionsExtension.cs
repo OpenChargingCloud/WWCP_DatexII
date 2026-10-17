@@ -39,7 +39,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.CommonExtension
         /// A comparison operator for the applicable emission classifications in correspondence to the specified value.
         /// The comparison applies to the Roman- or Arabic-numbered portion (e.g. euro6 > euro5b), but not crosswise (e.g. euro6 cannot be compared to euroV).
         /// </summary>
-        [XmlElement("comparisonOperator", Namespace = "http://datex2.eu/schema/3/common")]
+        [XmlElement("comparisonOperator", Namespace = "http://datex2.eu/schema/3/commonExtension")]
         public ComparisonOperator  ComparisonOperator    { get; } = ComparisonOperator;
 
         #endregion
