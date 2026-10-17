@@ -524,7 +524,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(evse.ChargingConnectors.Single().Format,           Is.EqualTo(POI.ChargingConnectorFormat.CABLE));
                 Assert.That(evse.ChargingTariffIds,                            Is.EqualTo(new[] { T1 }));
 
-                Assert.That(JToken.DeepEquals(expected, actual),               Is.True, $"{expected}\n{actual}");
+                Assert.That(TestParties.SameByValue(expected, actual),         Is.True, $"{expected}\n{actual}");
 
             });
 
