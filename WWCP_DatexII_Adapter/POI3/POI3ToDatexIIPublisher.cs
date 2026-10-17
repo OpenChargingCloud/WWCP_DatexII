@@ -102,9 +102,35 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         private readonly ConcurrentDictionary<POI.EVSE_Id, Byte>            plannedEnergyDeltas   = new ();
 
         /// <summary>
+        /// The EVSEs of the next grouped status delta, whether it is planned, and when the last one was published; how
+        /// many deltas were published since the last full status, and the schedule of the next full status. Only the
+        /// worker touches them.
+        /// </summary>
+        private readonly HashSet<POI.EVSE_Id>                               pendingDeltaEVSEs     = [];
+        private          Boolean                                            deltaPlanned;
+        private          DateTimeOffset                                     lastGroupedDelta      = DateTimeOffset.MinValue;
+        private          UInt32                                             deltasSinceSnapshot;
+        private          Int32                                              snapshotGeneration;
+
+        /// <summary>
         /// The default least time between two status deltas of an EVSE for a changed energy status: one minute.
         /// </summary>
         public static readonly TimeSpan DefaultEnergyStatusDeltaInterval = TimeSpan.FromMinutes(1);
+
+        /// <summary>
+        /// The Mobilithek profile: status deltas at most once a second, the changes of a second grouped.
+        /// </summary>
+        public static readonly TimeSpan MobilithekStatusDeltaInterval    = TimeSpan.FromSeconds(1);
+
+        /// <summary>
+        /// The Mobilithek profile: a full status at least every six hours...
+        /// </summary>
+        public static readonly TimeSpan MobilithekSnapshotInterval       = TimeSpan.FromHours(6);
+
+        /// <summary>
+        /// ...and after at most 3500 status deltas.
+        /// </summary>
+        public const           UInt32   MobilithekMaxDeltasPerSnapshot   = 3500;
 
         #endregion
 
@@ -146,6 +172,24 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// status is published at once, and with it the energy status as it is then. Zero publishes every change.
         /// </summary>
         public TimeSpan                                        EnergyStatusDeltaInterval   { get; }
+
+        /// <summary>
+        /// The least time between two status deltas: the changes until then are grouped into one delta. Zero, the
+        /// default, publishes every delta at once; the Mobilithek profile wants one second (MobilithekStatusDeltaInterval).
+        /// </summary>
+        public TimeSpan                                        StatusDeltaInterval         { get; }
+
+        /// <summary>
+        /// The longest time between two full status publications: when it is over, the full status is published again,
+        /// though nothing changed. None by default; the Mobilithek profile wants six hours (MobilithekSnapshotInterval).
+        /// </summary>
+        public TimeSpan?                                       SnapshotInterval            { get; }
+
+        /// <summary>
+        /// The most status deltas between two full status publications: after as many, the full status is published
+        /// again. None by default; the Mobilithek profile wants 3500 (MobilithekMaxDeltasPerSnapshot).
+        /// </summary>
+        public UInt32?                                         MaxDeltasPerSnapshot        { get; }
 
         /// <summary>
         /// The current table publication, once started.
@@ -195,17 +239,32 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// <param name="OperatorIds">The operators to publish; all, unless given.</param>
         /// <param name="StationIdBNetzA">Tells the station identification of the Bundesnetzagentur of a charging station.</param>
         /// <param name="EnergyStatusDeltaInterval">The least time between two status deltas of an EVSE for a changed energy status; one minute by default, zero for every change.</param>
+        /// <param name="StatusDeltaInterval">The least time between two status deltas, the changes until then grouped; zero by default, for every delta at once.</param>
+        /// <param name="SnapshotInterval">The longest time between two full status publications; none by default.</param>
+        /// <param name="MaxDeltasPerSnapshot">The most status deltas between two full status publications; none by default.</param>
         public POI3ToDatexIIPublisher(POI.RoamingNetworkHistory                      History,
                                       InternationalIdentifier                        PublicationCreator,
                                       Languages?                                     Language                    = null,
                                       String?                                        TableId                     = null,
                                       IEnumerable<POI.ChargingStationOperator_Id>?   OperatorIds                 = null,
                                       StationIdBNetzADelegate?                       StationIdBNetzA             = null,
-                                      TimeSpan?                                      EnergyStatusDeltaInterval   = null)
+                                      TimeSpan?                                      EnergyStatusDeltaInterval   = null,
+                                      TimeSpan?                                      StatusDeltaInterval         = null,
+                                      TimeSpan?                                      SnapshotInterval            = null,
+                                      UInt32?                                        MaxDeltasPerSnapshot        = null)
         {
 
             if (EnergyStatusDeltaInterval < TimeSpan.Zero)
                 throw new ArgumentException("The energy status delta interval must not be negative!", nameof(EnergyStatusDeltaInterval));
+
+            if (StatusDeltaInterval < TimeSpan.Zero)
+                throw new ArgumentException("The status delta interval must not be negative!", nameof(StatusDeltaInterval));
+
+            if (SnapshotInterval <= TimeSpan.Zero)
+                throw new ArgumentException("The snapshot interval must be positive!", nameof(SnapshotInterval));
+
+            if (MaxDeltasPerSnapshot == 0)
+                throw new ArgumentException("The most status deltas per snapshot must be positive!", nameof(MaxDeltasPerSnapshot));
 
             this.History             = History;
             this.PublicationCreator  = PublicationCreator;
@@ -214,6 +273,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             this.OperatorIds         = OperatorIds?.ToHashSet();
             this.StationIdBNetzA     = StationIdBNetzA;
             this.EnergyStatusDeltaInterval = EnergyStatusDeltaInterval ?? DefaultEnergyStatusDeltaInterval;
+            this.StatusDeltaInterval       = StatusDeltaInterval       ?? TimeSpan.Zero;
+            this.SnapshotInterval          = SnapshotInterval;
+            this.MaxDeltasPerSnapshot      = MaxDeltasPerSnapshot;
 
         }
 
@@ -269,6 +331,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             History.RuntimeStatus.OnStatusPlanned  -= StatusPlanned;
 
             Interlocked.Increment(ref openingGeneration);
+            Interlocked.Increment(ref snapshotGeneration);
 
             work.Writer.TryComplete();
 
@@ -417,6 +480,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             await Raise(OnStatusPublication, handler => handler(this, CurrentStatusPublication, false));
 
+            SnapshotPublished();
+
             ScheduleOpeningChange();
 
         }
@@ -538,7 +603,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             => PublishStatusAsync([ EVSEId ]);
 
         /// <summary>
-        /// Renew the full status, and publish the status of the given EVSEs as one delta.
+        /// Renew the full status, and publish the status of the given EVSEs as one delta: at once, or grouped with the
+        /// others until the status delta interval since the last delta is over.
         /// </summary>
         private async Task PublishStatusAsync(IReadOnlyList<POI.EVSE_Id> EVSEIds)
         {
@@ -546,14 +612,63 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             if (TableVersion is null || EVSEIds.Count == 0)
                 return;
 
-            var head  = History.Head.RoamingNetwork;
-
-            CurrentStatusPublication = POI3Mapper.ToStatusPublication(head,
+            CurrentStatusPublication = POI3Mapper.ToStatusPublication(History.Head.RoamingNetwork,
                                                                       PublicationCreator,
                                                                       Language,
                                                                       TableId,
                                                                       TableVersion,
                                                                       OperatorIds);
+
+            if (StatusDeltaInterval == TimeSpan.Zero)
+            {
+                await PublishDeltaAsync(EVSEIds);
+                return;
+            }
+
+            pendingDeltaEVSEs.UnionWith(EVSEIds);
+
+            if (deltaPlanned)
+                return;
+
+            var wait = lastGroupedDelta + StatusDeltaInterval - Timestamp.Now;
+
+            if (wait <= TimeSpan.Zero)
+            {
+                await PublishPendingDeltaAsync();
+                return;
+            }
+
+            deltaPlanned = true;
+
+            _ = Task.Delay(wait).ContinueWith(_ => work.Writer.TryWrite(PublishPendingDeltaAsync), TaskScheduler.Default);
+
+        }
+
+        /// <summary>
+        /// Publish the status of the EVSEs grouped since the last delta as one delta, as it is now.
+        /// </summary>
+        private Task PublishPendingDeltaAsync()
+        {
+
+            deltaPlanned = false;
+
+            var evseIds = pendingDeltaEVSEs.ToArray();
+            pendingDeltaEVSEs.Clear();
+
+            return PublishDeltaAsync(evseIds);
+
+        }
+
+        /// <summary>
+        /// Publish the status of the given EVSEs as one delta; after the most deltas per snapshot, the full status.
+        /// </summary>
+        private async Task PublishDeltaAsync(IReadOnlyList<POI.EVSE_Id> EVSEIds)
+        {
+
+            if (TableVersion is null || EVSEIds.Count == 0)
+                return;
+
+            var head  = History.Head.RoamingNetwork;
 
             var delta = POI3Mapper.ToStatusPublication(head,
                                                        PublicationCreator,
@@ -573,9 +688,58 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 foreach (var evseId in EVSEIds)
                     lastDeltas[evseId] = now;
 
+                lastGroupedDelta = now;
+
                 await Raise(OnStatusPublication, handler => handler(this, delta, true));
 
+                if (MaxDeltasPerSnapshot.HasValue && ++deltasSinceSnapshot >= MaxDeltasPerSnapshot.Value)
+                    await PublishSnapshotAsync();
+
             }
+
+        }
+
+        #endregion
+
+        #region (private) PublishSnapshotAsync() / SnapshotPublished()
+
+        /// <summary>
+        /// Publish the full status again, as it is now: it tells nothing the deltas did not.
+        /// </summary>
+        private async Task PublishSnapshotAsync()
+        {
+
+            if (TableVersion is null)
+                return;
+
+            CurrentStatusPublication = POI3Mapper.ToStatusPublication(History.Head.RoamingNetwork,
+                                                                      PublicationCreator,
+                                                                      Language,
+                                                                      TableId,
+                                                                      TableVersion,
+                                                                      OperatorIds);
+
+            await Raise(OnStatusPublication, handler => handler(this, CurrentStatusPublication, false));
+
+            SnapshotPublished();
+
+        }
+
+        /// <summary>
+        /// The full status was published: count the deltas anew, and publish it again when the snapshot interval is over.
+        /// </summary>
+        private void SnapshotPublished()
+        {
+
+            deltasSinceSnapshot = 0;
+
+            var generation = Interlocked.Increment(ref snapshotGeneration);
+
+            if (SnapshotInterval is TimeSpan interval)
+                _ = Task.Delay(interval).ContinueWith(_ => {
+                        if (generation == Volatile.Read(ref snapshotGeneration))
+                            work.Writer.TryWrite(PublishSnapshotAsync);
+                    }, TaskScheduler.Default);
 
         }
 

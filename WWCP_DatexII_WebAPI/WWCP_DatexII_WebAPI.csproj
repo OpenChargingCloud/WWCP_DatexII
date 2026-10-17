@@ -4,6 +4,13 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>cloud.charging.open.protocols.DatexII.v3.WebAPI</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Hermod\Hermod\Hermod.csproj" />
+    <ProjectReference Include="..\WWCP_DatexII\WWCP_DatexII.csproj" />
+    <ProjectReference Include="..\WWCP_DatexII_Adapter\WWCP_DatexII_Adapter.csproj" />
+  </ItemGroup>
 
 </Project>

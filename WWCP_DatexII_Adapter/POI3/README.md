@@ -10,6 +10,8 @@ with the profile "AFIR Energy Infrastructure" 01-00-00.
 | `POI3Mapper` | The mapping itself: pure conversions in both directions, with warnings for what does not map. |
 | `POI3ToDatexIIPublisher` | **CPO side.** Turns a `RoamingNetworkHistory` into a current `EnergyInfrastructureTablePublication` and `EnergyInfrastructureStatusPublication`, and raises events for new ones, e.g. to push them to a national access point. |
 | `DatexIIToPOI3Importer` | **Consumer side.** Commits table and status publications, e.g. read from a national access point, to a `RoamingNetworkHistory`. |
+| `MobilithekPushClient` (`WWCP_DatexII_WebAPI`) | **Transport, push.** Pushes the publications of a publisher to the Mobilithek: tables to its static publication, statuses to its dynamic one, over mutual TLS. |
+| `DatexIIHTTPAPI` (`WWCP_DatexII_WebAPI`) | **Transport, pull.** Serves the current table and full status over HTTP, as XML, DATEX II 3.7 JSON and Mobilithek JSON. |
 
 The DATEX II side is the model of [`WWCP_DatexII`](../../WWCP_DatexII): DATEX II 3.7 in the namespaces
 `afirEnergyInfrastructure` (`aegi`) and `afirFacilities` (`afac`). It is written and read as XML, as DATEX II 3.7 JSON,
@@ -18,17 +20,30 @@ and as the JSON of the Mobilithek profile (see the [main README](../../README.md
 ## Usage
 
 ```csharp
-// CPO side: the head as the current publications, and every commit and EVSE status change from now on.
+// CPO side: the head as the current publications, and every commit and EVSE status change from now on, with the
+// delta and snapshot rules of the Mobilithek profile.
 await using var publisher = new POI3ToDatexIIPublisher(history,
                                                        new InternationalIdentifier(Country.Germany, "DE-NAP-GEF"),
                                                        Languages.de,
-                                                       OperatorIds:     [ ChargingStationOperator_Id.Parse("DE*GEF") ],
-                                                       StationIdBNetzA: station => stationIds.GetValueOrDefault(station.Id));
-publisher.OnTablePublication  += async (sender, table)           => await PushToNAP(table. ToJSON(DatexIIJSONDialect.Mobilithek_01_00_00));
-publisher.OnStatusPublication += async (sender, status, isDelta) => await PushToNAP(status.ToJSON(DatexIIJSONDialect.Mobilithek_01_00_00));  // snapshotPush or deltaPush
-publisher.OnError             += (sender, description, warnings) => …;
+                                                       OperatorIds:           [ ChargingStationOperator_Id.Parse("DE*GEF") ],
+                                                       StationIdBNetzA:       station => stationIds.GetValueOrDefault(station.Id),
+                                                       StatusDeltaInterval:   POI3ToDatexIIPublisher.MobilithekStatusDeltaInterval,
+                                                       SnapshotInterval:      POI3ToDatexIIPublisher.MobilithekSnapshotInterval,
+                                                       MaxDeltasPerSnapshot:  POI3ToDatexIIPublisher.MobilithekMaxDeltasPerSnapshot);
+publisher.OnError += (sender, description, warnings) => …;
+
+// Pushed to the two publications of the data provider at the Mobilithek, with its machine certificate.
+await using var pusher = new MobilithekPushClient(StaticPublicationId:      123456,
+                                                  DynamicPublicationId:     123457,
+                                                  MachineCertificate:       X509CertificateLoader.LoadPkcs12FromFile("machine.p12", password),
+                                                  TrustedRootCertificates:  mobilithekChain);
+pusher.OnPush += (sender, publicationId, publication, result) => …;
+pusher.Attach(publisher);
+
+// And served for a pull: {RootPath}/table.xml, table.json, mobilithek/table.json, and the same for status.
+var api = new DatexIIHTTPAPI(httpServer, () => publisher.CurrentTablePublication, () => publisher.CurrentStatusPublication, HTTPPath.Parse("/datex"));
+
 await publisher.StartAsync();
-var servedOnRequest = publisher.CurrentTablePublication;     // and CurrentStatusPublication; ToXML() for DATEX II XML
 
 // Consumer side: commit what is read, signed with the keys of the operators.
 await using var importer = new DatexIIToPOI3Importer(history, changeSet => changeSet.Sign(operatorKey, operatorKeyId, COSEAlgorithm.ES256));
@@ -65,8 +80,39 @@ await importer.ImportAsync(table!);
   `EnergyStatusDeltaInterval` ago (a constructor parameter, one minute by default, zero for every change); otherwise
   one delta follows when the interval is over, with the energy status as it is then. A status change is published at
   once anyway, with the energy status as it is.
-- **Serving and pushing:** the publisher keeps the current publications and raises events. Serving them, e.g. over
-  HTTP for a pull by the national access point, and pushing them is up to the subscribers.
+- **Grouped deltas:** with a `StatusDeltaInterval` (zero by default), a delta is published at once when the last one is
+  at least that long ago; the changes until then are grouped into one delta of their EVSEs, as they are then. The
+  Mobilithek profile wants at most one delta a second (`MobilithekStatusDeltaInterval`).
+- **Snapshots:** with a `SnapshotInterval` and `MaxDeltasPerSnapshot` (none by default), the full status is published
+  again when that long passed since the last one, or after as many deltas. It tells nothing the deltas did not. The
+  Mobilithek profile wants one at least every six hours and after at most 3500 deltas (`MobilithekSnapshotInterval`,
+  `MobilithekMaxDeltasPerSnapshot`).
+- **Serving and pushing:** the publisher keeps the current publications and raises events. `WWCP_DatexII_WebAPI` serves
+  and pushes them, see [Transport](#transport).
+
+### Transport
+
+The Mobilithek's guideline for AFIR recharging offers wants two publications of the data provider, both pushed over
+HTTPS as the JSON of the profile: a static one for the tables, whose offer does not take deltas, and a dynamic one for
+the statuses, whose offer does. Its technical interface description (TSSB 1.3.2) tells how.
+
+- **`MobilithekPushClient`:** a `POST` of the Mobilithek JSON to `https://mobilithek.info:8443/mobilithek/api/v1.0/publication/{id}`,
+  gzip compressed unless told otherwise, authenticated by the machine certificate the Mobilithek issued to the data
+  provider's organisation (mutual TLS). The Mobilithek signs its server certificate itself, so it is checked against the
+  given root certificates (its chain from mobilithek.info/help/download), else by the operating system. A table is a
+  bare payload and replaces the static data at the Mobilithek; a status is in its message container, a `snapshotPush`
+  or, for a delta, a `deltaPush`. Attached to a publisher, it pushes one publication after the other, in their order; a
+  table that could not be pushed is pushed again before the next status, and after a status that could not be pushed,
+  the next status pushed is the full one rather than a delta, as the Mobilithek missed a change. `OnPush` tells every
+  result: 400 an invalid publication identification, 403 a certificate not authorised for the publication, 404 an
+  unknown or expired publication, 422 a delta without a valid exchange protocol.
+- **`DatexIIHTTPAPI`:** a snapshot pull from a simple HTTP server (DATEX II Exchange 2020, Annex K), e.g. for the
+  Mobilithek polling a URL of the offer, or any other subscriber: `GET {RootPath}/table.xml` and `status.xml` (DATEX II
+  3.7 XML, `text/xml`), `table.json` and `status.json` (DATEX II 3.7 JSON), `mobilithek/table.json` and
+  `mobilithek/status.json` (Mobilithek JSON, the status as a snapshot). `Last-Modified` is the publication time, a request
+  with `If-Modified-Since` gets `304 Not Modified` when nothing newer was published, and `503 Service Unavailable` comes
+  before the first publication. Compression (`AutomaticContentCompression`) and client certificates are the HTTP
+  server's.
 
 ### Importer
 
@@ -343,10 +389,11 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
 - **Two publications:** DATEX II separates static data (table) and status (status publication). The status refers to
   the table by version, so a status publication is only meaningful together with its table. The publisher therefore
   publishes the full status again after every new table version.
-- **Deltas:** the publisher publishes status deltas, but always full tables. Delta tables (only the changed sites, as the
-  Mobilithek profile allows) are not made.
-- **Transport:** neither class does HTTP, the Mobilithek push or pull, or the subscription handling of DATEX II
-  (`WWCP_DatexII_WebAPI` is still empty).
+- **Deltas:** the publisher publishes status deltas, but always full tables. The Mobilithek takes no table deltas: the
+  offer of the static data must not take deltas, and every table replaces the one before.
+- **Transport:** the Mobilithek push and a pull from a simple HTTP server are there (see [Transport](#transport)). The
+  stateful push and subscription handling of DATEX II Exchange 2020 (SOAP) are not, nor is deleting the content of a
+  publication at the Mobilithek.
 
 ## The DATEX II implementation and the standard
 
