@@ -88,6 +88,15 @@ await importer.ImportAsync(table!);
   statuses that have not started yet are planned as statuses of the
   EVSE from their start; when one ends without another starting then, the EVSE is planned to have its current status
   again.
+- **Operation and energy status:** the `operationStatus` of a site, station or refill point becomes the admin status of
+  the charging pool, charging station or EVSE: `inOperation` is operational. `notInOperation` is out of service, unless
+  the current admin status already tells why it is not operational; for an EVSE, a refill point status `planned`,
+  `blocked` or `internalUse` is that admin status. The `currentChargingPower`, `currentVoltage` and
+  `remainingChargingTime` of a charging point become the energy status of its EVSE; DATEX II does not tell the power
+  still `available`, so it is none while the EVSE charges and its maximum power otherwise.
+- **Identifications:** two DATEX II identifications can become the same POI3 identification (see
+  [Identifications and versions](#identifications-and-versions)). The first site, station or charging point is
+  imported, a warning tells about the others, and their statuses are not taken for its status.
 - **Other refill points:** diesel, petrol and alternative fuels refill points have no POI3 counterpart. They are left out
   with a warning ("imported partly"), and their statuses are skipped.
 - **Operators:** they must already be in the roaming network. Adding them is up to the roaming network operator.
@@ -106,11 +115,11 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | POI3 | DATEX II |
 |---|---|
 | operator `DE*GEF` | the site `operator`: an `afac:AnOrganisation` with the external identifier `DE*GEF` of the type `operatorId`, as the Mobilithek profile wants it. Import: from the `operatorId` of the site's operator, else of a station's operator, else from the EVSE identification of the first charging point. |
-| charging pool `DE*GEF*P1` | site `id` `DE*GEF*P1`. Import: a foreign identification, e.g. a GUID, becomes `DE*GEF*P` + its first 30 letters and digits. |
+| charging pool `DE*GEF*P1` | site `id` `DE*GEF*P1`. Import: a foreign identification, e.g. a GUID, becomes `DE*GEF*P` + its first 30 letters and digits; of two that become the same, the first is imported. |
 | charging station `DE*GEF*S1` | station `id` `DE*GEF*S1`. Import: as for the pool, `…*S…`. |
 | — | the station's external identifier of the type `stationIdBNetzA`, from the `StationIdBNetzA` delegate. Without one there is none, and a warning says so. |
 | EVSE `DE*GEF*E1*1` | refill point `id`, and its external identifier `DE*GEF*E1*1` of the type `evseId` (only on the charging point, as the profile wants it). Import: from the `evseId`, else `id`, else `…*E…`. |
-| charging connector `1` | — (connectors have no identification; import numbers them 1, 2, …) |
+| charging connector `1` | connector `externalIdentifier` `1` of the type `connectorId` (an `otherTypeOfIdentifier`, also in the Mobilithek profile). Import: kept, unless two connectors of a charging point have it; the others are numbered 1, 2, … with the numbers no connector keeps. |
 | charging tariff `DE*GEF*T1` | energy rate `id` `DE*GEF*T1`. Import: a foreign identification becomes the suffix `DE*GEF*T<id>`. |
 | `LastChangeDate` | `version`: milliseconds since 1970, so a later change has a greater version, and `lastUpdated` |
 | commit revision | table `version`; the status refers to it as `tableReference` |
@@ -126,11 +135,11 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 | `NUTSCodes` | `afirFacilityLocation/nutsArea`s of the site: level 1 → `nuts1Code`, 2 → `nuts2Code`, 3 → `nuts3Code`; a country (level 0) is left out. Import: the NUTS 1 to 3 areas of the site and of its stations. |
 | `TimeZone` (or that of the address) | `afirFacilityLocation/timeZone`, as an offset: the standard offset of the zone, e.g. Europe/Berlin → `+01:00` |
 | `ParkingType` | `typeOfSite`: ON_STREET ↔ `onstreet`; PARKING_GARAGE, UNDERGROUND_GARAGE → `inBuilding` → PARKING_GARAGE; PARKING_LOT, ALONG_MOTORWAY → `openSpace` → PARKING_LOT; ON_DRIVEWAY → `other` |
-| `OpeningTimes` | `operatingHours`: open 24/7 ↔ `afac:OpenAllHours`. Regular openings ↔ `afac:OperatingHoursSpecification` with one valid period per time of day (`recurringTimePeriodOfDay`) on its weekdays (`recurringDayWeekMonthPeriod`); the overall period starts with the creation of the pool. |
+| `OpeningTimes` | `operatingHours`: open 24/7 ↔ `afac:OpenAllHours`. Regular openings ↔ `afac:OperatingHoursSpecification` with one valid period per time of day (`recurringTimePeriodOfDay`) on its weekdays (`recurringDayWeekMonthPeriod`); the overall period starts with the creation of the pool. The free text is the `label` of the operating hours specification. |
 | `Facilities` | `supplementalFacility`: HOTEL ↔ `hotel`, RESTAURANT ↔ `restaurant` (import also `restaurantSelfService`, `motorwayRestaurant…`), CAFE ↔ `cafe` (import also `snackBar`), MALL ↔ `shop`, SUPERMARKET ↔ `foodShopping`, BIKE_SHARING ↔ `bikeSharing`, FUEL_STATION ↔ `petrolStation` (all `afac:SupplementalServiceFacility`), WIFI ↔ `afac:SupplementalEquipment` `internetWireless` |
 | `Images` (URLs) | `photoUrl`. Import: images in the category LOCATION, type by file extension. |
 | `HotlinePhoneNumber`, else the operator's | `helpdesk`: an `afac:AnOrganisation` "Hotline" whose organisation unit has the telephone number |
-| first brand | `brand` (its name) |
+| first brand | `brand` (its name; a site has at most one) |
 | operator: name, description, homepage, logo, telephone, e-mail | `operator`: `name`, `description`, `linkToGeneralInformation`, `linkToLogo`, organisation unit contact information, and the external identifier `operatorId` |
 | `LocationLanguages` | the `userInterfaceLanguage`s of the stations (union on import) |
 | `AuthenticationModes`, `PaymentOptions` | the `authenticationAndIdentificationMethods` of the stations (see below; union on import) |
@@ -218,13 +227,13 @@ maximum current of an EVSE, given once for all members of a group. A change of a
 | EVSE admin status, where not operational | planned, inDeployment → `planned`; deleted → `removed`; outOfService → `inoperative`; blocked → `blocked`; internalUse → `internalUse` |
 | import | `available`, `blocked`, `charging`, `faulted`, `inoperative`, `occupied`, `outOfOrder`, `planned` (→ inDeployment), `removed`, `reserved`, `unavailable`, `outOfStock` (→ unavailable), else unknown |
 | status / admin status timestamp | `lastUpdated` (the later of both) |
-| admin status | `operationStatus`: operational → `inOperation`, planned/inDeployment/outOfService/blocked/deleted → `notInOperation` (also of the site, from the pool's admin status) |
+| admin status | `operationStatus`: operational → `inOperation`, planned/inDeployment/outOfService/blocked/deleted → `notInOperation` (also of the site and station, from the admin statuses of pool and station). Import: see the importer. |
 | — | station `isAvailable`: any of its charging points `available` (full publications only) |
 | entity versions | `reference` `id` and `version`, the same as in the table |
 | exceptional closings and openings of the pool's `OpeningTimes` | site status: during a closing `openingStatus` `temporarilyClosed`, during an opening `open`, with `regularOperatingHoursInForce` false; while there are current or future ones, `regularOperatingHoursInForce` true otherwise, and `newOperatingHours`: the regular operating hours, the openings as dated valid periods, the closings as exception periods. The table keeps the regular operating hours. Not imported: POI3 opening times are content, changed by commits. |
 | price status of the EVSE, its charging station and its charging pool | `energyRateUpdate`s of its `refillPointStatus`: for every charging tariff the most specific new prices (`ChargingPrices.Effective`), referring to the rate of the tariff, since the timestamp of the price status, the prices as those of the tariff in the table. Import: the price status of the EVSE. |
 | future entries of the EVSE status and admin status schedules | `plannedRefillPointStatus`: from every future entry that changes the refill point status (as the current one: admin status first), until the next such change; the last one without an end. Import: planned EVSE statuses, see the importer. |
-| EVSE energy status `used`, `currentVoltage`, `remainingChargingTime` | `currentChargingPower`, `currentVoltage`, `remainingChargingTime` of its `refillPointStatus`; its timestamp also counts for `lastUpdated`. `available` (the power a newly arriving vehicle would get) and `storedEnergy` have no counterpart. Not imported: POI3 is where these values come from. |
+| EVSE energy status `used`, `currentVoltage`, `remainingChargingTime` | `currentChargingPower`, `currentVoltage`, `remainingChargingTime` of its `refillPointStatus`; its timestamp also counts for `lastUpdated`. `available` (the power a newly arriving vehicle would get) and `storedEnergy` have no counterpart. Import: the energy status of the EVSE, see the importer. |
 | full status / one changed EVSE | `IsDelta` false / true: `snapshotPush` / `deltaPush` in the Mobilithek message container |
 
 ### What the import keeps
@@ -285,11 +294,11 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
 - **Price components:** PARKING_TIME prices, step sizes and the prices of a reservation have no counterpart. Power and
   current restrictions have none either; energy and duration restrictions only in whole kWh and minutes.
 - **Opening times:** exceptional openings and closings are not in the table, but in the site status (see above). The
-  free text is left out.
+  free text is the label of the operating hours; opening times around the clock have none in DATEX II, so their free
+  text is left out, and so is a free text without regular openings.
 - **Time zone:** DATEX II has a fixed UTC offset, not a named zone with daylight saving time. The standard offset is
   published; the import does not set the time zone.
-- **Connectors:** connector identifications are not published (3.7 has `externalIdentifier` on a connector). CHAOJI,
-  GB/T, NEMA and others become `other`. Per connector, DATEX II gives power, voltage and current, but POI3 has them only
+- **Connectors:** CHAOJI, GB/T, NEMA and others become `other`. Per connector, DATEX II gives power, voltage and current, but POI3 has them only
   per EVSE, so all connectors of an EVSE get the same values. Whether a connector can be locked, its cable length,
   weight and cable management system, its standards and images have no counterpart; as DATEX II tells the connectors
   of a charging point as a whole, the import replaces them and these are lost.
@@ -299,7 +308,8 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
   charging point, the properties charging station groups give onto their stations), tariff groups, signing and identity keys, data licenses, energy meters, grid connection points,
   manufacturers and models, calibration and certification links, entrance and exit addresses, related locations,
   charging when closed, UI features and the further pool and station features.
-- **Brands:** only the first brand's name is published.
+- **Brands:** DATEX II has at most one brand per site and none per station, so only the name of the pool's first
+  brand is published.
 - **Images:** POI3 images are URLs, so they are published as `photoUrl`, never as embedded `photo` data.
 
 ### What DATEX II has and POI3 does not, or not here
@@ -318,14 +328,15 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
   products of a station (rather than of its charging points) are imported only as rates.
 - **Hydrogen:** the hydrogen of a station (refuelling modes, capacity) is read and written by the library, but has no
   POI3 counterpart.
-- **Status:** only the refill point `status`, its planned statuses (as planned EVSE statuses, not admin statuses) and the
-  energy rate updates of refill points and stations are imported. Waiting time, remaining charging time, current
-  voltage and power, next available slots,
-  opening and operation status, faults, limited hydrogen amount, and site and station statuses are not.
+- **Status:** the refill point `status`, its planned statuses (as planned EVSE statuses, not admin statuses), the
+  energy rate updates of refill points and stations, the operation status of sites, stations and refill points, and
+  the current charging power, voltage and remaining charging time are imported. Waiting time, next available slots,
+  the opening status, faults and the limited hydrogen amount have no POI3 counterpart and are not.
 - **Locations:** only point and area locations are used, and only their display coordinates and address. GML
   geometries, NUTS areas, heights and accuracies are read by the library, but not imported; OpenLR is not read.
-- **Identifications:** foreign identifications longer than 30 letters and digits are cut. Two such sites or stations of
-  one operator that differ only after 30 characters would collide.
+- **Identifications:** foreign identifications longer than 30 letters and digits are cut, and only letters and digits
+  are kept. Two sites, stations or charging points of one operator that differ only after 30 letters and digits, or
+  only in other characters, would be the same: the first is imported, and a warning tells about the others.
 
 ### Structural
 

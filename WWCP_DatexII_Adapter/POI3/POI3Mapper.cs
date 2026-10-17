@@ -71,7 +71,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         /// <summary>
         /// A suffix of a POI3 identification made of the given DATEX II identification: its letters and digits,
-        /// at most 30 of them, e.g. of a GUID.
+        /// at most 30 of them, e.g. of a GUID. Two identifications that differ only in other characters or after the
+        /// 30th letter or digit have the same suffix; the import takes the first of them and warns about the others.
         /// </summary>
         /// <param name="Id">A DATEX II identification.</param>
         public static String ToPOI3Suffix(String Id)
@@ -169,6 +170,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             return POI.ChargingTariff_Id.TryParse(OperatorId, RateId);
 
         }
+
+        /// <summary>
+        /// The identification of the given connector: its external identifier of the type connectorId, when it is one.
+        /// </summary>
+        public static POI.ChargingConnector_Id? ConnectorIdOf(Connector Connector)
+
+            => Connector.ExternalIdentifier.
+                         FirstOrDefault(identifier => identifier.Type == TypeOfIdentifier.ConnectorId)?.Identifier is String text
+                   ? POI.ChargingConnector_Id.TryParse(text)
+                   : null;
 
         /// <summary>
         /// The operator identification of the given organisation: its external identifier of the type operatorId.
@@ -600,7 +611,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         /// <summary>
         /// The connector of the given charging connector: its plug type, and the maximum power, voltage and current of
-        /// its EVSE.
+        /// its EVSE, and its identification as an external identifier of the type connectorId.
         /// </summary>
         public static Connector ToDatexII(this POI.ChargingConnector  ChargingConnector,
                                           POI.EVSE                    EVSE,
@@ -618,7 +629,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                        OtherConnector:    connectorType.HasValue ? null : ChargingConnector.Type.ToString(),
                        ConnectorFormat:   ToDatexII(ChargingConnector.Format, EVSE.ChargingModes),
                        Voltage:           EVSE.MaxVoltage,
-                       MaximumCurrent:    EVSE.MaxCurrent
+                       MaximumCurrent:    EVSE.MaxCurrent,
+                       ExternalIdentifier:  [ ExternalIdentifier.Of(ChargingConnector.Id.ToString(), TypeOfIdentifier.ConnectorId) ]
                    );
 
         }
@@ -1086,11 +1098,12 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                    ).ToJSON();
 
             var mappedStations   = new List<JObject>();
+            var stationOfId      = new Dictionary<POI.ChargingStation_Id, String>();
 
             foreach (var station in Site.EnergyInfrastructureStations)
             {
                 var chargingStation = station.ToPOI3(OperatorId, Language, Warnings);
-                if (chargingStation is not null)
+                if (chargingStation is not null && IsFirst(stationOfId, chargingStation.Id, station.Id, "stations", "charging station", Warnings))
                     mappedStations.Add(chargingStation.ToJSON());
             }
 
@@ -1209,6 +1222,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             var evses = new List<POI.EVSE>();
 
+            var chargingPointOfId = new Dictionary<POI.EVSE_Id, String>();
+
             foreach (var refillPoint in Station.RefillPoints)
             {
 
@@ -1220,7 +1235,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
                 var evse = chargingPoint.ToPOI3(OperatorId, Language, Warnings);
 
-                if (evse is not null)
+                if (evse is not null && IsFirst(chargingPointOfId, evse.Id, chargingPoint.Id, "charging points", "EVSE", Warnings))
                     evses.Add(evse);
 
             }
@@ -1254,6 +1269,42 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                          : null,
                        LastChange:   Station.LastUpdated
                    );
+
+        }
+
+        #endregion
+
+        #region IsFirst(Taken, POI3Id, DatexIIId, What, Entity, Warnings)
+
+        /// <summary>
+        /// Whether the given POI3 identification is not taken yet by another DATEX II facility, and take it then.
+        /// Two DATEX II identifications can become the same POI3 identification (see ToPOI3Suffix): the first is
+        /// taken, a warning tells about the others, and the same facility given twice is taken once.
+        /// </summary>
+        /// <param name="Taken">The POI3 identifications taken, with the DATEX II identification that took each.</param>
+        /// <param name="POI3Id">The POI3 identification.</param>
+        /// <param name="DatexIIId">The DATEX II identification it was made of.</param>
+        /// <param name="What">What the facilities are, e.g. "sites".</param>
+        /// <param name="Entity">What the POI3 entity is, e.g. "charging pool".</param>
+        /// <param name="Warnings">The warnings.</param>
+        public static Boolean IsFirst<TId>(IDictionary<TId, String>  Taken,
+                                           TId                       POI3Id,
+                                           String                    DatexIIId,
+                                           String                    What,
+                                           String                    Entity,
+                                           ICollection<String>       Warnings)
+
+            where TId : notnull
+
+        {
+
+            if (Taken.TryAdd(POI3Id, DatexIIId))
+                return true;
+
+            if (Taken[POI3Id] != DatexIIId)
+                Warnings.Add($"The {What} '{Taken[POI3Id]}' and '{DatexIIId}' would both be the {Entity} '{POI3Id}': '{DatexIIId}' is left out!");
+
+            return false;
 
         }
 
@@ -1310,7 +1361,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             var connectors     = new List<POI.ChargingConnector>();
             var currentTypes   = POI.CurrentTypes.Unspecified;
             var chargingModes  = POI.ChargingModes.Unspecified;
-            var number         = 1;
+            var known          = new List<(Connector Connector, POI.ChargingConnectorType Type, POI.ChargingConnector_Id? Id)>();
 
             foreach (var connector in ChargingPoint.Connector)
             {
@@ -1321,10 +1372,41 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                     Warnings.Add($"The connector type '{connector.ConnectorType}' of the charging point '{ChargingPoint.Id}' has no counterpart and is left out!");
 
                 else
-                    connectors.Add(new POI.ChargingConnector(POI.ChargingConnector_Id.Parse((number++).ToString()),
-                                                             type.Value,
-                                                             Format: ToPOI3(connector.ConnectorFormat)));
+                    known.Add((connector, type.Value, ConnectorIdOf(connector)));
 
+            }
+
+            // A connector keeps its identification of the type connectorId, unless another connector of the charging
+            // point has it too; the others are numbered 1, 2, … with the numbers no connector keeps.
+            var keptIds = known.Where (connector => connector.Id.HasValue).
+                                GroupBy(connector => connector.Id!.Value).
+                                Where (group     => group.Count() == 1).
+                                Select(group     => group.Key).
+                                ToHashSet();
+
+            foreach (var duplicate in known.Where(connector => connector.Id.HasValue && !keptIds.Contains(connector.Id.Value)).Select(connector => connector.Id!.Value).Distinct())
+                Warnings.Add($"The connector identification '{duplicate}' is given twice in the charging point '{ChargingPoint.Id}': its connectors are numbered!");
+
+            var number = (UInt16) 1;
+
+            foreach (var (connector, type, id) in known)
+            {
+
+                var connectorId = id.HasValue && keptIds.Contains(id.Value)
+                                      ? id.Value
+                                      : NextFree();
+
+                connectors.Add(new POI.ChargingConnector(connectorId,
+                                                         type,
+                                                         Format: ToPOI3(connector.ConnectorFormat)));
+
+            }
+
+            POI.ChargingConnector_Id NextFree()
+            {
+                while (keptIds.Contains(POI.ChargingConnector_Id.Parse(number)))
+                    number++;
+                return POI.ChargingConnector_Id.Parse(number++);
             }
 
             (currentTypes, chargingModes) = ChargingPoint.ChargingMode?.ToString() switch {
@@ -1714,7 +1796,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                                     POI.RoamingNetwork   RoamingNetwork)
         {
 
-            var groups = RoamingNetwork.ParkingSpaces.
+            // As they are at runtime, with the properties their parking space groups give them.
+            var groups = RoamingNetwork.EffectiveParkingSpaces.
                              Where  (space => space.ChargingStationIds.Contains(ChargingStation.Id)).
                              GroupBy(space => String.Join(",", space.ParkingRestrictions.Select(restriction => restriction.ToString())) + "|" +
                                               String.Join(",", space.EUVehicleCategories.Select(category    => category.   ToString())) + "|" +
@@ -2345,7 +2428,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         /// <summary>
         /// Open around the clock, or the regular openings as periods: one for each time of day, on the weekdays it is
-        /// open then. The overall period starts with the creation of the charging pool.
+        /// open then, with the free text as their label. The overall period starts with the creation of the charging pool.
         /// </summary>
         private static AOperatingHours? ToDatexII(ImmutableOpeningTimes?  OpeningTimes,
                                                   String                  Id,
@@ -2357,8 +2440,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             if (OpeningTimes is null)
                 return null;
 
+            var freeText = OpeningTimes.FreeText?.Trim();
+
             if (OpeningTimes.IsOpen24Hours)
+            {
+
+                // Open all hours has nothing to tell a text in.
+                if (!String.IsNullOrEmpty(freeText))
+                    Warnings.Add($"The free text of the opening times of '{Id}' is left out, as they are open around the clock!");
+
                 return new OpenAllHours();
+
+            }
 
             if (OpeningTimes.ExceptionalOpenings.Length > 0)
                 Warnings.Add($"The exceptional openings of '{Id}' are left out!");
@@ -2373,11 +2466,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                   )).
                               ToArray();
 
+            // Without a period the overall period would mean open all the time, so a free text alone is left out.
+            if (periods.Length == 0 && !String.IsNullOrEmpty(freeText))
+                Warnings.Add($"The free text of the opening times of '{Id}' is left out, as they have no regular openings!");
+
             return periods.Length > 0
                        ? new OperatingHoursSpecification(
                              Id:             $"{Id}*OPENINGTIMES",
                              Version:        Version,
-                             OverallPeriod:  new OverallPeriod(Created, ValidPeriod: periods)
+                             OverallPeriod:  new OverallPeriod(Created, ValidPeriod: periods),
+                             Label:          String.IsNullOrEmpty(freeText) ? null : freeText
                          )
                        : null;
 
@@ -2395,7 +2493,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
                 case OperatingHoursSpecification specification:
 
-                    var openingTimes = new OpeningTimes();
+                    var openingTimes = new OpeningTimes(specification.Label?.Trim() ?? "");
 
                     foreach (var period in specification.OverallPeriod.ValidPeriod)
                     {

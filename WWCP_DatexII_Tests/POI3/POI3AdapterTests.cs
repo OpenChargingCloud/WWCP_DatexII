@@ -255,7 +255,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
             // DATEX II 3.7 knows only evseId as an identifier type, as an extended value; the others are other types.
             Assert.That(xml.Descendants(v3.DatexIINS.Facilities + "typeOfIdentifier").Select(type => type.Attribute("_extendedValue")?.Value), Is.EqualTo(new[] { "evseId" }));
-            Assert.That(xml.Descendants(v3.DatexIINS.Facilities + "otherTypeOfIdentifier").Select(type => type.Value),                        Is.EquivalentTo(new[] { "operatorId", "stationIdBNetzA" }));
+            Assert.That(xml.Descendants(v3.DatexIINS.Facilities + "otherTypeOfIdentifier").Select(type => type.Value),                        Is.EquivalentTo(new[] { "operatorId", "stationIdBNetzA", "connectorId" }));
 
             var site         = publication.EnergyInfrastructureTables.Single().EnergyInfrastructureSites.Single();
             var location     = (PointLocation) site.LocationReference!;
@@ -1429,6 +1429,231 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
             lock (errors)
                 Assert.That(errors, Has.Count.EqualTo(1), String.Join(Environment.NewLine, errors));
+
+        }
+
+        #endregion
+
+        #region ConnectorsKeepTheirIdentifications()
+
+        /// <summary>
+        /// A connector is published with its identification as an external identifier of the type connectorId, and
+        /// imported with it. One given twice, and none given, are numbered with the numbers no connector keeps.
+        /// </summary>
+        [Test]
+        public void ConnectorsKeepTheirIdentifications()
+        {
+
+            var warnings   = new List<String>();
+            var table      = POI3Mapper.ToTablePublication(ANetwork(), Creator, Languages.de, "rn1", "1", warnings, StationIdBNetzA: station => "BNetzA-4711");
+
+            AssertValidTable(table);
+
+            var connector  = table.EnergyInfrastructureTables.Single().EnergyInfrastructureSites.Single().EnergyInfrastructureStations.Single().
+                                   RefillPoints.OfType<ElectricChargingPoint>().Single().Connector.Single();
+
+            Assert.Multiple(() => {
+                Assert.That(connector.ExternalIdentifier.Single().Identifier,  Is.EqualTo("1"));
+                Assert.That(connector.ExternalIdentifier.Single().Type,        Is.EqualTo(TypeOfIdentifier.ConnectorId));
+            });
+
+            static Connector Plug(String? Id)
+
+                => new (ConnectorType.Parse("iec62196T2"),
+                        Watt.FromW(22000),
+                        ExternalIdentifier: Id is not null ? [ ExternalIdentifier.Of(Id, TypeOfIdentifier.ConnectorId) ] : null);
+
+            var chargingPoint  = new ElectricChargingPoint("DE*GEF*E9*1",
+                                                           "1",
+                                                           DeliveryUnit.Parse("kWh"),
+                                                           CurrentType. Parse("ac"),
+                                                           Connector: [ Plug("7"), Plug(null), Plug("5"), Plug("5") ]);
+
+            warnings.Clear();
+
+            var evse           = chargingPoint.ToPOI3(GEF, Languages.de, warnings);
+
+            // 7 is kept; the other three are numbered 1, 2, 3 (POI3 orders connectors by their identifications).
+            Assert.Multiple(() => {
+                Assert.That(evse!.ChargingConnectors.Select(chargingConnector => chargingConnector.Id.ToString()),  Is.EqualTo(new[] { "1", "2", "3", "7" }));
+                Assert.That(warnings.Single(),                                                                      Does.Contain("'5' is given twice"));
+            });
+
+        }
+
+        #endregion
+
+        #region TheFreeTextOfOpeningTimesIsTheirLabel()
+
+        /// <summary>
+        /// The free text of the opening times of a charging pool is the label of the operating hours of its site.
+        /// </summary>
+        [Test]
+        public void TheFreeTextOfOpeningTimesIsTheirLabel()
+        {
+
+            var text      = "Am Wochenende nach Vereinbarung";
+
+            var network   = new POI.RoamingNetwork(POI.RoamingNetwork_Id.Parse("rn1"),
+                                                   Created:                   Created,
+                                                   ChargingStationOperators:  [ new POI.ChargingStationOperator(GEF,
+                                                                                                                Name:             I18NString.Create(Languages.en, "GraphDefined"),
+                                                                                                                ChargingTariffs:  [ ATariff() ],
+                                                                                                                ChargingPools:    [ new POI.ChargingPool(P1,
+                                                                                                                                                         I18NString.Create(Languages.en, "Biberweg"),
+                                                                                                                                                         GeoLocation:       GeoCoordinate.Parse(50.92, 11.58),
+                                                                                                                                                         OpeningTimes:      new ImmutableOpeningTimes(new OpeningTimes(text).AddRegularOpening(DayOfWeek.Monday, new HourMin(8, 0), new HourMin(18, 0))),
+                                                                                                                                                         ChargingStations:  [ new POI.ChargingStation(S1, EVSEs: [ AnEVSE() ], Created: Created) ],
+                                                                                                                                                         Created:           Created) ],
+                                                                                                                Created:          Created) ]).WithKeys();
+
+            var warnings  = new List<String>();
+            var table     = POI3Mapper.ToTablePublication(network, Creator, Languages.de, "rn1", "1", warnings, StationIdBNetzA: station => "BNetzA-4711");
+
+            AssertValidTable(table);
+
+            var site      = table.EnergyInfrastructureTables.Single().EnergyInfrastructureSites.Single();
+
+            Assert.That(((OperatingHoursSpecification) site.OperatingHours!).Label, Is.EqualTo(text));
+
+            var poolJSON  = site.ToPOI3(GEF, null, Languages.de, warnings);
+
+            Assert.That(POI.ChargingPool.TryParse(poolJSON!, out var pool, out var errorResponse), Is.True, errorResponse);
+            Assert.That(pool!.OpeningTimes?.FreeText, Is.EqualTo(text));
+
+        }
+
+        #endregion
+
+        #region TheImporterTakesTheOperationAndEnergyStatus()
+
+        /// <summary>
+        /// The operation status of sites, stations and refill points becomes the admin status of charging pools,
+        /// charging stations and EVSEs, and the current charging power, voltage and remaining charging time of a
+        /// charging point the energy status of its EVSE.
+        /// </summary>
+        [Test]
+        public async Task TheImporterTakesTheOperationAndEnergyStatus()
+        {
+
+            var history  = POI.RoamingNetworkHistory.Start(ANetwork(WithPools: false));
+            var errors   = new List<String>();
+
+            await using var importer = new DatexIIToPOI3Importer(history, changeSet => changeSet.SignedByAll(history.Head.RoamingNetwork));
+
+            importer.OnError += (sender, description, warnings) => { lock (errors) errors.Add(description + " " + String.Join(" ", warnings)); };
+
+            await importer.ImportAsync(POI3Mapper.ToTablePublication(ANetwork(), Creator, Languages.de, "rn1", "1", [], StationIdBNetzA: station => "BNetzA-4711").ToXML());
+
+            lock (errors)
+                errors.Clear();
+
+            static XElement Status(DateTimeOffset   At,
+                                   String           SiteOperation,
+                                   String           PointStatus,
+                                   String           PointOperation,
+                                   Watt?            Power)
+
+                => new EnergyInfrastructureStatusPublication(
+                       At,
+                       Creator,
+                       Languages.de,
+                       EnergyInfrastructureSiteStatus: [
+                           new EnergyInfrastructureSiteStatus(
+                               new FacilityObjectVersionedReference(P1.ToString()),
+                               LastUpdated:      At,
+                               OperationStatus:  OperationStatus.Parse(SiteOperation),
+                               EnergyInfrastructureStationStatus: [
+                                   new EnergyInfrastructureStationStatus(
+                                       new FacilityObjectVersionedReference(S1.ToString()),
+                                       LastUpdated:      At,
+                                       OperationStatus:  OperationStatus.Parse("inOperation"),
+                                       RefillPointStatus: [
+                                           new ElectricChargingPointStatus(RefillPointStatusEnum.Parse(PointStatus),
+                                                                           new FacilityObjectVersionedReference(E1.ToString()),
+                                                                           LastUpdated:            At,
+                                                                           OperationStatus:        OperationStatus.Parse(PointOperation),
+                                                                           RemainingChargingTime:  Power.HasValue ? TimeSpan.FromMinutes(30) : null,
+                                                                           CurrentVoltage:         Power.HasValue ? Volt.FromV(400)          : null,
+                                                                           CurrentChargingPower:   Power)
+                                       ]
+                                   )
+                               ]
+                           )
+                       ]
+                   ).ToXML();
+
+            String? Current(POI.POIRuntimeStatusKind Kind, String EntityType, String EntityId)
+
+                => history.RuntimeStatus.TryGet(Kind, EntityType, EntityId, out var status)
+                       ? status.Value
+                       : null;
+
+            // Charging: a site out of operation, its station and charging point in operation.
+            await importer.ImportAsync(Status(T0.AddMinutes(5), "notInOperation", "charging", "inOperation", Watt.FromW(11000)));
+
+            Assert.That(POI.POIEnergyStatus.TryParseText(Current(POI.POIRuntimeStatusKind.EnergyStatus, nameof(POI.EVSE), E1.ToString()) ?? "", out var energyStatus), Is.True);
+
+            Assert.Multiple(() => {
+                Assert.That(Current(POI.POIRuntimeStatusKind.AdminStatus, nameof(POI.ChargingPool),    P1.ToString()),  Is.EqualTo("outOfService"));
+                Assert.That(Current(POI.POIRuntimeStatusKind.AdminStatus, nameof(POI.ChargingStation), S1.ToString()),  Is.EqualTo("operational"));
+                Assert.That(Current(POI.POIRuntimeStatusKind.Status,      nameof(POI.EVSE),            E1.ToString()),  Is.EqualTo("charging"));
+                Assert.That(energyStatus.Used.Value,                                                                 Is.EqualTo(11000));
+                Assert.That(energyStatus.Available.Value,                                                            Is.EqualTo(0));
+                Assert.That(energyStatus.CurrentVoltage?.Value,                                                      Is.EqualTo(400));
+                Assert.That(energyStatus.RemainingChargingTime,                                                      Is.EqualTo(TimeSpan.FromMinutes(30)));
+            });
+
+            // Blocked: the refill point status tells why the charging point is not in operation.
+            await importer.ImportAsync(Status(T0.AddMinutes(6), "inOperation", "blocked", "notInOperation", null));
+
+            Assert.Multiple(() => {
+                Assert.That(Current(POI.POIRuntimeStatusKind.AdminStatus, nameof(POI.ChargingPool),    P1.ToString()),  Is.EqualTo("operational"));
+                Assert.That(Current(POI.POIRuntimeStatusKind.AdminStatus, nameof(POI.EVSE),            E1.ToString()),  Is.EqualTo("blocked"));
+            });
+
+            lock (errors)
+                Assert.That(errors, Is.Empty, String.Join(Environment.NewLine, errors));
+
+        }
+
+        #endregion
+
+        #region TwoSitesThatWouldBeTheSameChargingPoolAreNotBothImported()
+
+        /// <summary>
+        /// Two sites whose identifications differ only after their 30th letter or digit would be the same charging
+        /// pool: the first is imported, and a warning tells about the second instead of it overwriting the first.
+        /// </summary>
+        [Test]
+        public async Task TwoSitesThatWouldBeTheSameChargingPoolAreNotBothImported()
+        {
+
+            var history  = POI.RoamingNetworkHistory.Start(ANetwork(WithPools: false));
+            var errors   = new List<String>();
+
+            await using var importer = new DatexIIToPOI3Importer(history, changeSet => changeSet.SignedByAll(history.Head.RoamingNetwork));
+
+            importer.OnError += (sender, description, warnings) => { lock (errors) errors.Add(description + " " + String.Join(" ", warnings)); };
+
+            var aegi     = DatexIINS.EnergyInfrastructure;
+            var table    = POI3Mapper.ToTablePublication(ANetwork(), Creator, Languages.de, "rn1", "1", [], StationIdBNetzA: station => "BNetzA-4711").ToXML();
+            var site     = table.Descendants(aegi + "energyInfrastructureSite").Single();
+            var longId   = "SITE-" + new String('A', 32) + "-";
+
+            site.SetAttributeValue("id", longId + "1");
+
+            var other    = new XElement(site);
+            other.SetAttributeValue("id", longId + "2");
+            site.AddAfterSelf(other);
+
+            await importer.ImportAsync(table);
+
+            Assert.That(history.Head.RoamingNetwork.GetChargingStationOperatorById(GEF)!.ChargingPools.Select(pool => pool.Id.ToString()),
+                        Is.EqualTo(new[] { "DE*GEF*PSITE" + new String('A', 26) }));
+
+            lock (errors)
+                Assert.That(errors.Single(), Does.Contain($"'{longId}1' and '{longId}2' would both be the charging pool"));
 
         }
 

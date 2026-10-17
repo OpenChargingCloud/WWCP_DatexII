@@ -26,6 +26,7 @@ using Newtonsoft.Json.Linq;
 using org.GraphDefined.Vanaheimr.Illias;
 
 using cloud.charging.open.protocols.DatexII.v3.D2Payload;
+using cloud.charging.open.protocols.DatexII.v3.Facilities;
 using cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure;
 
 using POI = cloud.charging.open.protocols.WWCP.POI;
@@ -64,7 +65,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         private readonly Channel<Func<Task>>                        work                 = Channel.CreateUnbounded<Func<Task>>(new UnboundedChannelOptions { SingleReader = true });
         private readonly ConcurrentDictionary<String, POI.EVSE_Id>  evseIds              = new();
         private readonly ConcurrentDictionary<String, Byte>         otherRefillPointIds  = new();
-        private readonly ConcurrentDictionary<String, POI.ChargingStation_Id>  stationIds  = new();
+        private readonly ConcurrentDictionary<String, POI.ChargingStation_Id>  stationIds      = new();
+        private readonly ConcurrentDictionary<String, POI.ChargingPool_Id>     poolIdsOfSites  = new();
         private readonly Task                                       worker;
 
         #endregion
@@ -254,7 +256,10 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                  Boolean                               RemoveMissingSites)
         {
 
-            var sitesByOperator = new Dictionary<POI.ChargingStationOperator_Id, List<EnergyInfrastructureSite>>();
+            var sitesByOperator  = new Dictionary<POI.ChargingStationOperator_Id, List<EnergyInfrastructureSite>>();
+            var takenPoolIds     = new Dictionary<POI.ChargingPool_Id,    String>();
+            var takenStationIds  = new Dictionary<POI.ChargingStation_Id, String>();
+            var takenEVSEIds     = new Dictionary<POI.EVSE_Id,            String>();
 
             foreach (var table in TablePublication.EnergyInfrastructureTables)
             {
@@ -274,14 +279,22 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
                     sites.Add(site);
 
-                    // Which EVSE a refill point status is about.
+                    // Which EVSE a refill point status is about. A facility left out, as another one became the same
+                    // POI3 identification, has none: its status is not taken for that of the other.
                     foreach (var chargingPoint in site.EnergyInfrastructureStations.SelectMany(station => station.RefillPoints).OfType<ElectricChargingPoint>())
-                        if (POI3Mapper.ToPOI3EVSEId(chargingPoint, operatorId.Value) is POI.EVSE_Id evseId)
+                        if (POI3Mapper.ToPOI3EVSEId(chargingPoint, operatorId.Value) is POI.EVSE_Id evseId &&
+                            POI3Mapper.IsFirst(takenEVSEIds, evseId, chargingPoint.Id, "charging points", "EVSE", []))
                             evseIds[chargingPoint.Id] = evseId;
+
+                    // Which charging pool a site status is about.
+                    if (POI3Mapper.ToPOI3PoolId(site.Id, operatorId.Value) is POI.ChargingPool_Id poolIdOfSite &&
+                        POI3Mapper.IsFirst(takenPoolIds, poolIdOfSite, site.Id, "sites", "charging pool", []))
+                        poolIdsOfSites[site.Id] = poolIdOfSite;
 
                     // Which charging station a station status is about.
                     foreach (var station in site.EnergyInfrastructureStations)
-                        if (POI3Mapper.ToPOI3StationId(station.Id, operatorId.Value) is POI.ChargingStation_Id stationId)
+                        if (POI3Mapper.ToPOI3StationId(station.Id, operatorId.Value) is POI.ChargingStation_Id stationId &&
+                            POI3Mapper.IsFirst(takenStationIds, stationId, station.Id, "stations", "charging station", []))
                             stationIds[station.Id] = stationId;
 
                     // And which refill points are no EVSEs, e.g. diesel ones: their statuses are skipped.
@@ -305,11 +318,16 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
                                    head.TryGetChargingStationOperatorById(operatorId, out var chargingStationOperator);
                                    var poolIds  = new HashSet<String>();
+                                   var siteOfPool = new Dictionary<String, String>();
 
                                    foreach (var site in sites)
                                    {
 
                                        var poolId    = POI3Mapper.ToPOI3PoolId(site.Id, operatorId)?.ToString();
+
+                                       if (poolId is not null && !POI3Mapper.IsFirst(siteOfPool, poolId, site.Id, "sites", "charging pool", warnings))
+                                           continue;
+
                                        var existing  = pools.OfType<JObject>().FirstOrDefault(pool => pool["@id"]?.Value<String>() == poolId);
                                        // The existing charging pool as it is at runtime, with what its groups give it, and as DATEX II
                                        // tells it: what DATEX II tells alike is kept, what the groups give stays in the groups.
@@ -389,6 +407,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             foreach (var siteStatus in StatusPublication.EnergyInfrastructureSiteStatus)
             {
+
+                // The operation status of the site: the admin status of the charging pool.
+                if ((poolIdsOfSites.TryGetValue(siteStatus.Reference.Id, out var knownPool)
+                         ? knownPool
+                         : POI.ChargingPool_Id.TryParse(siteStatus.Reference.Id)) is POI.ChargingPool_Id chargingPoolId)
+                {
+                    ImportAdminStatus(nameof(POI.ChargingPool),
+                                      chargingPoolId.ToString(),
+                                      siteStatus.OperationStatus,
+                                      null,
+                                      siteStatus.LastUpdated ?? StatusPublication.PublicationTime);
+                }
+
                 foreach (var stationStatus in siteStatus.EnergyInfrastructureStationStatus)
                 {
 
@@ -397,11 +428,19 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                              ? knownStation
                              : POI.ChargingStation_Id.TryParse(stationStatus.Reference.Id)) is POI.ChargingStation_Id chargingStationId)
                     {
+
+                        ImportAdminStatus(nameof(POI.ChargingStation),
+                                          chargingStationId.ToString(),
+                                          stationStatus.OperationStatus,
+                                          null,
+                                          stationStatus.LastUpdated ?? StatusPublication.PublicationTime);
+
                         ImportPriceStatus(nameof(POI.ChargingStation),
                                           chargingStationId.ToString(),
                                           chargingStationId.OperatorId,
                                           stationStatus.EnergyRateUpdates,
                                           stationStatus.LastUpdated ?? StatusPublication.PublicationTime);
+
                     }
 
                     foreach (var refillPointStatus in stationStatus.RefillPointStatus)
@@ -424,6 +463,17 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                      refillPointStatus.Status.ToPOI3Status(),
                                      refillPointStatus.LastUpdated ?? StatusPublication.PublicationTime);
 
+                        ImportAdminStatus(nameof(POI.EVSE),
+                                          evseId.Value.ToString(),
+                                          refillPointStatus.OperationStatus,
+                                          refillPointStatus.Status.ToString(),
+                                          refillPointStatus.LastUpdated ?? StatusPublication.PublicationTime);
+
+                        if (refillPointStatus is ElectricChargingPointStatus electricChargingPointStatus)
+                            ImportEnergyStatus(evseId.Value,
+                                               electricChargingPointStatus,
+                                               refillPointStatus.LastUpdated ?? StatusPublication.PublicationTime);
+
                         ImportPlannedStatus(evseId.Value,
                                             refillPointStatus);
 
@@ -442,30 +492,124 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         private void ImportStatus(POI.EVSE_Id         EVSEId,
                                   POI.EVSEStatusType  Status,
                                   DateTimeOffset      Timestamp)
+
+            => TakeCurrent(POI.POIRuntimeStatusKind.Status,
+                           nameof(POI.EVSE),
+                           EVSEId.ToString(),
+                           Status.ToString(),
+                           Timestamp,
+                           "status");
+
+        /// <summary>
+        /// The operation status of a site, station or refill point as the admin status of the charging pool, charging
+        /// station or EVSE: in operation is operational. Not in operation is out of service, unless the current admin
+        /// status already tells why it is not operational; for an EVSE, a refill point status planned, blocked or for
+        /// internal use tells that admin status.
+        /// </summary>
+        private void ImportAdminStatus(String            EntityType,
+                                       String            EntityId,
+                                       OperationStatus?  OperationStatus,
+                                       String?           RefillPointStatus,
+                                       DateTimeOffset    Timestamp)
         {
 
-            var value = Status.ToString();
+            if (!OperationStatus.HasValue)
+                return;
 
-            // What a publication tells is the current status. A later one here, e.g. the default status of an EVSE
-            // just imported, is followed right after.
-            if (History.RuntimeStatus.TryGet(POI.POIRuntimeStatusKind.Status, nameof(POI.EVSE), EVSEId.ToString(), out var current) &&
+            var hasCurrent  = History.RuntimeStatus.TryGet(POI.POIRuntimeStatusKind.AdminStatus, EntityType, EntityId, out var current);
+            var isOperational = !hasCurrent || current!.Value.ToLowerInvariant() is "operational" or "unknown" or "unspecified";
+
+            var value = OperationStatus.Value.ToString() switch {
+                            "inOperation"     => "operational",
+                            "notInOperation"  => RefillPointStatus switch {
+                                                     "planned"      => "planned",
+                                                     "blocked"      => "blocked",
+                                                     "internalUse"  => "internalUse",
+                                                     _              => isOperational ? "outOfService" : null
+                                                 },
+                            _                 => null
+                        };
+
+            if (value is null ||
+                (hasCurrent && String.Equals(current!.Value, value, StringComparison.OrdinalIgnoreCase)))
+            {
+                return;
+            }
+
+            TakeCurrent(POI.POIRuntimeStatusKind.AdminStatus,
+                        EntityType,
+                        EntityId,
+                        value,
+                        Timestamp,
+                        "admin status");
+
+        }
+
+        /// <summary>
+        /// The current charging power, voltage and remaining charging time of an electric charging point as the energy
+        /// status of its EVSE. DATEX II does not tell the power still available: none while it charges, else the
+        /// maximum power of the EVSE.
+        /// </summary>
+        private void ImportEnergyStatus(POI.EVSE_Id                  EVSEId,
+                                        ElectricChargingPointStatus  Status,
+                                        DateTimeOffset               Timestamp)
+        {
+
+            if (!Status.CurrentChargingPower.HasValue)
+                return;
+
+            var used      = Status.CurrentChargingPower.Value;
+            var maxPower  = History.Head.RoamingNetwork.GetChargingStationOperatorById(EVSEId.OperatorId) is POI.ChargingStationOperator chargingStationOperator &&
+                            chargingStationOperator.TryGetEVSE(EVSEId, out var evse)
+                                ? evse.MaxPower
+                                : null;
+
+            var energyStatus = new POI.EnergyInfo(used,
+                                                  used.Value > 0
+                                                      ? Watt.FromW(0)
+                                                      : maxPower ?? Watt.FromW(0),
+                                                  CurrentVoltage:         Status.CurrentVoltage,
+                                                  RemainingChargingTime:  Status.RemainingChargingTime);
+
+            TakeCurrent(POI.POIRuntimeStatusKind.EnergyStatus,
+                        nameof(POI.EVSE),
+                        EVSEId.ToString(),
+                        POI.POIEnergyStatus.ToText(energyStatus),
+                        Timestamp,
+                        "energy status");
+
+        }
+
+        /// <summary>
+        /// Take the given value as the current runtime status of the given kind. What a publication tells is the current
+        /// one: a later one here, e.g. the default status of an EVSE just imported, is followed right after.
+        /// </summary>
+        private void TakeCurrent(POI.POIRuntimeStatusKind  Kind,
+                                 String                    EntityType,
+                                 String                    EntityId,
+                                 String                    Value,
+                                 DateTimeOffset            Timestamp,
+                                 String                    Description)
+        {
+
+            if (History.RuntimeStatus.TryGet(Kind, EntityType, EntityId, out var current) &&
                 current.Timestamp >= Timestamp &&
-                !String.Equals(current.Value, value, StringComparison.OrdinalIgnoreCase))
+                !String.Equals(current.Value, Value, StringComparison.OrdinalIgnoreCase))
             {
                 Timestamp = current.Timestamp.AddMilliseconds(1);
             }
 
-            var result = History.RuntimeStatus.TryUpdate(POI.POIRuntimeStatusKind.Status,
-                                                         nameof(POI.EVSE),
-                                                         EVSEId.ToString(),
-                                                         value,
+            var result = History.RuntimeStatus.TryUpdate(Kind,
+                                                         EntityType,
+                                                         EntityId,
+                                                         Value,
                                                          Timestamp,
                                                          out _,
                                                          out var errorResponse,
                                                          DataSource: "DATEX II");
 
             if (result == POI.POIStatusUpdateResult.Refused)
-                RaiseError($"The status of the EVSE '{EVSEId}' can not be taken: {errorResponse}", []);
+                RaiseError($"The {Description} of the {EntityType} '{EntityId}' can not be taken: {errorResponse}", []);
 
         }
 

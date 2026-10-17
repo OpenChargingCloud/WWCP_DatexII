@@ -228,6 +228,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
         public static TypeOfIdentifier  ProviderId    { get; }
             = Register("providerId");
 
+        /// <summary>
+        /// The identification of a connector within its charging point, e.g. 1 (as in OCPI and POI3). No type of the
+        /// Mobilithek profile, so it is an otherTypeOfIdentifier there as well.
+        /// </summary>
+        public static TypeOfIdentifier  ConnectorId    { get; }
+            = Register("connectorId");
+
         #endregion
 
 
