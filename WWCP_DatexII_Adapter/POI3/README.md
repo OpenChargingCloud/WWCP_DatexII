@@ -301,9 +301,13 @@ DATEX II tells only part of a charging pool, so the import lays it onto the exis
   tell, and an EVSE no charging modes of its own, where DATEX II tells those it derives. What a POI3 network publishes,
   imported back into it, commits nothing.
 - **What groups give:** what DATEX II tells of a charging pool, station or EVSE as its groups give it stays in the
-  groups: where it is to have what its effective one has, it keeps what it has of its own, also nothing; of an array,
-  e.g. its features, it takes as its own only what its groups do not give it. Another value, e.g. another `maxPower`,
-  becomes its own, as its own wins. What its groups give can not be taken away by DATEX II.
+  groups (`POIGroupMembers.KeepWhatGroupsGive`, by the rules by which the groups give it at runtime): where it is to
+  have what its effective one has, it keeps what it has of its own, also nothing; of an array it unites with theirs,
+  e.g. its features, it takes as its own only what its groups do not give it, elements matched by their key (an
+  authentication mode by its type, so an RFID mode DATEX II tells without its card types keeps those of its group; an
+  image by its URL). An array it takes whole - its charging tariffs, current types and charging modes - becomes its
+  own whole when DATEX II tells another one, and so does another single value, e.g. another `maxPower`, as its own
+  wins. What its groups give can not be taken away by DATEX II.
 - **Kept untouched:** accessibility, data licenses, grid connection, energy meters, brands, UI features, features of the
   pool, entrances and exits, related locations, charging when closed, manufacturer and model, calibration, parking
   spaces, groups, keys and custom data.

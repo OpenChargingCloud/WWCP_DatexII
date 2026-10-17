@@ -1018,7 +1018,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// are added, ones gone are removed.
         /// What DATEX II tells as it tells the existing charging pool, station or EVSE is kept as it is: e.g. the NUTS
         /// code of the country, which DATEX II does not tell, or no charging modes, where DATEX II tells those it derives.
-        /// What it tells of them as their groups give it stays in their groups: see KeepWhatGroupsGive(…).
+        /// What it tells of them as their groups give it stays in their groups: see POIGroupMembers.KeepWhatGroupsGive(…).
         /// </summary>
         /// <param name="Site">A site.</param>
         /// <param name="OperatorId">The operator of the site.</param>
@@ -1122,7 +1122,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             OverlayTold(desired, mapped, "features", PoolFeaturesDatexIITells,  Unchanged);
 
             if (Effective is not null)
-                KeepWhatGroupsGive(desired, storedPool, Effective, [ .. PoolProperties, "services", "features" ]);
+                POI.POIGroupMembers.KeepWhatGroupsGive(desired, storedPool, Effective, [ .. PoolProperties, "services", "features" ]);
 
             #region The charging stations: matched by their identification
 
@@ -1150,7 +1150,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 OverlayTold(station, mappedStation, "vehicleTypes", VehicleTypesDatexIITells,     unchangedStation);
 
                 if (effectiveStation is not null)
-                    KeepWhatGroupsGive(station, stored, effectiveStation, [ .. StationProperties, "features", "vehicleTypes" ]);
+                    POI.POIGroupMembers.KeepWhatGroupsGive(station, stored, effectiveStation, [ .. StationProperties, "features", "vehicleTypes" ]);
 
                 #region The EVSEs of the charging station: matched by their identification
 
@@ -1171,7 +1171,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                         Overlay(evse, mappedEVSE, Changed(mappedEVSE, ChildOf(unchangedStation, "EVSEs", evseId), EVSEProperties));
 
                         if (effectiveEVSE is not null)
-                            KeepWhatGroupsGive(evse, storedEVSE, effectiveEVSE, EVSEProperties);
+                            POI.POIGroupMembers.KeepWhatGroupsGive(evse, storedEVSE, effectiveEVSE, EVSEProperties);
 
                     }
 
@@ -1578,61 +1578,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             array = [];
             Parent[Property] = array;
             return array;
-
-        }
-
-        /// <summary>
-        /// Keep in the groups of a charging station what they give it, of the given properties: where it is to have what
-        /// it has with them, its effective charging station, it keeps what it has of its own, also nothing; of an array
-        /// it takes as its own only the elements they do not give it, named by their "url" or "@id", else as they are.
-        /// What it is to have otherwise becomes its own, as what its own wins.
-        /// </summary>
-        /// <param name="Desired">The charging station as it is to be, changed.</param>
-        /// <param name="Stored">The charging station as it is stored.</param>
-        /// <param name="Effective">The charging station with the properties its groups give it.</param>
-        /// <param name="Properties">The properties to look at.</param>
-        internal static void KeepWhatGroupsGive(JObject              Desired,
-                                                JObject              Stored,
-                                                JObject              Effective,
-                                                IEnumerable<String>  Properties)
-        {
-
-            static String KeyOf(JToken Element)
-
-                => Element is JObject element && (element["url"] ?? element["@id"]) is JValue key
-                       ? key.ToString()
-                       : Element.ToString(Newtonsoft.Json.Formatting.None);
-
-            foreach (var property in Properties)
-            {
-
-                var desired    = Desired  [property];
-                var stored     = Stored   [property];
-                var effective  = Effective[property];
-
-                if (JToken.DeepEquals(desired, effective))
-                {
-                    if (stored is not null)
-                        Desired[property] = stored.DeepClone();
-                    else
-                        Desired.Remove(property);
-                }
-
-                else if (desired is JArray desiredElements && effective is JArray effectiveElements)
-                {
-
-                    var own        = (stored as JArray ?? []).Select(KeyOf).ToHashSet();
-                    var given      = effectiveElements.Select(KeyOf).Where(key => !own.Contains(key)).ToHashSet();
-                    var remaining  = desiredElements.Where(element => !given.Contains(KeyOf(element))).Select(element => element.DeepClone()).ToArray();
-
-                    if (remaining.Length > 0)
-                        Desired[property] = new JArray(remaining);
-                    else
-                        Desired.Remove(property);
-
-                }
-
-            }
 
         }
 
