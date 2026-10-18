@@ -72,7 +72,8 @@ await importer.ImportAsync(table!);
   once, with its planned statuses (POI3 `OnStatusPlanned`). When the planned status is due, its change is published as
   any other.
 - **When an exceptional closing or opening of a charging pool begins or ends:** a delta of its EVSEs, so that the opening
-  status of its site changes in time; the publisher waits for the next such change (at most twelve hours at once).
+  status of its site changes in time, also of one its template gives it; the publisher waits for the next such change (at
+  most twelve hours at once).
 - **On every price status change of a charging pool, station or EVSE:** a delta of all its EVSEs at once, with their
   energy rate updates.
 - **On every energy status change of an EVSE:** the same, but throttled: its charging power, voltage and remaining
@@ -276,8 +277,8 @@ members, its `lastChange` being the last change of these and of what embeds them
 | admin status | `operationStatus`: operational → `inOperation`, planned/inDeployment/outOfService/blocked/deleted → `notInOperation` (also of the site and station, from the admin statuses of pool and station). Import: see the importer. |
 | — | station `isAvailable`: any of its charging points `available` (full publications only) |
 | entity versions | `reference` `id` and `version`, the same as in the table |
-| exceptional closings and openings of the pool's `OpeningTimes` | site status: during a closing `openingStatus` `temporarilyClosed`, during an opening `open`, with `regularOperatingHoursInForce` false; while there are current or future ones, `regularOperatingHoursInForce` true otherwise, and `newOperatingHours`: the regular operating hours, the openings as dated valid periods, the closings as exception periods. The table keeps the regular operating hours. Not imported: POI3 opening times are content, changed by commits. |
-| price status of the EVSE, its charging station and its charging pool | `energyRateUpdate`s of its `refillPointStatus`: for every charging tariff the most specific new prices (`ChargingPrices.Effective`), referring to the rate of the tariff, since the timestamp of the price status, the prices as those of the tariff in the table. Import: the price status of the EVSE. |
+| exceptional closings and openings of the pool's `OpeningTimes`, as it is at runtime, also those its templates give it | site status: during a closing `openingStatus` `temporarilyClosed`, during an opening `open`, with `regularOperatingHoursInForce` false; while there are current or future ones, `regularOperatingHoursInForce` true otherwise, and `newOperatingHours`: the regular operating hours, the openings as dated valid periods, the closings as exception periods. The table keeps the regular operating hours. Not imported: POI3 opening times are content, changed by commits. |
+| price status of the EVSE, its charging station and its charging pool | `energyRateUpdate`s of its `refillPointStatus`: for every charging tariff the EVSE takes as it is at runtime - its own, else its templates', the energy rates of the table - the most specific new prices (`ChargingPrices.Effective`), referring to the rate of the tariff, since the timestamp of the price status, the prices as those of the tariff in the table. Import: the price status of the EVSE. |
 | future entries of the EVSE status and admin status schedules | `plannedRefillPointStatus`: from every future entry that changes the refill point status (as the current one: admin status first), until the next such change; the last one without an end. Import: planned EVSE statuses, see the importer. |
 | EVSE energy status `used`, `currentVoltage`, `remainingChargingTime` | `currentChargingPower`, `currentVoltage`, `remainingChargingTime` of its `refillPointStatus`; its timestamp also counts for `lastUpdated`. `available` (the power a newly arriving vehicle would get) and `storedEnergy` have no counterpart. Import: the energy status of the EVSE, see the importer. |
 | full status / one changed EVSE | `IsDelta` false / true: `snapshotPush` / `deltaPush` in the Mobilithek message container |

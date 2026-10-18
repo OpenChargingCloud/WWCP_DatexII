@@ -738,8 +738,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         #region ToSiteStatus(ChargingPool, EVSEIds = null)
 
         /// <summary>
-        /// The site status of the given charging pool: the status of its EVSEs, of the given ones only, if given;
-        /// null when none of them is there.
+        /// The site status of the given charging pool as it is at runtime, its effective one (EffectiveChargingPools): the
+        /// status of its EVSEs, of the given ones only, if given; null when none of them is there.
         /// </summary>
         public static EnergyInfrastructureSiteStatus? ToSiteStatus(this POI.ChargingPool       ChargingPool,
                                                                    IReadOnlySet<POI.EVSE_Id>?  EVSEIds   = null)
@@ -939,14 +939,18 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         #region EnergyRateUpdatesOf(ChargingPool, ChargingStation, EVSE)
 
         /// <summary>
-        /// The energy rate updates of the given EVSE: for every charging tariff, the new prices in effect there, of its
-        /// own price status, else of its charging station's, else of its charging pool's; since when they apply.
+        /// The energy rate updates of the given EVSE as it is at runtime, its effective one: for every charging tariff it
+        /// takes, its own, else the one of its templates, the new prices in effect there, of its own price status, else of
+        /// its charging station's, else of its charging pool's; since when they apply. New prices of a tariff it does not
+        /// take, e.g. the AC tariff of its pool at a DC EVSE, are none of its energy rates: the table names only those it
+        /// takes, as the OCPI 2.3.0 adapter does.
         /// </summary>
         public static IEnumerable<EnergyRateUpdate> EnergyRateUpdatesOf(POI.ChargingPool?     ChargingPool,
                                                                         POI.ChargingStation?  ChargingStation,
                                                                         POI.EVSE              EVSE)
 
             => POI.ChargingPrices.Effective(ChargingPool, ChargingStation, EVSE).
+                   Where (price => EVSE.ChargingTariffIds.Contains(price.Value.ChargingTariffId)).
                    Select(price => new EnergyRateUpdate(
                                        LastUpdated:          price.Timestamp,
                                        EnergyRateReference:  new EnergyRateReference(price.Value.ChargingTariffId.ToString()),

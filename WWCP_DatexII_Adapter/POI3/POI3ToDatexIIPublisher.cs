@@ -492,7 +492,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         /// <summary>
         /// Wake up when the next exceptional closing or opening of a published charging pool begins or ends, so that the
-        /// opening status of its site changes in time.
+        /// opening status of its site changes in time: of its opening times as it is at runtime, also those its templates
+        /// give it.
         /// </summary>
         private void ScheduleOpeningChange()
         {
@@ -502,7 +503,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             var next        = History.Head.RoamingNetwork.ChargingStationOperators.
                                   Where     (chargingStationOperator => OperatorIds is null || OperatorIds.Contains(chargingStationOperator.Id)).
-                                  SelectMany(chargingStationOperator => chargingStationOperator.ChargingPools).
+                                  SelectMany(chargingStationOperator => chargingStationOperator.EffectiveChargingPools).
                                   Select    (chargingPool            => POI3Mapper.NextOpeningChangeOf(chargingPool, now)).
                                   Where     (timestamp               => timestamp.HasValue).
                                   Min();
@@ -537,7 +538,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             var evseIds  = History.Head.RoamingNetwork.ChargingStationOperators.
                                Where     (chargingStationOperator => OperatorIds is null || OperatorIds.Contains(chargingStationOperator.Id)).
-                               SelectMany(chargingStationOperator => chargingStationOperator.ChargingPools).
+                               SelectMany(chargingStationOperator => chargingStationOperator.EffectiveChargingPools).
                                Where     (chargingPool            => chargingPool.OpeningTimes is not null &&
                                                                      chargingPool.OpeningTimes.ExceptionalClosings.Concat(chargingPool.OpeningTimes.ExceptionalOpenings).
                                                                          SelectMany(period => new[] { period.Begin, period.End }).
