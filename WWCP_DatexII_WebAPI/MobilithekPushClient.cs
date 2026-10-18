@@ -72,8 +72,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.WebAPI
     /// Attached to a POI3ToDatexIIPublisher, it pushes its publications one after the other, in their order. A table
     /// that could not be pushed is pushed again before the next status publication. After a status publication could not
     /// be pushed, the Mobilithek misses a change, so the next status publication pushed is the full status, a snapshot,
-    /// rather than a delta. For the Mobilithek profile, create the publisher with its delta interval and snapshot rules
-    /// (MobilithekStatusDeltaInterval, MobilithekSnapshotInterval and MobilithekMaxDeltasPerSnapshot).
+    /// rather than a delta. A push that failed for a passing reason (no answer, 408, 429 or 5xx) is also tried again
+    /// without waiting for the next publication: after RetryDelay, then twice as long each time up to MaxRetryDelay, the
+    /// pending table and the full status as they are then. 400, 403 and 404 tell a wrong configuration and are not tried
+    /// again until the next publication. For the Mobilithek profile, create the publisher with its delta interval and
+    /// snapshot rules (MobilithekStatusDeltaInterval, MobilithekSnapshotInterval and MobilithekMaxDeltasPerSnapshot).
     /// </remarks>
     public sealed class MobilithekPushClient : IAsyncDisposable
     {
@@ -90,9 +93,23 @@ namespace cloud.charging.open.protocols.DatexII.v3.WebAPI
         private          Task?                             worker;
         private          POI3ToDatexIIPublisher?           publisher;
 
+        private readonly CancellationTokenSource           disposed       = new();
+
         // Only the worker touches them.
         private          EnergyInfrastructureTablePublication?  pendingTable;
         private          Boolean                                snapshotNeeded;
+        private          Boolean                                retryPlanned;
+        private          TimeSpan                               nextRetryDelay;
+
+        /// <summary>
+        /// The default time before a failed push is tried again: five seconds.
+        /// </summary>
+        public static readonly TimeSpan DefaultRetryDelay     = TimeSpan.FromSeconds(5);
+
+        /// <summary>
+        /// The default longest time between two tries: five minutes.
+        /// </summary>
+        public static readonly TimeSpan DefaultMaxRetryDelay  = TimeSpan.FromMinutes(5);
 
         #endregion
 
@@ -123,6 +140,17 @@ namespace cloud.charging.open.protocols.DatexII.v3.WebAPI
         /// </summary>
         public TimeSpan RequestTimeout          { get; }
 
+        /// <summary>
+        /// The time before a push that failed for a passing reason is tried again; zero tries again only with the next
+        /// publication.
+        /// </summary>
+        public TimeSpan RetryDelay              { get; }
+
+        /// <summary>
+        /// The longest time between two tries: the time doubles with every try until then.
+        /// </summary>
+        public TimeSpan MaxRetryDelay           { get; }
+
         #endregion
 
         #region Events
@@ -146,20 +174,30 @@ namespace cloud.charging.open.protocols.DatexII.v3.WebAPI
         /// <param name="PublicationURL">The publication URL; that of the Mobilithek by default.</param>
         /// <param name="Compress">Whether to push gzip compressed; true by default.</param>
         /// <param name="RequestTimeout">The longest time a push may take; 60 seconds by default.</param>
+        /// <param name="RetryDelay">The time before a push that failed for a passing reason is tried again; five seconds by default, zero for none.</param>
+        /// <param name="MaxRetryDelay">The longest time between two tries; five minutes by default.</param>
         public MobilithekPushClient(UInt64                           StaticPublicationId,
                                     UInt64                           DynamicPublicationId,
                                     X509Certificate2?                MachineCertificate        = null,
                                     IEnumerable<X509Certificate2>?   TrustedRootCertificates   = null,
                                     URL?                             PublicationURL            = null,
                                     Boolean                          Compress                  = true,
-                                    TimeSpan?                        RequestTimeout            = null)
+                                    TimeSpan?                        RequestTimeout            = null,
+                                    TimeSpan?                        RetryDelay                = null,
+                                    TimeSpan?                        MaxRetryDelay             = null)
         {
+
+            if (RetryDelay < TimeSpan.Zero)
+                throw new ArgumentException("The retry delay must not be negative!", nameof(RetryDelay));
 
             this.StaticPublicationId   = StaticPublicationId;
             this.DynamicPublicationId  = DynamicPublicationId;
             this.PublicationURL        = PublicationURL ?? DefaultPublicationURL;
             this.Compress              = Compress;
             this.RequestTimeout        = RequestTimeout ?? TimeSpan.FromSeconds(60);
+            this.RetryDelay            = RetryDelay     ?? DefaultRetryDelay;
+            this.MaxRetryDelay         = MaxRetryDelay  ?? DefaultMaxRetryDelay;
+            this.nextRetryDelay        = this.RetryDelay;
 
             var roots                  = TrustedRootCertificates?.ToArray();
 
@@ -226,6 +264,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.WebAPI
 
                 snapshotNeeded = !result.IsSuccess || (snapshotNeeded && status.IsDelta);
 
+                Settled(result);
+
             });
             return Task.CompletedTask;
         }
@@ -236,10 +276,76 @@ namespace cloud.charging.open.protocols.DatexII.v3.WebAPI
             if (pendingTable is null)
                 return;
 
-            if ((await PushTableAsync(pendingTable)).IsSuccess)
+            var result = await PushTableAsync(pendingTable);
+
+            if (result.IsSuccess)
                 pendingTable = null;
 
+            Settled(result);
+
         }
+
+        #endregion
+
+        #region (private) Settled(Result) / RetryAsync()
+
+        /// <summary>
+        /// After a push: when nothing is pending any more, the next failure starts with the retry delay again; when the
+        /// push failed for a passing reason, try again later, once.
+        /// </summary>
+        private void Settled(MobilithekPushResult Result)
+        {
+
+            if (pendingTable is null && !snapshotNeeded)
+            {
+                nextRetryDelay = RetryDelay;
+                return;
+            }
+
+            if (Result.IsSuccess || !IsPassing(Result) || RetryDelay == TimeSpan.Zero || retryPlanned)
+                return;
+
+            retryPlanned    = true;
+
+            var delay       = nextRetryDelay;
+            nextRetryDelay  = TimeSpan.FromTicks(Math.Min(delay.Ticks * 2, Math.Max(MaxRetryDelay.Ticks, RetryDelay.Ticks)));
+
+            _ = Task.Delay(delay, disposed.Token).ContinueWith(task => {
+                    if (!task.IsCanceled)
+                        work.Writer.TryWrite(RetryAsync);
+                }, TaskScheduler.Default);
+
+        }
+
+        /// <summary>
+        /// Try again what is pending: the table, and the full status as it is now.
+        /// </summary>
+        private async Task RetryAsync()
+        {
+
+            retryPlanned = false;
+
+            await PushPendingTableAsync();
+
+            if (snapshotNeeded && publisher?.CurrentStatusPublication is EnergyInfrastructureStatusPublication full)
+            {
+
+                var result = await PushStatusAsync(full.AsDelta(false));
+
+                snapshotNeeded = !result.IsSuccess;
+
+                Settled(result);
+
+            }
+
+        }
+
+        /// <summary>
+        /// Whether the push failed for a passing reason, so that trying again may succeed: no answer, 408, 429 or 5xx.
+        /// </summary>
+        private static Boolean IsPassing(MobilithekPushResult Result)
+
+            => Result.StatusCode is null or 408 or 429 or >= 500;
 
         #endregion
 
@@ -409,6 +515,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.WebAPI
         public async ValueTask DisposeAsync()
         {
 
+            disposed.Cancel();
+
             if (publisher is not null)
             {
                 publisher.OnTablePublication   -= TablePublished;
@@ -421,6 +529,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.WebAPI
                 await worker;
 
             await httpClient.DisposeAsync();
+
+            disposed.Dispose();
 
         }
 

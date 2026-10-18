@@ -363,6 +363,160 @@ namespace cloud.charging.open.protocols.DatexII.Tests.WebAPI
 
         #endregion
 
+        #region (private static) AMobilithek(HTTPServer, Answer, Pushes)
+
+        /// <summary>
+        /// The Mobilithek as far as a data provider sees it: every push is counted, and answered as the given delegate
+        /// tells for the publication and the number of pushes to it so far.
+        /// </summary>
+        private static void AMobilithek(HTTPServer                                   HTTPServer,
+                                        Func<String, Int32, HTTPStatusCode>          Answer,
+                                        List<(String PublicationId, JObject JSON)>   Pushes)
+        {
+
+            var tries = new Dictionary<String, Int32>();
+
+            new HTTPAPI(HTTPServer).AddHandler(HTTPPath.Parse("/mobilithek/api/v1.0/publication/{publicationId}"),
+                                               HTTPMethod:    HTTPMethod.POST,
+                                               HTTPDelegate:  request => {
+
+                                                   var publicationId  = request.ParsedURLParameters[0];
+                                                   var body           = request.HTTPBody ?? [];
+
+                                                   if (body.Length > 2 && body[0] == 0x1f && body[1] == 0x8b)
+                                                   {
+                                                       using var gzip     = new GZipStream(new MemoryStream(body), CompressionMode.Decompress);
+                                                       using var decoded  = new MemoryStream();
+                                                       gzip.CopyTo(decoded);
+                                                       body = decoded.ToArray();
+                                                   }
+
+                                                   HTTPStatusCode statusCode;
+
+                                                   lock (Pushes)
+                                                   {
+                                                       tries[publicationId] = tries.GetValueOrDefault(publicationId) + 1;
+                                                       statusCode = Answer(publicationId, tries[publicationId]);
+                                                       Pushes.Add((publicationId, JObject.Parse(Encoding.UTF8.GetString(body))));
+                                                   }
+
+                                                   return Task.FromResult(new HTTPResponse.Builder(request) { HTTPStatusCode = statusCode }.AsImmutable);
+
+                                               });
+
+        }
+
+        #endregion
+
+        #region AFailedPushIsTriedAgainWithBackoff()
+
+        /// <summary>
+        /// A status push the Mobilithek could not take for a passing reason is tried again without a new publication:
+        /// after the retry delay, then twice as long, as the full status.
+        /// </summary>
+        [Test]
+        public async Task AFailedPushIsTriedAgainWithBackoff()
+        {
+
+            var pushes = new List<(String PublicationId, JObject JSON)>();
+
+            await using var httpServer = new HTTPServer(IPAddress: IPv4Address.Localhost, TCPPort: IPPort.Zero, AutoStart: true);
+
+            // The first two pushes of the status are answered 503 Service Unavailable.
+            AMobilithek(httpServer,
+                        (publicationId, tries) => publicationId == "22" && tries <= 2 ? HTTPStatusCode.ServiceUnavailable : HTTPStatusCode.OK,
+                        pushes);
+
+            var history  = POI.RoamingNetworkHistory.Start(ANetwork());
+
+            await using var publisher  = new POI3ToDatexIIPublisher(history, Creator, Languages.de, StationIdBNetzA: station => "BNetzA-4711");
+            await using var pusher     = new MobilithekPushClient(11, 22,
+                                                                  PublicationURL:  URL.Parse($"http://127.0.0.1:{httpServer.TCPPort}/mobilithek/api/v1.0/publication/"),
+                                                                  RetryDelay:      TimeSpan.FromMilliseconds(300),
+                                                                  MaxRetryDelay:   TimeSpan.FromSeconds(1));
+
+            var results  = new List<(DateTimeOffset At, MobilithekPushResult Result)>();
+            pusher.OnPush += (sender, publicationId, publication, result) => { if (publicationId == 22) lock (results) results.Add((Timestamp.Now, result)); };
+
+            pusher.Attach(publisher);
+
+            await publisher.StartAsync();
+
+            // The status: failed, failed, and taken, with nothing published in between.
+            Assert.That(await Eventually(() => { lock (results) return results.Count == 3; }), Is.True, () => { lock (results) return $"{results.Count} pushes of the status"; });
+
+            lock (results)
+            {
+                Assert.That(results.Select(result => result.Result.IsSuccess), Is.EqualTo(new[] { false, false, true }));
+                // 300 ms, then 600 ms.
+                Assert.That(results[1].At - results[0].At, Is.GreaterThanOrEqualTo(TimeSpan.FromMilliseconds(250)));
+                Assert.That(results[2].At - results[1].At, Is.GreaterThanOrEqualTo(TimeSpan.FromMilliseconds(550)));
+            }
+
+            lock (pushes)
+                Assert.That(pushes.Last().JSON.SelectToken("$..codedExchangeProtocol.value")?.Value<String>(), Is.EqualTo("snapshotPush"));
+
+            // And no more tries once taken.
+            await Task.Delay(1500);
+
+            lock (results)
+                Assert.That(results, Has.Count.EqualTo(3));
+
+        }
+
+        #endregion
+
+        #region AWrongConfigurationIsNotTriedAgain()
+
+        /// <summary>
+        /// 404, an unknown publication, tells a wrong configuration: it is not tried again until the next publication.
+        /// </summary>
+        [Test]
+        public async Task AWrongConfigurationIsNotTriedAgain()
+        {
+
+            var pushes = new List<(String PublicationId, JObject JSON)>();
+
+            await using var httpServer = new HTTPServer(IPAddress: IPv4Address.Localhost, TCPPort: IPPort.Zero, AutoStart: true);
+
+            AMobilithek(httpServer,
+                        (publicationId, tries) => publicationId == "22" ? HTTPStatusCode.NotFound : HTTPStatusCode.OK,
+                        pushes);
+
+            var history  = POI.RoamingNetworkHistory.Start(ANetwork());
+
+            await using var publisher  = new POI3ToDatexIIPublisher(history, Creator, Languages.de, StationIdBNetzA: station => "BNetzA-4711");
+            await using var pusher     = new MobilithekPushClient(11, 22,
+                                                                  PublicationURL:  URL.Parse($"http://127.0.0.1:{httpServer.TCPPort}/mobilithek/api/v1.0/publication/"),
+                                                                  RetryDelay:      TimeSpan.FromMilliseconds(100));
+
+            var results  = new List<MobilithekPushResult>();
+            pusher.OnPush += (sender, publicationId, publication, result) => { if (publicationId == 22) lock (results) results.Add(result); };
+
+            pusher.Attach(publisher);
+
+            await publisher.StartAsync();
+
+            Assert.That(await Eventually(() => { lock (results) return results.Count == 1; }), Is.True);
+
+            await Task.Delay(1000);
+
+            lock (results)
+            {
+                Assert.That(results,                 Has.Count.EqualTo(1));
+                Assert.That(results[0].StatusCode,   Is.EqualTo(404));
+                Assert.That(results[0].Description,  Does.Contain("unknown or expired"));
+            }
+
+            // The next publication tries again.
+            SetStatus(history, "charging");
+
+            Assert.That(await Eventually(() => { lock (results) return results.Count == 2; }), Is.True);
+
+        }
+
+        #endregion
+
     }
 
 }

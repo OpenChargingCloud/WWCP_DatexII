@@ -104,9 +104,13 @@ the statuses, whose offer does. Its technical interface description (TSSB 1.3.2)
   bare payload and replaces the static data at the Mobilithek; a status is in its message container, a `snapshotPush`
   or, for a delta, a `deltaPush`. Attached to a publisher, it pushes one publication after the other, in their order; a
   table that could not be pushed is pushed again before the next status, and after a status that could not be pushed,
-  the next status pushed is the full one rather than a delta, as the Mobilithek missed a change. `OnPush` tells every
-  result: 400 an invalid publication identification, 403 a certificate not authorised for the publication, 404 an
-  unknown or expired publication, 422 a delta without a valid exchange protocol.
+  the next status pushed is the full one rather than a delta, as the Mobilithek missed a change. A push that failed for
+  a passing reason (no answer, 408, 429 or 5xx) is also tried again without waiting for the next publication: after
+  `RetryDelay` (five seconds by default, zero for none), then twice as long each time up to `MaxRetryDelay` (five
+  minutes), with the pending table and the full status as they are then. `OnPush` tells every result: 400 an invalid
+  publication identification, 403 a certificate not authorised for the publication, 404 an unknown or expired
+  publication, 422 a delta without a valid exchange protocol; these tell a wrong configuration and are tried again only
+  with the next publication.
 - **`DatexIIHTTPAPI`:** a snapshot pull from a simple HTTP server (DATEX II Exchange 2020, Annex K), e.g. for the
   Mobilithek polling a URL of the offer, or any other subscriber: `GET {RootPath}/table.xml` and `status.xml` (DATEX II
   3.7 XML, `text/xml`), `table.json` and `status.json` (DATEX II 3.7 JSON), `mobilithek/table.json` and
