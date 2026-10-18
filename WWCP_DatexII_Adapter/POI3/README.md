@@ -199,9 +199,9 @@ other type is an `otherTypeOfIdentifier`. The Mobilithek JSON writes those as ex
 ### Charging station ↔ station (`EnergyInfrastructureStation`)
 
 Charging pools, stations and EVSEs are published as they are at runtime, the effective ones of their operator: with
-the properties their groups give them, e.g. the facilities of a pool, the features or the `MaxPower` of a station, the
-maximum current of an EVSE, given once for all members of a group. A change of a group changes its members, its
-`lastChange` being the last change of these and of what embeds them.
+the properties their templates give them, e.g. the facilities of a pool, the features or the `MaxPower` of a station,
+the maximum current of an EVSE, given once for all members naming a template. A change of a template changes its
+members, its `lastChange` being the last change of these and of what embeds them. Groups give nothing.
 
 | POI3 charging station | DATEX II station |
 |---|---|
@@ -233,7 +233,7 @@ maximum current of an EVSE, given once for all members of a group. A change of a
 | `MaxCurrent` | `maximumCurrent` of its connectors (import: the highest) |
 | ISO 15118 authentication mode of the pool | `vehicleToGridCommunicationType` `iso15118` |
 | `ChargingConnectors` | `connector`s, `numberOfConnectors` |
-| pool `EnergyMix`, and the `ChargingTariffIds` of the EVSE, else the tariff of its most specific EVSE, station or pool groups, as its effective EVSE has them | one `energyProduct` of the type `aegi:ElectricEnergy` (`electricEnergy` in the Mobilithek JSON): `energyProductName`, `electricEnergySourceRatio`s, `isGreenEnergy` (all sources renewable), and its `energyRate`s, each with the full rate |
+| pool `EnergyMix`, and the `ChargingTariffIds` of the EVSE, else the tariff of the first of its EVSE templates naming one, else of its station's, else of its pool's, as its effective EVSE has them | one `energyProduct` of the type `aegi:ElectricEnergy` (`electricEnergy` in the Mobilithek JSON): `energyProductName`, `electricEnergySourceRatio`s, `isGreenEnergy` (all sources renewable), and its `energyRate`s, each with the full rate |
 
 ### Charging connector ↔ connector (`Connector`)
 
@@ -300,17 +300,17 @@ DATEX II tells only part of a charging pool, so the import lays it onto the exis
   what DATEX II tells does DATEX II's value win. So a pool keeps the NUTS code of its country, which DATEX II does not
   tell, and an EVSE no charging modes of its own, where DATEX II tells those it derives. What a POI3 network publishes,
   imported back into it, commits nothing.
-- **What groups give:** what DATEX II tells of a charging pool, station or EVSE as its groups give it stays in the
-  groups (`POIGroupMembers.KeepWhatGroupsGive`, by the rules by which the groups give it at runtime): where it is to
-  have what its effective one has, it keeps what it has of its own, also nothing; of an array it unites with theirs,
-  e.g. its features, it takes as its own only what its groups do not give it, elements matched by their key (an
-  authentication mode by its type, so an RFID mode DATEX II tells without its card types keeps those of its group; an
-  image by its URL). An array it takes whole - its charging tariffs, current types and charging modes - becomes its
-  own whole when DATEX II tells another one, and so does another single value, e.g. another `maxPower`, as its own
-  wins. What its groups give can not be taken away by DATEX II.
+- **What templates give:** what DATEX II tells of a charging pool, station or EVSE as its templates give it stays in
+  the templates (`POITemplateMembers.KeepWhatTemplatesGive`, by the rules by which the templates give it at runtime):
+  where it is to have what its effective one has, it keeps what it has of its own, also nothing; of an array it unites
+  with theirs, e.g. its features, it takes as its own only what its templates do not give it, elements matched by their
+  key (an authentication mode by its type, so an RFID mode DATEX II tells without its card types keeps those of its
+  template; an image by its URL). An array it takes whole - its charging tariffs, current types and charging modes -
+  becomes its own whole when DATEX II tells another one, and so does another single value, e.g. another `maxPower`, as
+  its own wins. What its templates give can not be taken away by DATEX II.
 - **Kept untouched:** accessibility, data licenses, grid connection, energy meters, brands, UI features, features of the
   pool, entrances and exits, related locations, charging when closed, manufacturer and model, calibration, parking
-  spaces, groups, keys and custom data.
+  spaces, templates and `templateIds`, groups, charging tariff offers, keys and custom data.
 
 ## Gaps
 
@@ -354,8 +354,8 @@ documentation (revision 2) asks for more than its schemas require. POI3 has no d
   of a charging point as a whole, the import replaces them and these are lost.
 - **Charging modes:** AC one phase in mode 3 has no DATEX II charging mode. An EVSE with connectors of different
   charging modes gets one, the first that applies.
-- **No counterpart at all:** EVSE, charging station and charging pool groups (their tariffs are resolved onto every
-  charging point, the properties charging station groups give onto their stations), tariff groups, signing and identity keys, data licenses, energy meters, grid connection points,
+- **No counterpart at all:** templates (their tariffs are resolved onto every charging point, the properties charging
+  station templates give onto their stations), groups, charging tariff offers, signing and identity keys, data licenses, energy meters, grid connection points,
   manufacturers and models, calibration and certification links, entrance and exit addresses, related locations,
   charging when closed, UI features and the further pool and station features.
 - **Brands:** DATEX II has at most one brand per site and none per station, so only the name of the pool's first
