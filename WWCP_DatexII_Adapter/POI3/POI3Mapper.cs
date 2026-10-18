@@ -327,7 +327,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             foreach (var chargingStationOperator in RoamingNetwork.ChargingStationOperators.Where(op => operatorIds is null || operatorIds.Contains(op.Id)))
             {
-                // With the properties their groups give its charging stations.
+                // With the properties their templates give its charging stations.
                 foreach (var chargingPool in chargingStationOperator.EffectiveChargingPools)
                 {
 
@@ -367,7 +367,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// The site of the given charging pool with its stations, or null when it has no geo location.
         /// </summary>
         /// <param name="ChargingPool">A charging pool.</param>
-        /// <param name="RoamingNetwork">The roaming network of the charging pool: for its operator, brands, groups and tariffs.</param>
+        /// <param name="RoamingNetwork">The roaming network of the charging pool: for its operator, brands and tariffs.</param>
         /// <param name="Language">The language of texts POI3 has in no language.</param>
         /// <param name="Warnings">Where to tell what could not be mapped.</param>
         /// <param name="StationIdBNetzA">Tells the station identification of the Bundesnetzagentur of a charging station.</param>
@@ -1018,7 +1018,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// are added, ones gone are removed.
         /// What DATEX II tells as it tells the existing charging pool, station or EVSE is kept as it is: e.g. the NUTS
         /// code of the country, which DATEX II does not tell, or no charging modes, where DATEX II tells those it derives.
-        /// What it tells of them as their groups give it stays in their groups: see POIGroupMembers.KeepWhatGroupsGive(…).
+        /// What it tells of them as their templates give it stays in their templates: see POITemplateMembers.KeepWhatTemplatesGive(…).
         /// </summary>
         /// <param name="Site">A site.</param>
         /// <param name="OperatorId">The operator of the site.</param>
@@ -1027,7 +1027,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// <param name="Warnings">Where to tell what could not be mapped.</param>
         /// <param name="Unchanged">The existing charging pool, as DATEX II tells it: published and read back, if any.</param>
         /// <param name="Effective">The JSON of the existing charging pool as it is at runtime, its effective one, with the
-        /// properties its groups and those of its charging stations and EVSEs give them, if any.</param>
+        /// properties its templates and those of its charging stations and EVSEs give them, if any.</param>
         public static JObject? ToPOI3(this EnergyInfrastructureSite      Site,
                                       POI.ChargingStationOperator_Id     OperatorId,
                                       JObject?                           Existing,
@@ -1122,7 +1122,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             OverlayTold(desired, mapped, "features", PoolFeaturesDatexIITells,  Unchanged);
 
             if (Effective is not null)
-                POI.POIGroupMembers.KeepWhatGroupsGive(desired, storedPool, Effective, [ .. PoolProperties, "services", "features" ]);
+                POI.POITemplateMembers.KeepWhatTemplatesGive(desired, storedPool, Effective, [ .. PoolProperties, "services", "features" ]);
 
             #region The charging stations: matched by their identification
 
@@ -1150,7 +1150,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                 OverlayTold(station, mappedStation, "vehicleTypes", VehicleTypesDatexIITells,     unchangedStation);
 
                 if (effectiveStation is not null)
-                    POI.POIGroupMembers.KeepWhatGroupsGive(station, stored, effectiveStation, [ .. StationProperties, "features", "vehicleTypes" ]);
+                    POI.POITemplateMembers.KeepWhatTemplatesGive(station, stored, effectiveStation, [ .. StationProperties, "features", "vehicleTypes" ]);
 
                 #region The EVSEs of the charging station: matched by their identification
 
@@ -1171,7 +1171,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                         Overlay(evse, mappedEVSE, Changed(mappedEVSE, ChildOf(unchangedStation, "EVSEs", evseId), EVSEProperties));
 
                         if (effectiveEVSE is not null)
-                            POI.POIGroupMembers.KeepWhatGroupsGive(evse, storedEVSE, effectiveEVSE, EVSEProperties);
+                            POI.POITemplateMembers.KeepWhatTemplatesGive(evse, storedEVSE, effectiveEVSE, EVSEProperties);
 
                     }
 
@@ -1741,7 +1741,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                                     POI.RoamingNetwork   RoamingNetwork)
         {
 
-            // As they are at runtime, with the properties their parking space groups give them.
+            // As they are at runtime, with the properties their parking space templates give them.
             var groups = RoamingNetwork.EffectiveParkingSpaces.
                              Where  (space => space.ChargingStationIds.Contains(ChargingStation.Id)).
                              GroupBy(space => String.Join(",", space.ParkingRestrictions.Select(restriction => restriction.ToString())) + "|" +

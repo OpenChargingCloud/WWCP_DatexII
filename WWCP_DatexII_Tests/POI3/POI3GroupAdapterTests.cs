@@ -36,7 +36,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 {
 
     /// <summary>
-    /// Parking spaces whose charging station, dimensions and roof, and an EVSE whose tariff, only their groups give:
+    /// Parking spaces whose charging station, dimensions and roof, and an EVSE whose tariff, only their templates give:
     /// the DATEX II station has them, as they are at runtime.
     /// </summary>
     [TestFixture]
@@ -73,6 +73,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                                                                 Address:           new Address("Biberweg", "07749", I18NString.Create(Languages.de, "Jena"), Country.Germany, HouseNumber: "18"),
                                                                                                 GeoLocation:       GeoCoordinate.Parse(50.92, 11.58),
                                                                                                 TimeZone:          Time_Zone.Parse("Europe/Berlin"),
+                                                                                                TemplateIds:       [ POI.ChargingPoolTemplate_Id.Parse("DE*GEF*PT1") ],
                                                                                                 Created:           Created,
                                                                                                 ChargingStations:  [ new POI.ChargingStation(S1,
                                                                                                                                              Created:  Created,
@@ -81,16 +82,14 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                                                                                                                                       MaxPower:            Watt.FromW(22000),
                                                                                                                                                                       ChargingConnectors:  [ new POI.ChargingConnector(POI.ChargingConnector_Id.Parse("1"), POI.ChargingConnectorType.IEC_62196_T2, Format: POI.ChargingConnectorFormat.CABLE) ],
                                                                                                                                                                       Created:             Created) ]) ]) ],
-                                                    ChargingPoolGroups:  [ new POI.ChargingPoolGroup(POI.ChargingPoolGroup_Id.Parse("DE*GEF*PG1"),
-                                                                                                     ChargingPoolIds:   [ P1 ],
-                                                                                                     ChargingTariffId:  T1,
-                                                                                                     Created:           Created) ]) ],
+                                                    ChargingPoolTemplates:  [ new POI.ChargingPoolTemplate(POI.ChargingPoolTemplate_Id.Parse("DE*GEF*PT1"),
+                                                                                                           ChargingTariffId:  T1,
+                                                                                                           Created:           Created) ]) ],
                    ParkingOperators:          [ new POI.ParkingOperator(POI.ParkingOperator_Id.Parse("DE*PAR"),
-                                                    Created:             Created,
-                                                    ParkingSpaces:       [ new POI.ParkingSpace(POI.ParkingSpace_Id.Parse("space-1"), Created: Created),
-                                                                           new POI.ParkingSpace(POI.ParkingSpace_Id.Parse("space-2"), Created: Created) ],
-                                                    ParkingSpaceGroups:  [ new POI.ParkingSpaceGroup(POI.ParkingSpaceGroup_Id.Parse("level-1"),
-                                                                                                     ParkingSpaceIds:     [ POI.ParkingSpace_Id.Parse("space-1"), POI.ParkingSpace_Id.Parse("space-2") ],
+                                                    Created:                Created,
+                                                    ParkingSpaces:          [ new POI.ParkingSpace(POI.ParkingSpace_Id.Parse("space-1"), TemplateIds: [ POI.ParkingSpaceTemplate_Id.Parse("level-1") ], Created: Created),
+                                                                              new POI.ParkingSpace(POI.ParkingSpace_Id.Parse("space-2"), TemplateIds: [ POI.ParkingSpaceTemplate_Id.Parse("level-1") ], Created: Created) ],
+                                                    ParkingSpaceTemplates:  [ new POI.ParkingSpaceTemplate(POI.ParkingSpaceTemplate_Id.Parse("level-1"),
                                                                                                      ChargingStationIds:  [ S1 ],
                                                                                                      Length:              Meter.From_m(5),
                                                                                                      Width:               Meter.From_m(3.5m),
@@ -103,7 +102,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
         #region WhatGroupsGiveIsPublished()
 
         [Test]
-        public void WhatGroupsGiveIsPublished()
+        public void WhatTemplatesGiveIsPublished()
         {
 
             var warnings     = new List<String>();
@@ -117,10 +116,10 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
                 Assert.That(warnings,                                                     Is.Empty);
 
-                // The tariff of the charging pool group, as the EVSE has none of its own.
+                // The tariff of the charging pool template, as the EVSE has none of its own.
                 Assert.That(point.ElectricEnergy.Single().EnergyRates.Single().Id,       Is.EqualTo(T1.ToString()));
 
-                // The parking spaces name the charging station by their group only, and are alike.
+                // The parking spaces name the charging station by their template only, and are alike.
                 Assert.That(parking.NumberOfSpaces,                                       Is.EqualTo(2));
                 Assert.That(parking.Dimension?.Length?.m,                                 Is.EqualTo(5));
                 Assert.That(parking.Dimension?.Width?.m,                                  Is.EqualTo(3.5m));

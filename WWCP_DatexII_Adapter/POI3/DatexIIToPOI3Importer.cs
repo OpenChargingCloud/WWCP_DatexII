@@ -329,8 +329,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                            continue;
 
                                        var existing  = pools.OfType<JObject>().FirstOrDefault(pool => pool["@id"]?.Value<String>() == poolId);
-                                       // The existing charging pool as it is at runtime, with what its groups give it, and as DATEX II
-                                       // tells it: what DATEX II tells alike is kept, what the groups give stays in the groups.
+                                       // The existing charging pool as it is at runtime, with what its templates give it, and as DATEX II
+                                       // tells it: what DATEX II tells alike is kept, what the templates give stays in the templates.
                                        var effective  = chargingStationOperator is not null &&
                                                         POI.ChargingPool_Id.TryParse(poolId ?? "", out var chargingPoolId) &&
                                                         chargingStationOperator.TryGetEffectiveChargingPool(chargingPoolId, out var effectiveChargingPool)

@@ -103,8 +103,8 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     ChargingTariffIds:   [ T1 ],
                     Created:             Created);
 
-        private static POI.ChargingPool APool(Int32    MaxPower         = 22000,
-                                              Boolean  FeaturesByGroup  = false)
+        private static POI.ChargingPool APool(Int32    MaxPower            = 22000,
+                                              Boolean  FeaturesByTemplate  = false)
 
             => new (P1,
                     I18NString.Create(Languages.en, "Biberweg"),
@@ -120,15 +120,16 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                     NUTSCodes:            [ POI.NUTSCode.Parse("DE"), POI.NUTSCode.Parse("DEG"), POI.NUTSCode.Parse("DEG03") ],
                     Features:             [ POI.ChargingPoolFeature.Roofed, POI.ChargingPoolFeature.IlluminatedParkingNearby ],
                     ChargingStations:     [ new POI.ChargingStation(S1,
-                                                                    Features:             FeaturesByGroup ? [ POI.ChargingStationFeature.Illuminated ] : [ POI.ChargingStationFeature.Reservable, POI.ChargingStationFeature.Illuminated ],
+                                                                    Features:             FeaturesByTemplate ? [ POI.ChargingStationFeature.Illuminated ] : [ POI.ChargingStationFeature.Reservable, POI.ChargingStationFeature.Illuminated ],
+                                                                    TemplateIds:          FeaturesByTemplate ? [ POI.ChargingStationTemplate_Id.Parse("DE*GEF*ST1") ] : null,
                                                                     EVSEs:                [ AnEVSE(MaxPower) ],
                                                                     EUVehicleCategories:  [ POI.EUVehicleCategory.M1, POI.EUVehicleCategory.N1, POI.EUVehicleCategory.L ],
                                                                     VehicleTypes:         [ POI.VehicleType.VAN, POI.VehicleType.PERSONAL_VEHICLE ],
                                                                     Created:              Created) ],
                     Created:              Created);
 
-        private static POI.RoamingNetwork ANetwork(Boolean WithPools        = true,
-                                                   Boolean FeaturesByGroup  = false)
+        private static POI.RoamingNetwork ANetwork(Boolean WithPools           = true,
+                                                   Boolean FeaturesByTemplate  = false)
 
             => new POI.RoamingNetwork(POI.RoamingNetwork_Id.Parse("rn1"),
                                       Created:                   Created,
@@ -136,9 +137,8 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                                                                                                    Name:            I18NString.Create(Languages.en, "GraphDefined"),
                                                                                                    Homepage:        URL.Parse("https://graphdefined.com"),
                                                                                                    ChargingTariffs: WithPools ? [ ATariff() ] : null,
-                                                                                                   ChargingPools:   WithPools ? [ APool(FeaturesByGroup: FeaturesByGroup) ] : null,
-                                                                                                   ChargingStationGroups: WithPools && FeaturesByGroup ? [ new POI.ChargingStationGroup(POI.ChargingStationGroup_Id.Parse("DE*GEF*SG1"),
-                                                                                                                                                                                       ChargingStationIds:  [ S1 ],
+                                                                                                   ChargingPools:   WithPools ? [ APool(FeaturesByTemplate: FeaturesByTemplate) ] : null,
+                                                                                                   ChargingStationTemplates: WithPools && FeaturesByTemplate ? [ new POI.ChargingStationTemplate(POI.ChargingStationTemplate_Id.Parse("DE*GEF*ST1"),
                                                                                                                                                                                        Features:            [ POI.ChargingStationFeature.Reservable ],
                                                                                                                                                                                        MaxPower:            Watt.FromW(11000),
                                                                                                                                                                                        Created:             Created) ] : null,
@@ -311,18 +311,18 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         #endregion
 
-        #region WhatGroupsGiveIsPublished()
+        #region WhatTemplatesGiveIsPublished()
 
         /// <summary>
-        /// A charging station is published with the properties its groups give it.
+        /// A charging station is published with the properties its templates give it.
         /// </summary>
         [Test]
-        public void WhatGroupsGiveIsPublished()
+        public void WhatTemplatesGiveIsPublished()
         {
 
-            // The charging station is reservable, and limited to 11 kW, by its group only.
+            // The charging station is reservable, and limited to 11 kW, by its template only.
             var warnings     = new List<String>();
-            var publication  = POI3Mapper.ToTablePublication(ANetwork(FeaturesByGroup: true), Creator, Languages.de, "rn1", "1", warnings,
+            var publication  = POI3Mapper.ToTablePublication(ANetwork(FeaturesByTemplate: true), Creator, Languages.de, "rn1", "1", warnings,
                                                              StationIdBNetzA: station => "BNetzA-4711");
 
             AssertValidTable(publication);
@@ -850,14 +850,14 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         #endregion
 
-        #region TheImporterKeepsWhatGroupsGiveInTheGroups()
+        #region TheImporterKeepsWhatTemplatesGiveInTheTemplates()
 
         [Test]
-        public async Task TheImporterKeepsWhatGroupsGiveInTheGroups()
+        public async Task TheImporterKeepsWhatTemplatesGiveInTheTemplates()
         {
 
-            // The charging station is reservable, and limited to 11 kW, by its group only.
-            var history   = POI.RoamingNetworkHistory.Start(ANetwork(FeaturesByGroup: true));
+            // The charging station is reservable, and limited to 11 kW, by its template only.
+            var history   = POI.RoamingNetworkHistory.Start(ANetwork(FeaturesByTemplate: true));
             var revision  = history.Head.Commit.Revision;
             var errors    = new List<String>();
             var warnings  = new List<String>();
@@ -878,7 +878,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
                 Assert.That(stored.MaxPower,                                           Is.Null);
             });
 
-            // Another maximum power than its group gives it becomes its own; its features stay as they are.
+            // Another maximum power than its template gives it becomes its own; its features stay as they are.
             var json      = history.Head.RoamingNetwork.ToJSON(IncludeETags: false);
             json["chargingStationOperators"]![0]!["chargingPools"]![0]!["chargingStations"]![0]!["maxPower"] = 7400;
 
@@ -907,14 +907,14 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         /// <summary>
         /// What a POI3 network publishes, imported back into it, commits nothing: also not what DATEX II can not tell,
-        /// e.g. the NUTS code of the country, or what it derives, e.g. the charging mode of an EVSE, nor what the groups
+        /// e.g. the NUTS code of the country, or what it derives, e.g. the charging mode of an EVSE, nor what the templates
         /// of a charging pool or of an EVSE give it.
         /// </summary>
         [Test]
         public async Task ARoundTripCommitsNothing()
         {
 
-            // The facility of the charging pool and the maximum current of the EVSE given by their groups only.
+            // The facility of the charging pool and the maximum current of the EVSE given by their templates only.
             var json      = ANetwork().ToJSON(IncludeETags: false);
             var gef       = (JObject) json["chargingStationOperators"]![0]!;
             var pool      = (JObject) gef["chargingPools"]![0]!;
@@ -923,15 +923,16 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             pool.Remove("facilities");
             evse.Remove("maxCurrent");
 
-            gef["chargingPoolGroups"] = new JArray(new JObject(new JProperty("@id",              "DE*GEF*PG1"),
-                                                               new JProperty("chargingPoolIds",  new JArray(P1.ToString())),
-                                                               new JProperty("facilities",       new JArray("CAFE")),
-                                                               new JProperty("created",          "2026-01-01T00:00:00.000Z")));
+            pool["templateIds"]          = new JArray("DE*GEF*PT1");
+            evse["templateIds"]          = new JArray("DE*GEF*ET1");
 
-            gef["EVSEGroups"]         = new JArray(new JObject(new JProperty("@id",              "DE*GEF*EG1"),
-                                                               new JProperty("EVSEIds",          new JArray(E1.ToString())),
-                                                               new JProperty("maxCurrent",       32),
-                                                               new JProperty("created",          "2026-01-01T00:00:00.000Z")));
+            gef["chargingPoolTemplates"] = new JArray(new JObject(new JProperty("@id",         "DE*GEF*PT1"),
+                                                                  new JProperty("facilities",  new JArray("CAFE")),
+                                                                  new JProperty("created",     "2026-01-01T00:00:00.000Z")));
+
+            gef["EVSETemplates"]         = new JArray(new JObject(new JProperty("@id",         "DE*GEF*ET1"),
+                                                                  new JProperty("maxCurrent",  32),
+                                                                  new JProperty("created",     "2026-01-01T00:00:00.000Z")));
 
             Assert.That(POI.RoamingNetwork.TryParse(json, out var network, out var errorResponse), Is.True, errorResponse);
 
