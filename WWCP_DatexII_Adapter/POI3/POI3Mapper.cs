@@ -1099,7 +1099,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                                                  ? ToI18NString(Site.AdditionalInformation.First(), Language)
                                                                  : null,
                                        LastChange:           Site.LastUpdated
-                                   ).ToJSON();
+                                   ).ToJSON(Embedded: true);
 
             var mappedStations   = new List<JObject>();
             var stationOfId      = new Dictionary<POI.ChargingStation_Id, String>();
@@ -1108,7 +1108,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             {
                 var chargingStation = station.ToPOI3(OperatorId, Language, Warnings);
                 if (chargingStation is not null && IsFirst(stationOfId, chargingStation.Id, station.Id, "stations", "charging station", Warnings))
-                    mappedStations.Add(chargingStation.ToJSON());
+                    mappedStations.Add(chargingStation.ToJSON(Embedded: true));
             }
 
             #endregion
