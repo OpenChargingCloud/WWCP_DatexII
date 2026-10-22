@@ -2752,7 +2752,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
             return new POI.EnergyMix(
                        sources,
                        [],
-                       new ImmutableI18NString(I18NString.Empty),
+                       ImmutableI18NString.Empty,
                        new ImmutableI18NString(ToI18NString(ElectricEnergy.EnergyProductName, Language) ?? I18NString.Empty)
                    );
 
