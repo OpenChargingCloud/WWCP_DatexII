@@ -2295,11 +2295,11 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                    Description:               ToMultilingualString(Operator.Description),
                    LinkToGeneralInformation:  Operator.Homepage,
                    LinkToLogo:                Operator.Logo,
-                   OrganisationUnits:         Operator.EMailAddress.HasValue || Operator.Telephone.HasValue
+                   OrganisationUnits:         Operator.EMailAddress is not null || Operator.Telephone.HasValue
                                                   ? [
                                                         new OrganisationUnit(
                                                             ContactInformation: [ new ContactInformation(TelephoneNumber: Operator.Telephone?.ToString(),
-                                                                                                         EMail:           Operator.EMailAddress?.ToString()) ]
+                                                                                                         EMail:           Operator.EMailAddress?.Address.ToString()) ]
                                                         )
                                                     ]
                                                   : null
