@@ -73,7 +73,7 @@ await importer.ImportAsync(table!);
   any other.
 - **When an exceptional closing or opening of a charging pool begins or ends:** a delta of its EVSEs, so that the opening
   status of its site changes in time, also of one its template gives it; the publisher waits for the next such change (at
-  most twelve hours at once).
+  most twelve hours at once), also when publishing this one failed.
 - **On every price status change of a charging pool, station or EVSE:** a delta of all its EVSEs at once, with their
   energy rate updates.
 - **On every energy status change of an EVSE:** the same, but throttled: its charging power, voltage and remaining

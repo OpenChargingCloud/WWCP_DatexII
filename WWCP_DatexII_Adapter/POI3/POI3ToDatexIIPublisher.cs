@@ -526,7 +526,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
         /// <summary>
         /// Publish a delta of the EVSEs of the charging pools whose exceptional closing or opening began or ended since
-        /// the last time, and wait for the next change.
+        /// the last time, and wait for the next change: also when publishing it failed, so that a failure does not end
+        /// the opening changes to come.
         /// </summary>
         private async Task PublishOpeningChangesAsync()
         {
@@ -536,20 +537,27 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             openingCheckedUntil = now;
 
-            var evseIds  = History.Head.RoamingNetwork.ChargingStationOperators.
-                               Where     (chargingStationOperator => OperatorIds is null || OperatorIds.Contains(chargingStationOperator.Id)).
-                               SelectMany(chargingStationOperator => chargingStationOperator.EffectiveChargingPools).
-                               Where     (chargingPool            => chargingPool.OpeningTimes is not null &&
-                                                                     chargingPool.OpeningTimes.ExceptionalClosings.Concat(chargingPool.OpeningTimes.ExceptionalOpenings).
-                                                                         SelectMany(period => new[] { period.Begin, period.End }).
-                                                                         Any(timestamp => timestamp > since && timestamp <= now)).
-                               SelectMany(chargingPool            => chargingPool.ChargingStations.SelectMany(chargingStation => chargingStation.EVSEs)).
-                               Select    (evse                    => evse.Id).
-                               ToArray();
+            try
+            {
 
-            await PublishStatusAsync(evseIds);
+                var evseIds  = History.Head.RoamingNetwork.ChargingStationOperators.
+                                   Where     (chargingStationOperator => OperatorIds is null || OperatorIds.Contains(chargingStationOperator.Id)).
+                                   SelectMany(chargingStationOperator => chargingStationOperator.EffectiveChargingPools).
+                                   Where     (chargingPool            => chargingPool.OpeningTimes is not null &&
+                                                                         chargingPool.OpeningTimes.ExceptionalClosings.Concat(chargingPool.OpeningTimes.ExceptionalOpenings).
+                                                                             SelectMany(period => new[] { period.Begin, period.End }).
+                                                                             Any(timestamp => timestamp > since && timestamp <= now)).
+                                   SelectMany(chargingPool            => chargingPool.ChargingStations.SelectMany(chargingStation => chargingStation.EVSEs)).
+                                   Select    (evse                    => evse.Id).
+                                   ToArray();
 
-            ScheduleOpeningChange();
+                await PublishStatusAsync(evseIds);
+
+            }
+            finally
+            {
+                ScheduleOpeningChange();
+            }
 
         }
 
