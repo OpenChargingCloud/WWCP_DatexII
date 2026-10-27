@@ -240,6 +240,91 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
         #endregion
 
+        #region (private static) AClosingNetwork(Begin, End)
+
+        /// <summary>
+        /// A network of one charging pool, closed exceptionally from the given beginning to the given end.
+        /// </summary>
+        private static POI.RoamingNetwork AClosingNetwork(DateTimeOffset  Begin,
+                                                         DateTimeOffset  End)
+
+            => new POI.RoamingNetwork(POI.RoamingNetwork_Id.Parse("rn1"),
+                                      Created:                   Created,
+                                      ChargingStationOperators:  [ new POI.ChargingStationOperator(GEF,
+                                                                                                   Name:             I18NString.Create(Languages.en, "GraphDefined"),
+                                                                                                   ChargingTariffs:  [ ATariff() ],
+                                                                                                   ChargingPools:    [ new POI.ChargingPool(P1,
+                                                                                                                                            I18NString.Create(Languages.en, "Biberweg"),
+                                                                                                                                            GeoLocation:       GeoCoordinate.Parse(50.92, 11.58),
+                                                                                                                                            OpeningTimes:      new ImmutableOpeningTimes(new OpeningTimes().AddExceptionalClosing(Begin, End)),
+                                                                                                                                            ChargingStations:  [ new POI.ChargingStation(S1, EVSEs: [ AnEVSE() ], Created: Created) ],
+                                                                                                                                            Created:           Created) ],
+                                                                                                   Created:          Created) ]).WithKeys();
+
+        #endregion
+
+        #region (private static) StartedBeforeItsClosing(Duration, Subscribe, Reset)
+
+        /// <summary>
+        /// A publisher of a network whose charging pool closes exceptionally for the given duration, started before the
+        /// closing begins. It begins 1.5 seconds after now; where the start took longer, e.g. as the whole suite runs at once,
+        /// the closing was in the full status already, so the publisher is disposed and started anew, with a lead twice as
+        /// long, up to 12 seconds, after resetting what the subscriber collected.
+        /// </summary>
+        /// <param name="Duration">How long the charging pool is closed.</param>
+        /// <param name="Subscribe">Subscribes to a publisher before it starts.</param>
+        /// <param name="Reset">Forgets what the subscriber collected from a publisher started too late.</param>
+        private static async Task<(POI3ToDatexIIPublisher Publisher, POI.RoamingNetwork Network, DateTimeOffset Begin, DateTimeOffset End)>
+
+            StartedBeforeItsClosing(TimeSpan                        Duration,
+                                    Action<POI3ToDatexIIPublisher>  Subscribe,
+                                    Action                          Reset)
+
+        {
+
+            for (var lead = TimeSpan.FromSeconds(1.5); ; lead *= 2)
+            {
+
+                var begin      = Timestamp.Now + lead;
+                var end        = begin + Duration;
+                var network    = AClosingNetwork(begin, end);
+                var publisher  = new POI3ToDatexIIPublisher(POI.RoamingNetworkHistory.Start(network), Creator, Languages.de, StationIdBNetzA: station => "BNetzA-4711");
+
+                Subscribe(publisher);
+
+                await publisher.StartAsync();
+
+                if (Timestamp.Now < begin - TimeSpan.FromMilliseconds(250) || lead >= TimeSpan.FromSeconds(12))
+                    return (publisher, network, begin, end);
+
+                await publisher.DisposeAsync();
+
+                Reset();
+
+            }
+
+        }
+
+        #endregion
+
+        #region (private static) UntilItBegins(Begin)
+
+        /// <summary>
+        /// Waits until the given beginning, so that waiting for what follows it does not depend on the lead.
+        /// </summary>
+        private static Task UntilItBegins(DateTimeOffset Begin)
+        {
+
+            var wait = Begin - Timestamp.Now;
+
+            return wait > TimeSpan.Zero
+                       ? Task.Delay(wait)
+                       : Task.CompletedTask;
+
+        }
+
+        #endregion
+
 
         #region APoolBecomesASchemaValidSite()
 
@@ -1276,26 +1361,20 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
         public async Task ExceptionalClosingsAreTheOpeningStatusOfASite()
         {
 
-            var now       = Timestamp.Now;
-            var begin     = now.AddSeconds(1.5);
-            var end       = now.AddSeconds(3);
+            // The publisher: the full status tells it in advance, and a delta follows when it begins and when it ends.
+            var deltas    = new List<EnergyInfrastructureStatusPublication>();
 
-            var network   = new POI.RoamingNetwork(POI.RoamingNetwork_Id.Parse("rn1"),
-                                                   Created:                   Created,
-                                                   ChargingStationOperators:  [ new POI.ChargingStationOperator(GEF,
-                                                                                                                Name:             I18NString.Create(Languages.en, "GraphDefined"),
-                                                                                                                ChargingTariffs:  [ ATariff() ],
-                                                                                                                ChargingPools:    [ new POI.ChargingPool(P1,
-                                                                                                                                                         I18NString.Create(Languages.en, "Biberweg"),
-                                                                                                                                                         GeoLocation:       GeoCoordinate.Parse(50.92, 11.58),
-                                                                                                                                                         OpeningTimes:      new ImmutableOpeningTimes(new OpeningTimes().AddExceptionalClosing(begin, end)),
-                                                                                                                                                         ChargingStations:  [ new POI.ChargingStation(S1, EVSEs: [ AnEVSE() ], Created: Created) ],
-                                                                                                                                                         Created:           Created) ],
-                                                                                                                Created:          Created) ]).WithKeys();
+            var started   = await StartedBeforeItsClosing(TimeSpan.FromSeconds(1.5),
+                                                          subscribed => subscribed.OnStatusPublication += (sender, publication, isDelta) => { if (isDelta) lock (deltas) deltas.Add(publication); return Task.CompletedTask; },
+                                                          ()         => { lock (deltas) deltas.Clear(); });
 
-            var pool      = network.GetChargingStationOperatorById(GEF)!.ChargingPools.Single();
+            await using var publisher = started.Publisher;
 
-            var before    = POI3Mapper.OpeningOf(pool, now);
+            var begin     = started.Begin;
+            var end       = started.End;
+            var pool      = started.Network.GetChargingStationOperatorById(GEF)!.ChargingPools.Single();
+
+            var before    = POI3Mapper.OpeningOf(pool, begin.AddSeconds(-1));
             var during    = POI3Mapper.OpeningOf(pool, begin.AddMilliseconds(500));
             var after     = POI3Mapper.OpeningOf(pool, end.AddSeconds(1));
 
@@ -1314,21 +1393,13 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
             });
 
-            // The publisher: the full status tells it in advance, and a delta follows when it begins and when it ends.
-            var history   = POI.RoamingNetworkHistory.Start(network);
-            var deltas    = new List<EnergyInfrastructureStatusPublication>();
-
-            await using var publisher = new POI3ToDatexIIPublisher(history, Creator, Languages.de, StationIdBNetzA: station => "BNetzA-4711");
-
-            publisher.OnStatusPublication += (sender, publication, isDelta) => { if (isDelta) lock (deltas) deltas.Add(publication); return Task.CompletedTask; };
-
-            await publisher.StartAsync();
-
             var full      = publisher.CurrentStatusPublication!;
 
             AssertValidStatus(full);
 
             Assert.That(full.EnergyInfrastructureSiteStatus.Single().RegularOperatingHoursInForce, Is.True);
+
+            await UntilItBegins(begin);
 
             Assert.That(await Eventually(() => { lock (deltas) return deltas.Count >= 1; }), Is.True, "The beginning closing was not published.");
 
@@ -1367,50 +1438,34 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
         public async Task AnExceptionalClosingEndingWhileItsBeginningIsPublishedIsPublished()
         {
 
-            var now       = Timestamp.Now;
-            var begin     = now.AddSeconds(1.5);
-            var end       = begin.AddMilliseconds(200);
-
-            var network   = new POI.RoamingNetwork(POI.RoamingNetwork_Id.Parse("rn1"),
-                                                   Created:                   Created,
-                                                   ChargingStationOperators:  [ new POI.ChargingStationOperator(GEF,
-                                                                                                                Name:             I18NString.Create(Languages.en, "GraphDefined"),
-                                                                                                                ChargingTariffs:  [ ATariff() ],
-                                                                                                                ChargingPools:    [ new POI.ChargingPool(P1,
-                                                                                                                                                         I18NString.Create(Languages.en, "Biberweg"),
-                                                                                                                                                         GeoLocation:       GeoCoordinate.Parse(50.92, 11.58),
-                                                                                                                                                         OpeningTimes:      new ImmutableOpeningTimes(new OpeningTimes().AddExceptionalClosing(begin, end)),
-                                                                                                                                                         ChargingStations:  [ new POI.ChargingStation(S1, EVSEs: [ AnEVSE() ], Created: Created) ],
-                                                                                                                                                         Created:           Created) ],
-                                                                                                                Created:          Created) ]).WithKeys();
-
-            var history   = POI.RoamingNetworkHistory.Start(network);
             var deltas    = new List<EnergyInfrastructureStatusPublication>();
-
-            await using var publisher = new POI3ToDatexIIPublisher(history, Creator, Languages.de, StationIdBNetzA: station => "BNetzA-4711");
-
-            publisher.OnStatusPublication += (sender, publication, isDelta) => {
-
-                if (isDelta)
-                {
-
-                    lock (deltas)
-                        deltas.Add(publication);
-
-                    // Published as it begins: the clock passes its end meanwhile.
-                    if (publication.EnergyInfrastructureSiteStatus.Single().OpeningStatus?.ToString() == "temporarilyClosed")
-                        Timestamp.TravelForwardInTime(TimeSpan.FromMilliseconds(500));
-
-                }
-
-                return Task.CompletedTask;
-
-            };
 
             try
             {
 
-                await publisher.StartAsync();
+                var started = await StartedBeforeItsClosing(TimeSpan.FromMilliseconds(200),
+                                                            subscribed => subscribed.OnStatusPublication += (sender, publication, isDelta) => {
+
+                                                                if (isDelta)
+                                                                {
+
+                                                                    lock (deltas)
+                                                                        deltas.Add(publication);
+
+                                                                    // Published as it begins: the clock passes its end meanwhile.
+                                                                    if (publication.EnergyInfrastructureSiteStatus.Single().OpeningStatus?.ToString() == "temporarilyClosed")
+                                                                        Timestamp.TravelForwardInTime(TimeSpan.FromMilliseconds(500));
+
+                                                                }
+
+                                                                return Task.CompletedTask;
+
+                                                            },
+                                                            () => { lock (deltas) deltas.Clear(); });
+
+                await using var publisher = started.Publisher;
+
+                await UntilItBegins(started.Begin);
 
                 Assert.That(await Eventually(() => { lock (deltas) return deltas.Count >= 2; }), Is.True, "The ending closing was not published.");
 
