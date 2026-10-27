@@ -471,6 +471,9 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             await Raise(OnTablePublication, handler => handler(this, table));
 
+            // The full status tells every opening change until now.
+            openingCheckedUntil      = Timestamp.Now;
+
             CurrentStatusPublication = POI3Mapper.ToStatusPublication(head.RoamingNetwork,
                                                                       PublicationCreator,
                                                                       Language,
@@ -493,26 +496,30 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
         /// <summary>
         /// Wake up when the next exceptional closing or opening of a published charging pool begins or ends, so that the
         /// opening status of its site changes in time: of its opening times as it is at runtime, also those its templates
-        /// give it.
+        /// give it. The next one after the time opening changes were published until, not after now: one in between, e.g.
+        /// as the delay ended a little early, would neither be published nor be waited for.
         /// </summary>
         private void ScheduleOpeningChange()
         {
 
-            var now         = Timestamp.Now;
+            var from        = openingCheckedUntil;
             var generation  = Interlocked.Increment(ref openingGeneration);
 
             var next        = History.Head.RoamingNetwork.ChargingStationOperators.
                                   Where     (chargingStationOperator => OperatorIds is null || OperatorIds.Contains(chargingStationOperator.Id)).
                                   SelectMany(chargingStationOperator => chargingStationOperator.EffectiveChargingPools).
-                                  Select    (chargingPool            => POI3Mapper.NextOpeningChangeOf(chargingPool, now)).
+                                  Select    (chargingPool            => POI3Mapper.NextOpeningChangeOf(chargingPool, from)).
                                   Where     (timestamp               => timestamp.HasValue).
                                   Min();
 
             if (!next.HasValue)
                 return;
 
-            // A millisecond late rather than early.
-            var wait = next.Value - now + TimeSpan.FromMilliseconds(1);
+            // A millisecond late rather than early; at once when it passed already.
+            var wait = next.Value - Timestamp.Now + TimeSpan.FromMilliseconds(1);
+
+            if (wait < TimeSpan.Zero)
+                wait = TimeSpan.Zero;
 
             if (wait > maxOpeningWait)
                 wait = maxOpeningWait;
