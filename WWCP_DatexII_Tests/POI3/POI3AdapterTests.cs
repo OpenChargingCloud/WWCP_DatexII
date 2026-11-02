@@ -1013,11 +1013,13 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
             gef["chargingPoolTemplates"] = new JArray(new JObject(new JProperty("@id",         "DE*GEF*PT1"),
                                                                   new JProperty("facilities",  new JArray("CAFE")),
-                                                                  new JProperty("created",     "2026-01-01T00:00:00.000Z")));
+                                                                  new JProperty("created",     "2026-01-01T00:00:00.000Z"),
+                                                                  new JProperty("lastChange",  "2026-01-01T00:00:00.000Z")));
 
             gef["EVSETemplates"]         = new JArray(new JObject(new JProperty("@id",         "DE*GEF*ET1"),
                                                                   new JProperty("maxCurrent",  32),
-                                                                  new JProperty("created",     "2026-01-01T00:00:00.000Z")));
+                                                                  new JProperty("created",     "2026-01-01T00:00:00.000Z"),
+                                                                  new JProperty("lastChange",  "2026-01-01T00:00:00.000Z")));
 
             Assert.That(POI.RoamingNetwork.TryParse(json, out var network, out var errorResponse), Is.True, errorResponse);
 

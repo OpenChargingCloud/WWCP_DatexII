@@ -368,7 +368,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
                                            continue;
 
                                        var existing        = tariffs.OfType<JObject>().FirstOrDefault(tariff => tariff["@id"]?.Value<String>() == chargingTariff.Id.ToString());
-                                       var desired         = chargingTariff.ToJSON();
+                                       var desired         = chargingTariff.ToJSON(Embedded: true);
 
                                        if (existing is not null)
                                        {

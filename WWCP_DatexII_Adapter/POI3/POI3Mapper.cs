@@ -1113,11 +1113,13 @@ namespace cloud.charging.open.protocols.DatexII.v3.POI3
 
             #endregion
 
-            // A new charging pool is created when DATEX II last updated its site, as POI3 reads it only with its creation.
+            // A new charging pool is created when DATEX II last updated its site, as POI3 reads it only with its creation,
+            // and last changed then, as POI3 writes it.
             var desired   = Existing is not null
                                 ? (JObject) Existing.DeepClone()
-                                : new JObject(new JProperty("@id",      poolId.Value.ToString()),
-                                              new JProperty("created",  mapped["created"]));
+                                : new JObject(new JProperty("@id",         poolId.Value.ToString()),
+                                              new JProperty("created",     mapped["created"]),
+                                              new JProperty("lastChange",  mapped["lastChange"]));
 
             var storedPool = (JObject) desired.DeepClone();
 
