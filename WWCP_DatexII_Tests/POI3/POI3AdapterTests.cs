@@ -1445,7 +1445,8 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
             try
             {
 
-                var started = await StartedBeforeItsClosing(TimeSpan.FromMilliseconds(200),
+                // Closed for 2 seconds, so that a wake-up late on a busy machine still finds it closed.
+                var started = await StartedBeforeItsClosing(TimeSpan.FromSeconds(2),
                                                             subscribed => subscribed.OnStatusPublication += (sender, publication, isDelta) => {
 
                                                                 if (isDelta)
@@ -1456,7 +1457,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.POI3
 
                                                                     // Published as it begins: the clock passes its end meanwhile.
                                                                     if (publication.EnergyInfrastructureSiteStatus.Single().OpeningStatus?.ToString() == "temporarilyClosed")
-                                                                        Timestamp.TravelForwardInTime(TimeSpan.FromMilliseconds(500));
+                                                                        Timestamp.TravelForwardInTime(TimeSpan.FromSeconds(3));
 
                                                                 }
 
