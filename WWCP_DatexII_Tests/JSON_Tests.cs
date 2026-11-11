@@ -21,6 +21,8 @@ using NUnit.Framework;
 
 using Newtonsoft.Json.Linq;
 
+using org.GraphDefined.Vanaheimr.Illias;
+
 using cloud.charging.open.protocols.DatexII.v3;
 using cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure;
 
@@ -298,7 +300,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests
                 case (JValue expected, JValue actual):
                     if (!(expected.Value is IConvertible && actual.Value is IConvertible &&
                           expected.Type is JTokenType.Integer or JTokenType.Float && actual.Type is JTokenType.Integer or JTokenType.Float
-                              ? Convert.ToDecimal(expected.Value) == Convert.ToDecimal(actual.Value)
+                              ? expected.AsDecimal() == actual.AsDecimal()
                               : JToken.DeepEquals(expected, actual)))
                         yield return $"{Path}: {expected.ToString(Newtonsoft.Json.Formatting.None)}, not {actual.ToString(Newtonsoft.Json.Formatting.None)}";
                     break;
