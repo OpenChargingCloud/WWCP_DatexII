@@ -22,6 +22,38 @@ The tests validate against the XML schemas, the official DATEX II 3.7 JSON schem
 
 [WWCP_DatexII_Adapter/POI3](WWCP_DatexII_Adapter/POI3/README.md) maps the publications to and from a POI3 roaming network, and documents what the mapping leaves out and how this implementation compares with the standard and the profile.
 
+[DataModel.md](DataModel.md) shows as class diagrams how the classes of the data model belong together.
+
+
+## Where the data model comes from
+
+The classes are written by hand after two sources. Neither is generated from, so a change of a source has to be taken over by hand.
+
+| Source | What it gives | Where it is in this repository |
+|---|---|---|
+| **DATEX II 3.7**, the release of the DATEX II organisation: [docs.datex2.eu/downloads/modelv37](https://docs.datex2.eu/downloads/modelv37/). Its UML model is kept in [DATEX-II-EU/datexiimodel](https://github.com/DATEX-II-EU/datexiimodel), issues of the standard in [DATEX-II-EU/DatexII](https://github.com/DATEX-II-EU/DatexII). | The domain model itself: the XML schemas and the official JSON schemas of the namespaces `afirEnergyInfrastructure`, `afirFacilities`, `common`, `commonExtension`, `locationReferencing`, `locationExtension` and `d2Payload`. | XML schemas: `WWCP_DatexII/Schemas/3.7` (embedded in the library). JSON schemas: `WWCP_DatexII_Tests/Documentation/3.7`. |
+| **The Mobilithek profile** "AFIR Energy Infrastructure" 01-00-00 of the German national access point: [MobilithekDE/AFIR-DATEX-II-Recharging-Profil](https://github.com/MobilithekDE/AFIR-DATEX-II-Recharging-Profil). | What of DATEX II the German NAP takes, and how: its JSON schemas, its examples, the profile documentation and the data dictionaries (PDF). | JSON schemas and examples: `WWCP_DatexII_Tests/Documentation/Mobilithek-01-00-00`, from `Releases/Version 01-00-00/Schema und Beispiele` (revision 2 of 2026-04-10). |
+
+The Mobilithek offers the profile for download as well:
+
+- [mobilithek.info/cms/downloads/datenprofile-afir](https://mobilithek.info/cms/downloads/datenprofile-afir): the profile as one ZIP archive, with the same documentation, schemas and examples as `Releases/Version 01-00-00` of the repository (revision 2).
+- [mobilithek.info/help/download](https://mobilithek.info/help/download): the download page of the Mobilithek, with its guidelines and technical documents, and the certificate chain the `MobilithekPushClient` verifies the Mobilithek by.
+
+The regulation behind both is the EU Alternative Fuels Infrastructure Regulation, (EU) 2023/1804 (AFIR), which requires DATEX II for the static and dynamic data of public recharging points from 2026-04-14.
+
+### Taking over changes of the data model
+
+The repository to watch is **[MobilithekDE/AFIR-DATEX-II-Recharging-Profil](https://github.com/MobilithekDE/AFIR-DATEX-II-Recharging-Profil)**: it is what the Mobilithek validates a publication against, and it changes without a new DATEX II release. The same profile is published at [mobilithek.info/cms/downloads/datenprofile-afir](https://mobilithek.info/cms/downloads/datenprofile-afir). A new DATEX II release is announced at [docs.datex2.eu](https://docs.datex2.eu/).
+
+Last compared: the profile at its commit `7ab184bc` of 2026-04-10 (release 01-00-00, revision 2), DATEX II at release 3.7.
+
+To take over a change:
+
+1. Copy the new schemas and examples over those in the repository: a new profile release into `WWCP_DatexII_Tests/Documentation/Mobilithek-<version>`, a new DATEX II release into `WWCP_DatexII/Schemas/<version>` and `WWCP_DatexII_Tests/Documentation/<version>`.
+2. Run the tests. They validate everything the library writes against the XML schemas and both sets of JSON schemas, and send the examples of the profile through the model and back, so what a schema newly requires or no longer knows fails there.
+3. Change the classes in `WWCP_DatexII/DataStructures`, for a difference between the profile and DATEX II the dialect in `DatexIIJSON`, and, where POI3 can tell it, the mapping in `WWCP_DatexII_Adapter/POI3`.
+4. Write down here what was compared last, in the [adapter README](WWCP_DatexII_Adapter/POI3/README.md#the-datex-ii-implementation-and-the-standard) how the implementation compares now, and in [DataModel.md](DataModel.md) what changed between the classes.
+
 
 ## Known DatexII Specification Issues
 
