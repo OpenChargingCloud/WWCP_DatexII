@@ -24,6 +24,8 @@ The tests validate against the XML schemas, the official DATEX II 3.7 JSON schem
 
 [DataModel.md](DataModel.md) shows as class diagrams how the classes of the data model belong together.
 
+[ProposedExtensions.md](ProposedExtensions.md) proposes what DATEX II 3.7 cannot tell yet, e.g. the public keys of the energy meter of a charging point.
+
 
 ## Where the data model comes from
 
