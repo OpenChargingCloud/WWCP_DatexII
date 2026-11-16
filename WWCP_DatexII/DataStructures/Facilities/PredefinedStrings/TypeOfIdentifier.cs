@@ -51,8 +51,8 @@ namespace cloud.charging.open.protocols.DatexII.v3.Facilities
     /// The type of an external identifier. DATEX II 3.7 knows only evseId, as an extended value; the Mobilithek profile adds the others.
     /// </summary>
     public readonly struct TypeOfIdentifier : IId,
-                                        IEquatable<TypeOfIdentifier>,
-                                        IComparable<TypeOfIdentifier>
+                                              IEquatable<TypeOfIdentifier>,
+                                              IComparable<TypeOfIdentifier>
     {
 
         #region Data

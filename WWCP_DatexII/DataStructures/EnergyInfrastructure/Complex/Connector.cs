@@ -41,15 +41,15 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
     /// <param name="MaximumCurrent">Maximum current.</param>
     /// <param name="ExternalIdentifier">External identifiers of the connector (DATEX II 3.7).</param>
     [XmlType("Connector", Namespace = "http://datex2.eu/schema/3/afirEnergyInfrastructure")]
-    public class Connector(ConnectorType          ConnectorType,
-                           Watt                   MaxPowerAtSocket,
-                           String?                OtherConnector           = null,
-                           IEnumerable<Country>?  CountryOfDomesticSocket  = null,
-                           ConnectorFormat?       ConnectorFormat          = null,
-                           Volt?                  Voltage                  = null,
-                           Ampere?                MaximumCurrent           = null,
-                           IEnumerable<Facilities.ExternalIdentifier>?  ExternalIdentifier  = null,
-                           XElement?              ConnectorExtension       = null)
+    public class Connector(ConnectorType                                ConnectorType,
+                           Watt                                         MaxPowerAtSocket,
+                           String?                                      OtherConnector            = null,
+                           IEnumerable<Country>?                        CountryOfDomesticSocket   = null,
+                           ConnectorFormat?                             ConnectorFormat           = null,
+                           Volt?                                        Voltage                   = null,
+                           Ampere?                                      MaximumCurrent            = null,
+                           IEnumerable<Facilities.ExternalIdentifier>?  ExternalIdentifier        = null,
+                           XElement?                                    ConnectorExtension        = null)
     {
 
         #region Properties
@@ -169,7 +169,6 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
         #endregion
 
-
         #region ToXML(XMLName = null)
 
         /// <summary>
@@ -211,6 +210,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
                );
 
         #endregion
+
 
     }
 

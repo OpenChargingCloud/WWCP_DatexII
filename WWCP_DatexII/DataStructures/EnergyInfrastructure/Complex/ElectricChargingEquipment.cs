@@ -41,7 +41,7 @@ namespace cloud.charging.open.protocols.DatexII.v3.EnergyInfrastructure
 
                                            MultilingualString?                   Name                                 = null,
                                            IEnumerable<MultilingualString>?      Alias                                = null,
-                                           IEnumerable<ExternalIdentifier>?       ExternalIdentifier                   = null,
+                                           IEnumerable<ExternalIdentifier>?      ExternalIdentifier                   = null,
                                            DateTimeOffset?                       LastUpdated                          = null,
                                            MultilingualString?                   Description                          = null,
                                            IEnumerable<Accessibility>?           Accessibility                        = null,
