@@ -116,6 +116,11 @@ namespace cloud.charging.open.protocols.DatexII.Tests.WebAPI
         /// With a status delta interval, the first change is published at once, and the changes until the interval is
         /// over are grouped into one delta, as they are then.
         /// </summary>
+        /// <remarks>
+        /// The interval is two seconds, as the two changes after the first delta must come before it is over: with
+        /// 600 ms, a slow runner took longer than that to set them, and "available" was published at once as a delta
+        /// of its own (the CSMSCLI nightly on windows-latest, 2026-11-18).
+        /// </remarks>
         [Test]
         public async Task StatusDeltasAreGroupedPerInterval()
         {
@@ -123,7 +128,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.WebAPI
             var history  = POI.RoamingNetworkHistory.Start(ANetwork());
             var deltas   = new List<EnergyInfrastructureStatusPublication>();
 
-            await using var publisher = new POI3ToDatexIIPublisher(history, Creator, Languages.de, StatusDeltaInterval: TimeSpan.FromMilliseconds(600));
+            await using var publisher = new POI3ToDatexIIPublisher(history, Creator, Languages.de, StatusDeltaInterval: TimeSpan.FromSeconds(2));
 
             publisher.OnStatusPublication += (sender, publication, isDelta) => { if (isDelta) lock (deltas) deltas.Add(publication); return Task.CompletedTask; };
 
@@ -138,7 +143,7 @@ namespace cloud.charging.open.protocols.DatexII.Tests.WebAPI
 
             Assert.That(await Eventually(() => { lock (deltas) return deltas.Count == 2; }), Is.True, "The grouped changes were not published.");
 
-            await Task.Delay(800);
+            await Task.Delay(TimeSpan.FromSeconds(2.5));
 
             lock (deltas)
             {
